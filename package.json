@@ -1,0 +1,33 @@
+{
+  "name": "bun-react-template",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.tsx",
+  "module": "src/index.tsx",
+  "scripts": {
+    "conan-dbg": "conan install . --output-folder=dbg --build=missing",
+    "conan-rel": "conan install . --output-folder=rel --build=missing",
+    "conan-rdbi": "conan install . --output-folder=rdbi --build=missing",
+    "cmake-dbg": "cmake -G Ninja -S . -B dbg -DCMAKE_TOOLCHAIN_FILE=\"conan/conan_toolchain.cmake\" -DCMAKE_BUILD_TYPE=Debug",
+    "cmake-rel": "cmake -G Ninja -S . -B rel -DCMAKE_TOOLCHAIN_FILE=\"conan/conan_toolchain.cmake\" -DCMAKE_BUILD_TYPE=Release",
+    "cmake-rdbi": "cmake -G Ninja -S . -B rdbi -DCMAKE_TOOLCHAIN_FILE=\"conan/conan_toolchain.cmake\" -DCMAKE_BUILD_TYPE=RelWithDebInfo",
+    "dev": "bun --hot src/index.tsx",
+    "build": "bun build ./src/index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
+    "start": "NODE_ENV=production bun src/index.tsx",
+    "format": "tools format bun",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@freik/workspace": "^0.6.5",
+    "@types/bun": "latest",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "husky": "^9.1.7",
+    "prettier": "^3.5.3"
+  }
+}
