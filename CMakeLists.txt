@@ -19,4 +19,4 @@ set(
 add_executable(cassette ${SOURCE_FILES})
 
 # Link the dependencies with our binary
-# target_link_libraries(cassette PUBLIC ...)
+target_link_libraries(cassette PUBLIC ${CROW_LIB})

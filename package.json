@@ -15,6 +15,7 @@
     "cmake-dbg": "cmake -S . -B dbg -DCMAKE_TOOLCHAIN_FILE=\"conan/conan_toolchain.cmake\" -DCMAKE_BUILD_TYPE=Debug",
     "cmake-rel": "cmake -S . -B rel -DCMAKE_TOOLCHAIN_FILE=\"conan/conan_toolchain.cmake\" -DCMAKE_BUILD_TYPE=Release",
     "cmake-rdbi": "cmake -S . -B rdbi -DCMAKE_TOOLCHAIN_FILE=\"conan/conan_toolchain.cmake\" -DCMAKE_BUILD_TYPE=RelWithDebInfo",
+    "bld": "cmake --build --preset conan-release",
     "dev": "bun --hot src/index.tsx",
     "build": "bun build ./src/index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
     "start": "NODE_ENV=production bun src/index.tsx",
