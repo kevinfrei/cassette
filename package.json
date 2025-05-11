@@ -31,6 +31,7 @@
     "@types/bun": "latest",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "clang-format": "^1.8.0",
     "husky": "^9.1.7",
     "prettier": "^3.5.3"
   }
