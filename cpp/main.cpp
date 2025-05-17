@@ -6,6 +6,8 @@
 
 #include <filesystem>
 #include <iostream>
+#include <random>
+#include <string>
 
 std::string ExtensionToMimeType(const std::string& extension) {
   if (extension == "txt") {
@@ -53,8 +55,20 @@ std::string LoadFileWithMimeType(const std::filesystem::path& path,
   return ret;
 }
 
+void OpenMac(const std::string& url) {
+  std::string target =
+      "/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome "
+      "--new-window --app=" +
+      url;
+  system(target.c_str());
+}
+
 int main(void) {
   crow::SimpleApp app;
+  std::random_device rd;
+  std::uniform_int_distribution<int> dist(0, 16383);
+  const int port = 49152 + dist(rd);
+  std::string url = "http://localhost:" + std::to_string(port) + "/index.html";
   // Define a route
   CROW_ROUTE(app, "/<path>")
   ([&](const crow::request& req, const std::string& path) {
@@ -85,17 +99,16 @@ int main(void) {
   //   res.end();
   //   return res;
   // });
-  std::cout << "http://localhost:18080/index.html" << std::endl;
+  std::cout << url << std::endl;
 #if defined(_WIN32)
-  system("start http://localhost:18080/index.html");
+  system(append("start ", url).c_str());
 #elif defined(__APPLE__)
-  system("open http://localhost:18080/index.html");
+  OpenMac(url); // system("open http://localhost:" << port << "/index.html");
 #elif defined(__linux__)
-  system("xdg-open http://localhost:18080/index.html");
+  system((std::string{"xdg-open "} + url)).c_str());
 #else
-  std::cout << "Please open http://localhost:18080/index.html in your browser."
-            << std::endl;
+  std::cout << "Please open " << url << " in your browser." << std::endl;
 #endif
-  app.port(18080).multithreaded().run();
+  app.port(port).multithreaded().run();
   return 0;
 }
