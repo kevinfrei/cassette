@@ -1,19 +1,18 @@
 {
-  "name": "bun-react-template",
+  "name": "freik-local-app",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
-  "main": "src/index.tsx",
-  "module": "src/index.tsx",
   "scripts": {
     "config": "cmake -B build -G \"Ninja Multi-Config\" -S . -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=cmake/conan_provider.cmake",
     "rbuild": "cmake --build build --config Release",
     "dbuild": "cmake --build build --config Debug",
-    "wdbld": "bun build ./src/index.html --outdir=build/Debug/www --sourcemap --target=browser --define:process.env.NODE_ENV='\"debug\"' --env='BUN_PUBLIC_*'",
-    "wrbld": "bun build ./src/index.html --outdir=build/Release/www --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
-    "start": "NODE_ENV=production bun src/index.tsx",
+    "wdbld": "bun build ./www/index.html --outdir=build/Debug/www --sourcemap --target=browser --define:process.env.NODE_ENV='\"debug\"' --env='BUN_PUBLIC_*'",
+    "wrbld": "bun build ./www/index.html --outdir=build/Release/www --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
     "format": "tools format bun",
-    "prepare": "husky"
+    "prepare": "husky",
+    "bld": "bun run scripts/build.ts",
+    "dbld": "bun run scripts/build.ts Debug",
+    "rbld": "bun run scripts/build.ts Release"
   },
   "dependencies": {
     "@fluentui/react-components": "^9.64.0",
