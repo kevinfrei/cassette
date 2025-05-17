@@ -8,11 +8,16 @@
 import { createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 import { App } from "./App";
+import { Provider } from "jotai";
+import { KeepAlive } from "./KeepAlive";
 
 const elem = document.getElementById("root")!;
 const app = (
   <StrictMode>
-    <App />
+    <Provider>
+      <App />
+      <KeepAlive />
+    </Provider>
   </StrictMode>
 );
 
@@ -24,3 +29,8 @@ if (import.meta.hot) {
   // The hot module reloading API is not available in production.
   createRoot(elem).render(app);
 }
+
+// This is the thing to tell the server to quit when the page is closed
+window.addEventListener("unload", () => {
+  fetch("/quit", { method: "GET" });
+});

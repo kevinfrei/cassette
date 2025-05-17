@@ -1,3 +1,4 @@
+#include <atomic>
 #if defined(_WIN32)
 #define _WIN32_WINNT 0xA00
 #endif
@@ -64,6 +65,11 @@ void OpenMac(const std::string& url) {
 }
 
 std::atomic_bool quit = false;
+std::atomic_int8_t quit_timer = 10;
+
+void keep_alive() {
+  quit_timer.store(10);
+}
 
 int main(void) {
   crow::SimpleApp app;
@@ -75,6 +81,7 @@ int main(void) {
   // Define a route
   CROW_ROUTE(app, "/www/<path>")
   ([&](const crow::request& req, const std::string& path) {
+    keep_alive();
     std::cout << "Path: " << path << std::endl;
     crow::response resp;
     std::filesystem::path p = std::filesystem::path{"www"};
@@ -93,6 +100,7 @@ int main(void) {
 
   CROW_ROUTE(app, "/api/<path>")
   ([&](const crow::request& req, const std::string& path) {
+    keep_alive();
     std::cout << "API Path: " << path << std::endl;
     crow::response resp;
     resp.code = 200;
@@ -100,7 +108,15 @@ int main(void) {
     resp.set_header("Content-Type", "text/json");
     return resp;
   });
-
+  CROW_ROUTE(app, "/keepalive")
+  ([]() {
+    keep_alive();
+    std::cout << "Keepalive" << std::endl;
+    crow::response resp;
+    resp.code = 200;
+    resp.body = "OK";
+    return resp;
+  });
   CROW_ROUTE(app, "/quit")
   ([&](const crow::request& req) {
     std::cout << "Quit" << std::endl;
@@ -121,7 +137,14 @@ int main(void) {
   auto _a = app.port(port).multithreaded().run_async();
   while (!quit.load()) {
     _a.wait_for(std::chrono::seconds(1));
-    std::cout << "Server is running on port " << port << std::endl;
+    if (quit_timer > 0) {
+      quit_timer--;
+      std::cout << "Quit timer decremented: " << quit_timer << std::endl;
+    } else {
+      std::cout << "Quitting..." << std::endl;
+      quit.store(true);
+    }
+    std::cout << "" << port << std::endl;
   }
   app.stop();
   return 0;
