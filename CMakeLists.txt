@@ -7,8 +7,11 @@ project(cassette)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
+# Gotta have at least 1 find_package for the conan provider to trigger properly
+# I wonder what I might be able to do to address this...
+find_package(Crow REQUIRED)
 # Find Conan2 generated libraries
-include(ConanLibImports.cmake)
+include(cmake/ConanLibImports.cmake)
 
 set(
     SOURCE_FILES

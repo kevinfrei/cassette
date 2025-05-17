@@ -5,3 +5,7 @@ ConanLibImports.cmake
 dbg
 rel
 rdbi
+.cache
+build-rel
+build-dbg
+CMakeUserPresets.json
