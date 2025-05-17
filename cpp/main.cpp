@@ -11,33 +11,37 @@
 #include "MediaInfo/MediaInfo.h"
 #include "crow.h"
 
+#include "window.h"
+
 std::string ExtensionToMimeType(const std::string& extension) {
-  if (extension == "txt") {
+  if (extension == ".txt") {
     return "text/plain";
-  } else if (extension == "css" || extension == "scss") {
+  } else if (extension == ".css" || extension == ".scss") {
     return "text/css";
-  } else if (extension == "html" || extension == "htm") {
+  } else if (extension == ".html" || extension == ".htm") {
     return "text/html";
-  } else if (extension == "js") {
+  } else if (extension == ".js") {
     return "text/javascript";
-  } else if (extension == "gif") {
+  } else if (extension == ".gif") {
     return "image/gif";
-  } else if (extension == "jpg") {
+  } else if (extension == ".jpg") {
     return "image/jpeg";
-  } else if (extension == "png") {
+  } else if (extension == ".png") {
     return "image/png";
-  } else if (extension == "svg") {
-    return "image/svg";
-  } else if (extension == "flac") {
+  } else if (extension == ".svg") {
+    return "image/svg+xml";
+  } else if (extension == ".flac") {
     return "audio/flac";
-  } else if (extension == "m4a") {
+  } else if (extension == ".m4a") {
     return "audio/m4a";
-  } else if (extension == "mp3") {
+  } else if (extension == ".mp3") {
     return "audio/mp3";
   }
+  std::cout << "unknown: " << extension << std::endl;
   return "text/html";
 }
 
+#if 0
 std::string LoadFileWithMimeType(const std::filesystem::path& path,
                                  std::string& mime_type) {
   std::ifstream input_file(path, std::ifstream::binary);
@@ -56,23 +60,7 @@ std::string LoadFileWithMimeType(const std::filesystem::path& path,
 
   return ret;
 }
-
-void open(const std::string& url) {
-  std::string prefix;
-#if defined(_WIN32)
-  prefix = "start ";
-#elif defined(__APPLE__)
-  prefix =
-      "/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome "
-      "--new-window --app=";
-#elif defined(__linux__)
-  prefix = "xdg-open ";
-#else
-  std::cout << "Please open " << url << " in your browser." << std::endl;
-  return;
 #endif
-  system((prefix + url).c_str());
-}
 
 std::atomic_bool quit = false;
 std::atomic_int8_t quit_timer = 10;
@@ -93,7 +81,7 @@ int main(void) {
   CROW_ROUTE(app, "/www/<path>")
   ([&](const crow::request& req, const std::string& path) {
     keep_alive();
-    std::cout << "Path: " << path << std::endl;
+    // std::cout << "Path: " << path << std::endl;
     crow::response resp;
     std::filesystem::path p = std::filesystem::path{"www"};
     if (path.empty()) {
@@ -102,6 +90,7 @@ int main(void) {
       p = p / path;
     }
     resp.set_static_file_info(p.generic_string());
+    resp.set_header("Content-type", ExtensionToMimeType(p.extension()));
     return resp;
   });
 
@@ -128,8 +117,7 @@ int main(void) {
     quit.store(true);
     return crow::response(200);
   });
-  std::cout << url << std::endl;
-
+  window::open(url);
   auto _a = app.port(port).multithreaded().run_async();
   while (!quit.load()) {
     _a.wait_for(std::chrono::seconds(1));

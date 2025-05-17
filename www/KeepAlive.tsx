@@ -1,7 +1,8 @@
 import React from 'react';
 import { useInterval } from './hooks';
+import { Post } from './io';
 
 export function KeepAlive(): React.JSX.Element {
-  useInterval(() => fetch('/keepalive', { method: 'GET' }), 5 * 1000);
+  useInterval(() => Post('keepalive'), 5 * 1000);
   return <></>;
 }
