@@ -6,6 +6,9 @@
   "main": "src/index.tsx",
   "module": "src/index.tsx",
   "scripts": {
+    "config": "cmake -B build -G \"Ninja Multi-Config\" -S . -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=cmake/conan_provider.cmake",
+    "rbuild": "cmake --build build --config Release",
+    "dbuild": "cmake --build build --config Debug",
     "config-rel": "cmake -B build-rel -G Ninja -S . -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=cmake/conan_provider.cmake -DCMAKE_BUILD_TYPE=Release",
     "build-rel": "cmake --build build-rel --config Release",
     "config-dbg": "cmake -B build-dbg -G Ninja -S . -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=cmake/conan_provider.cmake -DCMAKE_BUILD_TYPE=Debug",
@@ -20,14 +23,16 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "react": "^19",
-    "react-dom": "^19"
+    "@fluentui/react-components": "^9.64.0",
+    "jotai": "^2.12.4",
+    "react": "^18",
+    "react-dom": "^18"
   },
   "devDependencies": {
     "@freik/workspace": "^0.6.5",
     "@types/bun": "latest",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
     "clang-format": "^1.8.0",
     "husky": "^9.1.7",
     "prettier": "^3.5.3"

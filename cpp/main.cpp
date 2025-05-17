@@ -63,15 +63,19 @@ void OpenMac(const std::string& url) {
   system(target.c_str());
 }
 
+std::atomic_bool quit = false;
+
 int main(void) {
   crow::SimpleApp app;
   std::random_device rd;
   std::uniform_int_distribution<int> dist(0, 16383);
   const int port = 49152 + dist(rd);
-  std::string url = "http://localhost:" + std::to_string(port) + "/index.html";
+  std::string url =
+      "http://localhost:" + std::to_string(port) + "/www/index.html";
   // Define a route
-  CROW_ROUTE(app, "/<path>")
+  CROW_ROUTE(app, "/www/<path>")
   ([&](const crow::request& req, const std::string& path) {
+    std::cout << "Path: " << path << std::endl;
     crow::response resp;
     std::filesystem::path p = std::filesystem::path{"www"};
     if (path.empty()) {
@@ -79,27 +83,32 @@ int main(void) {
     } else {
       p = p / path;
     }
-    std::string mime_type = ExtensionToMimeType(p.extension().string());
+    // std::string mime_type = ExtensionToMimeType(p.extension().string());
     resp.set_static_file_info(p.generic_string());
     // resp = LoadFileWithMimeType(p / path, mime_type);
     // resp.set_header("Content-Type", mime_type);
     // resp.end();
     return resp;
   });
-  // CROW_ROUTE(app, "/")([] {
-  //   crow::response res("<html>"
-  //     "<head><title>Simple Crow App</title></head>"
-  //     "<body>"
-  //     "<h1>Hello, Crow!</h1>"
-  //     "<a href='app/index.html'>The App</a>"
-  //     "</body>"
-  //     "</html>"
-  //   );
-  //   // res.set_header("Content-Type", "text/html");
-  //   res.end();
-  //   return res;
-  // });
+
+  CROW_ROUTE(app, "/api/<path>")
+  ([&](const crow::request& req, const std::string& path) {
+    std::cout << "API Path: " << path << std::endl;
+    crow::response resp;
+    resp.code = 200;
+    resp.body = "{\"path\":\"" + path + "\"}";
+    resp.set_header("Content-Type", "text/json");
+    return resp;
+  });
+
+  CROW_ROUTE(app, "/quit")
+  ([&](const crow::request& req) {
+    std::cout << "Quit" << std::endl;
+    quit.store(true);
+    return crow::response(200);
+  });
   std::cout << url << std::endl;
+
 #if defined(_WIN32)
   system(append("start ", url).c_str());
 #elif defined(__APPLE__)
@@ -109,6 +118,11 @@ int main(void) {
 #else
   std::cout << "Please open " << url << " in your browser." << std::endl;
 #endif
-  app.port(port).multithreaded().run();
+  auto _a = app.port(port).multithreaded().run_async();
+  while (!quit.load()) {
+    _a.wait_for(std::chrono::seconds(1));
+    std::cout << "Server is running on port " << port << std::endl;
+  }
+  app.stop();
   return 0;
 }

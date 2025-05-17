@@ -9,3 +9,4 @@ rdbi
 build-rel
 build-dbg
 CMakeUserPresets.json
+build

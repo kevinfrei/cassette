@@ -28,6 +28,7 @@ libraries = [
     Library("libjpeg", "9e"),
     Library("libpng", "1.6.40", CMakeInfo("PNG", "PNG::PNG")),
     Library("libtiff", "4.6.0", CMakeInfo("TIFF", "TIFF::TIFF")),
+    Library("libmediainfo", "22.03", CMakeInfo("MediaInfoLib", "MediaInfoLib::MediaInfoLib")),
     Library("zlib", "1.3.1", CMakeInfo("ZLIB", "ZLIB::ZLIB")),
 ]
 
