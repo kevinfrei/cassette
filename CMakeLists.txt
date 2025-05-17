@@ -22,4 +22,4 @@ set(
 add_executable(cassette ${SOURCE_FILES})
 
 # Link the dependencies with our binary
-target_link_libraries(cassette PUBLIC ${CROW_LIB})
+target_link_libraries(cassette PUBLIC ${CROW_LIB} ${MEDIAINFO_LIB})

@@ -17,7 +17,7 @@ find_package(TIFF REQUIRED)
 set(TIFF_LIB TIFF::TIFF)
 
 find_package(MediaInfoLib REQUIRED)
-set(MEDIAINFO_LIB mediainfolib)
+set(MEDIAINFO_LIB mediainfo)
 
 find_package(ZLIB REQUIRED)
 set(ZLIB_LIB ZLIB::ZLIB)

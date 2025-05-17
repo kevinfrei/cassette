@@ -1,14 +1,15 @@
 #include <atomic>
-#if defined(_WIN32)
-#define _WIN32_WINNT 0xA00
-#endif
-
-#include "crow.h"
-
 #include <filesystem>
 #include <iostream>
 #include <random>
 #include <string>
+
+#if defined(_WIN32)
+#define _WIN32_WINNT 0xA00
+#endif
+
+#include "MediaInfo/MediaInfo.h"
+#include "crow.h"
 
 std::string ExtensionToMimeType(const std::string& extension) {
   if (extension == "txt") {
@@ -56,12 +57,21 @@ std::string LoadFileWithMimeType(const std::filesystem::path& path,
   return ret;
 }
 
-void OpenMac(const std::string& url) {
-  std::string target =
+void open(const std::string& url) {
+  std::string prefix;
+#if defined(_WIN32)
+  prefix = "start ";
+#elif defined(__APPLE__)
+  prefix =
       "/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome "
-      "--new-window --app=" +
-      url;
-  system(target.c_str());
+      "--new-window --app=";
+#elif defined(__linux__)
+  prefix = "xdg-open ";
+#else
+  std::cout << "Please open " << url << " in your browser." << std::endl;
+  return;
+#endif
+  system((prefix + url).c_str());
 }
 
 std::atomic_bool quit = false;
@@ -78,7 +88,8 @@ int main(void) {
   const int port = 49152 + dist(rd);
   std::string url =
       "http://localhost:" + std::to_string(port) + "/www/index.html";
-  // Define a route
+
+  // Define the routes:
   CROW_ROUTE(app, "/www/<path>")
   ([&](const crow::request& req, const std::string& path) {
     keep_alive();
@@ -90,11 +101,7 @@ int main(void) {
     } else {
       p = p / path;
     }
-    // std::string mime_type = ExtensionToMimeType(p.extension().string());
     resp.set_static_file_info(p.generic_string());
-    // resp = LoadFileWithMimeType(p / path, mime_type);
-    // resp.set_header("Content-Type", mime_type);
-    // resp.end();
     return resp;
   });
 
@@ -111,7 +118,6 @@ int main(void) {
   CROW_ROUTE(app, "/keepalive")
   ([]() {
     keep_alive();
-    std::cout << "Keepalive" << std::endl;
     crow::response resp;
     resp.code = 200;
     resp.body = "OK";
@@ -119,32 +125,19 @@ int main(void) {
   });
   CROW_ROUTE(app, "/quit")
   ([&](const crow::request& req) {
-    std::cout << "Quit" << std::endl;
     quit.store(true);
     return crow::response(200);
   });
   std::cout << url << std::endl;
 
-#if defined(_WIN32)
-  system(append("start ", url).c_str());
-#elif defined(__APPLE__)
-  OpenMac(url); // system("open http://localhost:" << port << "/index.html");
-#elif defined(__linux__)
-  system((std::string{"xdg-open "} + url)).c_str());
-#else
-  std::cout << "Please open " << url << " in your browser." << std::endl;
-#endif
   auto _a = app.port(port).multithreaded().run_async();
   while (!quit.load()) {
     _a.wait_for(std::chrono::seconds(1));
     if (quit_timer > 0) {
       quit_timer--;
-      std::cout << "Quit timer decremented: " << quit_timer << std::endl;
     } else {
-      std::cout << "Quitting..." << std::endl;
       quit.store(true);
     }
-    std::cout << "" << port << std::endl;
   }
   app.stop();
   return 0;

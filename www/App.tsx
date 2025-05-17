@@ -1,10 +1,10 @@
-import "./index.css";
-import { APITester } from "./APITester";
+import './index.css';
+import { APITester } from './APITester';
 
-import logo from "./logo.svg";
-import reactLogo from "./react.svg";
+import logo from './logo.svg';
+import reactLogo from './react.svg';
 
-export function App() {
+export function App(): React.JSX.Element {
   return (
     <div className="app">
       <div className="logo-container">
