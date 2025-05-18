@@ -1,27 +1,10 @@
 import { WebBuild } from './webbuild';
 import { CppBuild } from './cppbuild';
 
-import type { BuildType } from './types';
+import { GetBuildType, BuildType } from './buildtype';
 
 // Logically:
 // bun wdbld && bun dbuild && ( cd build/Debug && ./cassette )
-const args = process.argv.slice(2);
-let arg = args[0] || 'Debug';
-let buildType: BuildType;
-switch (arg.toLowerCase()) {
-  case 'debug':
-    buildType = 'Debug';
-    break;
-  case 'release':
-    buildType = 'Release';
-    break;
-  case 'relwithdebinfo':
-    buildType = 'RelWithDebInfo';
-    break;
-  default:
-    console.error(`Unknown build type: ${arg}`);
-    process.exit(1);
-}
 
 async function parallelBuild(buildType: BuildType): Promise<void> {
   const res = await Promise.all([WebBuild(buildType), CppBuild(buildType)]);
@@ -44,7 +27,7 @@ async function parallelBuild(buildType: BuildType): Promise<void> {
 
 console.log(process.argv);
 
-parallelBuild(buildType)
+parallelBuild(GetBuildType())
   .then(() => {})
   .catch((err) => {
     console.error(err);

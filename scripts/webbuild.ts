@@ -1,6 +1,6 @@
 import { BuildOutput } from 'bun';
 
-import type { BuildType } from './types';
+import { GetBuildType, BuildType } from './buildtype';
 
 export function WebBuild(buildType: BuildType): Promise<BuildOutput> {
   return Bun.build({
@@ -15,4 +15,13 @@ export function WebBuild(buildType: BuildType): Promise<BuildOutput> {
     },
     env: 'BUN_PUBLIC_*',
   });
+}
+
+if (import.meta.main) {
+  WebBuild(GetBuildType())
+    .then(() => {})
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
 }
