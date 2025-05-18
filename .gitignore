@@ -2,3 +2,5 @@
 .cache
 CMakeUserPresets.json
 build
+.vs
+

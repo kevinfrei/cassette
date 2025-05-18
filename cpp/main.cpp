@@ -90,7 +90,8 @@ int main(void) {
       p = p / path;
     }
     resp.set_static_file_info(p.generic_string());
-    resp.set_header("Content-type", ExtensionToMimeType(p.extension()));
+    resp.set_header("Content-type",
+                    ExtensionToMimeType(p.extension().generic_string()));
     return resp;
   });
 
