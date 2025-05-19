@@ -106,13 +106,15 @@ int main(void) {
     return resp;
   });
   CROW_ROUTE(app, "/keepalive")
-  ([]() {
-    keep_alive();
-    crow::response resp;
-    resp.code = 200;
-    resp.body = "OK";
-    return resp;
-  });
+      .methods(crow::HTTPMethod::GET,
+               crow::HTTPMethod::POST,
+               crow::HTTPMethod::PUT)([]() {
+        keep_alive();
+        crow::response resp;
+        resp.code = 200;
+        resp.body = "OK";
+        return resp;
+      });
   CROW_ROUTE(app, "/quit")
   ([&](const crow::request& req) {
     quit.store(true);
