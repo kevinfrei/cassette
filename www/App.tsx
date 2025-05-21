@@ -14,6 +14,7 @@ export function App(): React.JSX.Element {
       <h1>Bun + React</h1>
       <p>
         Edit <code>src/App.tsx</code> and save to test HMR
+        <audio autoPlay={true} src="/tune/file.m4a" controls={true} />
       </p>
       <APITester />
     </div>

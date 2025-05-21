@@ -8,8 +8,9 @@
 #define _WIN32_WINNT 0xA00
 #endif
 
-#include "MediaInfo/MediaInfo.h"
-#include "crow.h"
+// #include "MediaInfo/MediaInfo.h"
+
+#include <crow/app.h>
 
 #include "window.h"
 
@@ -69,42 +70,64 @@ void keep_alive() {
   quit_timer.store(10);
 }
 
-int main(void) {
-  crow::SimpleApp app;
+int GetRandomPort() {
   std::random_device rd;
   std::uniform_int_distribution<int> dist(0, 16383);
-  const int port = 49152 + dist(rd);
-  std::string url =
-      "http://localhost:" + std::to_string(port) + "/www/index.html";
+  return 49152 + dist(rd);
+}
+
+std::string GetRootUrl(int port) {
+  return "http://localhost:" + std::to_string(port) + "/www/index.html";
+}
+
+crow::response handle_file_path(const crow::request& req,
+                                const std::string& path) {
+  keep_alive();
+
+  // std::cout << "Path: " << path << std::endl;
+  crow::response resp;
+  std::filesystem::path p = std::filesystem::path{"www"};
+  p = p / (path.empty() ? "index.html" : path);
+  resp.set_static_file_info(p.generic_string());
+  resp.set_header("Content-type",
+                  ExtensionToMimeType(p.extension().generic_string()));
+  return resp;
+}
+
+crow::response handle_tune(const crow::request& req, const std::string& path) {
+  keep_alive();
+  crow::response resp;
+  std::filesystem::path p = std::filesystem::path{"/home/freik"};
+  p = p / path;
+  std::cout << "Tune: " << path << " to file " << p.generic_string()
+            << std::endl;
+  resp.set_static_file_info(p.generic_string());
+  resp.set_header("Content-type",
+                  ExtensionToMimeType(p.extension().generic_string()));
+  return resp;
+}
+
+crow::response handle_api(const crow::request& req, const std::string& path) {
+  keep_alive();
+
+  // std::cout << "API Path: " << path << std::endl;
+  crow::response resp;
+  resp.code = 200;
+  resp.body = "{\"path\":\"" + path + "\"}";
+  resp.set_header("Content-Type", "text/json");
+  return resp;
+}
+
+int main(void) {
+  crow::SimpleApp app;
+
+  const int port = GetRandomPort();
+  std::string url = GetRootUrl(port);
 
   // Define the routes:
-  CROW_ROUTE(app, "/www/<path>")
-  ([&](const crow::request& req, const std::string& path) {
-    keep_alive();
-    // std::cout << "Path: " << path << std::endl;
-    crow::response resp;
-    std::filesystem::path p = std::filesystem::path{"www"};
-    if (path.empty()) {
-      p = p / "index.html";
-    } else {
-      p = p / path;
-    }
-    resp.set_static_file_info(p.generic_string());
-    resp.set_header("Content-type",
-                    ExtensionToMimeType(p.extension().generic_string()));
-    return resp;
-  });
-
-  CROW_ROUTE(app, "/api/<path>")
-  ([&](const crow::request& req, const std::string& path) {
-    keep_alive();
-    std::cout << "API Path: " << path << std::endl;
-    crow::response resp;
-    resp.code = 200;
-    resp.body = "{\"path\":\"" + path + "\"}";
-    resp.set_header("Content-Type", "text/json");
-    return resp;
-  });
+  CROW_ROUTE(app, "/www/<path>")(handle_file_path);
+  CROW_ROUTE(app, "/api/<path>")(handle_api);
+  CROW_ROUTE(app, "/tune/<path>")(handle_tune);
   CROW_ROUTE(app, "/keepalive")
       .methods(crow::HTTPMethod::GET,
                crow::HTTPMethod::POST,
@@ -117,17 +140,18 @@ int main(void) {
       });
   CROW_ROUTE(app, "/quit")
   ([&](const crow::request& req) {
-    quit.store(true);
+    quit = true;
     return crow::response(200);
   });
+
   window::open(url);
   auto _a = app.port(port).multithreaded().run_async();
-  while (!quit.load()) {
+  while (!quit) {
     _a.wait_for(std::chrono::seconds(1));
     if (quit_timer > 0) {
       quit_timer--;
     } else {
-      quit.store(true);
+      quit = true;
     }
   }
   app.stop();
