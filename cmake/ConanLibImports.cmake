@@ -16,9 +16,12 @@ set(PNG_LIB PNG::PNG)
 find_package(TIFF REQUIRED)
 set(TIFF_LIB TIFF::TIFF)
 
+find_package(ZLIB REQUIRED)
+set(ZLIB_LIB ZLIB::ZLIB)
+
 find_package(MediaInfoLib REQUIRED)
 set(MEDIAINFO_LIB mediainfo)
 
-find_package(ZLIB REQUIRED)
-set(ZLIB_LIB ZLIB::ZLIB)
+find_package(taglib REQUIRED)
+set(TAGLIB_LIB taglib::taglib)
 

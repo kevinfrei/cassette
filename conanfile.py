@@ -22,14 +22,16 @@ class Library(NamedTuple):
 
 
 libraries = [
-    Library("boost", "1.83.0", CMakeInfo("Boost", "boost::boost")),
-    Library("crowcpp-crow", "1.0+3", CMakeInfo("Crow", "Crow::Crow")),
-    Library("gtest", "1.12.1", CMakeInfo("GTest", "gtest::gtest")),   
+    Library("boost", "1.87.0", CMakeInfo("Boost", "boost::boost")),
+    Library("crowcpp-crow", "1.2.0", CMakeInfo("Crow", "Crow::Crow")),
+    Library("gtest", "1.16.0", CMakeInfo("GTest", "gtest::gtest")),   
     Library("libjpeg", "9e"),
-    Library("libpng", "1.6.40", CMakeInfo("PNG", "PNG::PNG")),
-    Library("libtiff", "4.6.0", CMakeInfo("TIFF", "TIFF::TIFF")),
-    Library("libmediainfo", "22.03", CMakeInfo("MediaInfoLib", "mediainfo", "MEDIAINFO_LIB")),
+    Library("libpng", "1.6.48", CMakeInfo("PNG", "PNG::PNG")),
+    Library("libtiff", "4.7.0", CMakeInfo("TIFF", "TIFF::TIFF")),
     Library("zlib", "1.3.1", CMakeInfo("ZLIB", "ZLIB::ZLIB")),
+    # Probably only need one of these two:
+    Library("libmediainfo", "22.03", CMakeInfo("MediaInfoLib", "mediainfo", "MEDIAINFO_LIB")),
+    Library("taglib", "2.0", CMakeInfo("taglib", "taglib::taglib")),
 ]
 
 class CassetteRecipe(ConanFile):
