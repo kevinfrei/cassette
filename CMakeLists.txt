@@ -13,16 +13,5 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # Find Conan2 generated libraries
 include(cmake/ConanLibImports.cmake)
 
-set(
-    SOURCE_FILES
-    cpp/main.cpp
-    cpp/window.cpp
-)
-
-# Compile main.cpp
-add_executable(cassette ${SOURCE_FILES})
-
-target_include_directories(cassette PUBLIC include)
-
-# Link the dependencies with our binary
-target_link_libraries(cassette PUBLIC ${CROW_LIB} ${MEDIAINFO_LIB})
+add_subdirectory(cpp)
+add_subdirectory(test)
