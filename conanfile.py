@@ -41,14 +41,30 @@ class CassetteRecipe(ConanFile):
     def init(self):
         # emit the find_package calls in the ConanLibImports.cmake file,
         # along with the variables for later use in the CMakeLists
+        imports = [
+          '# Generated file: DO NOT EDIT or COMMIT!\n',
+          '# Add your library to the conanfile.py libraries list\n','\n']
+        for library in libraries:
+            if library.info:
+              imports.append(f'find_package({library.info.package} REQUIRED)\n')
+              var_name = library.info.var if library.info.var else f'{library.info.package.upper()}_LIB'
+              imports.append(f'set({var_name} {library.info.target})\n')
+              imports.append('\n')
+        file_location = os.path.join(self.recipe_folder, "cmake/ConanLibImports.cmake")
+        if os.path.exists(file_location):
+            # Check to see if the file is the same as what we're about to write, so we don't
+            # unnecessarily trigger a camke reconfig
+            with open(file_location, "r", newline='\n') as f:
+                existing = f.readlines()
+            if len(imports) == len(existing):
+                for i in range(len(imports)):
+                    if imports[i] != existing[i]:
+                        break
+                else:
+                    # File is the same, so don't write it out
+                    return
         with open(os.path.join(self.recipe_folder, "cmake/ConanLibImports.cmake"), "w", newline='\n') as f:
-            f.write('# Generated file: DO NOT EDIT or COMMIT!\n')
-            f.write('# Add your library to the conanfile.py libraries list\n\n')
-            for library in libraries:
-                if library.info:
-                  f.write(f'find_package({library.info.package} REQUIRED)\n')
-                  var_name = library.info.var if library.info.var else f'{library.info.package.upper()}_LIB'
-                  f.write(f'set({var_name} {library.info.target})\n\n')
+            f.writelines(imports)
                 
     def requirements(self):
         for requirement in libraries:

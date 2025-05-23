@@ -3,7 +3,7 @@ import { $ } from 'bun';
 import { GetBuildType, BuildType } from './buildtype';
 
 export function CppBuild(buildType: BuildType): $.ShellPromise {
-  return $`cmake --build build --config ${buildType}`;
+  return $`cmake --build build/${buildType}`;
 }
 
 if (import.meta.main) {
