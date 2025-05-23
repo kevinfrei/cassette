@@ -2,14 +2,11 @@
 #include <random>
 #include <string>
 
-#if defined(_WIN32)
-#define _WIN32_WINNT 0xA00
-#endif
+#include <crow/app.h>
 
 // #include "MediaInfo/MediaInfo.h"
 
-#include <crow/app.h>
-
+#include "files.h"
 #include "handlers.h"
 #include "quitting.h"
 #include "window.h"
@@ -27,6 +24,8 @@ std::string GetRootUrl(int port) {
 int main(void) {
   crow::SimpleApp app;
 
+  SetProgramLocation();
+
   const int port = GetRandomPort();
   std::string url = GetRootUrl(port);
 
@@ -37,28 +36,14 @@ int main(void) {
   CROW_ROUTE(app, "/keepalive")
       .methods(crow::HTTPMethod::GET,
                crow::HTTPMethod::POST,
-               crow::HTTPMethod::PUT)([]() {
-        keep_alive();
-        crow::response resp;
-        resp.code = 200;
-        resp.body = "OK";
-        return resp;
-      });
-  CROW_ROUTE(app, "/quit")
-  ([&](const crow::request& req) {
-    quit = true;
-    return crow::response(200);
-  });
+               crow::HTTPMethod::PUT)(handle_keepalive);
+  CROW_ROUTE(app, "/quit")(handle_quit);
 
   window::open(url);
   auto _a = app.port(port).multithreaded().run_async();
-  while (!quit) {
+  while (!should_quit()) {
     _a.wait_for(std::chrono::seconds(1));
-    if (quit_timer > 0) {
-      quit_timer--;
-    } else {
-      quit = true;
-    }
+    loop_wait();
   }
   app.stop();
   return 0;

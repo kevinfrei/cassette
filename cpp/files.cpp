@@ -1,6 +1,19 @@
+#include <filesystem>
 #include <iostream>
 
+#include <boost/dll/runtime_symbol_info.hpp>
+
 #include "files.h"
+
+std::filesystem::path program_location;
+
+void SetProgramLocation() {
+  program_location = boost::dll::program_location().string();
+}
+
+std::filesystem::path GetAppDir() {
+  return program_location.parent_path();
+}
 
 std::string FilePathToMimeType(const std::filesystem::path& filePath) {
   const std::string extension = filePath.extension().generic_string();

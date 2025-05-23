@@ -11,7 +11,7 @@ crow::response handle_file_path(const crow::request& req,
 
   // std::cout << "Path: " << path << std::endl;
   crow::response resp;
-  std::filesystem::path p = std::filesystem::path{"www"};
+  std::filesystem::path p = GetAppDir() / "www";
   p = p / (path.empty() ? "index.html" : path);
   resp.set_static_file_info(p.generic_string());
   resp.set_header("Content-type", FilePathToMimeType(p));
@@ -39,4 +39,17 @@ crow::response handle_api(const crow::request& req, const std::string& path) {
   resp.body = "{\"path\":\"" + path + "\"}";
   resp.set_header("Content-Type", "text/json");
   return resp;
+}
+
+crow::response handle_keepalive() {
+  keep_alive();
+  crow::response resp;
+  resp.code = 200;
+  resp.body = "OK";
+  return resp;
+}
+
+crow::response handle_quit() {
+  quit = true;
+  return crow::response(200);
 }
