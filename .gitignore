@@ -1,7 +1,10 @@
 /node_modules
 .cache
 CMakeUserPresets.json
-build
+build/Debug
+build/Release
+build/RelWithDebInfo
 .vs
 
 Testing
+out

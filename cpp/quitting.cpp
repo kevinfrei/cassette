@@ -2,7 +2,12 @@
 
 std::atomic_bool quit = false;
 std::atomic_int8_t quit_timer = 10;
-bool really_quit = !_DEBUG;
+
+#if defined(_DEBUG)
+bool really_quit = false;
+#else
+bool really_quit = false;
+#endif
 
 void keep_alive() {
   quit_timer.store(10);

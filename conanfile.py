@@ -36,10 +36,10 @@ libraries = [
 
 class CassetteRecipe(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
-    generators = "CMakeDeps", "CMakeToolchain"
+    generators = "CMakeDeps" #, "CMakeToolchain"
 
     def init(self):
-        # emit the find_package calls in the conanbuildinfo.cmake,
+        # emit the find_package calls in the ConanLibImports.cmake file,
         # along with the variables for later use in the CMakeLists
         with open(os.path.join(self.recipe_folder, "cmake/ConanLibImports.cmake"), "w", newline='\n') as f:
             f.write('# Generated file: DO NOT EDIT or COMMIT!\n')
