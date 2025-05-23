@@ -11,8 +11,9 @@ void SetProgramLocation() {
   program_location = boost::dll::program_location().string();
 }
 
-std::filesystem::path GetAppDir() {
-  return program_location.parent_path();
+std::filesystem::path GetWebDir() {
+  std::filesystem::path cur = program_location.parent_path();
+  return cur;
 }
 
 std::string FilePathToMimeType(const std::filesystem::path& filePath) {

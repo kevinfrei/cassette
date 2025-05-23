@@ -11,8 +11,7 @@ crow::response handle_file_path(const crow::request& req,
 
   // std::cout << "Path: " << path << std::endl;
   crow::response resp;
-  std::filesystem::path p = GetAppDir() / "www";
-  p = p / (path.empty() ? "index.html" : path);
+  std::filesystem::path p = GetWebDir() / (path.empty() ? "index.html" : path);
   resp.set_static_file_info(p.generic_string());
   resp.set_header("Content-type", FilePathToMimeType(p));
   return resp;
