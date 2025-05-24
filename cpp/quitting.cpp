@@ -1,5 +1,7 @@
 #include "quitting.h"
 
+namespace quitting {
+
 std::atomic_bool quit = false;
 std::atomic_int8_t quit_timer = 10;
 
@@ -29,3 +31,5 @@ void loop_wait() {
     quit = true;
   }
 }
+
+} // namespace quitting

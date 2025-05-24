@@ -24,7 +24,7 @@ std::string GetRootUrl(int port) {
 int main(void) {
   crow::SimpleApp app;
 
-  SetProgramLocation();
+  files::SetProgramLocation();
 
   const int port = GetRandomPort();
   std::string url = GetRootUrl(port);
@@ -41,9 +41,9 @@ int main(void) {
 
   window::open(url);
   auto _a = app.port(port).multithreaded().run_async();
-  while (!should_quit()) {
+  while (!quitting::should_quit()) {
     _a.wait_for(std::chrono::seconds(1));
-    loop_wait();
+    quitting::loop_wait();
   }
   app.stop();
   return 0;

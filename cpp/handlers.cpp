@@ -8,7 +8,7 @@
 namespace handlers {
 
 crow::response file_path(const crow::request& req, const std::string& path) {
-  keep_alive();
+  quitting::keep_alive();
 
   // std::cout << "Path: " << path << std::endl;
   crow::response resp;
@@ -20,19 +20,19 @@ crow::response file_path(const crow::request& req, const std::string& path) {
 }
 
 crow::response tune(const crow::request& req, const std::string& path) {
-  keep_alive();
+  quitting::keep_alive();
   crow::response resp;
   std::filesystem::path p = std::filesystem::path{"/home/freik"};
   p = p / path;
   std::cout << "Tune: " << path << " to file " << p.generic_string()
             << std::endl;
   resp.set_static_file_info(p.generic_string());
-  resp.set_header("Content-type", FilePathToMimeType(p));
+  resp.set_header("Content-type", files::PathToMimeType(p));
   return resp;
 }
 
 crow::response api(const crow::request& req, const std::string& path) {
-  keep_alive();
+  quitting::keep_alive();
 
   // std::cout << "API Path: " << path << std::endl;
   crow::response resp;
@@ -43,7 +43,7 @@ crow::response api(const crow::request& req, const std::string& path) {
 }
 
 crow::response keepalive() {
-  keep_alive();
+  quitting::keep_alive();
   crow::response resp;
   resp.code = 200;
   resp.body = "OK";
@@ -51,7 +51,7 @@ crow::response keepalive() {
 }
 
 crow::response quit() {
-  really_quit();
+  quitting::really_quit();
   return crow::response(200);
 }
 
