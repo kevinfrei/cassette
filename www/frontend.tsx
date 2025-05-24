@@ -19,11 +19,7 @@ const elem = document.getElementById('root')!;
 const app = (
   <StrictMode>
     <Provider>
-      <MantineProvider
-        defaultColorScheme="dark"
-        withCssVariables={true}
-        withGlobalClasses={true}
-      >
+      <MantineProvider defaultColorScheme="light">
         <App />
         <KeepAlive />
       </MantineProvider>
