@@ -49,6 +49,6 @@ crow::response handle_keepalive() {
 }
 
 crow::response handle_quit() {
-  quit = true;
+  really_quit();
   return crow::response(200);
 }

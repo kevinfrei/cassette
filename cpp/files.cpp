@@ -12,8 +12,8 @@ void SetProgramLocation() {
 }
 
 std::filesystem::path GetWebDir() {
-  std::filesystem::path cur = program_location.parent_path();
-  return cur;
+  std::filesystem::path cur = program_location.parent_path().parent_path();
+  return cur / "www";
 }
 
 std::string FilePathToMimeType(const std::filesystem::path& filePath) {

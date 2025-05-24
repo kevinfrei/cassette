@@ -4,9 +4,9 @@ std::atomic_bool quit = false;
 std::atomic_int8_t quit_timer = 10;
 
 #if defined(_DEBUG)
-bool really_quit = false;
+bool debug_quit = false;
 #else
-bool really_quit = false;
+bool debug_quit = true;
 #endif
 
 void keep_alive() {
@@ -14,7 +14,12 @@ void keep_alive() {
 }
 
 bool should_quit() {
-  return quit && really_quit;
+  return quit && debug_quit;
+}
+
+void really_quit() {
+  quit = true;
+  debug_quit = true;
 }
 
 void loop_wait() {
