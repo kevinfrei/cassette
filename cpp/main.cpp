@@ -30,14 +30,14 @@ int main(void) {
   std::string url = GetRootUrl(port);
 
   // Define the routes:
-  CROW_ROUTE(app, "/www/<path>")(handle_file_path);
-  CROW_ROUTE(app, "/api/<path>")(handle_api);
-  CROW_ROUTE(app, "/tune/<path>")(handle_tune);
+  CROW_ROUTE(app, "/www/<path>")(handlers::file_path);
+  CROW_ROUTE(app, "/api/<path>")(handlers::api);
+  CROW_ROUTE(app, "/tune/<path>")(handlers::tune);
   CROW_ROUTE(app, "/keepalive")
       .methods(crow::HTTPMethod::GET,
                crow::HTTPMethod::POST,
-               crow::HTTPMethod::PUT)(handle_keepalive);
-  CROW_ROUTE(app, "/quit")(handle_quit);
+               crow::HTTPMethod::PUT)(handlers::keepalive);
+  CROW_ROUTE(app, "/quit")(handlers::quit);
 
   window::open(url);
   auto _a = app.port(port).multithreaded().run_async();

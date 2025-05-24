@@ -5,6 +5,8 @@
 
 #include "files.h"
 
+namespace files {
+
 std::filesystem::path program_location;
 
 void SetProgramLocation() {
@@ -16,7 +18,7 @@ std::filesystem::path GetWebDir() {
   return cur / "www";
 }
 
-std::string FilePathToMimeType(const std::filesystem::path& filePath) {
+std::string PathToMimeType(const std::filesystem::path& filePath) {
   const std::string extension = filePath.extension().generic_string();
   if (extension == ".txt") {
     return "text/plain";
@@ -65,3 +67,5 @@ std::string LoadFileWithMimeType(const std::filesystem::path& path,
   return ret;
 }
 #endif
+
+} // namespace files

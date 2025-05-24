@@ -5,19 +5,21 @@
 #include "handlers.h"
 #include "quitting.h"
 
-crow::response handle_file_path(const crow::request& req,
-                                const std::string& path) {
+namespace handlers {
+
+crow::response file_path(const crow::request& req, const std::string& path) {
   keep_alive();
 
   // std::cout << "Path: " << path << std::endl;
   crow::response resp;
-  std::filesystem::path p = GetWebDir() / (path.empty() ? "index.html" : path);
+  std::filesystem::path p =
+      files::GetWebDir() / (path.empty() ? "index.html" : path);
   resp.set_static_file_info_unsafe(p.generic_string());
-  resp.set_header("Content-type", FilePathToMimeType(p));
+  resp.set_header("Content-type", files::PathToMimeType(p));
   return resp;
 }
 
-crow::response handle_tune(const crow::request& req, const std::string& path) {
+crow::response tune(const crow::request& req, const std::string& path) {
   keep_alive();
   crow::response resp;
   std::filesystem::path p = std::filesystem::path{"/home/freik"};
@@ -29,7 +31,7 @@ crow::response handle_tune(const crow::request& req, const std::string& path) {
   return resp;
 }
 
-crow::response handle_api(const crow::request& req, const std::string& path) {
+crow::response api(const crow::request& req, const std::string& path) {
   keep_alive();
 
   // std::cout << "API Path: " << path << std::endl;
@@ -40,7 +42,7 @@ crow::response handle_api(const crow::request& req, const std::string& path) {
   return resp;
 }
 
-crow::response handle_keepalive() {
+crow::response keepalive() {
   keep_alive();
   crow::response resp;
   resp.code = 200;
@@ -48,7 +50,9 @@ crow::response handle_keepalive() {
   return resp;
 }
 
-crow::response handle_quit() {
+crow::response quit() {
   really_quit();
   return crow::response(200);
 }
+
+} // namespace handlers
