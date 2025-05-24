@@ -11,13 +11,22 @@ import { App } from './App';
 import { Provider } from 'jotai';
 import { KeepAlive } from './KeepAlive';
 
+import '@mantine/core/styles.css';
+import { MantineProvider } from '@mantine/core';
+
 const elem = document.getElementById('root')!;
 
 const app = (
   <StrictMode>
     <Provider>
-      <App />
-      <KeepAlive />
+      <MantineProvider
+        defaultColorScheme="dark"
+        withCssVariables={true}
+        withGlobalClasses={true}
+      >
+        <App />
+        <KeepAlive />
+      </MantineProvider>
     </Provider>
   </StrictMode>
 );

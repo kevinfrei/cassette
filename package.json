@@ -12,8 +12,8 @@
     "dwww": "bun run scripts/webbuild.ts Debug",
     "rwww": "bun run scripts/webbuild.ts Release",
     "dbld": "bun run scripts/parbld.ts Debug",
-    "rbld": "bun run scripts/parbld.ts Release",
     "dtst": "bun run dcpp && cd build/Debug/test && ctest -C Debug",
+    "rbld": "bun run scripts/parbld.ts Release",
     "rtst": "bun run rcpp && cd build/Release/test && ctest -C Release",
     "drun": "./build/Debug/cpp/cassette",
     "rrun": "./build/Release/cpp/cassette",
@@ -23,6 +23,8 @@
   "dependencies": {
     "@fluentui/react-components": "^9.64.0",
     "@freik/typechk": "^0.6.7",
+    "@mantine/core": "^8.0.1",
+    "@mantine/hooks": "^8.0.1",
     "jotai": "^2.12.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
@@ -34,6 +36,9 @@
     "@types/react-dom": "^18.3.7",
     "clang-format": "^1.8.0",
     "husky": "^9.1.7",
+    "postcss": "^8.5.3",
+    "postcss-preset-mantine": "^1.17.0",
+    "postcss-simple-vars": "^7.0.1",
     "prettier": "^3.5.3"
   }
 }
