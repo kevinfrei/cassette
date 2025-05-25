@@ -1,3 +1,5 @@
+import { typecheck } from '@freik/typechk';
+
 export function Post(name: string): void {
   fetch('/' + name, { method: 'PUT' }).catch(console.error);
 }
@@ -19,7 +21,7 @@ export async function Get(
 }
 
 export async function GetAs<T>(
-  validator: (obj: unknown) => obj is T,
+  validator: typecheck<T>,
   endpoint: string,
   ...args: string[]
 ): Promise<T | undefined> {
