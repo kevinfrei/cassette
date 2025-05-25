@@ -7,6 +7,8 @@
         "@fluentui/react": "^8.122.19",
         "@fluentui/react-components": "^9.64.0",
         "@fluentui/react-icons-mdl2": "^1.3.87",
+        "@freik/fluentui-tools": "^1.0.6",
+        "@freik/react-tools": "^0.1.15",
         "@freik/typechk": "^0.6.7",
         "@freik/web-utils": "^0.5.2",
         "jotai": "^2.12.5",
@@ -255,6 +257,12 @@
     "@fluentui/tokens": ["@fluentui/tokens@1.0.0-alpha.21", "", { "dependencies": { "@swc/helpers": "^0.5.1" } }, "sha512-xQ1T56sNgDFGl+kJdIwhz67mHng8vcwO7Dvx5Uja4t+NRULQBgMcJ4reUo4FGF3TjufHj08pP0/OnKQgnOaSVg=="],
 
     "@fluentui/utilities": ["@fluentui/utilities@8.15.22", "", { "dependencies": { "@fluentui/dom-utilities": "^2.3.10", "@fluentui/merge-styles": "^8.6.14", "@fluentui/react-window-provider": "^2.2.30", "@fluentui/set-version": "^8.2.24", "tslib": "^2.1.0" }, "peerDependencies": { "@types/react": ">=16.8.0 <19.0.0", "react": ">=16.8.0 <19.0.0" } }, "sha512-ZhDO+6dVLjf2BbHizCA2bnVFLPmOSpemsTMtEY/Nr5fhot5+xeoZVBJrr10X6wN0fTdfMketj/+rnkh5hWXljg=="],
+
+    "@freik/fluentui-tools": ["@freik/fluentui-tools@1.0.6", "", { "dependencies": { "@freik/logger": "0.2.18", "@freik/react-tools": "0.1.15", "@freik/typechk": "0.6.7" }, "peerDependencies": { "@fluentui/react": ">=8.50.0", "@fluentui/react-components": ">=9.21.0", "@fluentui/react-hooks": ">=8.1.0", "react": ">=17.0.0", "react-dom": ">=17.0.0" } }, "sha512-+B6Ux3E1bjB9Fa/vn7nF9cO/oPXRVcMHU/b9HHM72sXMJXVdE6kscBPgcJ4eQvtZSo7E0Wqyi1oyzsvb10s2ww=="],
+
+    "@freik/logger": ["@freik/logger@0.2.18", "", { "dependencies": { "debug": "^4.4.0" } }, "sha512-3ocrwD/4tOqmcFJfJHCXyRP0wVd3riajP5Rj7H7cI8ZMKwjdQpAsW3X/wt8HhVgqByl49YRwtynIlsEp8ZeSpA=="],
+
+    "@freik/react-tools": ["@freik/react-tools@0.1.15", "", { "dependencies": { "@freik/logger": "0.2.18", "@freik/typechk": "0.6.7" }, "peerDependencies": { "react": ">=17.0.0", "react-dom": ">=17.0.0" } }, "sha512-baSviwUG6EYEWlRwOp22n+p5QO5ta72IkYqbxowadynV8lI7pjPVDl2cG5keCiPmD0ASFeGyJOQ00n/NuAbvPw=="],
 
     "@freik/typechk": ["@freik/typechk@0.6.7", "", {}, "sha512-I1tEX04W83AIoWLm7P/lVsFL4nz8EQaMPE8p9AEKGB/TLSDpMB93sAEFukciaDKHLWnkrd6Ob0gMdVBfAJwOPw=="],
 
