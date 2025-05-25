@@ -1,0 +1,101 @@
+@media (min-width: 500px) {
+  #sidebar {
+    margin: 0px 3px;
+    overflow-y: hidden;
+    padding: 4px;
+    grid-row: 2 / 4;
+    grid-column: 1;
+  }
+  .sidebar-container {
+    display: grid;
+    grid-template-columns: 26px auto;
+  }
+  .sidebar-container:hover {
+    filter: invert(38%) sepia(34%) saturate(2292%) hue-rotate(183deg)
+      brightness(95%) contrast(94%);
+    cursor: pointer;
+  }
+  .sidebar-icon {
+    grid-column: 1;
+    height: 18px;
+    width: 18px;
+    margin-top: 6px;
+    margin-left: 4px;
+  }
+  .sidebar-text {
+    grid-column: 2;
+    align-self: center;
+    margin: 4px;
+  }
+  #other-grabber {
+    -webkit-app-region: drag;
+    display: grid;
+    align-content: center;
+    justify-content: center;
+    margin-top: -10px;
+  }
+  #grab-icon {
+    grid-row: 1;
+    grid-column: 1;
+  }
+}
+@media (max-width: 499px) {
+  #sidebar {
+    visibility: collapse;
+    display: none;
+  }
+}
+
+::placeholder {
+  color: rgba(0, 0, 0, 0.2);
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0.25),
+    rgba(0, 0, 0, 0)
+  );
+}
+
+#Settings {
+  background: url('../img/settings.svg');
+  background-size: cover;
+}
+
+#Now-Playing {
+  background: url('../img/playing.svg');
+  background-size: cover;
+}
+
+#Albums {
+  background: url('../img/album.svg');
+  background-size: cover;
+}
+
+#Artists {
+  background: url('../img/artist.svg');
+  background-size: cover;
+}
+
+#All-Songs {
+  background: url('../img/song.svg');
+  background-size: cover;
+}
+
+#Playlists {
+  background: url('../img/playlist.svg');
+  background-size: cover;
+}
+
+#Tools {
+  background: url('../img/tools.svg');
+  background-size: cover;
+}
+
+.sidebar-selected {
+  font-weight: 600;
+}

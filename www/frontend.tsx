@@ -7,7 +7,7 @@
 
 import { createRoot } from 'react-dom/client';
 import { StrictMode } from 'react';
-import { App } from './App';
+import { App } from './UI/App';
 import { Provider } from 'jotai';
 import { KeepAlive } from './KeepAlive';
 import { RealTimeUpdates } from './Tools/ReactWebSocket';
