@@ -10,9 +10,6 @@ if(MSVC)
     set(CMAKE_CXX_FLAGS "/EHsc /D_WIN32_WINNT=0x0A00 /DWINVER=0x0A00")
 endif(MSVC)
 
-# find_package triggers conan...
-# find_package(Boost REQUIRED)
-
 # Find Conan2 generated libraries
 include(cmake/ConanLibImports.cmake)
 
