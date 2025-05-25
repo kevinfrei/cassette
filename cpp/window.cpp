@@ -5,8 +5,9 @@ namespace window {
 void open(const std::string& url) {
   std::string cmdln;
 #if defined(_WIN32)
-  // c:\\Program Files\\Google\\Chrome\\Application\\chrome.exe
-  cmdln = "start ";
+  cmdln =
+      "\"c:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" "
+      "--new-window --app=";
 #elif defined(__APPLE__)
   cmdln =
       "/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome "
