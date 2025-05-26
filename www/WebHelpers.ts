@@ -1,4 +1,16 @@
 import { typecheck } from '@freik/typechk';
+import { Keys, KeysEnum } from './Constants';
+
+const HostOs: 'mac' | 'windows' | 'linux' = (() => {
+  const ua = window.navigator.userAgent;
+  if (ua.indexOf('Mac') >= 0) {
+    return 'mac';
+  }
+  if (ua.indexOf('Windows') >= 0) {
+    return 'windows';
+  }
+  return 'linux';
+})();
 
 export function Post(name: string): void {
   fetch('/' + name, { method: 'PUT' }).catch(console.error);
@@ -49,4 +61,18 @@ export async function GetAs<T>(
 ): Promise<T | undefined> {
   const res = await Get(endpoint, ...args);
   return validator(res) ? res : undefined;
+}
+
+const accPrefix = HostOs === 'mac' ? '⌘' : 'Ctrl';
+
+export function GetHelperText(key: KeysEnum) {
+  if (key.length === 1) {
+    return `${accPrefix}-${key}`;
+  }
+  if (key === Keys.PreviousTrack) {
+    return accPrefix + '-←';
+  }
+  if (key === Keys.NextTrack) {
+    return accPrefix + '-→';
+  }
 }
