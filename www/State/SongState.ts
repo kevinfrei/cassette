@@ -1,5 +1,5 @@
-import { Atom, atom } from "jotai";
-import { atomFamily } from "jotai/utils";
+import { Atom, atom } from 'jotai';
+import { atomFamily } from 'jotai/utils';
 
 export type AlbumDescription = {
   artist: string;
@@ -16,7 +16,6 @@ export type SongDescription = {
   track: number;
 } & AlbumDescription;
 
-
 const defSongDescr: SongDescription = {
   title: `title`,
   track: 1,
@@ -26,6 +25,9 @@ const defSongDescr: SongDescription = {
 };
 
 export const curSongKeyState = atom<string>('');
-export const songDescriptionForSongState = atomFamily(
-  (songKey: string) => atom<SongDescription>(defSongDescr));
+export const songDescriptionForSongState = atomFamily((songKey: string) =>
+  atom<SongDescription>(defSongDescr),
 );
+
+// Are we displaying the play order?
+export const playOrderDisplayingState = atom<boolean>(false);
