@@ -1,5 +1,5 @@
 import { FontIcon, SearchBox, Text } from '@fluentui/react';
-import { hasStrField, isObjectNonNull } from '@freik/typechk';
+import { hasStrField, isObjectNonNull, isString } from '@freik/typechk';
 import { useAtom } from 'jotai';
 import { useCallback } from 'react';
 
@@ -8,6 +8,7 @@ import {
   CurrentViewEnum,
   Keys,
   KeysEnum,
+  st,
   StrId,
   StrIdEnum,
 } from 'www/Constants';
@@ -89,7 +90,7 @@ export function isSearchBox(target: EventTarget | null): boolean {
 export function Sidebar(): JSX.Element {
   const [curView, setCurView] = useAtom(curViewState);
   const onSearch = useCallback(
-    (view: CurrentViewEnum) => {
+    (newValue?: string) => {
       setCurView(CurrentView.search);
     },
     [setCurView],
@@ -107,7 +108,7 @@ export function Sidebar(): JSX.Element {
         placeholder="Search"
         onSearch={onSearch}
         onFocus={onFocus}
-        onChange={(e, nv) => nv && onSearch(nv)}
+        onChange={(e, newValue?: string) => onSearch(newValue)}
         componentRef={(ref) => SetSearch(ref)}
         title={GetHelperText(Keys.Find)}
       />

@@ -40,7 +40,7 @@ export function onClickPlayPause(
 }
 */
 
-export function onClickPlayPause() {
+export function onClickPlayPause(ref: ForwardedRef<HTMLAudioElement>): void {
   // TODO: Implement this function
 }
 
@@ -79,7 +79,7 @@ export function PlaybackControls({
 
   const clickShuffle = useCallback(() => setShuf(!shuf), [shuf]);
   const clickRepeat = useCallback(() => setRep(NextRepeat(rep)), [rep]);
-  const clickPlayPause = useCallback(() => onClickPlayPause(), []);
+  const clickPlayPause = useCallback(() => onClickPlayPause(audioRef), []);
 
   const clickPrev = useCallback(() => {
     if (hasPrevSong) {
