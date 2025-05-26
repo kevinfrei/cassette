@@ -47,6 +47,7 @@ crow::response keepalive() {
   crow::response resp;
   resp.code = 200;
   resp.body = "OK";
+  resp.set_header("Content-Type", "text/plain");
   return resp;
 }
 

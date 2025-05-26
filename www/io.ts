@@ -4,6 +4,26 @@ export function Post(name: string): void {
   fetch('/' + name, { method: 'PUT' }).catch(console.error);
 }
 
+export async function RawGet(
+  endpoint: string,
+  ...args: string[]
+): Promise<string | undefined> {
+  try {
+    const response = await fetch(endpoint, {
+      method: 'GET',
+    });
+    if (response.ok) {
+      return await response.text();
+    }
+  } catch (err) {
+    console.error(
+      `Failed to fetch ${endpoint} with args: ${args.join(', ')}`,
+      err,
+    );
+    throw err;
+  }
+}
+
 export async function Get(
   endpoint: string,
   ...args: string[]
