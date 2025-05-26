@@ -10,6 +10,7 @@ import { StrictMode } from 'react';
 import { App } from './UI/App';
 import { Provider } from 'jotai';
 import { KeepAlive } from './KeepAlive';
+import { FluentInitIcons } from './FluentInit';
 
 const elem = document.getElementById('root')!;
 
@@ -27,6 +28,7 @@ if (import.meta.hot) {
   const root = (import.meta.hot.data.root ??= createRoot(elem));
   root.render(app);
 } else {
+  FluentInitIcons();
   // The hot module reloading API is not available in production.
   createRoot(elem).render(app);
 }

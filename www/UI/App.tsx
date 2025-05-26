@@ -5,6 +5,7 @@ import '../styles/App.css';
 import { PlaybackControls } from './PlaybackControls';
 import { useRef } from 'react';
 import { SongPlaying } from './SongPlaying';
+import { VolumeControl } from './VolumeControl';
 
 export function App(): JSX.Element {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -14,9 +15,7 @@ export function App(): JSX.Element {
       <span id="top-row" />
       <PlaybackControls audioRef={audioRef} />
       <SongPlaying ref={audioRef} />
-      <div className="Spinner">
-        <div className="VolumeControl">Volume Control</div>
-      </div>
+      <VolumeControl />
       <div className="Spinner">
         <div className="Sidebar">Sidebar</div>
       </div>
