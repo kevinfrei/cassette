@@ -1,0 +1,134 @@
+/* "Normal" view */
+
+@media (min-width: 500px) {
+  #control-container {
+    grid-row: 1;
+    grid-column: 2;
+    margin: 4px;
+    padding-left: 10px;
+    justify-self: center;
+    display: inline-grid;
+    grid-template-columns: 14px 24px 28px 24px 14px;
+    grid-template-rows: 36px;
+  }
+  #play-pause {
+    width: 24px;
+    height: 24px;
+    grid-column: 3;
+    align-self: center;
+    justify-self: center;
+  }
+  #next,
+  #prev {
+    width: 20px;
+    height: 20px;
+    float: left;
+    background: url('../img/prev.svg');
+    background-size: cover;
+    align-self: center;
+    justify-self: center;
+  }
+  #repeat,
+  #shuffle {
+    width: 10px;
+    height: 10px;
+    align-self: center;
+    justify-self: center;
+  }
+}
+
+/* Compact view */
+
+@media (max-width: 499px) {
+  #control-container {
+    grid-row: 2;
+    grid-column: 2;
+    justify-self: start;
+    align-self: end;
+    display: inline-grid;
+    grid-template-columns: 10px 14px 17px 14px 10px;
+    grid-template-rows: 16px;
+    z-index: 10;
+    margin-left: 3px;
+    margin-bottom: -2px;
+  }
+  #play-pause {
+    width: 16px;
+    height: 16px;
+    grid-column: 3;
+    align-self: center;
+    justify-self: center;
+    z-index: 12;
+  }
+  #next,
+  #prev {
+    width: 13px;
+    height: 13px;
+    float: left;
+    background: url('../img/prev.svg');
+    background-size: cover;
+    align-self: center;
+    justify-self: center;
+    z-index: 12;
+  }
+  #repeat,
+  #shuffle {
+    width: 7px;
+    height: 7px;
+    align-self: center;
+    justify-self: center;
+    z-index: 12;
+  }
+}
+#repeat:hover,
+#shuffle:hover,
+#next:hover,
+#prev:hover,
+#play-pause:hover {
+  filter: invert(38%) sepia(34%) saturate(2292%) hue-rotate(183deg)
+    brightness(95%) contrast(94%);
+  cursor: pointer;
+}
+#play-pause.paused {
+  background: url('../img/play.svg');
+  background-size: cover;
+}
+
+#play-pause.playing {
+  background: url('../img/pause.svg');
+  background-size: cover;
+}
+
+#prev {
+  grid-column: 2;
+}
+
+#next {
+  grid-column: 4;
+  transform: scaleX(-1);
+}
+
+#shuffle {
+  grid-column: 1;
+  background: url('../img/shuffle.svg');
+  background-size: contain;
+}
+
+#repeat {
+  grid-column: 5;
+  background: url('../img/repeat.svg');
+  background-size: contain;
+}
+
+.disabled {
+  filter: opacity(25%);
+}
+#play-pause.disabled:hover,
+#prev.disabled:hover,
+#next.disabled:hover {
+  filter: opacity(25%);
+  cursor: default;
+}
+.enabled {
+  filter: opacity(100%);
+}

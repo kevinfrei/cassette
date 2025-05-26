@@ -1,5 +1,6 @@
-import { typecheck } from '@freik/typechk';
+import { hasFieldType, isObjectNonNull, typecheck } from '@freik/typechk';
 import { Keys, KeysEnum } from './Constants';
+import { ForwardedRef, MutableRefObject } from 'react';
 
 const HostOs: 'mac' | 'windows' | 'linux' = (() => {
   const ua = window.navigator.userAgent;
@@ -75,4 +76,10 @@ export function GetHelperText(key: KeysEnum) {
   if (key === Keys.NextTrack) {
     return accPrefix + '-→';
   }
+}
+
+export function isMutableRefObject<T>(
+  ref: ForwardedRef<T>,
+): ref is MutableRefObject<T> {
+  return isObjectNonNull(ref) && hasFieldType(ref, 'current', isObjectNonNull);
 }
