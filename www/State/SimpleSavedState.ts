@@ -2,7 +2,7 @@ import { atom } from 'jotai';
 import { CurrentView, CurrentViewEnum } from 'www/Constants';
 
 export const mutedState = atom<boolean>(false);
-export const volumeState = atom<number>(50); // Volume as a percentage (0-100)
+export const volumeState = atom<number>(0.5); // Volume as a percentage (0-100)
 
 export type RepeatType = 'off' | 'one' | 'all';
 
