@@ -76,6 +76,7 @@ export function GetHelperText(key: KeysEnum) {
   if (key === Keys.NextTrack) {
     return accPrefix + '-→';
   }
+  return `${accPrefix}-${key}`;
 }
 
 export function isMutableRefObject<T>(
