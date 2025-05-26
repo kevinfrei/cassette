@@ -1,34 +1,34 @@
-import { SpinnerSize } from '@fluentui/react';
-import { Spinner } from '@freik/fluentui-tools';
+import { Spinner, SpinnerSize } from '@fluentui/react';
+// import { Spinner } from '@freik/fluentui-tools';
 
-import './styles/App.css';
+import '../styles/App.css';
 
 export function App(): JSX.Element {
   // const audioRef = useRef<HTMLAudioElement>(null);
   return (
-    <>
+    <div id="app">
       <span id="left-column" />
       <span id="top-row" />
-      <Spinner>
+      <div className="Spinner">
         <div className="PlaybackControls" id="audioRef=[audioRef]">
           Playback Controls
         </div>
-      </Spinner>
-      <Spinner>
+      </div>
+      <div className="Spinner">
         <div className="ErrorBoundary">
           <div id="SongPlaying ref={audioRef}">Song Playing</div>
         </div>
-      </Spinner>
-      <Spinner>
+      </div>
+      <div className="Spinner">
         <div className="VolumeControl">Volume Control</div>
-      </Spinner>
-      <Spinner>
+      </div>
+      <div className="Spinner">
         <div className="Sidebar">Sidebar</div>
-      </Spinner>
-      <Spinner size={SpinnerSize.large}>
+      </div>
+      <div className="Spinner">
         <div className="ViewSelector">View Selector</div>
-      </Spinner>
+      </div>
       <div className="SongDetailPanel">Song Detail Panel</div>
-    </>
+    </div>
   );
 }

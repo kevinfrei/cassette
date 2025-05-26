@@ -1,6 +1,8 @@
 import { FontIcon, SearchBox, Text } from '@fluentui/react';
 import { hasStrField, isObjectNonNull } from '@freik/typechk';
 import { useAtom } from 'jotai';
+import { useCallback } from 'react';
+
 import {
   CurrentView,
   CurrentViewEnum,
@@ -9,9 +11,9 @@ import {
   StrId,
   StrIdEnum,
 } from 'www/Constants';
-// import { GetHelperText } from './MenuHelpers';
-// import { SetSearch } from '../MyWindow';
-// import { Notifier } from './Notifier';
+import { curViewState } from 'www/State/SimpleSavedState';
+import { GetHelperText } from 'www/WebHelpers';
+import { SetSearch } from 'www/Globals';
 
 import '../styles/Sidebar.css';
 
@@ -45,7 +47,7 @@ const views: (ViewEntry | null)[] = [
 
 function getEntry(
   curView: CurrentViewEnum,
-  setCurView: (newView: CurrentViewEnum) => Promise<void>,
+  setCurView: (newView: CurrentViewEnum) => void /*Promise<void>, */,
   view: ViewEntry | null,
   index: number,
 ) {
@@ -85,7 +87,13 @@ export function isSearchBox(target: EventTarget | null): boolean {
 }
 
 export function Sidebar(): JSX.Element {
-  const [curView, setCurView] = useAtom(curViewFunc);
+  const [curView, setCurView] = useAtom(curViewState);
+  const onSearch = useCallback(
+    (view: CurrentViewEnum) => {
+      setCurView(CurrentView.search);
+    },
+    [setCurView],
+  );
   /* const onSearch = useRecoilCallback(({ set }) => (newValue: string) => {
     void setCurView(CurrentView.search);
     set(searchTermState, newValue);
@@ -106,7 +114,6 @@ export function Sidebar(): JSX.Element {
       <div style={{ height: 8 }} />
       {views.map((ve, index) => getEntry(curView, setCurView, ve, index))}
       <br />
-      <Notifier />
     </div>
   );
 }
