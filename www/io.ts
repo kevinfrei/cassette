@@ -22,6 +22,7 @@ export async function RawGet(
     );
     throw err;
   }
+  return undefined;
 }
 
 export async function Get(
@@ -38,6 +39,7 @@ export async function Get(
   } catch (err) {
     return err;
   }
+  return { error: `Failed to fetch ${endpoint} with args: ${args.join(', ')}` };
 }
 
 export async function GetAs<T>(

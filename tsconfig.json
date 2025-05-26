@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
+    "target": "ES2022",
+    "module": "ES2022",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "allowJs": true,
@@ -9,9 +9,13 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "noEmit": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "noImplicitReturns": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true
   },
+  "include": ["www/**/*.ts", "www/**/*.tsx"],
   "exclude": ["dist", "node_modules"]
 }

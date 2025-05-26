@@ -18,7 +18,9 @@
     "drun": "./build/Debug/cpp/cassette",
     "rrun": "./build/Release/cpp/cassette",
     "dbr": "bun run dbld && bun run drun",
-    "rbr": "bun run rbld && bun run rrun"
+    "rbr": "bun run rbld && bun run rrun",
+    "typecheck": "tsc --noEmit",
+    "typechk": "tsc --noEmit"
   },
   "dependencies": {
     "@fluentui/react-components": "^9.64.0",
@@ -34,6 +36,7 @@
     "@types/react-dom": "^18.3.7",
     "clang-format": "^1.8.0",
     "husky": "^9.1.7",
-    "prettier": "^3.5.3"
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
   }
 }
