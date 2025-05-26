@@ -9,16 +9,21 @@ import { RawGet } from './WebHelpers';
 // If the server does not respond with 'OK', it will close the window after a short delay.
 // This is useful for preventing the server from shutting down due to inactivity
 // and for ensuring that the client is still connected to the server, and will close the window if the server is not responding.
+
+function closeWindow() {
+  // TODO: Turn this off for Debug builds...
+  window.close();
+}
 export function KeepAlive(): React.JSX.Element {
   useInterval(() => {
     RawGet('/keepalive')
       .then((res) => {
         if (!isString(res) || res !== 'OK') {
-          setTimeout(window.close, 100);
+          closeWindow();
         }
       })
       .catch((err) => {
-        setTimeout(window.close, 100);
+        closeWindow();
       });
   }, 5 * 1000);
   return <></>;
