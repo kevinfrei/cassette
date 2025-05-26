@@ -4,6 +4,7 @@ import { Spinner, SpinnerSize } from '@fluentui/react';
 import '../styles/App.css';
 import { PlaybackControls } from './PlaybackControls';
 import { useRef } from 'react';
+import { SongPlaying } from './SongPlaying';
 
 export function App(): JSX.Element {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -12,11 +13,7 @@ export function App(): JSX.Element {
       <span id="left-column" />
       <span id="top-row" />
       <PlaybackControls audioRef={audioRef} />
-      <div className="Spinner">
-        <div className="ErrorBoundary">
-          <div id="SongPlaying ref={audioRef}">Song Playing</div>
-        </div>
-      </div>
+      <SongPlaying ref={audioRef} />
       <div className="Spinner">
         <div className="VolumeControl">Volume Control</div>
       </div>
