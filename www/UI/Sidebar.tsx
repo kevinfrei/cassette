@@ -1,22 +1,22 @@
 import { FontIcon, SearchBox, Text } from '@fluentui/react';
-import { hasStrField, isObjectNonNull, isString } from '@freik/typechk';
+import { hasStrField, isObjectNonNull } from '@freik/typechk';
 import { useAtom } from 'jotai';
-import { useCallback } from 'react';
 
 import {
   CurrentView,
   CurrentViewEnum,
   Keys,
   KeysEnum,
-  st,
   StrId,
   StrIdEnum,
+  st,
 } from 'www/Constants';
-import { curViewState } from 'www/State/SimpleSavedState';
-import { GetHelperText } from 'www/WebHelpers';
 import { SetSearch } from 'www/Globals';
+import { GetHelperText } from 'www/WebHelpers';
 
 import '../styles/Sidebar.css';
+import { curViewState, searchTermState } from 'www/State/SimpleSavedState';
+import { useCallback } from 'react';
 
 type ViewEntry = {
   name: CurrentViewEnum;
@@ -48,7 +48,7 @@ const views: (ViewEntry | null)[] = [
 
 function getEntry(
   curView: CurrentViewEnum,
-  setCurView: (newView: CurrentViewEnum) => void /*Promise<void>, */,
+  setCurView: (newView: CurrentViewEnum) => Promise<void> | void,
   view: ViewEntry | null,
   index: number,
 ) {
@@ -61,7 +61,7 @@ function getEntry(
       key={index}
       className={`sidebar-container${extra}`}
       onClick={() => void setCurView(view.name)}
-      title="title" /* {GetHelperText(view.accelerator)} */
+      title={GetHelperText(view.accelerator)}
     >
       <span className="sidebar-icon" id={st(view.title).replace(/ /g, '-')}>
         &nbsp;
@@ -89,32 +89,27 @@ export function isSearchBox(target: EventTarget | null): boolean {
 
 export function Sidebar(): JSX.Element {
   const [curView, setCurView] = useAtom(curViewState);
+  const [searchTerm, setSearchTerm] = useAtom(searchTermState);
   const onSearch = useCallback(
-    (newValue?: string) => {
-      setCurView(CurrentView.search);
+    (newValue: string) => {
+      void setCurView(CurrentView.search);
+      setSearchTerm(newValue);
     },
-    [setCurView],
+    [setSearchTerm],
   );
-  /* const onSearch = useRecoilCallback(({ set }) => (newValue: string) => {
-    void setCurView(CurrentView.search);
-    set(searchTermState, newValue);
-  });
-  */
   const onFocus = () => void setCurView(CurrentView.search);
   return (
     <div id="sidebar">
-      <br />
       <SearchBox
         placeholder="Search"
         onSearch={onSearch}
         onFocus={onFocus}
-        onChange={(e, newValue?: string) => onSearch(newValue)}
+        onChange={(e, nv) => nv && onSearch(nv)}
         componentRef={(ref) => SetSearch(ref)}
         title={GetHelperText(Keys.Find)}
       />
       <div style={{ height: 8 }} />
       {views.map((ve, index) => getEntry(curView, setCurView, ve, index))}
-      <br />
     </div>
   );
 }

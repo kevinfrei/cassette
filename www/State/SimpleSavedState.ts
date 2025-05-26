@@ -20,3 +20,5 @@ export function NextRepeat(current: RepeatType): RepeatType {
       return 'off'; // Fallback to 'off' if something goes wrong
   }
 }
+
+export const searchTermState = atom<string>('');
