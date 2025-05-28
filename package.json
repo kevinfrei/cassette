@@ -5,10 +5,8 @@
   "scripts": {
     "prepare": "husky",
     "format": "tools format bun",
-    "dcfg": "cmake -B build/Debug -G Ninja -S . \"-DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=cmake/conan_provider.cmake\" -DCMAKE_BUILD_TYPE=Debug",
-    "rcfg": "cmake -B build/Release -G Ninja -S . \"-DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=cmake/conan_provider.cmake\" -DCMAKE_BUILD_TYPE=Release",
-    "ddef": "cmake -B build/Debug -S . \"-DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=cmake/conan_provider.cmake\" -DCMAKE_BUILD_TYPE=Debug",
-    "rdef": "cmake -B build/Release -S . \"-DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=cmake/conan_provider.cmake\" -DCMAKE_BUILD_TYPE=Release",
+    "dcfg": "cmake --preset debug",
+    "rcfg": "cmake --preset release",
     "dcpp": "cmake --build build/Debug",
     "rcpp": "cmake --build build/Release",
     "dwww": "bun run scripts/webbuild.ts Debug",
