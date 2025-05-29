@@ -1,5 +1,9 @@
 import { hasField } from '@freik/typechk';
 
+import * as SharedModule from '../www/SharedConstants';
+import type { SharedConstants } from '../www/SharedConstants';
+
+/*
 // A script to generate C++ code from the SharedConstants.ts file
 type SharedConstants<T> = {
   description: string;
@@ -7,6 +11,7 @@ type SharedConstants<T> = {
   type: [string, string];
   values: Record<string, T>;
 };
+*/
 
 async function generateCppConstants<T>(tc: SharedConstants<T>) {
   // file shared_constants.hpp
@@ -66,3 +71,13 @@ async function generateCppConstants<T>(tc: SharedConstants<T>) {
     }
   }
 }
+
+function main() {
+  const constants = Object.values(SharedModule);
+  console.log(SharedModule);
+  for (const constant of constants) {
+    console.log(constant);
+  }
+}
+
+main();

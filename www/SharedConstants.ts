@@ -1,9 +1,31 @@
+import {
+  chk2TupleOf,
+  hasFieldType,
+  is2TupleOf,
+  isBoolean,
+  isObjectNonNull,
+  isString,
+  typecheck,
+} from '@freik/typechk';
+
 export type SharedConstants<T> = {
   description: string;
   typechecker: boolean;
   type: [string, string];
   values: Record<string, T>;
 };
+
+export function isSharedConstants<T>(
+  val: unknown,
+  typechecker: typecheck<T>,
+): val is SharedConstants<T> {
+  return (
+    hasFieldType(val, 'description', isString) &&
+    hasFieldType(val, 'typechecker', isBoolean) &&
+    hasFieldType(val, 'type', chk2TupleOf(isString, isString)) &&
+    hasFieldType(val, 'values', isObjectNonNull)
+  );
+}
 
 export const CurrentView_source: SharedConstants<number> = {
   description: 'The current view selected by the user in the UI.',

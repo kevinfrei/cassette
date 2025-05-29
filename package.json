@@ -20,7 +20,8 @@
     "dbr": "bun run dbld && bun run drun",
     "rbr": "bun run rbld && bun run rrun",
     "typecheck": "tsc --noEmit",
-    "typechk": "tsc --noEmit"
+    "typechk": "tsc --noEmit",
+    "gen": "bun run scripts/gencpp.ts"
   },
   "dependencies": {
     "@fluentui/react": "^8.122.19",
