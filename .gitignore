@@ -8,3 +8,4 @@ build/RelWithDebInfo
 
 Testing
 out
+include/SharedConstants.hpp
