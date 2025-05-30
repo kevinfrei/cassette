@@ -83,6 +83,9 @@ async function emitCode(
   items: [string, SharedConstants<unknown>][],
 ): Promise<void> {
   const file = Bun.file(fileName);
+  if (await file.exists()) {
+    await file.delete();
+  }
   const writer = file.writer();
   await emitPreamble(writer);
   for (const [name, item] of items) {
