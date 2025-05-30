@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { CurrentView, CurrentViewEnum } from 'www/Constants';
+import { CurrentView, CurrentViewEnum, IgnoreItem } from 'www/Constants';
 
 export const mutedState = atom<boolean>(false);
 export const volumeState = atom<number>(0.5); // Volume as a percentage (0-100)
@@ -22,3 +22,5 @@ export function NextRepeat(current: RepeatType): RepeatType {
 }
 
 export const searchTermState = atom<string>('');
+export const ignoreItemsState = atom<IgnoreItem[]>([]);
+export const minSongCountForArtistListState = atom<number>(5);
