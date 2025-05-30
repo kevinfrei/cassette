@@ -1,9 +1,11 @@
 import {
   chk2TupleOf,
-  hasFieldType,
-  is2TupleOf,
+  chkObjectOfExactType,
+  hasField,
   isBoolean,
+  isNonNullable,
   isObjectNonNull,
+  isObjectOfExactType,
   isString,
   typecheck,
 } from '@freik/typechk';
@@ -15,16 +17,68 @@ export type SharedConstants<T> = {
   values: Record<string, T>;
 };
 
-export function isSharedConstants<T>(
+function isRecordOf<K extends string | number | symbol, V>(
+  obj: unknown,
+  keyChk: typecheck<K>,
+  valChk: typecheck<V>,
+): obj is Record<K, V> {
+  if (!isObjectNonNull(obj)) {
+    return false;
+  }
+  const keys = Object.keys(obj);
+  let len = keys.length;
+  for (const fieldName of keys) {
+    if (!hasField(obj, fieldName)) continue;
+    const theVal = obj[fieldName];
+    if (!keyChk(fieldName)) {
+      return false;
+    }
+    if (!valChk(theVal)) {
+      return false;
+    }
+    len--;
+  }
+  return len === 0;
+}
+
+function chkRecordOf<K extends string | number | symbol, V>(
+  keyChk: typecheck<K>,
+  valChk: typecheck<V>,
+): typecheck<Record<K, V>> {
+  return (obj): obj is Record<K, V> => isRecordOf(obj, keyChk, valChk);
+}
+
+export function isSharedConstantsOf<T>(
   val: unknown,
   typechecker: typecheck<T>,
 ): val is SharedConstants<T> {
-  return (
-    hasFieldType(val, 'description', isString) &&
-    hasFieldType(val, 'typechecker', isBoolean) &&
-    hasFieldType(val, 'type', chk2TupleOf(isString, isString)) &&
-    hasFieldType(val, 'values', isObjectNonNull)
-  );
+  return isObjectOfExactType(val, {
+    description: isString,
+    typechecker: isBoolean,
+    type: chk2TupleOf(isString, isString),
+    values: chkRecordOf(isString, typechecker),
+  });
+}
+
+export function chkSharedConstantsOf<T>(
+  typechecker: typecheck<T>,
+): typecheck<SharedConstants<T>> {
+  return (val): val is SharedConstants<T> =>
+    isSharedConstantsOf(val, typechecker);
+}
+
+export const chkSharedConstants: typecheck<SharedConstants<unknown>> =
+  chkObjectOfExactType({
+    description: isString,
+    typechecker: isBoolean,
+    type: chk2TupleOf(isString, isString),
+    values: chkRecordOf(isString, isNonNullable),
+  });
+
+export function isSharedConstants(
+  val: unknown,
+): val is SharedConstants<unknown> {
+  return chkSharedConstants(val);
 }
 
 export const CurrentView_source: SharedConstants<number> = {
@@ -119,4 +173,10 @@ export const Keys_source: SharedConstants<string> = {
     ToggleMiniPlayer: '9',
     Tools: 'L',
   },
+};
+
+export const AllConstants: Record<string, SharedConstants<any>> = {
+  Keys: Keys_source,
+  StrId: StrId_source,
+  CurrentView: CurrentView_source,
 };
