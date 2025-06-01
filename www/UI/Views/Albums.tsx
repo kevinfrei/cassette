@@ -14,10 +14,9 @@ import { CurrentView } from '@freik/emp-shared';
 import { MakeLog } from '@freik/logger';
 import { AlbumKey, Song } from '@freik/media-core';
 import { hasFieldType, isDefined, isNumber } from '@freik/typechk';
-import { MyTransactionInterface } from '@freik/web-utils';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
-import { useCallback, useState } from 'react';
+import { ReactElement, useCallback, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { AddSongs } from '../../Jotai/API';
 import { useJotaiCallback } from '../../Jotai/Helpers';
@@ -70,7 +69,7 @@ const [albumExpandedState, albumIsExpandedState] =
 const albumSortState = jatom(MakeSortKey(['l', 'n'], ['lry', 'nrt']));
 
 type AHDProps = { group: IGroup };
-function AlbumHeaderDisplay({ group }: AHDProps): JSX.Element {
+function AlbumHeaderDisplay({ group }: AHDProps): ReactElement {
   const album = useRecoilValue(albumByKeyFuncFam(group.key));
   const albumData = useRecoilValue(dataForAlbumFuncFam(group.key));
   const picurl = getAlbumImageUrl(group.key);
@@ -120,7 +119,7 @@ function AlbumHeaderDisplay({ group }: AHDProps): JSX.Element {
   );
 }
 
-export function GroupedAlbumList(): JSX.Element {
+export function GroupedAlbumList(): ReactElement {
   const [detailRef, setDetailRef] = useState<IDetailsList | null>(null);
 
   const albums = useRecoilValue(allAlbumsFunc);

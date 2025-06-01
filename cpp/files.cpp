@@ -43,8 +43,13 @@ std::string PathToMimeType(const std::filesystem::path& filePath) {
     return "audio/m4a";
   } else if (extension == ".mp3") {
     return "audio/mp3";
+  } else if (extension == ".map") {
+    return "application/json";
+  } else if (extension == ".json") {
+    return "application/json";
   }
-  std::cout << "unknown: " << extension << std::endl;
+  std::cerr << "unknown: " << extension << ", reverting to text/html"
+            << std::endl;
   return "text/html";
 }
 

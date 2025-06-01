@@ -9,14 +9,11 @@ import {
 } from '@fluentui/react';
 import { PlaylistName, Song, SongKey } from '@freik/media-core';
 import { hasFieldType, isDefined, isNumber, isUndefined } from '@freik/typechk';
-import {
-  Dialogs,
-  MyTransactionInterface,
-  useDialogState,
-} from '@freik/web-utils';
+import { Dialogs } from '@freik/fluentui-tools';
+import { useDialogState } from '@freik/react-tools';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
-import { useCallback, useState } from 'react';
+import { ReactElement, useCallback, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useJotaiAsyncCallback, useJotaiCallback } from '../../Jotai/Helpers';
 import { MakeSetAtomFamily } from '../../Jotai/Hooks';
@@ -72,7 +69,7 @@ function PlaylistHeaderDisplay({
 }: {
   group: IGroup;
   onDelete: (key: string) => void;
-}): JSX.Element {
+}): ReactElement {
   const expandedAtom = playlistIsExpandedState(group.key);
   const setPlaylistContext = useSetAtom(playlistContextState);
   const onHeaderExpanderClick = useJotaiCallback(
@@ -116,7 +113,7 @@ function PlaylistHeaderDisplay({
   );
 }
 
-export function PlaylistView(): JSX.Element {
+export function PlaylistView(): ReactElement {
   const [selected, setSelected] = useState('');
   const [songPlaylistToRemove, setSongPlaylistToRemove] = useState<
     [string, string, number]
@@ -196,7 +193,7 @@ export function PlaylistView(): JSX.Element {
   );
 
   // TODO: make delete work
-  const onTitleRenderer = (ttl: PlaylistSong, index?: number): JSX.Element => (
+  const onTitleRenderer = (ttl: PlaylistSong, index?: number): ReactElement => (
     <div style={{ marginLeft: -21 }}>
       <IconButton
         style={{ height: '20px' }}

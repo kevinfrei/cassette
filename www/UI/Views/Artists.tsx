@@ -12,10 +12,9 @@ import {
 } from '@fluentui/react';
 import { CurrentView } from '@freik/emp-shared';
 import { Album, AlbumKey, Artist, ArtistKey } from '@freik/media-core';
-import { MyTransactionInterface } from '@freik/web-utils';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
-import { useCallback, useState } from 'react';
+import { ReactElement, useCallback, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useJotaiCallback } from '../../Jotai/Helpers';
 import { MakeSetAtomFamily } from '../../Jotai/Hooks';
@@ -68,7 +67,7 @@ const [artistExpandedState, artistIsExpandedState] =
 // For grouping to work properly, the sort order needs to be fully specified
 const sortOrderState = jatom(MakeSortKey(['r', ''], ['r', 'ylnt']));
 
-function ArtistHeaderDisplay({ group }: { group: IGroup }): JSX.Element {
+function ArtistHeaderDisplay({ group }: { group: IGroup }): ReactElement {
   const expansionState = artistIsExpandedState(group.key);
   const artist = useRecoilValue(artistByKeyFuncFam(group.key));
   const picurl = getArtistImageUrl(group.key);
@@ -139,7 +138,7 @@ export function getFilteredArtists(
   return result;
 }
 
-export function GroupedAristList(): JSX.Element {
+export function GroupedAristList(): ReactElement {
   const [detailRef, setDetailRef] = useState<IDetailsList | null>(null);
 
   const artists = useRecoilValue(allArtistsFunc);
@@ -169,7 +168,7 @@ export function GroupedAristList(): JSX.Element {
 
   const filteredArtistsFromSongRenderer = (
     theSong: ArtistSong,
-  ): JSX.Element => (
+  ): ReactElement => (
     <ArtistNameFromArtistIds artistIds={[theSong.sortedArtistId]} />
   );
   const { songs: sortedSongs, groups } = SortSongsFromArtists(

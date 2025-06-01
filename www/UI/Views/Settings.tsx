@@ -1,5 +1,5 @@
 import { useAtom, useAtomValue } from 'jotai';
-import React, { useCallback, useState } from 'react';
+import React, { ReactElement, useCallback, useState } from 'react';
 import {
   DefaultButton,
   Dropdown,
@@ -12,7 +12,7 @@ import {
   TooltipHost,
 } from '@fluentui/react';
 import { isDefined } from '@freik/typechk';
-// import { Expandable, StateToggle } from '@freik/fluentui-tools';
+import { Expandable, StateToggle } from '@freik/fluentui-tools';
 import { useBoolState } from '@freik/react-tools';
 
 import { GetHelperText, Post } from 'www/WebHelpers';
@@ -48,7 +48,7 @@ export async function addLocation({
   return false;
 }*/
 
-function MusicLocations(): JSX.Element {
+function MusicLocations(): ReactElement {
   /*
 
   TODO
@@ -138,7 +138,7 @@ const ignoreOptions: IDropdownOption[] = [...ignoreTypeNameMap.entries()].map(
   ([key, text]) => ({ key, text }),
 );
 
-function IgnoreList(): JSX.Element {
+function IgnoreList(): ReactElement {
   const ignoreItems = useAtomValue(ignoreItemsState);
   const [newType, setNewType] = useState<IgnoreItemTypeEnum | ''>('');
   const [newValue, setNewValue] = useState<string>('');
@@ -207,12 +207,12 @@ function IgnoreList(): JSX.Element {
   );
 }
 
-function ArticleSorting(): React.JSX.Element {
+function ArticleSorting(): ReactElement {
   const articles = useBoolState(true);
   return <StateToggle label="Ignore articles when sorting" state={articles} />;
 }
 
-function ArtistFiltering(): React.JSX.Element {
+function ArtistFiltering(): ReactElement {
   const onlyAlbumArtists = useBoolState(
     /*showArtistsWithFullAlbumsState*/ true,
   );
@@ -243,7 +243,7 @@ function ArtistFiltering(): React.JSX.Element {
   );
 }
 
-function LikeFiltering(): React.JSX.Element {
+function LikeFiltering(): ReactElement {
   const neverPlayHates = useBoolState(/*neverPlayHatesState*/ true);
   const onlyPlayLikes = useBoolState(/*onlyPlayLikesState*/ false);
   return (
@@ -257,7 +257,7 @@ function LikeFiltering(): React.JSX.Element {
   );
 }
 
-function ArtworkSettings(): JSX.Element {
+function ArtworkSettings(): ReactElement {
   const dlAlbumArtwork = useBoolState(/*downloadAlbumArtworkState*/ true);
   const dlArtistArtwork = useBoolState(/*downloadArtistArtworkState*/ true);
   const saveAlbumArtwork = useBoolState(
@@ -293,7 +293,7 @@ function ArtworkSettings(): JSX.Element {
   );
 }
 
-export function SettingsView(): JSX.Element {
+export function SettingsView(): ReactElement {
   return (
     <div className="settings-view">
       <Expandable separator label="Music Locations" defaultShow={true}>

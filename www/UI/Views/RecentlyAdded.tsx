@@ -1,4 +1,6 @@
-export function RecentlyAddedView(): JSX.Element {
+import { ReactElement } from 'react';
+
+export function RecentlyAddedView(): ReactElement {
   return (
     <>
       <div>Not</div>

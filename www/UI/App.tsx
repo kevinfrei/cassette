@@ -1,5 +1,5 @@
 import { PlaybackControls } from './PlaybackControls';
-import { useRef } from 'react';
+import { ReactElement, useRef } from 'react';
 import { SongPlaying } from './SongPlaying';
 import { VolumeControl } from './VolumeControl';
 import { Sidebar } from './Sidebar';
@@ -7,7 +7,7 @@ import { Sidebar } from './Sidebar';
 import '../styles/App.css';
 import { ViewSelector } from './Views/Selector';
 
-export function App(): JSX.Element {
+export function App(): ReactElement {
   const audioRef = useRef<HTMLAudioElement>(null);
   return (
     <div id="app">
