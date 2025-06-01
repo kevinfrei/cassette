@@ -10,7 +10,7 @@ add_custom_command(
     bun gen
   DEPENDS
     ${PROJECT_SOURCE_DIR}/scripts/gencpp.ts
-    ${PROJECT_SOURCE_DIR}/www/SharedConstants.ts
+    ${PROJECT_SOURCE_DIR}/www/Shared/Enums.ts
   OUTPUT
     ${GEN_HEADER}
 )

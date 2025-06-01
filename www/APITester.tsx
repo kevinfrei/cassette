@@ -1,6 +1,6 @@
-import React, { useRef, type FormEvent } from 'react';
+import { ReactElement, useRef, type FormEvent } from 'react';
 
-export function APITester(): React.JSX.Element {
+export function APITester(): ReactElement {
   const responseInputRef = useRef<HTMLTextAreaElement>(null);
 
   const testEndpoint = async (e: FormEvent<HTMLFormElement>) => {

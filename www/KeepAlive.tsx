@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactElement } from 'react';
 import { isString } from '@freik/typechk';
 
 import { useInterval } from './hooks';
@@ -14,7 +14,7 @@ function closeWindow() {
   // TODO: Turn this off for Debug builds...
   window.close();
 }
-export function KeepAlive(): React.JSX.Element {
+export function KeepAlive(): ReactElement {
   useInterval(() => {
     RawGet('/keepalive')
       .then((res) => {

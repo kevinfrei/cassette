@@ -27,7 +27,7 @@ async function emitPostamble(writer: Bun.FileSink): Promise<void> {
 `);
 }
 
-async function emitNumericEnumm(
+async function emitNumericEnum(
   writer: Bun.FileSink,
   name: string,
   item: SharedEnum<number>,
@@ -94,7 +94,7 @@ async function emitConstantEnums(
       case 'unsigned long':
       case 'long long':
       case 'unsigned long long': {
-        await emitNumericEnumm(writer, name, item as SharedEnum<number>);
+        await emitNumericEnum(writer, name, item as SharedEnum<number>);
         break;
       }
       case 'string': {

@@ -9,7 +9,7 @@ import {
 import { isArrayOfString, isDefined } from '@freik/typechk';
 import { useBoolState } from '@freik/react-tools';
 import { useAtom, useAtomValue } from 'jotai';
-import { useState } from 'react';
+import { ReactElement, useState } from 'react';
 import { SetterOrUpdater } from 'recoil';
 import { useJotaiCallback } from '../../../Jotai/Helpers';
 import {
@@ -63,7 +63,7 @@ function getDir(
     });
 }
 
-export function TranscoderConfiguration(): JSX.Element {
+export function TranscoderConfiguration(): ReactElement {
   const copyArtwork = useBoolState(false);
   const mirror = useBoolState(false);
   const [srcLocType, setSrcLocType] = useAtom(sourceLocationTypeState);
