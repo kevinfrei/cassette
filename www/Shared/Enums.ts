@@ -1,87 +1,6 @@
-import {
-  chk2TupleOf,
-  chkObjectOfExactType,
-  hasField,
-  isBoolean,
-  isNonNullable,
-  isObjectNonNull,
-  isObjectOfExactType,
-  isString,
-  typecheck,
-} from '@freik/typechk';
+import { SharedEnum } from './EnumTypeSupport';
 
-export type SharedConstants<T> = {
-  description: string;
-  typechecker: boolean;
-  type: [string, string];
-  values: Record<string, T>;
-};
-
-function isRecordOf<K extends string | number | symbol, V>(
-  obj: unknown,
-  keyChk: typecheck<K>,
-  valChk: typecheck<V>,
-): obj is Record<K, V> {
-  if (!isObjectNonNull(obj)) {
-    return false;
-  }
-  const keys = Object.keys(obj);
-  let len = keys.length;
-  for (const fieldName of keys) {
-    if (!hasField(obj, fieldName)) continue;
-    const theVal = obj[fieldName];
-    if (!keyChk(fieldName)) {
-      return false;
-    }
-    if (!valChk(theVal)) {
-      return false;
-    }
-    len--;
-  }
-  return len === 0;
-}
-
-function chkRecordOf<K extends string | number | symbol, V>(
-  keyChk: typecheck<K>,
-  valChk: typecheck<V>,
-): typecheck<Record<K, V>> {
-  return (obj): obj is Record<K, V> => isRecordOf(obj, keyChk, valChk);
-}
-
-export function isSharedConstantsOf<T>(
-  val: unknown,
-  typechecker: typecheck<T>,
-): val is SharedConstants<T> {
-  return isObjectOfExactType(val, {
-    description: isString,
-    typechecker: isBoolean,
-    type: chk2TupleOf(isString, isString),
-    values: chkRecordOf(isString, typechecker),
-  });
-}
-
-export function chkSharedConstantsOf<T>(
-  typechecker: typecheck<T>,
-): typecheck<SharedConstants<T>> {
-  return (val): val is SharedConstants<T> =>
-    isSharedConstantsOf(val, typechecker);
-}
-
-export const chkSharedConstants: typecheck<SharedConstants<unknown>> =
-  chkObjectOfExactType({
-    description: isString,
-    typechecker: isBoolean,
-    type: chk2TupleOf(isString, isString),
-    values: chkRecordOf(isString, isNonNullable),
-  });
-
-export function isSharedConstants(
-  val: unknown,
-): val is SharedConstants<unknown> {
-  return chkSharedConstants(val);
-}
-
-export const CurrentView_source: SharedConstants<number> = {
+export const CurrentView_source: SharedEnum<number> = {
   description: 'The current view selected by the user in the UI.',
   typechecker: true,
   type: ['int', 'custom-enum'],
@@ -100,7 +19,7 @@ export const CurrentView_source: SharedConstants<number> = {
   },
 };
 
-export const StrId_source: SharedConstants<string> = {
+export const StrId_source: SharedEnum<string> = {
   description: 'String IDs for localization and UI strings.',
   typechecker: false,
   type: ['string', 'custom-enum'],
@@ -149,7 +68,7 @@ export const StrId_source: SharedConstants<string> = {
   },
 };
 
-export const Keys_source: SharedConstants<string> = {
+export const Keys_source: SharedEnum<string> = {
   description: 'Keyboard shortcuts for various actions in the UI.',
   typechecker: false,
   type: ['string', 'custom-enum'],
@@ -175,7 +94,7 @@ export const Keys_source: SharedConstants<string> = {
   },
 };
 
-export const IpcId_source: SharedConstants<string> = {
+export const IpcId_source: SharedEnum<string> = {
   description: 'IPC IDs for communication between the UI and the backend.',
   typechecker: false,
   type: ['string', 'custom-enum'],
@@ -224,7 +143,7 @@ export const IpcId_source: SharedConstants<string> = {
   },
 };
 
-export const IgnoreItemType_source: SharedConstants<string> = {
+export const IgnoreItemType_source: SharedEnum<string> = {
   description: 'Types of items that can be ignored in the music database.',
   typechecker: false,
   type: ['string', 'custom-enum'],
@@ -235,7 +154,7 @@ export const IgnoreItemType_source: SharedConstants<string> = {
   },
 };
 
-export const AllConstants: Record<string, SharedConstants<any>> = {
+export const EnumsToGenerate: Record<string, SharedEnum<any>> = {
   Keys: Keys_source,
   StrId: StrId_source,
   CurrentView: CurrentView_source,

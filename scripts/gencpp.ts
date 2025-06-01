@@ -1,10 +1,7 @@
 import { hasFieldType } from '@freik/typechk';
 
-import {
-  AllConstants,
-  chkSharedConstants,
-  SharedConstants,
-} from '../www/SharedConstants';
+import { chkSharedEnum, SharedEnum } from '../www/Shared/EnumTypeSupport';
+import { EnumsToGenerate } from '../www/Shared/Enums';
 
 async function emitPreamble(stream: Bun.FileSink): Promise<void> {
   await stream.write(`// Generated from www/SharedConstants.ts by scripts/gencpp.ts
@@ -30,10 +27,10 @@ async function emitPostamble(writer: Bun.FileSink): Promise<void> {
 `);
 }
 
-async function emitNumericConstants(
+async function emitNumericEnumm(
   writer: Bun.FileSink,
   name: string,
-  item: SharedConstants<number>,
+  item: SharedEnum<number>,
 ): Promise<void> {
   await writer.write(`
   // ${item.description}
@@ -44,10 +41,10 @@ ${Object.entries(item.values)
   };`);
 }
 
-async function emitStringConstants(
+async function emitStringEnum(
   writer: Bun.FileSink,
   name: string,
-  item: SharedConstants<string>,
+  item: SharedEnum<string>,
 ): Promise<void> {
   writer.write(`
   // ${item.description}
@@ -68,6 +65,8 @@ ${Object.entries(item.values)
     return "<unknown>";
   }
 `);
+
+  // This is *super* simplistic, and could be optimized in various ways...
   writer.write(`
   constexpr std::optional<${name}> string_to_${name}(const std::string_view &str) {
 ${Object.entries(item.values)
@@ -78,17 +77,11 @@ ${Object.entries(item.values)
 `);
 }
 
-async function emitCode(
-  fileName: string,
-  items: [string, SharedConstants<unknown>][],
-): Promise<void> {
-  const file = Bun.file(fileName);
-  if (await file.exists()) {
-    await file.delete();
-  }
-  const writer = file.writer();
-  await emitPreamble(writer);
-  for (const [name, item] of items) {
+async function emitConstantEnums(
+  enums: [string, SharedEnum<unknown>][],
+  writer: Bun.FileSink,
+) {
+  for (const [name, item] of enums) {
     // Emit the C++ code for each SharedConstants item, either numeric or string type
     switch (item.type[0]) {
       case 'char':
@@ -101,19 +94,11 @@ async function emitCode(
       case 'unsigned long':
       case 'long long':
       case 'unsigned long long': {
-        await emitNumericConstants(
-          writer,
-          name,
-          item as SharedConstants<number>,
-        );
+        await emitNumericEnumm(writer, name, item as SharedEnum<number>);
         break;
       }
       case 'string': {
-        await emitStringConstants(
-          writer,
-          name,
-          item as SharedConstants<string>,
-        );
+        await emitStringEnum(writer, name, item as SharedEnum<string>);
         break;
       }
       default: {
@@ -121,6 +106,19 @@ async function emitCode(
       }
     }
   }
+}
+
+async function emitCode(
+  fileName: string,
+  enums: [string, SharedEnum<unknown>][],
+): Promise<void> {
+  const file = Bun.file(fileName);
+  if (await file.exists()) {
+    await file.delete();
+  }
+  const writer = file.writer();
+  await emitPreamble(writer);
+  await emitConstantEnums(enums, writer);
   await emitPostamble(writer);
   await writer.end();
 }
@@ -132,13 +130,13 @@ async function main(fileName?: string): Promise<void> {
     process.exit(1);
   }
 
-  const items: [string, SharedConstants<unknown>][] = [];
-  for (const sc of Object.keys(AllConstants)) {
-    if (!hasFieldType(AllConstants, sc, chkSharedConstants)) {
+  const items: [string, SharedEnum<unknown>][] = [];
+  for (const sc of Object.keys(EnumsToGenerate)) {
+    if (!hasFieldType(EnumsToGenerate, sc, chkSharedEnum)) {
       console.warn(`Skipping ${sc} as it does not match SharedConstants type.`);
       continue;
     }
-    items.push([sc, AllConstants[sc]]);
+    items.push([sc, EnumsToGenerate[sc]]);
   }
 
   await emitCode(fileName, items);
