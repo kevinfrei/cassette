@@ -1,6 +1,11 @@
 import { MakeLog } from '@freik/logger';
 import { useAtom, useStore } from 'jotai';
-import { ForwardedRef, MouseEventHandler, useCallback } from 'react';
+import {
+  ForwardedRef,
+  MouseEventHandler,
+  ReactElement,
+  useCallback,
+} from 'react';
 
 import {
   NextRepeat,
@@ -58,7 +63,7 @@ export type PlaybackControlsProps = {
 
 export function PlaybackControls({
   audioRef,
-}: PlaybackControlsProps): JSX.Element {
+}: PlaybackControlsProps): ReactElement {
   const isPlaying = true; // TODO: useAtomValue(playingState);
 
   const hasAnySong = true; // TODO: useRecoilValue(hasAnySongsFunc);

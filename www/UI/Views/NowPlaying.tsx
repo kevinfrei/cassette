@@ -25,14 +25,10 @@ import {
   SongKey,
 } from '@freik/media-core';
 import { isNumber } from '@freik/typechk';
-import {
-  Dialogs,
-  MyTransactionInterface,
-  useDialogState,
-} from '@freik/web-utils';
+import { Dialogs } from '@freik/fluentui-tools';
+import { useDialogState } from '@freik/react-tools';
 import { atom as jatom, useAtom, useAtomValue } from 'jotai';
-import { useCallback, useState } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { ReactElement, useCallback, useState } from 'react';
 import { RemoveSongFromNowPlaying, StopAndClear } from '../../Jotai/API';
 import { useJotaiAsyncCallback, useJotaiCallback } from '../../Jotai/Helpers';
 import { isMiniplayerState, nowPlayingSortState } from '../../Jotai/Local';
@@ -74,7 +70,7 @@ const nowPlayingContextState = jatom<SongListMenuData>({
 });
 
 // The top line of the Now Playing view: Buttons & dialogs & stuff
-function TopLine(): JSX.Element {
+function TopLine(): ReactElement {
   const nowPlaying = useAtomValue(activePlaylistState);
   const songList = useRecoilValue(songListState);
   const saveEnabled = useAtomValue(saveableState);
@@ -175,8 +171,8 @@ function TopLine(): JSX.Element {
 
 function StickyDetailsHeader(
   theProps?: IDetailsHeaderProps,
-  defaultRender?: (p?: IDetailsHeaderProps) => JSX.Element | null,
-): JSX.Element | null {
+  defaultRender?: (p?: IDetailsHeaderProps) => ReactElement | null,
+): ReactElement | null {
   if (!theProps || !defaultRender) {
     return null;
   }
@@ -199,7 +195,7 @@ function StickyDetailsHeader(
 }
 
 // The Now Playing (Current playlist) view
-export function NowPlayingView(): JSX.Element {
+export function NowPlayingView(): ReactElement {
   const [detailRef, setDetailRef] = useState<IDetailsList | null>(null);
 
   const albums: Map<AlbumKey, Album> = useRecoilValue(allAlbumsFunc);

@@ -16,7 +16,7 @@ import { GetHelperText } from 'www/WebHelpers';
 
 import '../styles/Sidebar.css';
 import { curViewState, searchTermState } from 'www/State/SimpleSavedState';
-import { useCallback } from 'react';
+import { ReactElement, useCallback } from 'react';
 
 type ViewEntry = {
   name: CurrentViewEnum;
@@ -87,7 +87,7 @@ export function isSearchBox(target: EventTarget | null): boolean {
   );
 }
 
-export function Sidebar(): JSX.Element {
+export function Sidebar(): ReactElement {
   const [curView, setCurView] = useAtom(curViewState);
   const [searchTerm, setSearchTerm] = useAtom(searchTermState);
   const onSearch = useCallback(

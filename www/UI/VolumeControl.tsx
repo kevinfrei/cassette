@@ -4,6 +4,7 @@ import { useAtom } from 'jotai';
 import { mutedState, volumeState } from 'www/State/SimpleSavedState';
 
 import '../styles/VolumeControl.css';
+import { ReactElement } from 'react';
 
 export const mySliderStyles: Partial<ISliderStyles> = {
   thumb: {
@@ -18,7 +19,7 @@ export const mySliderStyles: Partial<ISliderStyles> = {
   },
 };
 
-export function VolumeControl(): JSX.Element {
+export function VolumeControl(): ReactElement {
   const [muted, setMuted] = useAtom(mutedState);
   const [volume, setVolume] = useAtom(volumeState);
   // Make the icon reflect approximate volume

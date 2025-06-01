@@ -5,6 +5,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useAtomCallback } from 'jotai/utils';
 import {
   ForwardedRef,
+  ReactElement,
   SyntheticEvent,
   forwardRef,
   useCallback,
@@ -40,7 +41,7 @@ import '../styles/SongPlaying.css';
 
 const { log } = MakeLog('EMP:render:SongPlayback');
 
-function CoverArt(): JSX.Element {
+function CoverArt(): ReactElement {
   /*
   const songKey = useRecoilValue(currentSongKeyFunc);
   const albumKey = useRecoilValue(albumKeyForSongKeyFuncFam(songKey));
@@ -55,7 +56,7 @@ function CoverArt(): JSX.Element {
   );
 }
 
-function MediaTimePosition(): JSX.Element {
+function MediaTimePosition(): ReactElement {
   const mediaTimePosition = useAtomValue(mediaTimePositionState);
   return (
     <Text
@@ -69,7 +70,7 @@ function MediaTimePosition(): JSX.Element {
   );
 }
 
-function MediaTimeRemaining(): JSX.Element {
+function MediaTimeRemaining(): ReactElement {
   const mediaTimeRemaining = useAtomValue(mediaTimeRemainingState);
   return (
     <Text
@@ -83,7 +84,7 @@ function MediaTimeRemaining(): JSX.Element {
   );
 }
 
-function MediaTimeSlider(): JSX.Element {
+function MediaTimeSlider(): ReactElement {
   const songKey = useAtomValue(curSongKeyState);
   const [mediaTimePercent, setMediaTimePercent] = useAtom(
     mediaTimePercentState,
@@ -110,7 +111,7 @@ function MediaTimeSlider(): JSX.Element {
   );
 }
 
-function SongName(): JSX.Element {
+function SongName(): ReactElement {
   const songKey = useAtomValue(curSongKeyState);
   const { title }: SongDescription = useAtomValue(
     songDescriptionForSongState(songKey),
@@ -122,7 +123,7 @@ function SongName(): JSX.Element {
   );
 }
 
-function ArtistAlbum(): JSX.Element {
+function ArtistAlbum(): ReactElement {
   const songKey = useAtomValue(curSongKeyState);
   const { artist, album }: SongDescription = useAtomValue(
     songDescriptionForSongState(songKey),
@@ -143,7 +144,7 @@ function ArtistAlbum(): JSX.Element {
 }
 
 export const SongPlaying = forwardRef(
-  (_props, audioRef: ForwardedRef<HTMLAudioElement>): JSX.Element => {
+  (_props, audioRef: ForwardedRef<HTMLAudioElement>): ReactElement => {
     const songKey = useAtomValue(curSongKeyState);
     const isShuffle = useAtomValue(shuffleState);
     const isMuted = useAtomValue(mutedState);

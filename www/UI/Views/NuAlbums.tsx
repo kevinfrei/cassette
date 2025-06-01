@@ -6,7 +6,7 @@ import {
   mergeStyleSets,
 } from '@fluentui/react';
 import { Album } from '@freik/media-core';
-import { useCallback, useRef } from 'react';
+import { ReactElement, useCallback, useRef } from 'react';
 import { useRecoilValue } from 'recoil';
 import { allAlbumsFunc, dataForAlbumFuncFam } from '../../Recoil/ReadOnly';
 import { getAlbumImageUrl } from '../../Tools';
@@ -74,7 +74,7 @@ function AlbumCoverView({
 }: {
   album: Album;
   cols: number;
-}): JSX.Element {
+}): ReactElement {
   const albumData = useRecoilValue(dataForAlbumFuncFam(album.key));
   const picurl = getAlbumImageUrl(album.key);
 
@@ -108,7 +108,7 @@ function AlbumCoverView({
   );
 }
 
-export function NuAlbumView(): JSX.Element {
+export function NuAlbumView(): ReactElement {
   const columnCount = useRef(0);
   const rowHeight = useRef(0);
 

@@ -1,5 +1,5 @@
 import { useAtomValue } from 'jotai';
-import { CSSProperties, useState } from 'react';
+import { CSSProperties, ReactElement, useState } from 'react';
 /*
 import { GroupedAlbumList } from './Albums';
 import { GroupedAristList } from './Artists';
@@ -20,14 +20,14 @@ function ignore(view: CurrentViewEnum): boolean {
   return view === CurrentView.settings || view === CurrentView.tools;
 }
 
-export function ViewSelector(): JSX.Element {
+export function ViewSelector(): ReactElement {
   const which = useAtomValue(curViewState);
   const [rendered, setRendered] = useState(new Set<CurrentViewEnum>([which]));
   // Let's see if I can speed this up a bit by not trying to render everything
   // the first time
   const sl = (v: CurrentViewEnum): CSSProperties =>
     which === v ? {} : { visibility: 'hidden' };
-  const contents: [CurrentViewEnum, JSX.Element][] = [];
+  const contents: [CurrentViewEnum, ReactElement][] = [];
   if (!rendered.has(which) && !ignore(which)) {
     const newrendered = new Set<CurrentViewEnum>([which, ...rendered]);
     setRendered(newrendered);

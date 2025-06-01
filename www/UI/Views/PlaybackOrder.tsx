@@ -9,8 +9,9 @@ import {
   songPlaybackOrderState,
 } from '../../Recoil/SongPlaying';
 import { SimpleSongsList } from './MixedSongs';
+import { ReactElement } from 'react';
 
-export function PlaybackOrder(): JSX.Element {
+export function PlaybackOrder(): ReactElement {
   const curIndex = useRecoilValue(currentIndexState);
   const isShuffle = useRecoilValue(shuffleFunc);
   const isMiniplayer = useAtomValue(isMiniplayerState);

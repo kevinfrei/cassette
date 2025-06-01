@@ -9,7 +9,7 @@ import { MakeLog } from '@freik/logger';
 import { Song, SongKey } from '@freik/media-core';
 import { isNumber } from '@freik/typechk';
 import { useAtomValue } from 'jotai';
-import { useCallback } from 'react';
+import { ReactElement, useCallback } from 'react';
 import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
 import { AddSongs } from '../../Jotai/API';
 import { useJotaiCallback } from '../../Jotai/Helpers';
@@ -65,7 +65,7 @@ const songContextState = atom<SongListMenuData>({
   default: { data: '', spot: { left: 0, top: 0 } },
 });
 
-function Liker({ songId }: { songId: SongKey }): JSX.Element {
+function Liker({ songId }: { songId: SongKey }): ReactElement {
   const likeNum = useAtomValue(songListLikeNumberFromStringFam(songId));
   const strings = ['⋯', '👍', '👎', '⋮'];
   const onClick = useJotaiCallback(
@@ -93,11 +93,11 @@ function Liker({ songId }: { songId: SongKey }): JSX.Element {
 
 // This is a function, and not a React Function Component, so you can't
 // have state in it: Gotta wrap it. Kinda weird, but whatever...
-export function LikeOrHate(song: Song): JSX.Element {
+export function LikeOrHate(song: Song): ReactElement {
   return <Liker songId={song.key} />;
 }
 
-export function MixedSongsList(): JSX.Element {
+export function MixedSongsList(): ReactElement {
   const sortedItems = useRecoilValue(sortedSongsState);
   const [sortOrder, setSortOrder] = useRecoilState(sortOrderState);
   const onAddSongClick = useCallback(
@@ -159,7 +159,7 @@ export function SimpleSongsList({
   forSongs: SongKey[];
   bold?: (props: IDetailsRowProps) => boolean;
   keyprefix?: string;
-}): JSX.Element {
+}): ReactElement {
   const pfx = keyprefix || 'ssl';
   const songList = useRecoilValue(dataForSongListFuncFam(forSongs));
   if (!songList) {

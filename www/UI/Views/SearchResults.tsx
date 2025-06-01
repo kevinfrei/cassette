@@ -18,8 +18,7 @@ import {
   SongKey,
 } from '@freik/media-core';
 import { hasFieldType, isBoolean } from '@freik/typechk';
-import { useCallback, useState } from 'react';
-import { useRecoilValue } from 'recoil';
+import { ReactElement, useCallback, useState } from 'react';
 import { GetDataForSong, SongData } from '../../DataSchema';
 import { SearchResults } from '../../ipc';
 import { AddSongs } from '../../Jotai/API';
@@ -192,7 +191,7 @@ function SearchResultsGroupHeader(props: {
   expander: () => void;
   text: string;
   keys: SongKey[];
-}): JSX.Element {
+}): ReactElement {
   const onAddSongListClick = useCallback(
     () => AddSongs(props.keys).catch(wrn),
     [props.keys],
@@ -216,7 +215,7 @@ function SearchResultsGroupHeader(props: {
 
 const noSort = MakeSortKey('rlnt');
 
-export function SearchResultsView(): JSX.Element {
+export function SearchResultsView(): ReactElement {
   const searchTerm = useRecoilValue(searchTermState);
   const searchResults = useRecoilValue(searchFuncFam(searchTerm));
   const songs = useRecoilValue(allSongsFunc);
@@ -271,7 +270,7 @@ export function SearchResultsView(): JSX.Element {
         setExpandedSet(newSet);
       },
     },
-    onRenderHeader: (props): JSX.Element | null => {
+    onRenderHeader: (props): ReactElement | null => {
       if (!props || !props.group) return null;
       const groupProps = props.group;
       const groupKey = groupProps.key;
