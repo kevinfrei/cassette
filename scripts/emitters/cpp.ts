@@ -1,6 +1,6 @@
 import {
   ArrType,
-  Atoms,
+  Simple,
   Enum,
   Int,
   MapType,
@@ -10,7 +10,7 @@ import {
   SetType,
   TupType,
 } from '../../www/Shared/IDL';
-import { EmitItem, Emitter } from './interface';
+import { FileGenerator, MakeGenerator, EmitItem, Emitter } from './api';
 
 async function header(writer: Bun.FileSink): Promise<void> {
   await writer.write(`// Generated from www/Shared/Enums.ts by scripts/gencpp.ts
@@ -36,7 +36,7 @@ async function footer(writer: Bun.FileSink): Promise<void> {
 `);
 }
 
-function getTypeName(type: Atoms): string {
+function getTypeName(type: Simple): string {
   switch (type) {
     case '0':
       return 'std::uint8_t';
@@ -92,7 +92,7 @@ ${Object.entries(item.v)
 };
 
 const strEnumType: EmitItem<SEnum> = async (writer, name, item) => {
-  writer.write(`
+  await writer.write(`
   // ${name}
   enum class ${name} {
 ${Object.keys(item.v)
@@ -101,7 +101,7 @@ ${Object.keys(item.v)
   };
 `);
 
-  writer.write(`
+  await writer.write(`
   constexpr std::string_view get_string(${name} _value) {
     switch (_value) {
 ${Object.entries(item.v)
@@ -113,7 +113,7 @@ ${Object.entries(item.v)
 `);
 
   // This is *super* simplistic, and could be optimized in various ways...
-  writer.write(`
+  await writer.write(`
   constexpr std::optional<${name}> string_to_${name}(const std::string_view &str) {
 ${Object.entries(item.v)
   .map(([key, val]) => `    if (str == "${val}") return ${name}::${key};`)
@@ -130,11 +130,23 @@ function NYI<T>(name: string): EmitItem<T> {
   };
 }
 
+const objType: EmitItem<ObjType> = async (writer, name, item) => {
+  await writer.write(`
+  struct ${name} {
+  `);
+  for (const [key, value] of Object.entries(item.d)) {
+    const typeName = getTypeName(value);
+    await writer.write(`    ${typeName} ${key};\n`);
+  }
+  await writer.write(`
+  };\n`);
+};
+
 export const CppEmitter: Emitter = {
   header,
   footer,
   types: {
-    objType: NYI<ObjType>('objType'),
+    objType,
     arrType: NYI<ArrType>('arrType'),
     setType: NYI<SetType>('setType'),
     mapType: NYI<MapType>('mapType'),
@@ -143,4 +155,10 @@ export const CppEmitter: Emitter = {
     numEnumType,
     strEnumType,
   },
+  fields: {},
 };
+
+export function GetCppGenerator(): FileGenerator {
+  // Returns the CppEmitter instance
+  return MakeGenerator(CppEmitter);
+}
