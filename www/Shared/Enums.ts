@@ -1,4 +1,4 @@
-import { enum_num, enum_str, NEnum, num, SEnum, Types } from './IDL';
+import { ADTs, enum_num, enum_str, NEnum, num, SEnum, Types } from './IDL';
 
 const define_CurrentView: NEnum = enum_num(num(), {
   disabled: -1,
@@ -128,7 +128,7 @@ const define_IgnoreItemType: SEnum = enum_str({
   DirName: 'dir-name',
 });
 
-export const TypesToGenerate: Record<string, Types> = {
+export const TypesToGenerate: Record<string, ADTs> = {
   Keys: define_Keys,
   StrId: define_StrId,
   CurrentView: define_CurrentView,
