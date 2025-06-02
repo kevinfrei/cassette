@@ -9,6 +9,7 @@ import {
   SEnum,
   SetType,
   TupType,
+  Types,
 } from '../../www/Shared/IDL';
 import { FileGenerator, MakeGenerator, EmitItem, Emitter } from './api';
 
@@ -20,8 +21,14 @@ async function header(writer: Bun.FileSink): Promise<void> {
 
 #pragma once
 
+#include <cstdint>
 #include <string_view>
 #include <optional>
+#include <vector>
+#include <set>
+#include <map>
+#include <tuple>
+#include <string>
 
 namespace Shared {
 `);
@@ -36,39 +43,55 @@ async function footer(writer: Bun.FileSink): Promise<void> {
 `);
 }
 
-function getTypeName(type: Simple): string {
-  switch (type) {
-    case '0':
-      return 'std::uint8_t';
-    case '1':
-      return 'std::int8_t';
-    case '2':
-      return 'std::uint16_t';
-    case '3':
-      return 'std::int16_t';
-    case '4':
-      return 'std::uint32_t';
-    case '5':
-      return 'std::int32_t';
-    case '6':
-      return 'std::uint64_t';
-    case '7':
-      return 'std::int64_t';
-    case '8':
-      return ''; // For Enum types, so it's empty
-    case 's':
-      return 'std::string';
-    case 'c':
-      return 'char';
-    case 'b':
-      return 'bool';
-    case 'f':
-      return 'float';
-    case 'd':
-      return 'double';
-    default:
-      throw new Error(`Unknown type: ${type}`);
+function getTypeName(type: Types): string {
+  if (typeof type === 'string') {
+    switch (type) {
+      case '0':
+        return 'std::uint8_t';
+      case '1':
+        return 'std::int8_t';
+      case '2':
+        return 'std::uint16_t';
+      case '3':
+        return 'std::int16_t';
+      case '4':
+        return 'std::uint32_t';
+      case '5':
+        return 'std::int32_t';
+      case '6':
+        return 'std::uint64_t';
+      case '7':
+        return 'std::int64_t';
+      case 's':
+        return 'std::string';
+      case 'c':
+        return 'char';
+      case 'b':
+        return 'bool';
+      case 'f':
+        return 'float';
+      case 'd':
+        return 'double';
+      default:
+        throw new Error(`Unknown type: ${type}`);
+    }
   }
+  if (type.t === 'R') {
+    return type.r; // Reference type, just return the name
+  }
+  if (type.t === 'A') {
+    return `std::vector<${getTypeName(type.d)}>`;
+  }
+  if (type.t === 'S') {
+    return `std::set<${getTypeName(type.d)}>`;
+  }
+  if (type.t === 'M') {
+    return `std::map<${getTypeName(type.k)}, ${getTypeName(type.v)}>`;
+  }
+  if (type.t === 'T') {
+    return `std::tuple<${type.l.map(getTypeName).join(', ')}>`;
+  }
+  throw new Error(`Unsupported unnamed type: ${JSON.stringify(type)}`);
 }
 
 const enumType: EmitItem<Enum> = async (writer, name, item) => {
@@ -142,15 +165,35 @@ const objType: EmitItem<ObjType> = async (writer, name, item) => {
   };\n`);
 };
 
+const arrType: EmitItem<ArrType> = async (writer, name, item) => {
+  await writer.write(`
+  using ${name} = std::vector<${getTypeName(item.d)}>;
+  `);
+};
+const setType: EmitItem<SetType> = async (writer, name, item) => {
+  await writer.write(`
+  using ${name} = std::set<${getTypeName(item.d)}>;
+  `);
+};
+const mapType: EmitItem<MapType> = async (writer, name, item) => {
+  await writer.write(`
+  using ${name} = std::map<${getTypeName(item.k)}, ${getTypeName(item.v)}>;
+  `);
+};
+const tupType: EmitItem<TupType> = async (writer, name, item) => {
+  await writer.write(`
+  using ${name} = std::tuple<${item.l.map(getTypeName).join(', ')}>;
+  `);
+};
 export const CppEmitter: Emitter = {
   header,
   footer,
   types: {
     objType,
-    arrType: NYI<ArrType>('arrType'),
-    setType: NYI<SetType>('setType'),
-    mapType: NYI<MapType>('mapType'),
-    tupType: NYI<TupType>('tupType'),
+    arrType,
+    setType,
+    mapType,
+    tupType,
     enumType,
     numEnumType,
     strEnumType,
