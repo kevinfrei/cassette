@@ -18,7 +18,7 @@ export function App(): ReactElement {
       <VolumeControl />
       <Sidebar />
       <ViewSelector />
-      <div className="SongDetailPanel">Song Detail Panel</div>
+      <div className="SongDetailPanel" />
     </div>
   );
 }
