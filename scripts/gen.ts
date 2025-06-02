@@ -1,10 +1,9 @@
 import { hasFieldType } from '@freik/typechk';
 
-import { chkSharedEnum, SharedEnum } from '../www/Shared/EnumTypeSupport';
-import { EnumsToGenerate } from '../www/Shared/Enums';
+import { TypesToGenerate } from '../www/Shared/Enums';
 
 async function emitPreamble(stream: Bun.FileSink): Promise<void> {
-  await stream.write(`// Generated from www/SharedConstants.ts by scripts/gencpp.ts
+  await stream.write(`// Generated from www/Shared/Enums.ts by scripts/gencpp.ts
 
 #ifndef SHARED_CONSTANTS_HPP
 #define SHARED_CONSTANTS_HPP
@@ -131,12 +130,12 @@ async function main(fileName?: string): Promise<void> {
   }
 
   const items: [string, SharedEnum<unknown>][] = [];
-  for (const sc of Object.keys(EnumsToGenerate)) {
-    if (!hasFieldType(EnumsToGenerate, sc, chkSharedEnum)) {
+  for (const sc of Object.keys(TypesToGenerate)) {
+    if (!hasFieldType(TypesToGenerate, sc, chkSharedEnum)) {
       console.warn(`Skipping ${sc} as it does not match SharedConstants type.`);
       continue;
     }
-    items.push([sc, EnumsToGenerate[sc]]);
+    items.push([sc, TypesToGenerate[sc]]);
   }
 
   await emitCode(fileName, items);
