@@ -1,144 +1,62 @@
 import { hasFieldType } from '@freik/typechk';
 
 import { TypesToGenerate } from '../www/Shared/Enums';
+import { ADTs } from '../www/Shared/IDL';
+import { CppEmitter } from './emitters/cpp';
+import { EmitItem, Emitter } from './emitters/interface';
 
-async function emitPreamble(stream: Bun.FileSink): Promise<void> {
-  await stream.write(`// Generated from www/Shared/Enums.ts by scripts/gencpp.ts
-
-#ifndef SHARED_CONSTANTS_HPP
-#define SHARED_CONSTANTS_HPP
-
-#pragma once
-
-#include <string_view>
-#include <optional>
-
-namespace Shared {
-`);
-}
-
-async function emitPostamble(writer: Bun.FileSink): Promise<void> {
-  await writer.write(`
-
-} // namespace Shared
-
-#endif // SHARED_CONSTANTS_HPP
-`);
-}
-
-async function emitNumericEnum(
-  writer: Bun.FileSink,
-  name: string,
-  item: SharedEnum<number>,
-): Promise<void> {
-  await writer.write(`
-  // ${item.description}
-  enum class ${name}: ${item.type[0]} {
-${Object.entries(item.values)
-  .map(([key, value]) => `    ${key} = ${value},`)
-  .join('\n')}
-  };`);
-}
-
-async function emitStringEnum(
-  writer: Bun.FileSink,
-  name: string,
-  item: SharedEnum<string>,
-): Promise<void> {
-  writer.write(`
-  // ${item.description}
-  enum class ${name} {
-${Object.keys(item.values)
-  .map((key) => `    ${key},`)
-  .join('\n')}
-  };
-`);
-
-  writer.write(`
-  constexpr std::string_view get_string(${name} _value) {
-    switch (_value) {
-${Object.entries(item.values)
-  .map(([key, val]) => `      case ${name}::${key}: return "${val}";`)
-  .join('\n')}
-    }
-    return "<unknown>";
-  }
-`);
-
-  // This is *super* simplistic, and could be optimized in various ways...
-  writer.write(`
-  constexpr std::optional<${name}> string_to_${name}(const std::string_view &str) {
-${Object.entries(item.values)
-  .map(([key, val]) => `    if (str == "${val}") return ${name}::${key};`)
-  .join('\n')}
-    return std::nullopt;
-  }
-`);
-}
-
-async function emitConstantEnums(
-  enums: [string, SharedEnum<unknown>][],
-  writer: Bun.FileSink,
-) {
-  for (const [name, item] of enums) {
-    // Emit the C++ code for each SharedConstants item, either numeric or string type
-    switch (item.type[0]) {
-      case 'char':
-      case 'unsigned char':
-      case 'short':
-      case 'unsigned short':
-      case 'int':
-      case 'unsigned int':
-      case 'long':
-      case 'unsigned long':
-      case 'long long':
-      case 'unsigned long long': {
-        await emitNumericEnum(writer, name, item as SharedEnum<number>);
-        break;
-      }
-      case 'string': {
-        await emitStringEnum(writer, name, item as SharedEnum<string>);
-        break;
-      }
-      default: {
-        console.warn(`Unknown type for SharedConstants: ${item.type}`);
-      }
-    }
+function forElement(emit: Emitter, adt: ADTs): EmitItem<any> {
+  // Returns the type emitter for the given ADT
+  switch (adt.t) {
+    case 'O':
+      return emit.types.objType;
+    case 'A':
+      return emit.types.arrType;
+    case 'S':
+      return emit.types.setType;
+    case 'M':
+      return emit.types.mapType;
+    case 'T':
+      return emit.types.tupType;
+    case '#':
+      return emit.types.enumType;
+    case '%':
+      return emit.types.numEnumType;
+    case '$':
+      return emit.types.strEnumType;
+    default:
+      throw new Error(`Unknown ADT type: ${adt.t}`);
   }
 }
 
 async function emitCode(
   fileName: string,
-  enums: [string, SharedEnum<unknown>][],
+  items: Record<string, ADTs>,
 ): Promise<void> {
   const file = Bun.file(fileName);
   if (await file.exists()) {
     await file.delete();
   }
   const writer = file.writer();
-  await emitPreamble(writer);
-  await emitConstantEnums(enums, writer);
-  await emitPostamble(writer);
+  const emitter = CppEmitter;
+  await emitter.header(writer);
+  for (const [name, item] of Object.entries(items)) {
+    // Emit the C++ code for each SharedConstants item, either numeric or string type
+    const itemEmitter = forElement(emitter, item);
+    await itemEmitter(writer, name, item);
+  }
+  await emitter.footer(writer);
   await writer.end();
 }
 
 async function main(fileName?: string): Promise<void> {
   // A script to generate C++ code from the SharedConstants.ts file
   if (!fileName) {
-    console.error('Usage: scripts/gencpp.ts <output_file>');
+    console.error('Usage: scripts/gen.ts <output_file>');
     process.exit(1);
   }
 
-  const items: [string, SharedEnum<unknown>][] = [];
-  for (const sc of Object.keys(TypesToGenerate)) {
-    if (!hasFieldType(TypesToGenerate, sc, chkSharedEnum)) {
-      console.warn(`Skipping ${sc} as it does not match SharedConstants type.`);
-      continue;
-    }
-    items.push([sc, TypesToGenerate[sc]]);
-  }
-
-  await emitCode(fileName, items);
+  await emitCode(fileName, TypesToGenerate);
 }
 
 console.log(`Generating C++ code to ${Bun.argv[2]}...`);

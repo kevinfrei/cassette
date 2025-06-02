@@ -33,14 +33,9 @@ export type SEnum = { t: '$'; v: Of<string> };
 
 export type Enums = Enum | NEnum | SEnum;
 
-export type Types =
-  | Atoms
-  | Enums
-  | ObjType
-  | ArrType
-  | SetType
-  | MapType
-  | TupType;
+export type ADTs = ObjType | ArrType | SetType | MapType | TupType | Enums;
+
+export type Types = Atoms | ADTs;
 
 export const str = (): Str => 's';
 export const chr = (): Char => 'c';

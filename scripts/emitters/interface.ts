@@ -18,7 +18,7 @@ export type EmitItem<T> = (
 export type Emitter = {
   header: (writer: Bun.FileSink) => Promise<void>;
   footer: (writer: Bun.FileSink) => Promise<void>;
-  elements: {
+  types: {
     objType: EmitItem<ObjType>;
     arrType: EmitItem<ArrType>;
     setType: EmitItem<SetType>;
@@ -28,4 +28,5 @@ export type Emitter = {
     numEnumType: EmitItem<NEnum>;
     strEnumType: EmitItem<SEnum>;
   };
+  fields: {};
 };
