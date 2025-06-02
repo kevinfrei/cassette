@@ -95,7 +95,7 @@ const strEnumType: EmitItem<SEnum> = async (writer, name, item) => {
   writer.write(`
   // ${name}
   enum class ${name} {
-${Object.keys(item.values)
+${Object.keys(item.v)
   .map((key) => `    ${key},`)
   .join('\n')}
   };
@@ -104,7 +104,7 @@ ${Object.keys(item.values)
   writer.write(`
   constexpr std::string_view get_string(${name} _value) {
     switch (_value) {
-${Object.entries(item.values)
+${Object.entries(item.v)
   .map(([key, val]) => `      case ${name}::${key}: return "${val}";`)
   .join('\n')}
     }
@@ -115,7 +115,7 @@ ${Object.entries(item.values)
   // This is *super* simplistic, and could be optimized in various ways...
   writer.write(`
   constexpr std::optional<${name}> string_to_${name}(const std::string_view &str) {
-${Object.entries(item.values)
+${Object.entries(item.v)
   .map(([key, val]) => `    if (str == "${val}") return ${name}::${key};`)
   .join('\n')}
     return std::nullopt;
@@ -133,7 +133,7 @@ function NYI<T>(name: string): EmitItem<T> {
 export const CppEmitter: Emitter = {
   header,
   footer,
-  elements: {
+  types: {
     objType: NYI<ObjType>('objType'),
     arrType: NYI<ArrType>('arrType'),
     setType: NYI<SetType>('setType'),
