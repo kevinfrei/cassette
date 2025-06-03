@@ -1,7 +1,9 @@
 import { MessageBar, MessageBarType } from '@fluentui/react';
 import { useAtom } from 'jotai';
 import { ReactElement, useEffect } from 'react';
+
 import { displayMessageState, recentlyQueuedState } from '../Jotai/Local';
+
 import './styles/Notifier.css';
 
 // This is a little self-contained notification doohickey

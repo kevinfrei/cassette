@@ -6,14 +6,13 @@ import {
   ReactElement,
   useCallback,
 } from 'react';
-
 import {
   NextRepeat,
   repeatState,
   shuffleState,
 } from 'www/State/SimpleSavedState';
 import { GetHelperText } from 'www/WebHelpers';
-import { Keys } from 'www/Constants';
+import { Keys } from 'www/Shared/CommonTypes';
 
 import '../styles/PlaybackControls.css';
 

@@ -1,9 +1,10 @@
 import { AlbumKey, ArtistKey, Song } from '@freik/media-core';
 import { hasFieldType, isArrayOfString } from '@freik/typechk';
 import { useAtomValue } from 'jotai';
+import { ReactElement } from 'react';
+
 import { albumByKey } from '../Jotai/Albums';
 import { artistStringStateFamily } from '../Jotai/Artists';
-import { ReactElement } from 'react';
 
 export function ArtistNameFromArtistIds({
   artistIds,
