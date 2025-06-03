@@ -11,7 +11,7 @@ import {
   IpcId_source,
   Keys_source,
   StrId_source,
-} from './Shared/Enums';
+} from './Shared/Definitions';
 
 // This is mostly just silly boilerplate to make sure that the enums
 // are properly typed and can be used in TypeScript.

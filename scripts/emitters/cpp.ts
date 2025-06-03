@@ -1,3 +1,4 @@
+import { isString } from '@freik/typechk';
 import {
   ArrType,
   Simple,
@@ -10,6 +11,26 @@ import {
   SetType,
   TupType,
   Types,
+  isSimpleType,
+  isRefType,
+  isArrayType,
+  isSetType,
+  isMapType,
+  isTupleType,
+  isPlainIntEnumType,
+  isU8Type,
+  isI8Type,
+  isU16Type,
+  isI16Type,
+  isI32Type,
+  isU32Type,
+  isU64Type,
+  isI64Type,
+  isCharType,
+  isBoolType,
+  isFloatType,
+  isDoubleType,
+  isStringType,
 } from '../../www/Shared/IDL';
 import { FileGenerator, MakeGenerator, EmitItem, Emitter } from './api';
 
@@ -22,15 +43,17 @@ async function header(writer: Bun.FileSink): Promise<void> {
 #pragma once
 
 #include <cstdint>
-#include <string_view>
-#include <optional>
-#include <vector>
-#include <set>
 #include <map>
-#include <tuple>
+#include <optional>
+#include <set>
 #include <string>
+#include <string_view>
+#include <tuple>
+#include <vector>
 
 namespace Shared {
+template <typename T>
+constexpr std::optional<T> from_string(const std::string_view& str);
 `);
 }
 
@@ -44,114 +67,104 @@ async function footer(writer: Bun.FileSink): Promise<void> {
 }
 
 function getTypeName(type: Types): string {
-  if (typeof type === 'string') {
-    switch (type) {
-      case '0':
-        return 'std::uint8_t';
-      case '1':
-        return 'std::int8_t';
-      case '2':
-        return 'std::uint16_t';
-      case '3':
-        return 'std::int16_t';
-      case '4':
-        return 'std::uint32_t';
-      case '5':
-        return 'std::int32_t';
-      case '6':
-        return 'std::uint64_t';
-      case '7':
-        return 'std::int64_t';
-      case 's':
-        return 'std::string';
-      case 'c':
-        return 'char';
-      case 'b':
-        return 'bool';
-      case 'f':
-        return 'float';
-      case 'd':
-        return 'double';
-      default:
-        throw new Error(`Unknown type: ${type}`);
-    }
-  }
-  if (type.t === 'R') {
+  if (isU8Type(type)) {
+    return 'std::uint8_t';
+  } else if (isI8Type(type)) {
+    return 'std::int8_t';
+  } else if (isU16Type(type)) {
+    return 'std::uint16_t';
+  } else if (isI16Type(type)) {
+    return 'std::int16_t';
+  } else if (isU32Type(type)) {
+    return 'std::uint32_t';
+  } else if (isI32Type(type)) {
+    return 'std::int32_t';
+  } else if (isU64Type(type)) {
+    return 'std::uint64_t';
+  } else if (isI64Type(type)) {
+    return 'std::int64_t';
+  } else if (isStringType(type)) {
+    return 'std::string';
+  } else if (isCharType(type)) {
+    return 'char';
+  } else if (isBoolType(type)) {
+    return 'bool';
+  } else if (isFloatType(type)) {
+    return 'float';
+  } else if (isDoubleType(type)) {
+    return 'double';
+  } else if (isRefType(type)) {
     return type.r; // Reference type, just return the name
-  }
-  if (type.t === 'A') {
+  } else if (isArrayType(type)) {
     return `std::vector<${getTypeName(type.d)}>`;
-  }
-  if (type.t === 'S') {
+  } else if (isSetType(type)) {
     return `std::set<${getTypeName(type.d)}>`;
-  }
-  if (type.t === 'M') {
+  } else if (isMapType(type)) {
     return `std::map<${getTypeName(type.k)}, ${getTypeName(type.v)}>`;
-  }
-  if (type.t === 'T') {
+  } else if (isTupleType(type)) {
     return `std::tuple<${type.l.map(getTypeName).join(', ')}>`;
   }
   throw new Error(`Unsupported unnamed type: ${JSON.stringify(type)}`);
 }
 
 const enumType: EmitItem<Enum> = async (writer, name, item) => {
-  const typeName = item.u === '8' ? '' : `: ${getTypeName(item.u)}`;
+  const typeName = isPlainIntEnumType(item.u) ? '' : `: ${getTypeName(item.u)}`;
   await writer.write(`
-  enum class ${name}${typeName} {
-${Object.entries(item.v)
-  .map((key) => `    ${key},`)
-  .join('\n')}
-  };`);
+enum class ${name}${typeName} {
+  ${item.v.join(',\n  ')}
+};`);
 };
 
 const numEnumType: EmitItem<NEnum> = async (writer, name, item) => {
-  const typeName = item.u === '8' ? '' : `: ${getTypeName(item.u)}`;
+  const typeName = isPlainIntEnumType(item.u) ? '' : `: ${getTypeName(item.u)}`;
   await writer.write(`
-  enum class ${name}:${typeName} {
+enum class ${name}${typeName} {
 ${Object.entries(item.v)
-  .map(([key, value]) => `    ${key} = ${value},`)
+  .map(([key, value]) => `  ${key} = ${value},`)
   .join('\n')}
-  };`);
+};`);
 };
 
 const strEnumType: EmitItem<SEnum> = async (writer, name, item) => {
   await writer.write(`
-  // ${name}
-  enum class ${name} {
-${Object.keys(item.v)
-  .map((key) => `    ${key},`)
-  .join('\n')}
-  };
+// ${name}
+enum class ${name} {
+  ${Object.keys(item.v)
+    .map((key) => `${key}`)
+    .join(',\n  ')}
+};
 `);
 
   await writer.write(`
-  constexpr std::string_view get_string(${name} _value) {
-    switch (_value) {
+inline constexpr std::string_view to_string(${name} _value) {
+  switch (_value) {
 ${Object.entries(item.v)
-  .map(([key, val]) => `      case ${name}::${key}: return "${val}";`)
+  .map(
+    ([key, val]) => `    case ${name}::${key}:
+      return "${val}";`,
+  )
   .join('\n')}
-    }
-    return "<unknown>";
+    default:
+      return "<unknown>";
   }
+}
 `);
 
   // This is *super* simplistic, and could be optimized in various ways...
   await writer.write(`
-  constexpr std::optional<${name}> string_to_${name}(const std::string_view &str) {
+template <>
+inline constexpr std::optional<${name}> from_string<${name}>(
+    const std::string_view& str) {
 ${Object.entries(item.v)
-  .map(([key, val]) => `    if (str == "${val}") return ${name}::${key};`)
+  .map(
+    ([key, val]) => `  if (str == "${val}")
+    return ${name}::${key};`,
+  )
   .join('\n')}
-    return std::nullopt;
-  }
+  return std::nullopt;
+}
 `);
 };
-
-function NYI<T>(name: string): EmitItem<T> {
-  return async () => {
-    console.error(`${name} not implemented in CppEmitter`);
-    return Promise.resolve();
-  };
-}
 
 const objType: EmitItem<ObjType> = async (writer, name, item) => {
   await writer.write(`
@@ -170,21 +183,25 @@ const arrType: EmitItem<ArrType> = async (writer, name, item) => {
   using ${name} = std::vector<${getTypeName(item.d)}>;
   `);
 };
+
 const setType: EmitItem<SetType> = async (writer, name, item) => {
   await writer.write(`
   using ${name} = std::set<${getTypeName(item.d)}>;
   `);
 };
+
 const mapType: EmitItem<MapType> = async (writer, name, item) => {
   await writer.write(`
   using ${name} = std::map<${getTypeName(item.k)}, ${getTypeName(item.v)}>;
   `);
 };
+
 const tupType: EmitItem<TupType> = async (writer, name, item) => {
   await writer.write(`
   using ${name} = std::tuple<${item.l.map(getTypeName).join(', ')}>;
   `);
 };
+
 export const CppEmitter: Emitter = {
   header,
   footer,
@@ -198,7 +215,6 @@ export const CppEmitter: Emitter = {
     numEnumType,
     strEnumType,
   },
-  fields: {},
 };
 
 export function GetCppGenerator(): FileGenerator {

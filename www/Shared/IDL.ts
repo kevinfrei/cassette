@@ -1,6 +1,8 @@
 // My silly IDL is actually just a set of functions that can be interpreted
 // by a script to create types for the data structures.
 
+import { isObjectNonNull, isString } from '@freik/typechk';
+
 export type Of<T> = { [key: string]: T };
 export type Str = 's';
 export type Char = 'c';
@@ -41,7 +43,8 @@ export type Anonymous =
   | SetType
   | MapType
   | TupType;
-export type Types = Anonymous | ObjType | EnumType;
+export type Types = Anonymous | ObjType | EnumType | I;
+export type NamedTypes = ObjType | EnumType;
 
 export const str = (): Str => 's';
 export const chr = (): Char => 'c';
@@ -74,6 +77,92 @@ export const enum_num = (u: Int | I, v: Of<number>): NEnum => ({
   v,
 });
 export const enum_str = (v: Of<string>): SEnum => ({ t: '$', v });
+
+// Type guards for the IDL types
+export function isStringType(x: Types): x is Str {
+  return x === 's';
+}
+export function isCharType(x: Types): x is Char {
+  return x === 'c';
+}
+export function isU8Type(x: Types): x is U8 {
+  return x === '0';
+}
+export function isI8Type(x: Types): x is I8 {
+  return x === '1';
+}
+export function isU16Type(x: Types): x is U16 {
+  return x === '2';
+}
+export function isI16Type(x: Types): x is I16 {
+  return x === '3';
+}
+export function isU32Type(x: Types): x is U32 {
+  return x === '4';
+}
+export function isI32Type(x: Types): x is I32 {
+  return x === '5';
+}
+export function isU64Type(x: Types): x is U64 {
+  return x === '6';
+}
+export function isI64Type(x: Types): x is I64 {
+  return x === '7';
+}
+export function isPlainIntEnumType(x: Types): x is I {
+  return x === '8';
+}
+export function isBoolType(x: Types): x is Bool {
+  return x === 'b';
+}
+export function isFloatType(x: Types): x is Flt {
+  return x === 'f';
+}
+export function isDoubleType(x: Types): x is Dbl {
+  return x === 'd';
+}
+export function isSimpleType(x: Types): x is Simple {
+  return isString(x) && x.length === 1 && 'sc01234567bfd'.indexOf(x) >= 0;
+}
+export function isRefType(x: Types): x is RefType {
+  return isObjectNonNull(x) && x.t === 'R';
+}
+export function isArrayType(x: Types): x is ArrType {
+  return isObjectNonNull(x) && x.t === 'A';
+}
+export function isSetType(x: Types): x is SetType {
+  return isObjectNonNull(x) && x.t === 'S';
+}
+export function isMapType(x: Types): x is MapType {
+  return isObjectNonNull(x) && x.t === 'M';
+}
+export function isTupleType(x: Types): x is TupType {
+  return isObjectNonNull(x) && x.t === 'T';
+}
+export function isObjectType(x: Types): x is ObjType {
+  return isObjectNonNull(x) && x.t === 'O';
+}
+export function isPlainEnumType(x: Types): x is Enum {
+  return isObjectNonNull(x) && x.t === '#';
+}
+export function isNumericEnumType(x: Types): x is NEnum {
+  return isObjectNonNull(x) && x.t === '%';
+}
+export function isStringEnumType(x: Types): x is SEnum {
+  return isObjectNonNull(x) && x.t === '$';
+}
+export function isEnumType(x: Types): x is EnumType {
+  return isObjectNonNull(x) && (x.t === '#' || x.t === '%' || x.t === '$');
+}
+export function isNamedType(x: Types): x is ObjType | EnumType {
+  return (
+    isObjectNonNull(x) &&
+    (x.t === 'O' || x.t === '#' || x.t === '%' || x.t === '$')
+  );
+}
+export function isAnonymousType(x: Types): x is Anonymous {
+  return !isNamedType(x);
+}
 
 export type SymbolList = Record<string, Types>;
 
@@ -114,13 +203,13 @@ export const TypesToGenerate: SymbolList = {
   ExampleEnum1,
   ExampleEnum2,
   ExampleEnum3,
+  // Inlined type for Metadata:
+  Metadata: obj({ author: str(), angle: dbl() }),
+  ExampleTupleType: ExampleTupleType_otherName,
   ExampleObjectType,
   ExampleArrayType,
-  ExampleObjectTupleType,
   ExampleNestedObjectType,
   ExampleNestedObjectType1,
   ExampleNestedObjectType2,
-  ExampleTupleType: ExampleTupleType_otherName,
-  // Inlined type for Metadata:
-  Metadata: obj({ author: str(), angle: dbl() }),
+  ExampleObjectTupleType,
 };

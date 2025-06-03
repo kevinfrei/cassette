@@ -1,13 +1,21 @@
 import {
-  Aggregate,
   ArrType,
   Enum,
+  isArrayType,
+  isMapType,
+  isNumericEnumType,
+  isObjectType,
+  isPlainEnumType,
+  isSetType,
+  isStringEnumType,
+  isTupleType,
   MapType,
   NEnum,
   ObjType,
   SEnum,
   SetType,
   TupType,
+  Types,
 } from '../../www/Shared/IDL';
 
 export type EmitItem<T> = (
@@ -29,37 +37,34 @@ export type Emitter = {
     numEnumType: EmitItem<NEnum>;
     strEnumType: EmitItem<SEnum>;
   };
-  fields: {};
 };
 
-function forElement(emit: Emitter, adt: Aggregate): EmitItem<any> {
+function forElement(emit: Emitter, adt: Types): EmitItem<any> {
   // Returns the type emitter for the given ADT
-  switch (adt.t) {
-    case 'O':
-      return emit.types.objType;
-    case 'A':
-      return emit.types.arrType;
-    case 'S':
-      return emit.types.setType;
-    case 'M':
-      return emit.types.mapType;
-    case 'T':
-      return emit.types.tupType;
-    case '#':
-      return emit.types.enumType;
-    case '%':
-      return emit.types.numEnumType;
-    case '$':
-      return emit.types.strEnumType;
-    default:
-      throw new Error(`Unknown ADT type: ${adt.t}`);
+  if (isObjectType(adt)) {
+    return emit.types.objType;
+  } else if (isArrayType(adt)) {
+    return emit.types.arrType;
+  } else if (isSetType(adt)) {
+    return emit.types.setType;
+  } else if (isMapType(adt)) {
+    return emit.types.mapType;
+  } else if (isTupleType(adt)) {
+    return emit.types.tupType;
+  } else if (isPlainEnumType(adt)) {
+    return emit.types.enumType;
+  } else if (isNumericEnumType(adt)) {
+    return emit.types.numEnumType;
+  } else if (isStringEnumType(adt)) {
+    return emit.types.strEnumType;
   }
+  throw new Error(`Unknown ADT type: ${adt.t}`);
 }
 
 async function emitCode(
   emitter: Emitter,
   fileName: string,
-  items: Record<string, Aggregate>,
+  items: Record<string, Types>,
 ): Promise<void> {
   const file = Bun.file(fileName);
   if (await file.exists()) {
@@ -78,10 +83,10 @@ async function emitCode(
 
 export type FileGenerator = (
   fileName: string,
-  items: Record<string, Aggregate>,
+  items: Record<string, Types>,
 ) => Promise<void>;
 
 export function MakeGenerator(emitter: Emitter): FileGenerator {
-  return async (fileName: string, items: Record<string, Aggregate>) =>
+  return async (fileName: string, items: Record<string, Types>) =>
     await emitCode(emitter, fileName, items);
 }
