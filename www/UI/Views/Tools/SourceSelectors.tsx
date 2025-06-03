@@ -1,8 +1,9 @@
+import { ReactElement } from 'react';
 import { ComboBox, IComboBox, IComboBoxOption } from '@fluentui/react';
 import { AlbumKey, Artist, ArtistKey, PlaylistName } from '@freik/media-core';
 import { isDefined, isString } from '@freik/typechk';
 import { useAtom, useAtomValue } from 'jotai';
-import { useRecoilValue } from 'recoil';
+
 import { useJotaiCallback } from '../../../Jotai/Helpers';
 import { WritableAtomType } from '../../../Jotai/Hooks';
 import { playlistNamesState } from '../../../Jotai/PlaylistControl';
@@ -13,7 +14,6 @@ import {
   artistByKeyFuncFam,
   filteredArtistsFunc,
 } from '../../../Recoil/ReadOnly';
-import { ReactElement } from 'react';
 
 export function PlaylistSelector({
   value,

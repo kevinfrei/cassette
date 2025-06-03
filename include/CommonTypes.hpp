@@ -603,6 +603,257 @@ inline constexpr std::optional<IgnoreItemType> from_string<IgnoreItemType>(
   return std::nullopt;
 }
 
+// StorageId
+enum class StorageId {
+  CurrentView,
+  CurrentIndex,
+  PlaybackOrder,
+  NowPlaying,
+  CurrentSongList,
+  Shuffle,
+  Repeat,
+  NeverPlayHates,
+  OnlyPlayLikes,
+  FullAlbumsOnly,
+  MinSongCount,
+  Mute,
+  LikedSongs,
+  HatedSongs,
+  Volume,
+  Locations,
+  DefaultLocation,
+  SortWithArticles,
+  DownloadAlbumArtwork,
+  DownloadArtistArtwork,
+  SaveAlbumArtworkWithMusic,
+  AlbumCoverName,
+  TranscodingUpdate,
+  TranscodeSrcLocDir,
+  TranscodeSrcLocPlaylist,
+  TranscodeSrcLocArtist,
+  TranscodeSrcLocAlbum,
+  TranscodeDestLoc,
+  TranscodeBitRate
+};
+
+inline constexpr std::string_view to_string(StorageId _value) {
+  switch (_value) {
+    case StorageId::CurrentView:
+      return "CurrentView";
+    case StorageId::CurrentIndex:
+      return "currentIndex";
+    case StorageId::PlaybackOrder:
+      return "playbackOrder";
+    case StorageId::NowPlaying:
+      return "nowPlaying";
+    case StorageId::CurrentSongList:
+      return "currentSongList";
+    case StorageId::Shuffle:
+      return "shuffle";
+    case StorageId::Repeat:
+      return "repeat";
+    case StorageId::NeverPlayHates:
+      return "neverPlayHates";
+    case StorageId::OnlyPlayLikes:
+      return "onlyPlayLikes";
+    case StorageId::FullAlbumsOnly:
+      return "FullAlbumsOnly";
+    case StorageId::MinSongCount:
+      return "MinSongCount";
+    case StorageId::Mute:
+      return "mute";
+    case StorageId::LikedSongs:
+      return "likedSongs";
+    case StorageId::HatedSongs:
+      return "hatedSongs";
+    case StorageId::Volume:
+      return "volume";
+    case StorageId::Locations:
+      return "locations";
+    case StorageId::DefaultLocation:
+      return "defaultLocation";
+    case StorageId::SortWithArticles:
+      return "rSortWithArticles";
+    case StorageId::DownloadAlbumArtwork:
+      return "downloadAlbumArtwork";
+    case StorageId::DownloadArtistArtwork:
+      return "downloadArtistArtwork";
+    case StorageId::SaveAlbumArtworkWithMusic:
+      return "saveAlbumArtworkWithMusic";
+    case StorageId::AlbumCoverName:
+      return "albumCoverName";
+    case StorageId::TranscodingUpdate:
+      return "get-xcode-update";
+    case StorageId::TranscodeSrcLocDir:
+      return "xcodeSrcLocDir";
+    case StorageId::TranscodeSrcLocPlaylist:
+      return "xcodeSrcLocPlaylist";
+    case StorageId::TranscodeSrcLocArtist:
+      return "xcodeSrcLocArtist";
+    case StorageId::TranscodeSrcLocAlbum:
+      return "xcodeSrcLocAlbum";
+    case StorageId::TranscodeDestLoc:
+      return "xcodeDestLoc";
+    case StorageId::TranscodeBitRate:
+      return "xcodeBitRate";
+    default:
+      return "<unknown>";
+  }
+}
+
+template <>
+inline constexpr std::optional<StorageId> from_string<StorageId>(
+    const std::string_view& str) {
+  if (str == "CurrentView")
+    return StorageId::CurrentView;
+  if (str == "currentIndex")
+    return StorageId::CurrentIndex;
+  if (str == "playbackOrder")
+    return StorageId::PlaybackOrder;
+  if (str == "nowPlaying")
+    return StorageId::NowPlaying;
+  if (str == "currentSongList")
+    return StorageId::CurrentSongList;
+  if (str == "shuffle")
+    return StorageId::Shuffle;
+  if (str == "repeat")
+    return StorageId::Repeat;
+  if (str == "neverPlayHates")
+    return StorageId::NeverPlayHates;
+  if (str == "onlyPlayLikes")
+    return StorageId::OnlyPlayLikes;
+  if (str == "FullAlbumsOnly")
+    return StorageId::FullAlbumsOnly;
+  if (str == "MinSongCount")
+    return StorageId::MinSongCount;
+  if (str == "mute")
+    return StorageId::Mute;
+  if (str == "likedSongs")
+    return StorageId::LikedSongs;
+  if (str == "hatedSongs")
+    return StorageId::HatedSongs;
+  if (str == "volume")
+    return StorageId::Volume;
+  if (str == "locations")
+    return StorageId::Locations;
+  if (str == "defaultLocation")
+    return StorageId::DefaultLocation;
+  if (str == "rSortWithArticles")
+    return StorageId::SortWithArticles;
+  if (str == "downloadAlbumArtwork")
+    return StorageId::DownloadAlbumArtwork;
+  if (str == "downloadArtistArtwork")
+    return StorageId::DownloadArtistArtwork;
+  if (str == "saveAlbumArtworkWithMusic")
+    return StorageId::SaveAlbumArtworkWithMusic;
+  if (str == "albumCoverName")
+    return StorageId::AlbumCoverName;
+  if (str == "get-xcode-update")
+    return StorageId::TranscodingUpdate;
+  if (str == "xcodeSrcLocDir")
+    return StorageId::TranscodeSrcLocDir;
+  if (str == "xcodeSrcLocPlaylist")
+    return StorageId::TranscodeSrcLocPlaylist;
+  if (str == "xcodeSrcLocArtist")
+    return StorageId::TranscodeSrcLocArtist;
+  if (str == "xcodeSrcLocAlbum")
+    return StorageId::TranscodeSrcLocAlbum;
+  if (str == "xcodeDestLoc")
+    return StorageId::TranscodeDestLoc;
+  if (str == "xcodeBitRate")
+    return StorageId::TranscodeBitRate;
+  return std::nullopt;
+}
+
+// TranscodeFormatTargetName
+enum class TranscodeFormatTargetName { m4a, mp3, aac };
+
+inline constexpr std::string_view to_string(TranscodeFormatTargetName _value) {
+  switch (_value) {
+    case TranscodeFormatTargetName::m4a:
+      return "m4a";
+    case TranscodeFormatTargetName::mp3:
+      return "mp3";
+    case TranscodeFormatTargetName::aac:
+      return "aac";
+    default:
+      return "<unknown>";
+  }
+}
+
+template <>
+inline constexpr std::optional<TranscodeFormatTargetName>
+from_string<TranscodeFormatTargetName>(const std::string_view& str) {
+  if (str == "m4a")
+    return TranscodeFormatTargetName::m4a;
+  if (str == "mp3")
+    return TranscodeFormatTargetName::mp3;
+  if (str == "aac")
+    return TranscodeFormatTargetName::aac;
+  return std::nullopt;
+}
+
+// TranscodeSource
+enum class TranscodeSource { Playlist, Artist, Album, Disk };
+
+inline constexpr std::string_view to_string(TranscodeSource _value) {
+  switch (_value) {
+    case TranscodeSource::Playlist:
+      return "p";
+    case TranscodeSource::Artist:
+      return "r";
+    case TranscodeSource::Album:
+      return "l";
+    case TranscodeSource::Disk:
+      return "d";
+    default:
+      return "<unknown>";
+  }
+}
+
+template <>
+inline constexpr std::optional<TranscodeSource> from_string<TranscodeSource>(
+    const std::string_view& str) {
+  if (str == "p")
+    return TranscodeSource::Playlist;
+  if (str == "r")
+    return TranscodeSource::Artist;
+  if (str == "l")
+    return TranscodeSource::Album;
+  if (str == "d")
+    return TranscodeSource::Disk;
+  return std::nullopt;
+}
+
+struct TranscodeSourceLocation {
+  TranscodeSource type;
+  std::string loc;
+};
+
+struct FileFailure {
+  std::string file;
+  std::string error;
+};
+
+struct TranscodeState {
+  std::string curStatus;
+  std::vector<std::string> filesTranscoded;
+  std::int32_t filesFound;
+  std::int32_t filesPending;
+  std::int32_t filesUntouched;
+  std::vector<FileFailure> filesFailed;
+  std::vector<std::string> itemsRemoved;
+};
+
+struct TranscodeInfo {
+  TranscodeSourceLocation source;
+  std::string dest;
+  bool artwork;
+  bool mirror;
+  TranscodeFormatTargetName format;
+  std::uint16_t bitrate;
+};
+
 } // namespace Shared
 
 #endif // SHARED_CONSTANTS_HPP
