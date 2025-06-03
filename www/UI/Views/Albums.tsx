@@ -10,34 +10,24 @@ import {
   SelectionMode,
   Text,
 } from '@fluentui/react';
-import { CurrentView } from '@freik/emp-shared';
 import { MakeLog } from '@freik/logger';
 import { AlbumKey, Song } from '@freik/media-core';
 import { hasFieldType, isDefined, isNumber } from '@freik/typechk';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
 import { ReactElement, useCallback, useState } from 'react';
-import { useRecoilValue } from 'recoil';
+
 import { AddSongs } from '../../Jotai/API';
 import { useJotaiCallback } from '../../Jotai/Helpers';
 import { MakeSetAtomFamily } from '../../Jotai/Hooks';
 import { focusedKeysFuncFam } from '../../Jotai/KeyBuffer';
 import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
-import { SongListFromKey } from '../../Recoil/api';
-import {
-  albumByKeyFuncFam,
-  allAlbumsFunc,
-  allArtistsFunc,
-  allSongsFunc,
-  dataForAlbumFuncFam,
-} from '../../Recoil/ReadOnly';
 import {
   articlesCmp,
   MakeSortKey,
   noArticlesCmp,
   SortSongsFromAlbums,
 } from '../../Sorting';
-import { getAlbumImageUrl, GetIndexOf } from '../../Tools';
 import {
   AlbumForSongRender,
   ArtistsForSongRender,
@@ -49,6 +39,7 @@ import {
   StickyRenderDetailsHeader,
 } from '../SongList';
 import { SongListMenu, SongListMenuData } from '../SongMenus';
+
 import './styles/Albums.css';
 
 const { wrn } = MakeLog('EMP:render:Albums');

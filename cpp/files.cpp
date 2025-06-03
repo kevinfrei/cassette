@@ -3,7 +3,7 @@
 
 #include <boost/dll/runtime_symbol_info.hpp>
 
-#include "SharedConstants.hpp"
+#include "CommonTypes.hpp"
 #include "files.h"
 
 namespace files {

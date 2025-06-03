@@ -16,13 +16,14 @@ import { Expandable, StateToggle } from '@freik/fluentui-tools';
 import { useBoolState } from '@freik/react-tools';
 
 import { GetHelperText, Post } from 'www/WebHelpers';
-import { IgnoreItemTypeEnum, IpcId, Keys, st, StrId } from 'www/Constants';
+import { st } from 'www/Constants';
 import {
   ignoreItemsState,
   minSongCountForArtistListState,
 } from 'www/State/SimpleSavedState';
 
 import './styles/Settings.css';
+import { IgnoreItemType, IpcId, Keys, StrId } from 'www/Shared/CommonTypes';
 
 const btnWidth: React.CSSProperties = { width: '155px', padding: 0 };
 const removeFromSet = (set: string[], val: string): string[] => {
@@ -128,7 +129,7 @@ function MusicLocations(): ReactElement {
   );
 }
 
-const ignoreTypeNameMap = new Map<IgnoreItemTypeEnum, string>([
+const ignoreTypeNameMap = new Map<IgnoreItemType, string>([
   ['path-root', 'Root Path'],
   ['dir-name', 'Directory Name'],
   ['path-keyword', 'Keyword'],
@@ -140,7 +141,7 @@ const ignoreOptions: IDropdownOption[] = [...ignoreTypeNameMap.entries()].map(
 
 function IgnoreList(): ReactElement {
   const ignoreItems = useAtomValue(ignoreItemsState);
-  const [newType, setNewType] = useState<IgnoreItemTypeEnum | ''>('');
+  const [newType, setNewType] = useState<IgnoreItemType | ''>('');
   const [newValue, setNewValue] = useState<string>('');
   return (
     <div id="ignore-list">
@@ -167,7 +168,7 @@ function IgnoreList(): ReactElement {
           selectedKey={newType}
           onChange={(ev: unknown, option?: IDropdownOption) => {
             if (isDefined(option) && option.key !== '') {
-              setNewType(option.key as IgnoreItemTypeEnum);
+              setNewType(option.key as IgnoreItemType);
             }
           }}
           options={ignoreOptions}

@@ -1,8 +1,7 @@
-import { CurrentView, CurrentViewEnum } from '@freik/emp-shared';
+import { ForwardedRef } from 'react';
 import { MakeLog } from '@freik/logger';
 import { hasStrField } from '@freik/typechk';
-import { MyTransactionInterface } from '@freik/web-utils';
-import { ForwardedRef } from 'react';
+
 import { MaybePlayNext, MaybePlayPrev } from '../Jotai/API';
 import { curViewFunc } from '../Jotai/CurrentView';
 import { mediaTimePercentFunc, mediaTimeState } from '../Jotai/MediaPlaying';

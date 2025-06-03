@@ -1,19 +1,9 @@
-import {
-  typecheck,
-  isObjectOfExactType,
-  isString,
-  isBoolean,
-  chk2TupleOf,
-  chkRecordOf,
-  chkObjectOfExactType,
-  isNonNullable,
-  isNumber,
-} from '@freik/typechk';
-import { CurrentViewEnum, CurrentView } from 'www/Constants';
+import { typecheck, isNumber } from '@freik/typechk';
+import { CurrentView } from './CommonTypes';
 
-export const isCurrentView: typecheck<CurrentViewEnum> = (
+export const isCurrentView: typecheck<CurrentView> = (
   val: unknown,
-): val is CurrentViewEnum =>
+): val is CurrentView =>
   isNumber(val) &&
   Number.isInteger(val) &&
   val >= CurrentView.disabled &&
