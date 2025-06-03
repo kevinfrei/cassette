@@ -1,4 +1,4 @@
-import { Keys, KeysEnum } from '@freik/emp-shared';
+import { Keys } from 'www/Shared/CommonTypes';
 
 const HostOs: 'mac' | 'windows' | 'linux' = (() => {
   const ua = window.navigator.userAgent;
@@ -13,7 +13,7 @@ const HostOs: 'mac' | 'windows' | 'linux' = (() => {
 
 const accPrefix = HostOs === 'mac' ? '⌘' : 'Ctrl';
 
-export function GetHelperText(key: KeysEnum) {
+export function GetHelperText(key: Keys) {
   if (key.length === 1) {
     return `${accPrefix}-${key}`;
   }
@@ -23,4 +23,5 @@ export function GetHelperText(key: KeysEnum) {
   if (key === Keys.NextTrack) {
     return accPrefix + '-→';
   }
+  return accPrefix + '-' + key;
 }

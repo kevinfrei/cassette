@@ -1,4 +1,20 @@
-import { enum_num, enum_str, NEnum, num, SEnum, Types } from './IDL';
+import {
+  arr,
+  bool,
+  enum_num,
+  enum_str,
+  i32,
+  NEnum,
+  num,
+  obj,
+  ObjType,
+  ref,
+  SEnum,
+  str,
+  Types,
+  u16,
+  u32,
+} from './IDL';
 
 const CurrentView: NEnum = enum_num(num(), {
   disabled: -1,
@@ -128,10 +144,91 @@ const IgnoreItemType: SEnum = enum_str({
   DirName: 'dir-name',
 });
 
+const StorageId: SEnum = enum_str({
+  CurrentView: 'CurrentView',
+  CurrentIndex: 'currentIndex',
+  PlaybackOrder: 'playbackOrder',
+  NowPlaying: 'nowPlaying',
+  CurrentSongList: 'currentSongList',
+  Shuffle: 'shuffle',
+  Repeat: 'repeat',
+  NeverPlayHates: 'neverPlayHates',
+  OnlyPlayLikes: 'onlyPlayLikes',
+  FullAlbumsOnly: 'FullAlbumsOnly',
+  MinSongCount: 'MinSongCount',
+  Mute: 'mute',
+  LikedSongs: 'likedSongs',
+  HatedSongs: 'hatedSongs',
+  Volume: 'volume',
+  Locations: 'locations',
+  DefaultLocation: 'defaultLocation',
+  SortWithArticles: 'rSortWithArticles',
+  DownloadAlbumArtwork: 'downloadAlbumArtwork',
+  DownloadArtistArtwork: 'downloadArtistArtwork',
+  SaveAlbumArtworkWithMusic: 'saveAlbumArtworkWithMusic',
+  AlbumCoverName: 'albumCoverName',
+  TranscodingUpdate: 'get-xcode-update',
+  TranscodeSrcLocDir: 'xcodeSrcLocDir',
+  TranscodeSrcLocPlaylist: 'xcodeSrcLocPlaylist',
+  TranscodeSrcLocArtist: 'xcodeSrcLocArtist',
+  TranscodeSrcLocAlbum: 'xcodeSrcLocAlbum',
+  TranscodeDestLoc: 'xcodeDestLoc',
+  TranscodeBitRate: 'xcodeBitRate',
+});
+
+const TranscodeFormatTargetName: SEnum = enum_str({
+  m4a: 'm4a',
+  mp3: 'mp3',
+  aac: 'aac',
+});
+
+const TranscodeSource: SEnum = enum_str({
+  Playlist: 'p',
+  Artist: 'r',
+  Album: 'l',
+  Disk: 'd',
+});
+
+const TranscodeSourceLocation: ObjType = obj({
+  type: ref('TranscodeSource'),
+  loc: str(),
+});
+
+const FileFailure: ObjType = obj({
+  file: str(),
+  error: str(),
+});
+
+const TranscodeState: ObjType = obj({
+  curStatus: str(),
+  filesTranscoded: arr(str()),
+  filesFound: i32(),
+  filesPending: i32(),
+  filesUntouched: i32(),
+  filesFailed: arr(ref('FileFailure')),
+  itemsRemoved: arr(str()),
+});
+
+const TranscodeInfo: ObjType = obj({
+  source: ref('TranscodeSourceLocation'),
+  dest: str(),
+  artwork: bool(),
+  mirror: bool(),
+  format: ref('TranscodeFormatTargetName'),
+  bitrate: u16(),
+});
+
 export const TypesToGenerate: Record<string, Types> = {
   Keys,
   StrId,
   CurrentView,
   IpcId,
   IgnoreItemType,
+  StorageId,
+  TranscodeFormatTargetName,
+  TranscodeSource,
+  TranscodeSourceLocation,
+  FileFailure,
+  TranscodeState,
+  TranscodeInfo,
 };

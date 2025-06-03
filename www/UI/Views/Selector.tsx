@@ -1,5 +1,8 @@
 import { useAtomValue } from 'jotai';
 import { CSSProperties, ReactElement, useState } from 'react';
+import { SettingsView } from './Settings';
+import { curViewState } from 'www/State/SimpleSavedState';
+import { CurrentView } from 'www/Shared/CommonTypes';
 /*
 import { GroupedAlbumList } from './Albums';
 import { GroupedAristList } from './Artists';
@@ -10,26 +13,23 @@ import { PlaylistView } from './Playlists';
 import { SearchResultsView } from './SearchResults';
 import { ToolsView } from './Tools';
 */
-import { SettingsView } from './Settings';
-import { CurrentView, CurrentViewEnum } from 'www/Constants';
-import { curViewState } from 'www/State/SimpleSavedState';
 
 import './styles/Selector.css';
 
-function ignore(view: CurrentViewEnum): boolean {
+function ignore(view: CurrentView): boolean {
   return view === CurrentView.settings || view === CurrentView.tools;
 }
 
 export function ViewSelector(): ReactElement {
   const which = useAtomValue(curViewState);
-  const [rendered, setRendered] = useState(new Set<CurrentViewEnum>([which]));
+  const [rendered, setRendered] = useState(new Set<CurrentView>([which]));
   // Let's see if I can speed this up a bit by not trying to render everything
   // the first time
-  const sl = (v: CurrentViewEnum): CSSProperties =>
+  const sl = (v: CurrentView): CSSProperties =>
     which === v ? {} : { visibility: 'hidden' };
-  const contents: [CurrentViewEnum, ReactElement][] = [];
+  const contents: [CurrentView, ReactElement][] = [];
   if (!rendered.has(which) && !ignore(which)) {
-    const newrendered = new Set<CurrentViewEnum>([which, ...rendered]);
+    const newrendered = new Set<CurrentView>([which, ...rendered]);
     setRendered(newrendered);
     // We still need to do a full render, because otherwise elements get
     // deleted and recreated, and that's probably bad, right?

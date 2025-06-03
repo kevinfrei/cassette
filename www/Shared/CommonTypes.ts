@@ -134,4 +134,83 @@ export const IgnoreItemType = Object.freeze({
 export type IgnoreItemType =
   (typeof IgnoreItemType)[keyof typeof IgnoreItemType];
 
+export const StorageId = Object.freeze({
+  CurrentView: 'CurrentView',
+  CurrentIndex: 'currentIndex',
+  PlaybackOrder: 'playbackOrder',
+  NowPlaying: 'nowPlaying',
+  CurrentSongList: 'currentSongList',
+  Shuffle: 'shuffle',
+  Repeat: 'repeat',
+  NeverPlayHates: 'neverPlayHates',
+  OnlyPlayLikes: 'onlyPlayLikes',
+  FullAlbumsOnly: 'FullAlbumsOnly',
+  MinSongCount: 'MinSongCount',
+  Mute: 'mute',
+  LikedSongs: 'likedSongs',
+  HatedSongs: 'hatedSongs',
+  Volume: 'volume',
+  Locations: 'locations',
+  DefaultLocation: 'defaultLocation',
+  SortWithArticles: 'rSortWithArticles',
+  DownloadAlbumArtwork: 'downloadAlbumArtwork',
+  DownloadArtistArtwork: 'downloadArtistArtwork',
+  SaveAlbumArtworkWithMusic: 'saveAlbumArtworkWithMusic',
+  AlbumCoverName: 'albumCoverName',
+  TranscodingUpdate: 'get-xcode-update',
+  TranscodeSrcLocDir: 'xcodeSrcLocDir',
+  TranscodeSrcLocPlaylist: 'xcodeSrcLocPlaylist',
+  TranscodeSrcLocArtist: 'xcodeSrcLocArtist',
+  TranscodeSrcLocAlbum: 'xcodeSrcLocAlbum',
+  TranscodeDestLoc: 'xcodeDestLoc',
+  TranscodeBitRate: 'xcodeBitRate',
+});
+export type StorageId = (typeof StorageId)[keyof typeof StorageId];
+
+export const TranscodeFormatTargetName = Object.freeze({
+  m4a: 'm4a',
+  mp3: 'mp3',
+  aac: 'aac',
+});
+export type TranscodeFormatTargetName =
+  (typeof TranscodeFormatTargetName)[keyof typeof TranscodeFormatTargetName];
+
+export const TranscodeSource = Object.freeze({
+  Playlist: 'p',
+  Artist: 'r',
+  Album: 'l',
+  Disk: 'd',
+});
+export type TranscodeSource =
+  (typeof TranscodeSource)[keyof typeof TranscodeSource];
+
+export type TranscodeSourceLocation = {
+  type: TranscodeSource;
+  loc: string;
+};
+
+export type FileFailure = {
+  file: string;
+  error: string;
+};
+
+export type TranscodeState = {
+  curStatus: string;
+  filesTranscoded: string[];
+  filesFound: number;
+  filesPending: number;
+  filesUntouched: number;
+  filesFailed: FileFailure[];
+  itemsRemoved: string[];
+};
+
+export type TranscodeInfo = {
+  source: TranscodeSourceLocation;
+  dest: string;
+  artwork: boolean;
+  mirror: boolean;
+  format: TranscodeFormatTargetName;
+  bitrate: number;
+};
+
 // End of generated code
