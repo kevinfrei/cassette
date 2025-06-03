@@ -1,12 +1,13 @@
 import { atom } from 'jotai';
-import { CurrentView, CurrentViewEnum, IgnoreItem } from 'www/Constants';
+import { IgnoreItem } from 'www/Constants';
+import { CurrentView } from 'www/Shared/CommonTypes';
 
 export const mutedState = atom<boolean>(false);
 export const volumeState = atom<number>(0.5); // Volume as a percentage (0-100)
 
 export type RepeatType = 'off' | 'one' | 'all';
 
-export const curViewState = atom<CurrentViewEnum>(CurrentView.albums);
+export const curViewState = atom<CurrentView>(CurrentView.albums);
 export const shuffleState = atom<boolean>(false);
 export const repeatState = atom<RepeatType>('off');
 export function NextRepeat(current: RepeatType): RepeatType {

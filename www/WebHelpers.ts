@@ -1,6 +1,6 @@
 import { hasFieldType, isObjectNonNull, typecheck } from '@freik/typechk';
-import { Keys, KeysEnum } from './Constants';
 import { ForwardedRef, MutableRefObject } from 'react';
+import { Keys } from './Shared/CommonTypes';
 
 const HostOs: 'mac' | 'windows' | 'linux' = (() => {
   const ua = window.navigator.userAgent;
@@ -66,7 +66,7 @@ export async function GetAs<T>(
 
 const accPrefix = HostOs === 'mac' ? '⌘' : 'Ctrl';
 
-export function GetHelperText(key: KeysEnum) {
+export function GetHelperText(key: Keys) {
   if (key.length === 1) {
     return `${accPrefix}-${key}`;
   }

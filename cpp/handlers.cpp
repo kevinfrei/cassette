@@ -1,7 +1,7 @@
 #include <filesystem>
 #include <string>
 
-#include "SharedConstants.hpp"
+#include "CommonTypes.hpp"
 #include "files.h"
 #include "handlers.h"
 #include "quitting.h"
