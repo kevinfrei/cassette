@@ -21,7 +21,7 @@
     "rbr": "bun run rbld && bun run rrun",
     "typecheck": "tsc --noEmit",
     "typechk": "tsc --noEmit",
-    "gen": "bun run scripts/gen.ts include/SharedConstants.hpp"
+    "gen": "bun run scripts/gen.ts include/CommonTypes.hpp www/Shared/CommonTypes.ts"
   },
   "dependencies": {
     "@fluentui/react": "^8.123.0",

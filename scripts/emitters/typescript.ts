@@ -1,1 +1,168 @@
-// NYI
+import {
+  ArrType,
+  Simple,
+  Enum,
+  Int,
+  MapType,
+  NEnum,
+  ObjType,
+  SEnum,
+  SetType,
+  TupType,
+  Types,
+  isSimpleType,
+  isRefType,
+  isArrayType,
+  isSetType,
+  isMapType,
+  isTupleType,
+  isPlainIntEnumType,
+  isU8Type,
+  isI8Type,
+  isU16Type,
+  isI16Type,
+  isI32Type,
+  isU32Type,
+  isU64Type,
+  isI64Type,
+  isCharType,
+  isBoolType,
+  isFloatType,
+  isDoubleType,
+  isStringType,
+} from '../../www/Shared/IDL';
+import { FileGenerator, MakeGenerator, EmitItem, Emitter } from './api';
+
+function SingleQuoteSafe(str: string): string {
+  // Escape single quotes in the string for TypeScript
+  return str.replace(/'/g, "\\'");
+}
+
+async function header(writer: Bun.FileSink): Promise<void> {
+  await writer.write(`// Generated from www/Shared/Enums.ts by scripts/gen.ts
+`);
+}
+
+async function footer(writer: Bun.FileSink): Promise<void> {
+  await writer.write(`
+// End of generated code
+`);
+}
+
+function getTypeName(type: Types): string {
+  if (
+    isU8Type(type) ||
+    isI8Type(type) ||
+    isU16Type(type) ||
+    isI16Type(type) ||
+    isU32Type(type) ||
+    isI32Type(type) ||
+    isFloatType(type) ||
+    isDoubleType(type)
+  ) {
+    return 'number';
+  } else if (isU64Type(type) || isI64Type(type)) {
+    return 'BigInt';
+  } else if (isStringType(type) || isCharType(type)) {
+    return 'string';
+  } else if (isBoolType(type)) {
+    return 'boolean';
+  } else if (isRefType(type)) {
+    return type.r; // Reference type, just return the name
+  } else if (isArrayType(type)) {
+    return `${getTypeName(type.d)}[]`;
+  } else if (isSetType(type)) {
+    return `Set<${getTypeName(type.d)}>`;
+  } else if (isMapType(type)) {
+    return `Map<${getTypeName(type.k)}, ${getTypeName(type.v)}>`;
+  } else if (isTupleType(type)) {
+    return `[${type.l.map(getTypeName).join(', ')}]`;
+  }
+  throw new Error(`Unsupported unnamed type: ${JSON.stringify(type)}`);
+}
+
+const enumType: EmitItem<Enum> = async (writer, name, item) => {
+  await writer.write(`
+export const ${name} = Object.freeze({
+  ${item.v.map((val, idx) => `${val}: ${idx}`).join(',\n  ')}
+});
+export type ${name} = (typeof ${name})[keyof typeof ${name}];
+`);
+};
+
+const numEnumType: EmitItem<NEnum> = async (writer, name, item) => {
+  await writer.write(`
+export const ${name} = Object.freeze({
+${Object.entries(item.v)
+  .map(([key, value]) => `  ${key}: ${value},`)
+  .join('\n')}
+});
+export type ${name} = (typeof ${name})[keyof typeof ${name}];
+`);
+};
+
+const strEnumType: EmitItem<SEnum> = async (writer, name, item) => {
+  await writer.write(`
+export const ${name} = Object.freeze({
+${Object.entries(item.v)
+  .map(([key, val]) => `  ${key}: '${SingleQuoteSafe(val)}',`)
+  .join('\n')}
+});
+export type ${name} = (typeof ${name})[keyof typeof ${name}];
+`);
+};
+
+const objType: EmitItem<ObjType> = async (writer, name, item) => {
+  await writer.write(`
+export type ${name} = {
+`);
+  for (const [key, value] of Object.entries(item.d)) {
+    const typeName = getTypeName(value);
+    await writer.write(`  ${key}: ${typeName};\n`);
+  }
+  await writer.write('\n};\n');
+};
+
+const arrType: EmitItem<ArrType> = async (writer, name, item) => {
+  await writer.write(`
+export type ${name} = ${getTypeName(item.d)}[];
+`);
+};
+
+const setType: EmitItem<SetType> = async (writer, name, item) => {
+  await writer.write(`
+export type ${name} = Set<${getTypeName(item.d)}>;
+`);
+};
+
+const mapType: EmitItem<MapType> = async (writer, name, item) => {
+  await writer.write(`
+export type ${name} = Map<${getTypeName(item.k)}, ${getTypeName(item.v)}>;
+`);
+};
+
+const tupType: EmitItem<TupType> = async (writer, name, item) => {
+  await writer.write(`
+export type ${name} = [${item.l.map(getTypeName).join(', ')}];
+`);
+};
+
+export const TypescriptEmitter: Emitter = {
+  header,
+  footer,
+  types: {
+    objType,
+    arrType,
+    setType,
+    mapType,
+    tupType,
+    enumType,
+    numEnumType,
+    strEnumType,
+  },
+};
+
+export function GetTypescriptGenerator(): FileGenerator {
+  // Returns the TypescriptEmitter instance
+  return MakeGenerator(TypescriptEmitter);
+}

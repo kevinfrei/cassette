@@ -1,20 +1,28 @@
-import { Aggregate, enum_num, enum_str, NEnum, num, SEnum, Types } from './IDL';
+// Generated from www/Shared/Enums.ts by scripts/gen.ts
 
-const define_CurrentView: NEnum = enum_num(num(), {
-  disabled: -1,
-  none: 0,
-  recent: 1,
-  albums: 2,
-  artists: 3,
-  songs: 4,
-  playlists: 5,
-  now_playing: 6,
-  settings: 7,
-  search: 8,
-  tools: 9,
+export const Keys = Object.freeze({
+  AddFileLocation: 'O',
+  Albums: '2',
+  Artists: '3',
+  Backward10s: '[',
+  Find: 'F',
+  Forward10s: ']',
+  NextTrack: 'Right',
+  NowPlaying: '1',
+  Play: 'P',
+  Playlists: '5',
+  PreviousTrack: 'Left',
+  Repeat: 'T',
+  SavePlaylist: 'S',
+  Settings: ',',
+  Shuffle: 'R',
+  Songs: '4',
+  ToggleMiniPlayer: '9',
+  Tools: 'L',
 });
+export type Keys = (typeof Keys)[keyof typeof Keys];
 
-const define_StrId: SEnum = enum_str({
+export const StrId = Object.freeze({
   Mono: 'mono',
   Stereo: 'stereo',
   Quadrophonic: 'quadrophonic',
@@ -56,29 +64,24 @@ const define_StrId: SEnum = enum_str({
   ViewTools: 'Tools',
   ImportFiles: 'Import Files...',
 });
+export type StrId = (typeof StrId)[keyof typeof StrId];
 
-const define_Keys: SEnum = enum_str({
-  AddFileLocation: 'O',
-  Albums: '2',
-  Artists: '3',
-  Backward10s: '[',
-  Find: 'F',
-  Forward10s: ']',
-  NextTrack: 'Right',
-  NowPlaying: '1',
-  Play: 'P',
-  Playlists: '5',
-  PreviousTrack: 'Left',
-  Repeat: 'T',
-  SavePlaylist: 'S',
-  Settings: ',',
-  Shuffle: 'R',
-  Songs: '4',
-  ToggleMiniPlayer: '9',
-  Tools: 'L',
+export const CurrentView = Object.freeze({
+  disabled: -1,
+  none: 0,
+  recent: 1,
+  albums: 2,
+  artists: 3,
+  songs: 4,
+  playlists: 5,
+  now_playing: 6,
+  settings: 7,
+  search: 8,
+  tools: 9,
 });
+export type CurrentView = (typeof CurrentView)[keyof typeof CurrentView];
 
-const define_IpcId: SEnum = enum_str({
+export const IpcId = Object.freeze({
   ClearHates: 'clear-hates',
   ClearLikes: 'clear-likes',
   ClearLocalOverrides: 'clear-local-overrides',
@@ -121,17 +124,14 @@ const define_IpcId: SEnum = enum_str({
   IgnoreListId: 'ignore-list',
   RescanInProgress: 'rescan-in-progress',
 });
+export type IpcId = (typeof IpcId)[keyof typeof IpcId];
 
-const define_IgnoreItemType: SEnum = enum_str({
+export const IgnoreItemType = Object.freeze({
   PathRoot: 'path-root',
   PathKeyword: 'path-keyword',
   DirName: 'dir-name',
 });
+export type IgnoreItemType =
+  (typeof IgnoreItemType)[keyof typeof IgnoreItemType];
 
-export const TypesToGenerate: Record<string, Aggregate> = {
-  Keys: define_Keys,
-  StrId: define_StrId,
-  CurrentView: define_CurrentView,
-  IpcId: define_IpcId,
-  IgnoreItemType: define_IgnoreItemType,
-};
+// End of generated code
