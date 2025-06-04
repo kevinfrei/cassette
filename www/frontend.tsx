@@ -5,12 +5,12 @@
  * It is included in `src/index.html`.
  */
 
-import { createRoot } from 'react-dom/client';
-import { StrictMode } from 'react';
-import { App } from './UI/App';
 import { Provider } from 'jotai';
-import { KeepAlive } from './KeepAlive';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 import { FluentInitIcons } from './FluentInit';
+import { KeepAlive } from './KeepAlive';
+import { App } from './UI/App';
 import { RealTimeUpdates } from './Tools/ReactWebSocket';
 
 const elem = document.getElementById('root')!;
