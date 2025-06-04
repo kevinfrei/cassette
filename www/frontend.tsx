@@ -10,13 +10,15 @@ import { StrictMode } from 'react';
 import { App } from './App';
 import { Provider } from 'jotai';
 import { KeepAlive } from './KeepAlive';
+import { RealTimeUpdates } from './Tools/ReactWebSocket';
 
 const elem = document.getElementById('root')!;
+const theActualApp = <App />;
 
 const app = (
   <StrictMode>
     <Provider>
-      <App />
+      <RealTimeUpdates />
       <KeepAlive />
     </Provider>
   </StrictMode>
@@ -26,6 +28,7 @@ if (import.meta.hot) {
   // With hot module reloading, `import.meta.hot.data` is persisted.
   const root = (import.meta.hot.data.root ??= createRoot(elem));
   root.render(app);
+  console.log(theActualApp);
 } else {
   // The hot module reloading API is not available in production.
   createRoot(elem).render(app);
