@@ -1,4 +1,5 @@
 import { atom } from 'jotai';
+
 import { IgnoreItem } from 'www/Constants';
 import { CurrentView } from 'www/Shared/CommonTypes';
 
