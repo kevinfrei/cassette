@@ -1,4 +1,8 @@
+import { MakeLog } from '@freik/logger';
+import { hasFieldOf, isNumber } from '@freik/typechk';
 import { ChangeEventHandler, ReactElement, useEffect, useState } from 'react';
+
+const { log, err } = MakeLog('Tools:RealTimeUpdates');
 
 export function RealTimeUpdates(): ReactElement {
   const [messages, setMessages] = useState<string[]>([]);
@@ -7,7 +11,12 @@ export function RealTimeUpdates(): ReactElement {
   const [clientId, setClientId] = useState(-1);
 
   useEffect(() => {
-    const websocket = new WebSocket('ws://localhost:55555/ws');
+    if (!hasFieldOf(window, 'wsport', isNumber)) {
+      err("Please make sure you're including the WebSocket server script.");
+      return () => {};
+    }
+
+    const websocket = new WebSocket(`ws://localhost:${window.wsport}/ws`);
 
     websocket.onopen = () => {
       console.log('WebSocket is connected');

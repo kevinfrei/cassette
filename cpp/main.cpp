@@ -1,6 +1,5 @@
 #include <cstdint>
 #include <iostream>
-#include <random>
 #include <string>
 
 #include <crow.h>
@@ -10,23 +9,12 @@
 #include "files.h"
 #include "handlers.h"
 #include "quitting.h"
+#include "setup.h"
 #include "window.h"
 
-int GetRandomPort() {
-  std::random_device rd;
-  std::uniform_int_distribution<int> dist(0, 16383);
-  return 55555; // 49152 + dist(rd);
-}
-
-std::string GetRootUrl(int port) {
-  return "http://localhost:" + std::to_string(port) + "/www/index.html";
-}
-
-void WebSocketOnClose(crow::websocket::connection& conn,
-                      const std::string& reason /*, uint16_t code*/) {
-  std::cout
-      << "WebSocket connection closed from " << conn.get_remote_ip()
-      << " with reason: " << reason /* << " and code " << code */ << std::endl;
+std::string GetRootUrl() {
+  return "http://localhost:" + std::to_string(GetRandomPort()) +
+         "/www/index.html";
 }
 
 int main(void) {
@@ -35,7 +23,7 @@ int main(void) {
   files::SetProgramLocation();
 
   const int port = GetRandomPort();
-  std::string url = GetRootUrl(port);
+  std::string url = GetRootUrl();
   crow::websocket::connection* theConn = nullptr;
   // Define the routes:
 
@@ -54,7 +42,12 @@ int main(void) {
                   << (is_binary ? " <not displaying> " : data) << " bytes from "
                   << conn.get_remote_ip() << std::endl;
       })
-      .onclose(WebSocketOnClose);
+      .onclose([&](crow::websocket::connection& conn,
+                   const std::string& reason /*, uint16_t code*/) {
+        std::cout << "WebSocket connection closed from " << conn.get_remote_ip()
+                  << " with reason: "
+                  << reason /* << " and code " << code */ << std::endl;
+      });
   CROW_ROUTE(app, "/www/<path>")(handlers::file_path);
   CROW_ROUTE(app, "/api/<path>")(handlers::api);
   CROW_ROUTE(app, "/tune/<path>")(handlers::tune);
