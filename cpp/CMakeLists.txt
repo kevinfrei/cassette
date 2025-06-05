@@ -1,26 +1,11 @@
 
-# set(GEN_HEADER ${PROJECT_SOURCE_DIR}/include/SharedConstants.hpp)
-
-# Define a custom command to generate the header file
-# add_custom_command(
-#   PRE_BUILD 
-#   COMMENT
-#     "Generating shared constants header file"
-#   COMMAND
-#     bun gen
-#   DEPENDS
-#     ${PROJECT_SOURCE_DIR}/scripts/gencpp.ts
-#     ${PROJECT_SOURCE_DIR}/www/Shared/Enums.ts
-#   OUTPUT
-#     ${GEN_HEADER}
-# )
 
 set(
   LIB_SOURCE_FILES
-  # ${GEN_HEADER}
   files.cpp
   handlers.cpp
   quitting.cpp
+  setup.cpp
   window.cpp
 )
 
