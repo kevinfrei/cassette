@@ -1,22 +1,61 @@
 #include <filesystem>
+#include <iostream>
 #include <string>
+
+#include <crow.h>
 
 #include "CommonTypes.hpp"
 #include "files.h"
 #include "handlers.h"
 #include "quitting.h"
+#include "setup.h"
 
 namespace handlers {
 
 crow::response file_path(const crow::request& req, const std::string& path) {
   quitting::keep_alive();
 
-  // std::cout << "Path: " << path << std::endl;
+  std::cout << "Path: " << path << std::endl;
   crow::response resp;
   std::filesystem::path p =
       files::GetWebDir() / (path.empty() ? "index.html" : path);
-  resp.set_static_file_info_unsafe(p.generic_string());
-  resp.set_header("Content-type", files::PathToMimeType(p));
+  if (p.filename() == "index.html") {
+    // We need to process the index.html file to replace the websocket URL
+    // with the correct one.
+
+    // Read the contents of the index.html file,
+    // Replace "window.wsport = 42;" with the actual port number
+    std::ifstream file(p);
+    if (!file.is_open()) {
+      std::cerr << "Failed to open index.html file: " << p.generic_string()
+                << std::endl;
+      resp.code = 404;
+      resp.body = "File not found";
+      resp.set_header("Content-Type", "text/plain");
+      return resp;
+    }
+    std::string content((std::istreambuf_iterator<char>(file)),
+                        std::istreambuf_iterator<char>());
+    file.close();
+    // Replace the placeholder with the actual port number
+    std::string wsport = std::to_string(GetRandomPort());
+    size_t pos = content.find("window.wsport = 42;");
+    if (pos != std::string::npos) {
+      content.replace(pos, 20, "window.wsport = " + wsport + ";");
+      resp.body = content;
+      resp.code = 200;
+      resp.set_header("Content-Type", "text/html");
+    } else {
+      std::cerr << "Placeholder not found in index.html file: "
+                << p.generic_string() << std::endl;
+      resp.code = 500;
+      resp.body = "Internal Server Error";
+      resp.set_header("Content-Type", "text/plain");
+    }
+  } else {
+    resp.set_static_file_info_unsafe(p.generic_string());
+    resp.set_header("Content-type", files::PathToMimeType(p));
+  }
   return resp;
 }
 
