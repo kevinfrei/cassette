@@ -857,7 +857,3 @@ struct TranscodeInfo {
   TranscodeFormatTargetName format;
   std::uint16_t bitrate;
 };
-
-} // namespace Shared
-
-#endif // SHARED_CONSTANTS_HPP
