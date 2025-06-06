@@ -1,9 +1,12 @@
 import {
   arr,
   bool,
+  enum_lst,
   enum_num,
   enum_str,
+  i16,
   i32,
+  map,
   NEnum,
   num,
   obj,
@@ -14,6 +17,7 @@ import {
   Types,
   u16,
   u32,
+  u8,
 } from './IDL';
 
 const CurrentView: NEnum = enum_num(num(), {
@@ -218,6 +222,115 @@ const TranscodeInfo: ObjType = obj({
   bitrate: u16(),
 });
 
+const SongKey = str();
+const AlbumKey = str();
+const ArtistKey = str();
+const MediaKey = str();
+const PlaylistName = str();
+const Playlist = arr(ref('SongKey'));
+
+const VAType = enum_lst(u8(), ['None', 'VA', 'OST']);
+
+const Song = obj({
+  key: ref('SongKey'),
+  track: i16(),
+  title: str(),
+  albumId: ref('AlbumKey'),
+  artistIds: arr(ref('ArtistKey')),
+  secondaryIds: arr(ref('ArtistKey')),
+  variations: arr(str()),
+});
+
+const SongObj = obj({
+  track: i16(),
+  title: str(),
+  album: ref('AlbumObj'), // ptr
+  artists: arr(ref('ArtistObj')), // ptr
+  secondaryArtists: arr(ref('ArtistObj')), // ptr
+  variations: arr(str()),
+});
+
+const ArtistObj = obj({
+  name: str(),
+  albums: arr(ref('AlbumObj')), // ptr
+  songs: arr(ref('SongObj')), // ptr
+});
+
+const AlbumObj = obj({
+  title: str(),
+  year: i16(),
+  vatype: ref('VAType'),
+  primaryArtists: arr(ref('ArtistObj')), // ptr
+  songs: arr(ref('SongObj')), // ptr
+  diskNames: arr(str()),
+});
+
+const Artist = obj({
+  key: ref('ArtistKey'),
+  name: str(),
+  albums: arr(ref('AlbumKey')),
+  songs: arr(ref('SongKey')),
+});
+
+const Album = obj({
+  key: ref('AlbumKey'),
+  year: i16(),
+  title: str(),
+  vatype: ref('VAType'),
+  primaryArtists: arr(ref('ArtistKey')),
+  songs: arr(ref('SongKey')),
+  diskNames: arr(str()),
+});
+
+const MediaInfo = obj({
+  general: map(str(), str()),
+  audio: map(str(), str()),
+});
+
+// This is the most simplistic strongly typed metadata you'll find
+const SimpleMetadata = obj({
+  artist: str(),
+  album: str(),
+  year: str(),
+  track: str(),
+  title: str(),
+  discNum: str(),
+  discName: str(),
+  compilation: ref('VAType'),
+});
+
+// This is a more robust metadata type, meant to be used in,
+// among other scenarios, situations where you're moving files around
+const FullMetadata = obj({
+  originalPath: str(),
+  artist: arr(str()),
+  album: str(),
+  year: i16(),
+  track: i16(),
+  title: str(),
+  vaType: ref('VAType'),
+  moreArtists: arr(str()),
+  variations: arr(str()),
+  disk: i16(),
+  diskName: str(),
+});
+
+// This is a general mechanism for describing how to extract
+// various metadata components out of a file path
+const AudioFileRegexPattern = obj({
+  // This can be something like "soundtrack"
+  // or "true/false" to simply indicate that it's
+  // a compilation of works by various artists
+  compilation: ref('VAType'),
+  // This is the regular expression to match
+  rgx: str(),
+});
+
+const MimeData = obj({
+  type: str(),
+  data: str(),
+});
+
 export const TypesToGenerate: Record<string, Types> = {
   Keys,
   StrId,
@@ -231,4 +344,24 @@ export const TypesToGenerate: Record<string, Types> = {
   FileFailure,
   TranscodeState,
   TranscodeInfo,
+  SongKey,
+  AlbumKey,
+  ArtistKey,
+  MediaKey,
+  PlaylistName,
+  Playlist,
+  Song,
+  SongObj,
+  ArtistObj,
+  VAType,
+  AlbumObj,
+  Artist,
+  Album,
+  MediaInfo,
+  SimpleMetadata,
+  FullMetadata,
+  AudioFileRegexPattern,
+  MimeData,
 };
+
+export const PicklersToGenerate: Record<string, Types> = {};
