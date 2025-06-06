@@ -239,36 +239,12 @@ export type Song = {
   variations: string[];
 };
 
-export type SongObj = {
-  track: number;
-  title: string;
-  album: AlbumObj;
-  artists: ArtistObj[];
-  secondaryArtists: ArtistObj[];
-  variations: string[];
-};
-
-export type ArtistObj = {
-  name: string;
-  albums: AlbumObj[];
-  songs: SongObj[];
-};
-
 export const VAType = Object.freeze({
   None: 0,
   VA: 1,
   OST: 2,
 });
 export type VAType = (typeof VAType)[keyof typeof VAType];
-
-export type AlbumObj = {
-  title: string;
-  year: number;
-  vatype: VAType;
-  primaryArtists: ArtistObj[];
-  songs: SongObj[];
-  diskNames: string[];
-};
 
 export type Artist = {
   key: ArtistKey;

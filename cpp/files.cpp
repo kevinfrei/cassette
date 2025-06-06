@@ -9,7 +9,7 @@
 namespace files {
 
 std::filesystem::path program_location;
-std::filessytem::path web_dir;
+std::filesystem::path web_dir;
 
 void SetProgramLocation() {
   program_location = boost::dll::program_location().string();
