@@ -10,6 +10,7 @@
 #ifndef SHARED_CONSTANTS_HPP
 #define SHARED_CONSTANTS_HPP
 
+#include <crow/json.h>
 #include <cstdint>
 #include <map>
 #include <optional>
@@ -829,6 +830,7 @@ inline constexpr std::optional<TranscodeSource> from_string<TranscodeSource>(
     return TranscodeSource::Disk;
   return std::nullopt;
 }
+
 struct TranscodeSourceLocation {
   TranscodeSource type;
   std::string loc;
@@ -857,3 +859,112 @@ struct TranscodeInfo {
   TranscodeFormatTargetName format;
   std::uint16_t bitrate;
 };
+
+using SongKey = std::string;
+
+using AlbumKey = std::string;
+
+using ArtistKey = std::string;
+
+using MediaKey = std::string;
+
+using PlaylistName = std::string;
+
+using Playlist = std::vector<SongKey>;
+
+struct Song {
+  SongKey key;
+  std::int16_t track;
+  std::string title;
+  AlbumKey albumId;
+  std::vector<ArtistKey> artistIds;
+  std::vector<ArtistKey> secondaryIds;
+  std::vector<std::string> variations;
+};
+
+struct SongObj {
+  std::int16_t track;
+  std::string title;
+  AlbumObj album;
+  std::vector<ArtistObj> artists;
+  std::vector<ArtistObj> secondaryArtists;
+  std::vector<std::string> variations;
+};
+
+struct ArtistObj {
+  std::string name;
+  std::vector<AlbumObj> albums;
+  std::vector<SongObj> songs;
+};
+
+enum class VAType : std::uint8_t { None, VA, OST };
+
+struct AlbumObj {
+  std::string title;
+  std::int16_t year;
+  VAType vatype;
+  std::vector<ArtistObj> primaryArtists;
+  std::vector<SongObj> songs;
+  std::vector<std::string> diskNames;
+};
+
+struct Artist {
+  ArtistKey key;
+  std::string name;
+  std::vector<AlbumKey> albums;
+  std::vector<SongKey> songs;
+};
+
+struct Album {
+  AlbumKey key;
+  std::int16_t year;
+  std::string title;
+  VAType vatype;
+  std::vector<ArtistKey> primaryArtists;
+  std::vector<SongKey> songs;
+  std::vector<std::string> diskNames;
+};
+
+struct MediaInfo {
+  std::map<std::string, std::string> general;
+  std::map<std::string, std::string> audio;
+};
+
+struct SimpleMetadata {
+  std::string artist;
+  std::string album;
+  std::string year;
+  std::string track;
+  std::string title;
+  std::string discNum;
+  std::string discName;
+  VAType compilation;
+};
+
+struct FullMetadata {
+  std::string originalPath;
+  std::vector<std::string> artist;
+  std::string album;
+  std::int16_t year;
+  std::int16_t track;
+  std::string title;
+  VAType vaType;
+  std::vector<std::string> moreArtists;
+  std::vector<std::string> variations;
+  std::int16_t disk;
+  std::string diskName;
+};
+
+struct AudioFileRegexPattern {
+  VAType compilation;
+  std::string rgx;
+};
+
+struct MimeData {
+  std::string type;
+  std::string data;
+};
+
+} // namespace Shared
+
+#endif // SHARED_CONSTANTS_HPP
