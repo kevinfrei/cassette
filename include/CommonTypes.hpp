@@ -882,31 +882,7 @@ struct Song {
   std::vector<std::string> variations;
 };
 
-struct SongObj {
-  std::int16_t track;
-  std::string title;
-  AlbumObj album;
-  std::vector<ArtistObj> artists;
-  std::vector<ArtistObj> secondaryArtists;
-  std::vector<std::string> variations;
-};
-
-struct ArtistObj {
-  std::string name;
-  std::vector<AlbumObj> albums;
-  std::vector<SongObj> songs;
-};
-
 enum class VAType : std::uint8_t { None, VA, OST };
-
-struct AlbumObj {
-  std::string title;
-  std::int16_t year;
-  VAType vatype;
-  std::vector<ArtistObj> primaryArtists;
-  std::vector<SongObj> songs;
-  std::vector<std::string> diskNames;
-};
 
 struct Artist {
   ArtistKey key;
