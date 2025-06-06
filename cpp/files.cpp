@@ -9,14 +9,18 @@
 namespace files {
 
 std::filesystem::path program_location;
+std::filessytem::path web_dir;
 
 void SetProgramLocation() {
   program_location = boost::dll::program_location().string();
 }
 
 std::filesystem::path GetWebDir() {
-  std::filesystem::path cur = program_location.parent_path().parent_path();
-  return cur / "www";
+  if (web_dir.empty()) {
+    std::filesystem::path cur = program_location.parent_path().parent_path();
+    web_dir = cur / "www";
+  }
+  return web_dir;
 }
 
 std::string PathToMimeType(const std::filesystem::path& filePath) {

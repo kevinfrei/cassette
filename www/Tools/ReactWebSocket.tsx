@@ -11,27 +11,29 @@ export function RealTimeUpdates(): ReactElement {
   const [clientId, setClientId] = useState(-1);
 
   useEffect(() => {
+    // Let's make sure the port is specified properly
     if (!hasFieldOf(window, 'wsport', isNumber)) {
       err("Please make sure you're including the WebSocket server script.");
       return () => {};
     }
-
+    // Create a new WebSocket connection
     const websocket = new WebSocket(`ws://localhost:${window.wsport}/ws`);
 
     websocket.onopen = () => {
-      console.log('WebSocket is connected');
+      log('WebSocket is connected');
       // Generate a unique client ID
-      const id = Math.floor(Math.random() * 1000);
+      const id = Math.floor(Math.random() * 32767);
       setClientId(id);
     };
 
     websocket.onmessage = (evt) => {
       const message = evt.data;
-      setMessages((prevMessages) => [...prevMessages, message]);
+      // Limit the number of messages to the last 10
+      setMessages((prevMessages) => [...prevMessages.slice(-9), message]);
     };
 
     websocket.onclose = () => {
-      console.log('WebSocket is closed');
+      log('WebSocket is closed');
     };
 
     setWs(websocket);
