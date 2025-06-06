@@ -34,6 +34,7 @@ export type Emitter = {
     setType: EmitItem<SetType>;
     mapType: EmitItem<MapType>;
     tupType: EmitItem<TupType>;
+    strType: EmitItem<Str>;
     enumType: EmitItem<Enum>;
     numEnumType: EmitItem<NEnum>;
     strEnumType: EmitItem<SEnum>;
