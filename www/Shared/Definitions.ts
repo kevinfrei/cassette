@@ -351,10 +351,12 @@ export const TypesToGenerate: Record<string, Types> = {
   PlaylistName,
   Playlist,
   Song,
+  VAType,
+  /* 
   SongObj,
   ArtistObj,
-  VAType,
   AlbumObj,
+  */
   Artist,
   Album,
   MediaInfo,
