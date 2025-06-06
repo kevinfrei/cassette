@@ -47,6 +47,7 @@ int main(void) {
         std::cout << "WebSocket connection closed from " << conn.get_remote_ip()
                   << " with reason: "
                   << reason /* << " and code " << code */ << std::endl;
+        theConn = nullptr;
       });
   CROW_ROUTE(app, "/www/<path>")(handlers::file_path);
   CROW_ROUTE(app, "/api/<path>")(handlers::api);
