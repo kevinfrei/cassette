@@ -8,6 +8,7 @@ import {
   isPlainEnumType,
   isSetType,
   isStringEnumType,
+  isStringType,
   isTupleType,
   MapType,
   NEnum,
@@ -57,8 +58,10 @@ function forElement(emit: Emitter, adt: Types): EmitItem<any> {
     return emit.types.numEnumType;
   } else if (isStringEnumType(adt)) {
     return emit.types.strEnumType;
+  } else if (isStringType(adt)) {
+    return emit.types.strType;
   }
-  throw new Error(`Unknown ADT type: ${adt.t}`);
+  throw new Error(`Unknown ADT type: ${adt}`);
 }
 
 async function emitCode(

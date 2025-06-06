@@ -217,4 +217,114 @@ export type TranscodeInfo = {
   bitrate: number;
 };
 
+export type SongKey = string;
+
+export type AlbumKey = string;
+
+export type ArtistKey = string;
+
+export type MediaKey = string;
+
+export type PlaylistName = string;
+
+export type Playlist = SongKey[];
+
+export type Song = {
+  key: SongKey;
+  track: number;
+  title: string;
+  albumId: AlbumKey;
+  artistIds: ArtistKey[];
+  secondaryIds: ArtistKey[];
+  variations: string[];
+};
+
+export type SongObj = {
+  track: number;
+  title: string;
+  album: AlbumObj;
+  artists: ArtistObj[];
+  secondaryArtists: ArtistObj[];
+  variations: string[];
+};
+
+export type ArtistObj = {
+  name: string;
+  albums: AlbumObj[];
+  songs: SongObj[];
+};
+
+export const VAType = Object.freeze({
+  None: 0,
+  VA: 1,
+  OST: 2,
+});
+export type VAType = (typeof VAType)[keyof typeof VAType];
+
+export type AlbumObj = {
+  title: string;
+  year: number;
+  vatype: VAType;
+  primaryArtists: ArtistObj[];
+  songs: SongObj[];
+  diskNames: string[];
+};
+
+export type Artist = {
+  key: ArtistKey;
+  name: string;
+  albums: AlbumKey[];
+  songs: SongKey[];
+};
+
+export type Album = {
+  key: AlbumKey;
+  year: number;
+  title: string;
+  vatype: VAType;
+  primaryArtists: ArtistKey[];
+  songs: SongKey[];
+  diskNames: string[];
+};
+
+export type MediaInfo = {
+  general: Map<string, string>;
+  audio: Map<string, string>;
+};
+
+export type SimpleMetadata = {
+  artist: string;
+  album: string;
+  year: string;
+  track: string;
+  title: string;
+  discNum: string;
+  discName: string;
+  compilation: VAType;
+};
+
+export type FullMetadata = {
+  originalPath: string;
+  artist: string[];
+  album: string;
+  year: number;
+  track: number;
+  title: string;
+  vaType: VAType;
+  moreArtists: string[];
+  variations: string[];
+  disk: number;
+  diskName: string;
+};
+
+export type AudioFileRegexPattern = {
+  compilation: VAType;
+  rgx: string;
+};
+
+export type MimeData = {
+  type: string;
+  data: string;
+};
+
 // End of generated code

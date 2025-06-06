@@ -8,26 +8,26 @@ import {
   SetType,
   TupType,
   Types,
-  isRefType,
   isArrayType,
-  isSetType,
-  isMapType,
-  isTupleType,
-  isU8Type,
-  isI8Type,
-  isU16Type,
+  isBoolType,
+  isCharType,
+  isDoubleType,
+  isFloatType,
   isI16Type,
   isI32Type,
+  isI64Type,
+  isI8Type,
+  isMapType,
+  isRefType,
+  isSetType,
+  isStringType,
+  isTupleType,
+  isU16Type,
   isU32Type,
   isU64Type,
-  isI64Type,
-  isCharType,
-  isBoolType,
-  isFloatType,
-  isDoubleType,
-  isStringType,
+  isU8Type,
 } from '../../www/Shared/IDL';
-import { FileGenerator, MakeGenerator, EmitItem, Emitter } from './api';
+import { EmitItem, Emitter, FileGenerator, MakeGenerator } from './api';
 
 function SingleQuoteSafe(str: string): string {
   // Escape single quotes in the string for TypeScript
@@ -122,27 +122,9 @@ export type ${name} = {`);
   await writer.write('\n};\n');
 };
 
-const arrType: EmitItem<ArrType> = async (writer, name, item) => {
+const simpleType: EmitItem<Types> = async (writer, name, item) => {
   await writer.write(`
-export type ${name} = ${getTypeName(item.d)}[];
-`);
-};
-
-const setType: EmitItem<SetType> = async (writer, name, item) => {
-  await writer.write(`
-export type ${name} = Set<${getTypeName(item.d)}>;
-`);
-};
-
-const mapType: EmitItem<MapType> = async (writer, name, item) => {
-  await writer.write(`
-export type ${name} = Map<${getTypeName(item.k)}, ${getTypeName(item.v)}>;
-`);
-};
-
-const tupType: EmitItem<TupType> = async (writer, name, item) => {
-  await writer.write(`
-export type ${name} = [${item.l.map(getTypeName).join(', ')}];
+export type ${name} = ${getTypeName(item)};
 `);
 };
 
@@ -151,11 +133,12 @@ export const TypescriptEmitter: Emitter = {
   footer,
   types: {
     objType,
-    arrType,
-    setType,
-    mapType,
-    tupType,
+    arrType: simpleType,
+    setType: simpleType,
+    mapType: simpleType,
+    tupType: simpleType,
     enumType,
+    strType: simpleType,
     numEnumType,
     strEnumType,
   },
