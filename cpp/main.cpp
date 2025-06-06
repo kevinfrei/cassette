@@ -60,12 +60,13 @@ int main(void) {
 
   window::open(url);
   auto _a = app.port(port).multithreaded().run_async();
+  int i = 0;
   while (!quitting::should_quit()) {
     _a.wait_for(std::chrono::seconds(1));
     quitting::loop_wait();
     if (theConn) {
       // Send a keepalive message every 5 seconds
-      theConn->send_text("keep alive the other way!");
+      theConn->send_text("keep alive the other way: " + std::to_string(i++));
     }
   }
   app.stop();
