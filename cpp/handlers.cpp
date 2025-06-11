@@ -9,6 +9,7 @@
 #include "handlers.h"
 #include "quitting.h"
 #include "setup.h"
+#include "tools.h"
 #include "tunes.h"
 
 namespace handlers {
@@ -28,11 +29,7 @@ crow::response file_path(const crow::request& req, const std::string& path) {
     // Replace "window.wsport = 42;" with the actual port number
     std::ifstream file(p);
     if (!file.is_open()) {
-      std::cerr << "Failed to open index.html file: " << p.generic_string()
-                << std::endl;
-      resp.code = 404;
-      resp.body = "File not found";
-      resp.set_header("Content-Type", "text/plain");
+      e404(resp, "index.html not found");
       return resp;
     }
     std::string content((std::istreambuf_iterator<char>(file)),
@@ -65,9 +62,7 @@ crow::response tune(const crow::request& req, const std::string& path) {
   crow::response resp;
   auto maybe_song = get_tune(path);
   if (!maybe_song) {
-    resp.code = 404;
-    resp.body = "Tune not found";
-    resp.set_header("Content-Type", "text/plain");
+    e404(resp, "Tune not found");
     return resp;
   }
   const auto& song = maybe_song.value();
