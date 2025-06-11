@@ -9,6 +9,7 @@
 #include "handlers.h"
 #include "quitting.h"
 #include "setup.h"
+#include "tunes.h"
 
 namespace handlers {
 
@@ -62,12 +63,16 @@ crow::response file_path(const crow::request& req, const std::string& path) {
 crow::response tune(const crow::request& req, const std::string& path) {
   quitting::keep_alive();
   crow::response resp;
-  std::filesystem::path p = std::filesystem::path{"/home/freik"};
-  p = p / path;
-  std::cout << "Tune: " << path << " to file " << p.generic_string()
-            << std::endl;
-  resp.set_static_file_info(p.generic_string());
-  resp.set_header("Content-type", files::PathToMimeType(p));
+  auto maybe_song = get_tune(path);
+  if (!maybe_song) {
+    resp.code = 404;
+    resp.body = "Tune not found";
+    resp.set_header("Content-Type", "text/plain");
+    return resp;
+  }
+  const auto& song = maybe_song.value();
+  resp.set_static_file_info_unsafe(song.generic_string());
+  resp.set_header("Content-type", files::PathToMimeType(song));
   return resp;
 }
 

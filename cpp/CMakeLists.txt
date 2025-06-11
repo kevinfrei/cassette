@@ -6,6 +6,7 @@ set(
   handlers.cpp
   quitting.cpp
   setup.cpp
+  tunes.cpp
   window.cpp
 )
 
