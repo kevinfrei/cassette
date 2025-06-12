@@ -6,8 +6,10 @@ project(cassette)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "/EHsc /D_WIN32_WINNT=0x0A00 /DWINVER=0x0A00")
+  # For windows/VC++, run normal exception handling & windows 10 APIs
+  set(CMAKE_CXX_FLAGS "/EHsc /D_WIN32_WINNT=0x0A00 /DWINVER=0x0A00")
 endif(MSVC)
 
 # Find Conan2 generated libraries

@@ -42,7 +42,7 @@ class CassetteRecipe(ConanFile):
         # emit the find_package calls in the ConanLibImports.cmake file,
         # along with the variables for later use in the CMakeLists
         imports = [
-          '# Generated file: DO NOT EDIT or COMMIT!\n',
+          '# Generated file: DO NOT EDIT\n',
           '# Add your library to the conanfile.py libraries list\n','\n']
         for library in libraries:
             if library.info:
