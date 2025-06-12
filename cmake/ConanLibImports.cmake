@@ -1,4 +1,4 @@
-# Generated file: DO NOT EDIT or COMMIT!
+# Generated file: DO NOT EDIT
 # Add your library to the conanfile.py libraries list
 
 find_package(Boost REQUIRED)
