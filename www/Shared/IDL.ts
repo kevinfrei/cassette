@@ -167,7 +167,7 @@ export function isAnonymousType(x: Types): x is Anonymous {
 export type SymbolList = Record<string, Types>;
 
 // An example of how to define types using the IDL:
-
+/*
 const ExampleEnum1 = enum_lst(u8(), ['one', 'two', 'three']);
 const ExampleEnum2 = enum_num(num(), { one: 1, two: 2, tre: 3 });
 const ExampleEnum3 = enum_str({
@@ -213,3 +213,4 @@ export const TypesToGenerate: SymbolList = {
   ExampleNestedObjectType2,
   ExampleObjectTupleType,
 };
+*/
