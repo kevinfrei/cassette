@@ -1,6 +1,7 @@
 
 set(LIB_SOURCE_FILES
     files.cpp
+    from_json.cpp
     handlers.cpp
     quitting.cpp
     setup.cpp
