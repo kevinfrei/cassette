@@ -43,15 +43,27 @@ crow::json::wvalue to_json<char>(const char& value) {
 }
 
 // Tuples are just arrays which the right size & type
+template <typename Tuple, size_t Index, typename T>
+void to_json_tuple_element_helper(const Tuple& tuple,
+                                  crow::json::wvalue& container) {
+  // std::cout << "Element " << Index << ": " << typeid(T).name() << std::endl;
+  container[Index] = to_json(std::get<Index>(tuple));
+}
+
+template <typename Tuple, size_t... Is>
+void to_json_tuple_recurse(const Tuple& tuple,
+                           crow::json::wvalue& json_list,
+                           std::index_sequence<Is...>) {
+  ((to_json_tuple_element_helper<Tuple, Is, std::tuple_element_t<Is, Tuple>>(
+       tuple, json_list)),
+   ...);
+}
+
 template <typename... Args>
 crow::json::wvalue to_json(const std::tuple<Args...>& value) {
   crow::json::wvalue vec{std::vector<crow::json::wvalue>()};
-  int i = 0;
-  std::apply(
-      [&](const auto&... args) {
-        vec[i++] = (to_json(args), ...); // C++17 fold expression
-      },
-      value);
+  to_json_tuple_recurse(
+      value, vec, std::make_index_sequence<sizeof...(Args)>{});
   return vec;
 }
 
@@ -63,19 +75,35 @@ crow::json::wvalue to_json(const std::map<K, V>& value) {
   crow::json::wvalue v;
   v["@dataType"] = "freik.Map";
   // Does this convert to an array of 2-tuples?
-  v["@dataValue"] = to_json(value);
+  // TODO v["@dataValue"] = to_json(value);
   return v;
 }
-
-// My pickling framework sends Maps as this (not just objects: They're TS
-// Map<K,V>)
-// {"@dataType":"freik.Map","@dataValue":[["a",1],["c",2],["b",3]]}
 template <typename K, typename V>
 crow::json::wvalue to_json(const std::unordered_map<K, V>& value) {
   crow::json::wvalue v;
   v["@dataType"] = "freik.Map";
   // Does this convert to an array of 2-tuples?
-  v["@dataValue"] = to_json(value);
+  // TODO v["@dataValue"] = to_json(value);
+  return v;
+}
+
+// My pickling framework sends Sets as this (not just objects: They're TS
+// Set<K>'s)
+// {"@dataType":"freik.Set","@dataValue":["a", "c", "b"]}
+template <typename T>
+crow::json::wvalue to_json(const std::unordered_set<T>& value) {
+  crow::json::wvalue v;
+  v["@dataType"] = "freik.Set";
+  // Does this convert to an array of 2-tuples?
+  // TODO v["@dataValue"] = to_json(value);
+  return v;
+}
+template <typename T>
+crow::json::wvalue to_json(const std::set<T>& value) {
+  crow::json::wvalue v;
+  v["@dataType"] = "freik.Set";
+  // Does this convert to an array of 2-tuples?
+  // TODO v["@dataValue"] = to_json(value);
   return v;
 }
 
@@ -232,18 +260,29 @@ struct from_json_impl<std::vector<T>> {
   }
 };
 
-template <typename Tuple, size_t... Is>
-void from_json_tuple_helper(const crow::json::rvalue& json,
-                            Tuple& tuple,
-                            bool& failed,
-                            std::index_sequence<Is...>) {
-  std::optional<decltype(std::get<Is>(tuple))> rval;
-  ((std::get<Is>(tuple) = from_json(rvalue[Is]), ...);
+template <typename Tuple, size_t Index, typename T>
+std::optional<T> from_json_tuple_element_helper(
+    Tuple& tuple, bool& failed, const crow::json::rvalue& container) {
+  // std::cout << "Element " << Index << ": " << typeid(T).name() << std::endl;
+  std::optional<T> res = from_json<T>(container[Index]);
+  failed = failed || !res.has_value();
+  if (res.has_value()) {
+    std::get<Index>(tuple) = res.value();
+  }
+  return res;
 }
 
-template <typename... Args>
-void printTuple(const std::tuple<Args...>& tuple) {
-  from_json_tuple_helper(tuple, std::index_sequence_for<Args...>{});
+template <typename Tuple, size_t... Is>
+std::optional<Tuple> from_json_tuple_recurse(
+    const crow::json::rvalue& container, std::index_sequence<Is...>) {
+  Tuple res;
+  bool failed = false;
+  ((from_json_tuple_element_helper<Tuple, Is, std::tuple_element_t<Is, Tuple>>(
+       res, failed, container)),
+   ...);
+  if (failed)
+    return std::nullopt;
+  return res;
 }
 
 template <typename... Args>
@@ -258,14 +297,8 @@ struct from_json_impl<std::tuple<Args...>> {
       return std::nullopt;
     }
     std::tuple<Args...> t;
-    int i = 0;
-    std::apply(
-        [&](auto&... args) {
-          (args = from_json<decltype<args>>(json[i++]),
-           ...); // C++17 fold expression
-        },
-        t);
-    return t;
+    return from_json_tuple_recurse<decltype(t)>(
+        json, std::make_index_sequence<sizeof...(Args)>{});
   }
 };
 

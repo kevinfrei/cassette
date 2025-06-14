@@ -14,7 +14,7 @@
     "rwww": "bun run scripts/webbuild.ts Release",
     "dbld": "bun run scripts/parbld.ts Debug",
     "rbld": "bun run scripts/parbld.ts Release",
-    "dtst": "bun run dcpp && cd build/Debug/test && ctest -C Debug",
+    "dtst": "bun run dcpp && cd build/Debug/test && ctest -C Debug --output-on-failure",
     "rtst": "bun run rcpp && cd build/Release/test && ctest -C Release",
     "drun": "./build/Debug/cpp/cassette",
     "rrun": "./build/Release/cpp/cassette",
