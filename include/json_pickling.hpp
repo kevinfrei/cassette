@@ -5,6 +5,8 @@
 #include <set>
 #include <string>
 #include <tuple>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 // #include "CommonTypes.hpp"
@@ -55,6 +57,18 @@ crow::json::wvalue to_json(const std::tuple<Args...>& value) {
 // {"@dataType":"freik.Map","@dataValue":[["a",1],["c",2],["b",3]]}
 template <typename K, typename V>
 crow::json::wvalue to_json(const std::map<K, V>& value) {
+  crow::json::wvalue v;
+  v["@dataType"] = "freik.Map";
+  // Does this convert to an array of 2-tuples?
+  v["@dataValue"] = to_json(value);
+  return v;
+}
+
+// My pickling framework sends Maps as this (not just objects: They're TS
+// Map<K,V>)
+// {"@dataType":"freik.Map","@dataValue":[["a",1],["c",2],["b",3]]}
+template <typename K, typename V>
+crow::json::wvalue to_json(const std::unordered_map<K, V>& value) {
   crow::json::wvalue v;
   v["@dataType"] = "freik.Map";
   // Does this convert to an array of 2-tuples?
