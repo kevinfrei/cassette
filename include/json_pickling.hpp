@@ -42,13 +42,16 @@ crow::json::wvalue to_json<char>(const char& value) {
   return crow::json::wvalue(std::string(1, value));
 }
 
-// Tuples are just arrays which the right size & types:
+// Tuples are just arrays which the right size & type
 template <typename... Args>
 crow::json::wvalue to_json(const std::tuple<Args...>& value) {
   crow::json::wvalue vec{std::vector<crow::json::wvalue>()};
-  for (size_t i = 0; i < value.size(); i++) {
-    vec[i] = to_json(value[i]);
-  }
+  int i = 0;
+  std::apply(
+      [&](const auto&... args) {
+        vec[i++] = (to_json(args), ...); // C++17 fold expression
+      },
+      value);
   return vec;
 }
 
@@ -229,11 +232,25 @@ struct from_json_impl<std::vector<T>> {
   }
 };
 
+template <typename Tuple, size_t... Is>
+void from_json_tuple_helper(const crow::json::rvalue& json,
+                            Tuple& tuple,
+                            bool& failed,
+                            std::index_sequence<Is...>) {
+  std::optional<decltype(std::get<Is>(tuple))> rval;
+  ((std::get<Is>(tuple) = from_json(rvalue[Is]), ...);
+}
+
+template <typename... Args>
+void printTuple(const std::tuple<Args...>& tuple) {
+  from_json_tuple_helper(tuple, std::index_sequence_for<Args...>{});
+}
+
 template <typename... Args>
 struct from_json_impl<std::tuple<Args...>> {
   static std::optional<std::tuple<Args...>> process(
       const crow::json::rvalue& json) {
-    if (json.t() != crow::json::type::Array) {
+    if (json.t() != crow::json::type::List) {
       return std::nullopt;
     }
     // Check exact tuple size
@@ -241,16 +258,13 @@ struct from_json_impl<std::tuple<Args...>> {
       return std::nullopt;
     }
     std::tuple<Args...> t;
-    for (size_t i = 0; i < sizeof...(Args); ++i) {
-      auto item =
-          from_json<typename std::tuple_element<i, std::tuple<Args...>>::type>(
-              json[i]);
-      if (!item) {
-        return std::nullopt;
-      }
-      t[i] = *item;
-      //      std::get<i>(t) = *item;
-    }
+    int i = 0;
+    std::apply(
+        [&](auto&... args) {
+          (args = from_json<decltype<args>>(json[i++]),
+           ...); // C++17 fold expression
+        },
+        t);
     return t;
   }
 };
