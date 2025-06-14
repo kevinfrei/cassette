@@ -200,18 +200,33 @@ TEST(JsonPickling, std_vector) {
   EXPECT_EQ(vec_value.value()[2], 3);
 }
 
-// TODO: Test std::tuple, std::set, std::map, plus the 3 different enumeration
-// types
 TEST(JsonPickling, std_tuple) {
   // Test the conversion of basic types to and from JSON
   std::tuple<int, double, std::string> tup = {1, 2.5, "hello"};
   crow::json::wvalue json_value = to_json(tup);
   EXPECT_EQ(json_value.t(), crow::json::type::List);
   std::string s = json_value.dump();
+  std::cout << "Tuple as JSON: " << s << std::endl;
   crow::json::rvalue json_value2 = crow::json::load(s);
   auto tup_value = from_json<std::tuple<int, double, std::string>>(json_value2);
   EXPECT_TRUE(tup_value.has_value());
   EXPECT_EQ(std::get<0>(tup_value.value()), 1);
   EXPECT_EQ(std::get<1>(tup_value.value()), 2.5);
   EXPECT_EQ(std::get<2>(tup_value.value()), "hello");
+  auto tup2 = from_json<std::tuple<std::string, int, double, bool>>(
+      crow::json::load("[\"hi\",15,4.125,false]"));
+  EXPECT_TRUE(tup2.has_value());
+  EXPECT_EQ(std::get<0>(tup2.value()), "hi");
+  EXPECT_EQ(std::get<1>(tup2.value()), 15);
+  EXPECT_EQ(std::get<2>(tup2.value()), 4.125);
+  EXPECT_EQ(std::get<3>(tup2.value()), false);
+}
+
+// TODO: Test std::set, std::map, plus the 3 different enumeration
+// types
+
+TEST(JsonPickling, sets) {
+  std::set<char> theSet{'a', 'c', 'd'};
+  crow::json::wvalue json_value = to_json(theSet);
+  EXPECT_EQ(json_value.t(), crow::json::type::Object);
 }
