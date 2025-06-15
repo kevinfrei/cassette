@@ -67,6 +67,21 @@ crow::json::wvalue to_json(const std::tuple<Args...>& value) {
   return vec;
 }
 
+// I didn't need this for Windows, but I do for Linux/Mac because the map
+// type is std::tuple instead of std::pair in glibcxx
+template <typename Iter>
+crow::json::wvalue to_json_vec_pair(const Iter& begin, const Iter& end) {
+  std::vector<crow::json::wvalue> vec;
+  for (auto it = begin; it != end; ++it) {
+    crow::json::wvalue pair{std::vector<crow::json::wvalue>()};
+    auto& [first, second] = *it;
+    pair[0] = to_json(first);
+    pair[1] = to_json(second);
+    vec.push_back(pair);
+  }
+  return vec;
+}
+
 // My pickling framework sends Maps as this (not just objects: They're TS
 // Map<K,V>)
 // {"@dataType":"freik.Map","@dataValue":[["a",1],["c",2],["b",3]]}
@@ -74,20 +89,14 @@ template <typename K, typename V>
 crow::json::wvalue to_json(const std::map<K, V>& value) {
   crow::json::wvalue v;
   v["@dataType"] = "freik.Map";
-  std::vector<std::tuple<K, V>> flat;
-  flat.reserve(value.size());
-  flat.assign(value.begin(), value.end());
-  v["@dataValue"] = to_json(flat);
+  v["@dataValue"] = to_json_vec_pair(value.begin(), value.end());
   return v;
 }
 template <typename K, typename V>
 crow::json::wvalue to_json(const std::unordered_map<K, V>& value) {
   crow::json::wvalue v;
   v["@dataType"] = "freik.Map";
-  std::vector<std::tuple<K, V>> flat;
-  flat.reserve(value.size());
-  flat.assign(value.begin(), value.end());
-  v["@dataValue"] = to_json(flat);
+  v["@dataValue"] = to_json_vec_pair(value.begin(), value.end());
   return v;
 }
 
