@@ -359,6 +359,26 @@ enum class CurrentView {
   search = 8,
   tools = 9,
 };
+
+inline constexpr bool is_valiid(CurrentView _value) {
+  switch (_value) {
+    case CurrentView::disabled:
+    case CurrentView::none:
+    case CurrentView::recent:
+    case CurrentView::albums:
+    case CurrentView::artists:
+    case CurrentView::songs:
+    case CurrentView::playlists:
+    case CurrentView::now_playing:
+    case CurrentView::settings:
+    case CurrentView::search:
+    case CurrentView::tools:
+      return true;
+    default:
+      return false;
+  }
+}
+
 // IpcId
 enum class IpcId {
   ClearHates,
@@ -883,6 +903,17 @@ struct Song {
 };
 
 enum class VAType : std::uint8_t { None, VA, OST };
+
+inline constexpr bool is_valiid(VAType _value) {
+  switch (_value) {
+    case VAType::None:
+    case VAType::VA:
+    case VAType::OST:
+      return true;
+    default:
+      return false;
+  }
+}
 
 struct Artist {
   ArtistKey key;
