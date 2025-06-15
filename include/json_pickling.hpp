@@ -74,16 +74,20 @@ template <typename K, typename V>
 crow::json::wvalue to_json(const std::map<K, V>& value) {
   crow::json::wvalue v;
   v["@dataType"] = "freik.Map";
-  // Does this convert to an array of 2-tuples?
-  // TODO v["@dataValue"] = to_json(value);
+  std::vector<std::tuple<K, V>> flat;
+  flat.reserve(value.size());
+  flat.assign(value.begin(), value.end());
+  v["@dataValue"] = to_json(flat);
   return v;
 }
 template <typename K, typename V>
 crow::json::wvalue to_json(const std::unordered_map<K, V>& value) {
   crow::json::wvalue v;
   v["@dataType"] = "freik.Map";
-  // Does this convert to an array of 2-tuples?
-  // TODO v["@dataValue"] = to_json(value);
+  std::vector<std::tuple<K, V>> flat;
+  flat.reserve(value.size());
+  flat.assign(value.begin(), value.end());
+  v["@dataValue"] = to_json(flat);
   return v;
 }
 
@@ -310,33 +314,6 @@ struct from_json_impl<std::tuple<Args...>> {
   }
 };
 
-// std::map specialization
-template <typename K, typename V>
-struct from_json_impl<std::map<K, V>> {
-  static std::optional<std::map<K, V>> process(const crow::json::rvalue& json) {
-    if (json.t() != crow::json::type::Object || json.size() != 2) {
-      return std::nullopt;
-    }
-    if (json["@dataType"].s() != "freik.Map") {
-      return std::nullopt;
-    }
-    auto dataValue = json["@dataValue"];
-    if (dataValue.t() != crow::json::type::Array) {
-      return std::nullopt;
-    }
-    std::map<K, V> m;
-    for (const auto& item : dataValue) {
-      auto key = from_json<K>(item[0]);
-      auto value = from_json<V>(item[1]);
-      if (!key || !value) {
-        return std::nullopt;
-      }
-      m[*key] = *value;
-    }
-    return m;
-  }
-};
-
 // std::set specialization:
 template <template <typename...> class SetType, typename Elem>
 struct set_helper_from_json {
@@ -377,5 +354,52 @@ struct from_json_impl<std::unordered_set<Elem>> {
   static std::optional<std::unordered_set<Elem>> process(
       const crow::json::rvalue& json) {
     return set_helper_from_json<std::unordered_set, Elem>::process(json);
+  }
+};
+
+// std::set specialization:
+template <template <typename...> class MapType, typename K, typename V>
+struct map_helper_from_json {
+  static std::optional<MapType<K, V>> process(const crow::json::rvalue& json) {
+    if (json.t() != crow::json::type::Object || json.size() != 2) {
+      return std::nullopt;
+    }
+    if (json["@dataType"].s() != "freik.Map") {
+      return std::nullopt;
+    }
+    auto dataValue = json["@dataValue"];
+    if (dataValue.t() != crow::json::type::List) {
+      return std::nullopt;
+    }
+    MapType<K, V> m;
+    for (const auto& item : dataValue) {
+      if (item.t() != crow::json::type::List || item.size() != 2) {
+        return std::nullopt;
+      }
+      auto key = from_json<K>(item[0]);
+      auto value = from_json<V>(item[1]);
+      if (!key || !value) {
+        return std::nullopt;
+      }
+      m[*key] = *value;
+    }
+    return m;
+  }
+};
+
+// std::map specialization
+template <typename K, typename V>
+struct from_json_impl<std::map<K, V>> {
+  static std::optional<std::map<K, V>> process(const crow::json::rvalue& json) {
+    return map_helper_from_json<std::map, K, V>::process(json);
+  }
+};
+
+// std::unordered_set specialization
+template <typename K, typename V>
+struct from_json_impl<std::unordered_map<K, V>> {
+  static std::optional<std::unordered_map<K, V>> process(
+      const crow::json::rvalue& json) {
+    return map_helper_from_json<std::unordered_map, K, V>::process(json);
   }
 };
