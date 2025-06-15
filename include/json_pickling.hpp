@@ -94,16 +94,20 @@ template <typename T>
 crow::json::wvalue to_json(const std::unordered_set<T>& value) {
   crow::json::wvalue v;
   v["@dataType"] = "freik.Set";
-  // Does this convert to an array of 2-tuples?
-  // TODO v["@dataValue"] = to_json(value);
+  std::vector<T> flat;
+  flat.reserve(value.size());
+  flat.assign(value.begin(), value.end());
+  v["@dataValue"] = to_json(flat);
   return v;
 }
 template <typename T>
 crow::json::wvalue to_json(const std::set<T>& value) {
   crow::json::wvalue v;
   v["@dataType"] = "freik.Set";
-  // Does this convert to an array of 2-tuples?
-  // TODO v["@dataValue"] = to_json(value);
+  std::vector<T> flat;
+  flat.reserve(value.size());
+  flat.assign(value.begin(), value.end());
+  v["@dataValue"] = to_json(flat);
   return v;
 }
 
@@ -237,8 +241,7 @@ std::optional<std::string> from_json<std::string>(
   return std::string(json.s());
 }
 
-// We don't want to get a std::vector<rvalue>'s, so we need to specialize
-// the vector case.
+// std::vector specialization:
 template <typename T>
 struct from_json_impl<std::vector<T>> {
   using value_type = T;
@@ -260,35 +263,41 @@ struct from_json_impl<std::vector<T>> {
   }
 };
 
-template <typename Tuple, size_t Index, typename T>
-std::optional<T> from_json_tuple_element_helper(
-    Tuple& tuple, bool& failed, const crow::json::rvalue& container) {
-  // std::cout << "Element " << Index << ": " << typeid(T).name() << std::endl;
-  std::optional<T> res = from_json<T>(container[Index]);
-  failed = failed || !res.has_value();
-  if (res.has_value()) {
-    std::get<Index>(tuple) = res.value();
-  }
-  return res;
-}
-
-template <typename Tuple, size_t... Is>
-std::optional<Tuple> from_json_tuple_recurse(
-    const crow::json::rvalue& container, std::index_sequence<Is...>) {
-  Tuple res;
-  bool failed = false;
-  ((from_json_tuple_element_helper<Tuple, Is, std::tuple_element_t<Is, Tuple>>(
-       res, failed, container)),
-   ...);
-  if (failed)
-    return std::nullopt;
-  return res;
-}
-
+// std::tuple specialization:
+// TODO: Explain this, as it is rather messsy.
 template <typename... Args>
 struct from_json_impl<std::tuple<Args...>> {
-  static std::optional<std::tuple<Args...>> process(
-      const crow::json::rvalue& json) {
+ private:
+  using tup_type = std::tuple<Args...>;
+  template <size_t Index, typename T>
+  static std::optional<T> element_helper(tup_type& tuple,
+                                         bool& failed,
+                                         const crow::json::rvalue& container) {
+    // std::cout << "Element " << Index << ": " << typeid(T).name() <<
+    // std::endl;
+    std::optional<T> res = from_json<T>(container[Index]);
+    failed = failed || !res.has_value();
+    if (res.has_value()) {
+      std::get<Index>(tuple) = res.value();
+    }
+    return res;
+  }
+
+  template <size_t... Is>
+  static std::optional<tup_type> recurse(const crow::json::rvalue& container,
+                                         std::index_sequence<Is...>) {
+    tup_type res;
+    bool failed = false;
+    ((element_helper<Is, std::tuple_element_t<Is, tup_type>>(
+         res, failed, container)),
+     ...);
+    if (failed)
+      return std::nullopt;
+    return res;
+  }
+
+ public:
+  static std::optional<tup_type> process(const crow::json::rvalue& json) {
     if (json.t() != crow::json::type::List) {
       return std::nullopt;
     }
@@ -296,15 +305,12 @@ struct from_json_impl<std::tuple<Args...>> {
     if (json.size() != sizeof...(Args)) {
       return std::nullopt;
     }
-    std::tuple<Args...> t;
-    return from_json_tuple_recurse<decltype(t)>(
-        json, std::make_index_sequence<sizeof...(Args)>{});
+    tup_type t;
+    return recurse(json, std::make_index_sequence<sizeof...(Args)>{});
   }
 };
 
-// TODO: Support for maps, sets, and all 3 flavors of enums:
-// plain, string, and numeric
-
+// std::map specialization
 template <typename K, typename V>
 struct from_json_impl<std::map<K, V>> {
   static std::optional<std::map<K, V>> process(const crow::json::rvalue& json) {
@@ -328,5 +334,39 @@ struct from_json_impl<std::map<K, V>> {
       m[*key] = *value;
     }
     return m;
+  }
+};
+
+// std::set specialization:
+template <template <typename...> class SetType, typename Elem>
+struct set_helper_from_json {
+  static std::optional<SetType<Elem>> process(const crow::json::rvalue& json) {
+    if (json.t() != crow::json::type::Object || json.size() != 2) {
+      return std::nullopt;
+    }
+    if (json["@dataType"].s() != "freik.Set") {
+      return std::nullopt;
+    }
+    auto dataValue = json["@dataValue"];
+    if (dataValue.t() != crow::json::type::List) {
+      return std::nullopt;
+    }
+    SetType<Elem> m;
+    for (const auto& item : dataValue) {
+      auto value = from_json<Elem>(item);
+      if (!value) {
+        return std::nullopt;
+      }
+      m.insert(*value);
+    }
+    return m;
+  }
+};
+
+// std::set specialization
+template <typename Elem>
+struct from_json_impl<std::set<Elem>> {
+  static std::optional<std::set<Elem>> process(const crow::json::rvalue& json) {
+    return set_helper_from_json<std ::set, Elem>::process(json);
   }
 };

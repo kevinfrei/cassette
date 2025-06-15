@@ -206,7 +206,7 @@ TEST(JsonPickling, std_tuple) {
   crow::json::wvalue json_value = to_json(tup);
   EXPECT_EQ(json_value.t(), crow::json::type::List);
   std::string s = json_value.dump();
-  std::cout << "Tuple as JSON: " << s << std::endl;
+  // std::cout << "Tuple as JSON: " << s << std::endl;
   crow::json::rvalue json_value2 = crow::json::load(s);
   auto tup_value = from_json<std::tuple<int, double, std::string>>(json_value2);
   EXPECT_TRUE(tup_value.has_value());
@@ -222,11 +222,59 @@ TEST(JsonPickling, std_tuple) {
   EXPECT_EQ(std::get<3>(tup2.value()), false);
 }
 
-// TODO: Test std::set, std::map, plus the 3 different enumeration
-// types
-
-TEST(JsonPickling, sets) {
-  std::set<char> theSet{'a', 'c', 'd'};
+template <typename T>
+void testSet(const T& theSet) {
   crow::json::wvalue json_value = to_json(theSet);
+  // std::cout << "JSON of std::set<char>: " << json_value.dump() << std::endl;
   EXPECT_EQ(json_value.t(), crow::json::type::Object);
+  EXPECT_EQ(json_value.keys().size(), 2);
+  auto tag = json_value["@dataType"];
+  auto val = json_value["@dataValue"];
+  crow::json::wvalue_reader trdr{tag};
+  std::string tagName = trdr.get(std::string{""});
+  // std::cout << "Tag: " << rdr.get(std::string{"---"}) << std::endl;
+  EXPECT_EQ(tag.t(), crow::json::type::String);
+  EXPECT_STREQ("freik.Set", tagName.c_str());
+  // std::cout << json_value.dump() << std::endl;
+  EXPECT_EQ(val.t(), crow::json::type::List);
+  EXPECT_EQ(val.size(), 4);
+  bool z = false, b = false, c = false, q = false;
+  for (size_t i = 0; i < 4; i++) {
+    auto elem = val[i];
+    EXPECT_EQ(elem.t(), crow::json::type::String);
+    std::string contents =
+        crow::json::wvalue_reader{elem}.get(std::string("NOPE"));
+    EXPECT_EQ(contents.size(), 1);
+    switch (contents[0]) {
+      case 'b':
+        b = true;
+        break;
+      case 'z':
+        z = true;
+        break;
+      case 'c':
+        c = true;
+        break;
+      case 'q':
+        q = true;
+        break;
+      default:
+        EXPECT_TRUE(false, "Invalid item from set");
+    }
+  }
+  EXPECT_TRUE(b && c && q && z);
+  std::string s = json_value.dump();
+  std::cout << s << std::endl;
+  auto set_val = from_json<T>(crow::json::load(s));
+  EXPECT_TRUE(set_val.has_value());
+  EXPECT_EQ(set_val->size(), theSet.size());
 }
+
+TEST(JsonPickling, std_set_and_hash) {
+  std::set<char> theSet{'z', 'c', 'b', 'q'};
+  testSet(theSet);
+  std::unordered_set<char> hashSet{'c', 'b', 'q', 'z'};
+  testSet(hashSet);
+}
+
+// TODO: Test std::map, plus the 3 different enumeration types
