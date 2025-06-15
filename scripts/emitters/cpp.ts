@@ -116,6 +116,14 @@ const enumType: EmitItem<Enum> = async (writer, name, item) => {
 enum class ${name}${typeName} {
   ${item.v.join(',\n  ')}
 };
+
+bool is_valiid(${name} _value) {
+  switch (_value) {${item.v
+    .map((val) => `    case ${name}::${val}: return true;`)
+    .join('\n')}
+    default: return false;
+  }
+}
 `);
 };
 
@@ -126,7 +134,16 @@ enum class ${name}${typeName} {
 ${Object.entries(item.v)
   .map(([key, value]) => `  ${key} = ${value},`)
   .join('\n')}
-};`);
+};
+
+bool is_valiid(${name} _value) {
+  switch (_value) {${Object.entries(item.v)
+    .map(([key]) => `    case ${name}::${key}: return true;`)
+    .join('\n')}
+    default: return false;
+  }
+}
+`);
 };
 
 const strEnumType: EmitItem<SEnum> = async (writer, name, item) => {
