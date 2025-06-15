@@ -5,6 +5,7 @@
   "scripts": {
     "prepare": "husky",
     "format": "tools format bun",
+    "clean": "bun run scripts/clean.ts",
     "dcfg": "cmake --preset debug",
     "rcfg": "cmake --preset release",
     "dcpp": "cmake --build build/Debug",
