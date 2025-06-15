@@ -264,10 +264,11 @@ void testSet(const T& theSet) {
   }
   EXPECT_TRUE(b && c && q && z);
   std::string s = json_value.dump();
-  std::cout << s << std::endl;
+  // std::cout << s << std::endl;
   auto set_val = from_json<T>(crow::json::load(s));
   EXPECT_TRUE(set_val.has_value());
-  EXPECT_EQ(set_val->size(), theSet.size());
+  // Round-trip validation:
+  EXPECT_EQ(*set_val, theSet);
 }
 
 TEST(JsonPickling, std_set_and_hash) {
