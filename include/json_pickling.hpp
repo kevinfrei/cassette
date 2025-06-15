@@ -367,6 +367,15 @@ struct set_helper_from_json {
 template <typename Elem>
 struct from_json_impl<std::set<Elem>> {
   static std::optional<std::set<Elem>> process(const crow::json::rvalue& json) {
-    return set_helper_from_json<std ::set, Elem>::process(json);
+    return set_helper_from_json<std::set, Elem>::process(json);
+  }
+};
+
+// std::unordered_set specialization
+template <typename Elem>
+struct from_json_impl<std::unordered_set<Elem>> {
+  static std::optional<std::unordered_set<Elem>> process(
+      const crow::json::rvalue& json) {
+    return set_helper_from_json<std::unordered_set, Elem>::process(json);
   }
 };
