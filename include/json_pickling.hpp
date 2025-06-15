@@ -124,6 +124,15 @@ crow::json::wvalue to_json(const std::set<T>& value) {
   return v;
 }
 
+/*
+template <typename T>
+crow::json::wvalue to_json(T value) {
+    std::enable_if_t<std::is_enum_v<T> && !std::is_convertible_v<T, typename
+std::underlying_type_t<T>>> return to_json(static_cast<typename
+std::underlying_type_t<T>>(value));
+}
+*/
+
 /****
 Conversion from JSON stuff
 ****/
@@ -412,3 +421,13 @@ struct from_json_impl<std::unordered_map<K, V>> {
     return map_helper_from_json<std::unordered_map, K, V>::process(json);
   }
 };
+
+/*
+template <typename T>
+std::optional<T> from_json(std::istream& is, T& value) {
+    std::enable_if_t<std::is_enum_v<T> && !std::is_convertible_v<T, typename
+std::underlying_type_t<T>>> typename std::underlying_type_t<T> underlyingValue;
+    is >> underlyingValue;
+    value = static_cast<T>(underlyingValue);
+}
+*/
