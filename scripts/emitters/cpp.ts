@@ -117,11 +117,12 @@ enum class ${name}${typeName} {
   ${item.v.join(',\n  ')}
 };
 
-bool is_valiid(${name} _value) {
-  switch (_value) {${item.v
-    .map((val) => `    case ${name}::${val}: return true;`)
-    .join('\n')}
-    default: return false;
+inline constexpr bool is_valiid(${name} _value) {
+  switch (_value) {
+${item.v.map((val) => `    case ${name}::${val}:`).join('\n')}
+      return true;
+    default:
+      return false;
   }
 }
 `);
@@ -136,11 +137,13 @@ ${Object.entries(item.v)
   .join('\n')}
 };
 
-bool is_valiid(${name} _value) {
+inline constexpr bool is_valiid(${name} _value) {
   switch (_value) {${Object.entries(item.v)
-    .map(([key]) => `    case ${name}::${key}: return true;`)
+    .map(([key]) => `    case ${name}::${key}:`)
     .join('\n')}
-    default: return false;
+      return true;
+    default:
+      return false;
   }
 }
 `);
@@ -199,8 +202,8 @@ const objType: EmitItem<ObjType> = async (writer, name, item) => {
 const usingType: EmitItem<Types> = async (writer, name, item) => {
   // This is a base type, so we don't need to do anything special
   await writer.write(`
-  using ${name} = ${getTypeName(item)};
-  `);
+using ${name} = ${getTypeName(item)};
+`);
 };
 
 export const CppEmitter: Emitter = {
