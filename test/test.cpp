@@ -259,7 +259,7 @@ void testSet(const T& theSet) {
         q = true;
         break;
       default:
-        EXPECT_TRUE(false, "Invalid item from set");
+        EXPECT_EQ("false", "Invalid item from set");
     }
   }
   EXPECT_TRUE(b && c && q && z);
@@ -276,6 +276,37 @@ TEST(JsonPickling, std_set_and_hash) {
   testSet(theSet);
   std::unordered_set<char> hashSet{'c', 'b', 'q', 'z'};
   testSet(hashSet);
+}
+
+template <typename MapType>
+void testMap(const MapType& theMap) {
+  crow::json::wvalue json_value = to_json(theMap);
+  // std::cout << json_value.dump() << std::endl;
+  EXPECT_EQ(json_value.t(), crow::json::type::Object);
+  EXPECT_EQ(json_value.keys().size(), 2);
+  auto tag = json_value["@dataType"];
+  auto val = json_value["@dataValue"];
+  crow::json::wvalue_reader trdr{tag};
+  std::string tagName = trdr.get(std::string{""});
+  EXPECT_EQ(tag.t(), crow::json::type::String);
+  EXPECT_STREQ("freik.Map", tagName.c_str());
+  // std::cout << json_value.dump() << std::endl;
+  EXPECT_EQ(val.t(), crow::json::type::List);
+  EXPECT_EQ(val.size(), 5);
+  std::string s = json_value.dump();
+  // std::cout << s << std::endl;
+  auto map_val = from_json<MapType>(crow::json::load(s));
+  EXPECT_TRUE(map_val.has_value());
+  // Round-trip validation:
+  EXPECT_EQ(*map_val, theMap);
+}
+TEST(JsonPickling, std_map_and_hash) {
+  std::map<std::string, int> theMap{
+      {"a1", 1}, {"b2", 2}, {"c3", 3}, {"d4", 4}, {"e5", 5}};
+  testMap(theMap);
+  std::unordered_map<std::string, int> hashMap{
+      {"a1", 1}, {"b2", 2}, {"c3", 3}, {"d4", 4}, {"e5", 5}};
+  testMap(hashMap);
 }
 
 // TODO: Test std::map, plus the 3 different enumeration types
