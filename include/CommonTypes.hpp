@@ -10,7 +10,6 @@
 #ifndef SHARED_CONSTANTS_HPP
 #define SHARED_CONSTANTS_HPP
 
-#include <crow/json.h>
 #include <cstdint>
 #include <map>
 #include <optional>
@@ -19,6 +18,10 @@
 #include <string_view>
 #include <tuple>
 #include <vector>
+
+#include <crow/json.h>
+
+#include "json_pickling.hpp"
 
 namespace Shared {
 template <typename T>
@@ -1041,11 +1044,32 @@ struct TranscodeSourceLocation {
   TranscodeSource type;
   std::string loc;
 };
+} // namespace Shared
+
+inline crow::json::wvalue to_json(
+    const Shared::TranscodeSourceLocation& _value) {
+  crow::json::wvalue _res;
+  _res["type"] = to_json(_value.type);
+  _res["loc"] = to_json(_value.loc);
+  return _res;
+}
+
+namespace Shared {
 
 struct FileFailure {
   std::string file;
   std::string error;
 };
+} // namespace Shared
+
+inline crow::json::wvalue to_json(const Shared::FileFailure& _value) {
+  crow::json::wvalue _res;
+  _res["file"] = to_json(_value.file);
+  _res["error"] = to_json(_value.error);
+  return _res;
+}
+
+namespace Shared {
 
 struct TranscodeState {
   std::string curStatus;
@@ -1056,6 +1080,21 @@ struct TranscodeState {
   std::vector<FileFailure> filesFailed;
   std::vector<std::string> itemsRemoved;
 };
+} // namespace Shared
+
+inline crow::json::wvalue to_json(const Shared::TranscodeState& _value) {
+  crow::json::wvalue _res;
+  _res["curStatus"] = to_json(_value.curStatus);
+  _res["filesTranscoded"] = to_json(_value.filesTranscoded);
+  _res["filesFound"] = to_json(_value.filesFound);
+  _res["filesPending"] = to_json(_value.filesPending);
+  _res["filesUntouched"] = to_json(_value.filesUntouched);
+  _res["filesFailed"] = to_json(_value.filesFailed);
+  _res["itemsRemoved"] = to_json(_value.itemsRemoved);
+  return _res;
+}
+
+namespace Shared {
 
 struct TranscodeInfo {
   TranscodeSourceLocation source;
@@ -1065,6 +1104,20 @@ struct TranscodeInfo {
   TranscodeFormatTargetName format;
   std::uint16_t bitrate;
 };
+} // namespace Shared
+
+inline crow::json::wvalue to_json(const Shared::TranscodeInfo& _value) {
+  crow::json::wvalue _res;
+  _res["source"] = to_json(_value.source);
+  _res["dest"] = to_json(_value.dest);
+  _res["artwork"] = to_json(_value.artwork);
+  _res["mirror"] = to_json(_value.mirror);
+  _res["format"] = to_json(_value.format);
+  _res["bitrate"] = to_json(_value.bitrate);
+  return _res;
+}
+
+namespace Shared {
 
 using SongKey = std::string;
 
@@ -1087,6 +1140,21 @@ struct Song {
   std::vector<ArtistKey> secondaryIds;
   std::vector<std::string> variations;
 };
+} // namespace Shared
+
+inline crow::json::wvalue to_json(const Shared::Song& _value) {
+  crow::json::wvalue _res;
+  _res["key"] = to_json(_value.key);
+  _res["track"] = to_json(_value.track);
+  _res["title"] = to_json(_value.title);
+  _res["albumId"] = to_json(_value.albumId);
+  _res["artistIds"] = to_json(_value.artistIds);
+  _res["secondaryIds"] = to_json(_value.secondaryIds);
+  _res["variations"] = to_json(_value.variations);
+  return _res;
+}
+
+namespace Shared {
 
 enum class VAType : std::uint8_t { None, VA, OST };
 
@@ -1107,6 +1175,18 @@ struct Artist {
   std::vector<AlbumKey> albums;
   std::vector<SongKey> songs;
 };
+} // namespace Shared
+
+inline crow::json::wvalue to_json(const Shared::Artist& _value) {
+  crow::json::wvalue _res;
+  _res["key"] = to_json(_value.key);
+  _res["name"] = to_json(_value.name);
+  _res["albums"] = to_json(_value.albums);
+  _res["songs"] = to_json(_value.songs);
+  return _res;
+}
+
+namespace Shared {
 
 struct Album {
   AlbumKey key;
@@ -1117,11 +1197,36 @@ struct Album {
   std::vector<SongKey> songs;
   std::vector<std::string> diskNames;
 };
+} // namespace Shared
+
+inline crow::json::wvalue to_json(const Shared::Album& _value) {
+  crow::json::wvalue _res;
+  _res["key"] = to_json(_value.key);
+  _res["year"] = to_json(_value.year);
+  _res["title"] = to_json(_value.title);
+  _res["vatype"] = to_json(_value.vatype);
+  _res["primaryArtists"] = to_json(_value.primaryArtists);
+  _res["songs"] = to_json(_value.songs);
+  _res["diskNames"] = to_json(_value.diskNames);
+  return _res;
+}
+
+namespace Shared {
 
 struct MediaInfo {
   std::map<std::string, std::string> general;
   std::map<std::string, std::string> audio;
 };
+} // namespace Shared
+
+inline crow::json::wvalue to_json(const Shared::MediaInfo& _value) {
+  crow::json::wvalue _res;
+  _res["general"] = to_json(_value.general);
+  _res["audio"] = to_json(_value.audio);
+  return _res;
+}
+
+namespace Shared {
 
 struct SimpleMetadata {
   std::string artist;
@@ -1133,6 +1238,22 @@ struct SimpleMetadata {
   std::string discName;
   VAType compilation;
 };
+} // namespace Shared
+
+inline crow::json::wvalue to_json(const Shared::SimpleMetadata& _value) {
+  crow::json::wvalue _res;
+  _res["artist"] = to_json(_value.artist);
+  _res["album"] = to_json(_value.album);
+  _res["year"] = to_json(_value.year);
+  _res["track"] = to_json(_value.track);
+  _res["title"] = to_json(_value.title);
+  _res["discNum"] = to_json(_value.discNum);
+  _res["discName"] = to_json(_value.discName);
+  _res["compilation"] = to_json(_value.compilation);
+  return _res;
+}
+
+namespace Shared {
 
 struct FullMetadata {
   std::string originalPath;
@@ -1147,17 +1268,54 @@ struct FullMetadata {
   std::int16_t disk;
   std::string diskName;
 };
+} // namespace Shared
+
+inline crow::json::wvalue to_json(const Shared::FullMetadata& _value) {
+  crow::json::wvalue _res;
+  _res["originalPath"] = to_json(_value.originalPath);
+  _res["artist"] = to_json(_value.artist);
+  _res["album"] = to_json(_value.album);
+  _res["year"] = to_json(_value.year);
+  _res["track"] = to_json(_value.track);
+  _res["title"] = to_json(_value.title);
+  _res["vaType"] = to_json(_value.vaType);
+  _res["moreArtists"] = to_json(_value.moreArtists);
+  _res["variations"] = to_json(_value.variations);
+  _res["disk"] = to_json(_value.disk);
+  _res["diskName"] = to_json(_value.diskName);
+  return _res;
+}
+
+namespace Shared {
 
 struct AudioFileRegexPattern {
   VAType compilation;
   std::string rgx;
 };
+} // namespace Shared
+
+inline crow::json::wvalue to_json(const Shared::AudioFileRegexPattern& _value) {
+  crow::json::wvalue _res;
+  _res["compilation"] = to_json(_value.compilation);
+  _res["rgx"] = to_json(_value.rgx);
+  return _res;
+}
+
+namespace Shared {
 
 struct MimeData {
   std::string type;
   std::string data;
 };
-
 } // namespace Shared
+
+inline crow::json::wvalue to_json(const Shared::MimeData& _value) {
+  crow::json::wvalue _res;
+  _res["type"] = to_json(_value.type);
+  _res["data"] = to_json(_value.data);
+  return _res;
+}
+
+namespace Shared {} // namespace Shared
 
 #endif // SHARED_CONSTANTS_HPP

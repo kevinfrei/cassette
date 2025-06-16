@@ -44,7 +44,6 @@ async function header(writer: Bun.FileSink): Promise<void> {
 #ifndef SHARED_CONSTANTS_HPP
 #define SHARED_CONSTANTS_HPP
 
-#include <crow/json.h>
 #include <cstdint>
 #include <map>
 #include <optional>
@@ -53,6 +52,10 @@ async function header(writer: Bun.FileSink): Promise<void> {
 #include <string_view>
 #include <tuple>
 #include <vector>
+
+#include <crow/json.h>
+
+#include "json_pickling.hpp"
 
 namespace Shared {
 template <typename T>
@@ -211,7 +214,19 @@ const objType: EmitItem<ObjType> = async (writer, name, item) => {
     const typeName = getTypeName(value);
     await writer.write(`  ${typeName} ${key};\n`);
   }
-  await writer.write(`};\n`);
+  await writer.write(`};
+} // namespace Shared
+
+inline crow::json::wvalue to_json(const Shared::${name}& _value) {
+  crow::json::wvalue _res;
+  ${Object.entries(item.d)
+    .map(([key]) => `_res["${key}"] = to_json(_value.${key});`)
+    .join('\n  ')}
+  return _res;
+}
+
+namespace Shared {
+`);
 };
 
 const usingType: EmitItem<Types> = async (writer, name, item) => {
