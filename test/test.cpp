@@ -405,7 +405,6 @@ TEST(JsonPickling, CustomObject) {
   EXPECT_EQ(json.t(), crow::json::type::Object);
   std::string s = json.dump();
   // std::cout << "Serialized TranscodeState: " << s << std::endl;
-  /*
   crow::json::rvalue recv = crow::json::load(s);
   auto sentState = from_json<Shared::TranscodeState>(recv);
   EXPECT_TRUE(sentState.has_value());
@@ -424,5 +423,4 @@ TEST(JsonPickling, CustomObject) {
   EXPECT_EQ(sentState->itemsRemoved.size(), 2);
   EXPECT_EQ(sentState->itemsRemoved[0], "item1");
   EXPECT_EQ(sentState->itemsRemoved[1], "item2");
-  */
 }
