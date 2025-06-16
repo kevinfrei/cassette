@@ -72,7 +72,7 @@ async function footer(writer: Bun.FileSink): Promise<void> {
 `);
 }
 
-function getTypeName(type: Types): string {
+function getTypeName(type: Types, scoped?: boolean): string {
   if (isU8Type(type)) {
     return 'std::uint8_t';
   } else if (isI8Type(type)) {
@@ -100,15 +100,15 @@ function getTypeName(type: Types): string {
   } else if (isDoubleType(type)) {
     return 'double';
   } else if (isRefType(type)) {
-    return type.r; // Reference type, just return the name
+    return scoped ? 'Shared::' + type.r : type.r; // Reference type, just return the name
   } else if (isArrayType(type)) {
-    return `std::vector<${getTypeName(type.d)}>`;
+    return `std::vector<${getTypeName(type.d, !!scoped)}>`;
   } else if (isSetType(type)) {
-    return `std::set<${getTypeName(type.d)}>`;
+    return `std::set<${getTypeName(type.d, !!scoped)}>`;
   } else if (isMapType(type)) {
-    return `std::map<${getTypeName(type.k)}, ${getTypeName(type.v)}>`;
+    return `std::map<${getTypeName(type.k, !!scoped)}, ${getTypeName(type.v, !!scoped)}>`;
   } else if (isTupleType(type)) {
-    return `std::tuple<${type.l.map(getTypeName).join(', ')}>`;
+    return `std::tuple<${type.l.map((a) => getTypeName(a, !!scoped)).join(', ')}>`;
   }
   throw new Error(`Unsupported unnamed type: ${JSON.stringify(type)}`);
 }
@@ -224,6 +224,28 @@ inline crow::json::wvalue to_json(const Shared::${name}& _value) {
     .join('\n  ')}
   return _res;
 }
+
+template <>
+inline std::optional<Shared::${name}> from_json<Shared::${name}>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object) return std::nullopt;
+  Shared::${name} _res;
+  ${Object.entries(item.d)
+    .map(
+      ([key, value]) => `
+  if (!_value.has("${key}")) return std::nullopt;
+  auto _${key}_opt_ = from_json<${getTypeName(value, true)}>(_value["${key}"]);
+  if (!_${key}_opt_.has_value()) return std::nullopt;
+  _res.${key} = std::move(*_${key}_opt_);`,
+    )
+    .join('\n  ')}
+
+  return _res;
+}
+`);
+
+  // Add the namespace declaration
+  await writer.write(`
 
 namespace Shared {
 `);

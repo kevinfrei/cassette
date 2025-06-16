@@ -1054,6 +1054,30 @@ inline crow::json::wvalue to_json(
   return _res;
 }
 
+template <>
+inline std::optional<Shared::TranscodeSourceLocation>
+from_json<Shared::TranscodeSourceLocation>(const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::TranscodeSourceLocation _res;
+
+  if (!_value.has("type"))
+    return std::nullopt;
+  auto _type_opt_ = from_json<Shared::TranscodeSource>(_value["type"]);
+  if (!_type_opt_.has_value())
+    return std::nullopt;
+  _res.type = std::move(*_type_opt_);
+
+  if (!_value.has("loc"))
+    return std::nullopt;
+  auto _loc_opt_ = from_json<std::string>(_value["loc"]);
+  if (!_loc_opt_.has_value())
+    return std::nullopt;
+  _res.loc = std::move(*_loc_opt_);
+
+  return _res;
+}
+
 namespace Shared {
 
 struct FileFailure {
@@ -1072,26 +1096,24 @@ inline crow::json::wvalue to_json(const Shared::FileFailure& _value) {
 template <>
 inline std::optional<Shared::FileFailure> from_json<Shared::FileFailure>(
     const crow::json::rvalue& _value) {
-  if (_value.t() != crow::json::type::Object) {
+  if (_value.t() != crow::json::type::Object)
     return std::nullopt;
-  }
   Shared::FileFailure _res;
+
   if (!_value.has("file"))
     return std::nullopt;
-  crow::json::rvalue _file = _value["file"];
-  auto _file_opt = from_json<std::string>(_file);
-  if (!_file_opt) {
+  auto _file_opt_ = from_json<std::string>(_value["file"]);
+  if (!_file_opt_.has_value())
     return std::nullopt;
-  }
-  _res.file = std::move(*_file_opt);
+  _res.file = std::move(*_file_opt_);
+
   if (!_value.has("error"))
     return std::nullopt;
-  crow::json::rvalue _error = _value["error"];
-  auto _error_opt = from_json<std::string>(_error);
-  if (!_error_opt) {
+  auto _error_opt_ = from_json<std::string>(_value["error"]);
+  if (!_error_opt_.has_value())
     return std::nullopt;
-  }
-  _res.error = std::move(*_error_opt);
+  _res.error = std::move(*_error_opt_);
+
   return _res;
 }
 
@@ -1120,74 +1142,68 @@ inline crow::json::wvalue to_json(const Shared::TranscodeState& _value) {
   return _res;
 }
 
-inline std::optional<Shared::TranscodeState> from_json(
+template <>
+inline std::optional<Shared::TranscodeState> from_json<Shared::TranscodeState>(
     const crow::json::rvalue& _value) {
-  if (_value.t() != crow::json::type::Object) {
+  if (_value.t() != crow::json::type::Object)
     return std::nullopt;
-  }
   Shared::TranscodeState _res;
+
   if (!_value.has("curStatus"))
     return std::nullopt;
-  crow::json::rvalue _curStatus = _value["curStatus"];
-  auto _curStatus_opt = from_json<std::string>(_curStatus);
-  if (!_curStatus_opt) {
+  auto _curStatus_opt_ = from_json<std::string>(_value["curStatus"]);
+  if (!_curStatus_opt_.has_value())
     return std::nullopt;
-  }
-  _res.curStatus = std::move(*_curStatus_opt);
+  _res.curStatus = std::move(*_curStatus_opt_);
+
   if (!_value.has("filesTranscoded"))
     return std::nullopt;
-  crow::json::rvalue _filesTranscoded = _value["filesTranscoded"];
-  auto _filesTranscoded_opt =
-      from_json<std::vector<std::string>>(_filesTranscoded);
-  if (!_filesTranscoded_opt) {
+  auto _filesTranscoded_opt_ =
+      from_json<std::vector<std::string>>(_value["filesTranscoded"]);
+  if (!_filesTranscoded_opt_.has_value())
     return std::nullopt;
-  }
-  _res.filesTranscoded = std::move(*_filesTranscoded_opt);
+  _res.filesTranscoded = std::move(*_filesTranscoded_opt_);
+
   if (!_value.has("filesFound"))
     return std::nullopt;
-  crow::json::rvalue _filesFound = _value["filesFound"];
-  auto _filesFound_opt = from_json<std::int32_t>(_filesFound);
-  if (!_filesFound_opt) {
+  auto _filesFound_opt_ = from_json<std::int32_t>(_value["filesFound"]);
+  if (!_filesFound_opt_.has_value())
     return std::nullopt;
-  }
-  _res.filesFound = std::move(*_filesFound_opt);
+  _res.filesFound = std::move(*_filesFound_opt_);
 
   if (!_value.has("filesPending"))
     return std::nullopt;
-  crow::json::rvalue _filesPending = _value["filesPending"];
-  auto _filesPending_opt = from_json<std::int32_t>(_filesPending);
-  if (!_filesPending_opt) {
+  auto _filesPending_opt_ = from_json<std::int32_t>(_value["filesPending"]);
+  if (!_filesPending_opt_.has_value())
     return std::nullopt;
-  }
+  _res.filesPending = std::move(*_filesPending_opt_);
 
-  _res.filesPending = std::move(*_filesPending_opt);
   if (!_value.has("filesUntouched"))
     return std::nullopt;
-  crow::json::rvalue _filesUntouched = _value["filesUntouched"];
-  auto _filesUntouched_opt = from_json<std::int32_t>(_filesUntouched);
-  if (!_filesUntouched_opt) {
+  auto _filesUntouched_opt_ = from_json<std::int32_t>(_value["filesUntouched"]);
+  if (!_filesUntouched_opt_.has_value())
     return std::nullopt;
-  }
-  _res.filesUntouched = std::move(*_filesUntouched_opt);
+  _res.filesUntouched = std::move(*_filesUntouched_opt_);
+
   if (!_value.has("filesFailed"))
     return std::nullopt;
-  crow::json::rvalue _filesFailed = _value["filesFailed"];
-  auto _filesFailed_opt =
-      from_json<std::vector<Shared::FileFailure>>(_filesFailed);
-  if (!_filesFailed_opt) {
+  auto _filesFailed_opt_ =
+      from_json<std::vector<Shared::FileFailure>>(_value["filesFailed"]);
+  if (!_filesFailed_opt_.has_value())
     return std::nullopt;
-  }
-  _res.filesFailed = std::move(*_filesFailed_opt);
+  _res.filesFailed = std::move(*_filesFailed_opt_);
+
   if (!_value.has("itemsRemoved"))
     return std::nullopt;
-  crow::json::rvalue _itemsRemoved = _value["itemsRemoved"];
-  auto _itemsRemoved_opt = from_json<std::vector<std::string>>(_itemsRemoved);
-  if (!_itemsRemoved_opt) {
+  auto _itemsRemoved_opt_ =
+      from_json<std::vector<std::string>>(_value["itemsRemoved"]);
+  if (!_itemsRemoved_opt_.has_value())
     return std::nullopt;
-  }
-  _res.itemsRemoved = std::move(*_itemsRemoved_opt);
+  _res.itemsRemoved = std::move(*_itemsRemoved_opt_);
+
   return _res;
 }
+
 namespace Shared {
 
 struct TranscodeInfo {
@@ -1208,6 +1224,60 @@ inline crow::json::wvalue to_json(const Shared::TranscodeInfo& _value) {
   _res["mirror"] = to_json(_value.mirror);
   _res["format"] = to_json(_value.format);
   _res["bitrate"] = to_json(_value.bitrate);
+  return _res;
+}
+
+template <>
+inline std::optional<Shared::TranscodeInfo> from_json<Shared::TranscodeInfo>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::TranscodeInfo _res;
+
+  if (!_value.has("source"))
+    return std::nullopt;
+  auto _source_opt_ =
+      from_json<Shared::TranscodeSourceLocation>(_value["source"]);
+  if (!_source_opt_.has_value())
+    return std::nullopt;
+  _res.source = std::move(*_source_opt_);
+
+  if (!_value.has("dest"))
+    return std::nullopt;
+  auto _dest_opt_ = from_json<std::string>(_value["dest"]);
+  if (!_dest_opt_.has_value())
+    return std::nullopt;
+  _res.dest = std::move(*_dest_opt_);
+
+  if (!_value.has("artwork"))
+    return std::nullopt;
+  auto _artwork_opt_ = from_json<bool>(_value["artwork"]);
+  if (!_artwork_opt_.has_value())
+    return std::nullopt;
+  _res.artwork = std::move(*_artwork_opt_);
+
+  if (!_value.has("mirror"))
+    return std::nullopt;
+  auto _mirror_opt_ = from_json<bool>(_value["mirror"]);
+  if (!_mirror_opt_.has_value())
+    return std::nullopt;
+  _res.mirror = std::move(*_mirror_opt_);
+
+  if (!_value.has("format"))
+    return std::nullopt;
+  auto _format_opt_ =
+      from_json<Shared::TranscodeFormatTargetName>(_value["format"]);
+  if (!_format_opt_.has_value())
+    return std::nullopt;
+  _res.format = std::move(*_format_opt_);
+
+  if (!_value.has("bitrate"))
+    return std::nullopt;
+  auto _bitrate_opt_ = from_json<std::uint16_t>(_value["bitrate"]);
+  if (!_bitrate_opt_.has_value())
+    return std::nullopt;
+  _res.bitrate = std::move(*_bitrate_opt_);
+
   return _res;
 }
 
@@ -1248,6 +1318,68 @@ inline crow::json::wvalue to_json(const Shared::Song& _value) {
   return _res;
 }
 
+template <>
+inline std::optional<Shared::Song> from_json<Shared::Song>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::Song _res;
+
+  if (!_value.has("key"))
+    return std::nullopt;
+  auto _key_opt_ = from_json<Shared::SongKey>(_value["key"]);
+  if (!_key_opt_.has_value())
+    return std::nullopt;
+  _res.key = std::move(*_key_opt_);
+
+  if (!_value.has("track"))
+    return std::nullopt;
+  auto _track_opt_ = from_json<std::int16_t>(_value["track"]);
+  if (!_track_opt_.has_value())
+    return std::nullopt;
+  _res.track = std::move(*_track_opt_);
+
+  if (!_value.has("title"))
+    return std::nullopt;
+  auto _title_opt_ = from_json<std::string>(_value["title"]);
+  if (!_title_opt_.has_value())
+    return std::nullopt;
+  _res.title = std::move(*_title_opt_);
+
+  if (!_value.has("albumId"))
+    return std::nullopt;
+  auto _albumId_opt_ = from_json<Shared::AlbumKey>(_value["albumId"]);
+  if (!_albumId_opt_.has_value())
+    return std::nullopt;
+  _res.albumId = std::move(*_albumId_opt_);
+
+  if (!_value.has("artistIds"))
+    return std::nullopt;
+  auto _artistIds_opt_ =
+      from_json<std::vector<Shared::ArtistKey>>(_value["artistIds"]);
+  if (!_artistIds_opt_.has_value())
+    return std::nullopt;
+  _res.artistIds = std::move(*_artistIds_opt_);
+
+  if (!_value.has("secondaryIds"))
+    return std::nullopt;
+  auto _secondaryIds_opt_ =
+      from_json<std::vector<Shared::ArtistKey>>(_value["secondaryIds"]);
+  if (!_secondaryIds_opt_.has_value())
+    return std::nullopt;
+  _res.secondaryIds = std::move(*_secondaryIds_opt_);
+
+  if (!_value.has("variations"))
+    return std::nullopt;
+  auto _variations_opt_ =
+      from_json<std::vector<std::string>>(_value["variations"]);
+  if (!_variations_opt_.has_value())
+    return std::nullopt;
+  _res.variations = std::move(*_variations_opt_);
+
+  return _res;
+}
+
 namespace Shared {
 
 enum class VAType : std::uint8_t { None, VA, OST };
@@ -1280,6 +1412,45 @@ inline crow::json::wvalue to_json(const Shared::Artist& _value) {
   return _res;
 }
 
+template <>
+inline std::optional<Shared::Artist> from_json<Shared::Artist>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::Artist _res;
+
+  if (!_value.has("key"))
+    return std::nullopt;
+  auto _key_opt_ = from_json<Shared::ArtistKey>(_value["key"]);
+  if (!_key_opt_.has_value())
+    return std::nullopt;
+  _res.key = std::move(*_key_opt_);
+
+  if (!_value.has("name"))
+    return std::nullopt;
+  auto _name_opt_ = from_json<std::string>(_value["name"]);
+  if (!_name_opt_.has_value())
+    return std::nullopt;
+  _res.name = std::move(*_name_opt_);
+
+  if (!_value.has("albums"))
+    return std::nullopt;
+  auto _albums_opt_ =
+      from_json<std::vector<Shared::AlbumKey>>(_value["albums"]);
+  if (!_albums_opt_.has_value())
+    return std::nullopt;
+  _res.albums = std::move(*_albums_opt_);
+
+  if (!_value.has("songs"))
+    return std::nullopt;
+  auto _songs_opt_ = from_json<std::vector<Shared::SongKey>>(_value["songs"]);
+  if (!_songs_opt_.has_value())
+    return std::nullopt;
+  _res.songs = std::move(*_songs_opt_);
+
+  return _res;
+}
+
 namespace Shared {
 
 struct Album {
@@ -1305,6 +1476,67 @@ inline crow::json::wvalue to_json(const Shared::Album& _value) {
   return _res;
 }
 
+template <>
+inline std::optional<Shared::Album> from_json<Shared::Album>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::Album _res;
+
+  if (!_value.has("key"))
+    return std::nullopt;
+  auto _key_opt_ = from_json<Shared::AlbumKey>(_value["key"]);
+  if (!_key_opt_.has_value())
+    return std::nullopt;
+  _res.key = std::move(*_key_opt_);
+
+  if (!_value.has("year"))
+    return std::nullopt;
+  auto _year_opt_ = from_json<std::int16_t>(_value["year"]);
+  if (!_year_opt_.has_value())
+    return std::nullopt;
+  _res.year = std::move(*_year_opt_);
+
+  if (!_value.has("title"))
+    return std::nullopt;
+  auto _title_opt_ = from_json<std::string>(_value["title"]);
+  if (!_title_opt_.has_value())
+    return std::nullopt;
+  _res.title = std::move(*_title_opt_);
+
+  if (!_value.has("vatype"))
+    return std::nullopt;
+  auto _vatype_opt_ = from_json<Shared::VAType>(_value["vatype"]);
+  if (!_vatype_opt_.has_value())
+    return std::nullopt;
+  _res.vatype = std::move(*_vatype_opt_);
+
+  if (!_value.has("primaryArtists"))
+    return std::nullopt;
+  auto _primaryArtists_opt_ =
+      from_json<std::vector<Shared::ArtistKey>>(_value["primaryArtists"]);
+  if (!_primaryArtists_opt_.has_value())
+    return std::nullopt;
+  _res.primaryArtists = std::move(*_primaryArtists_opt_);
+
+  if (!_value.has("songs"))
+    return std::nullopt;
+  auto _songs_opt_ = from_json<std::vector<Shared::SongKey>>(_value["songs"]);
+  if (!_songs_opt_.has_value())
+    return std::nullopt;
+  _res.songs = std::move(*_songs_opt_);
+
+  if (!_value.has("diskNames"))
+    return std::nullopt;
+  auto _diskNames_opt_ =
+      from_json<std::vector<std::string>>(_value["diskNames"]);
+  if (!_diskNames_opt_.has_value())
+    return std::nullopt;
+  _res.diskNames = std::move(*_diskNames_opt_);
+
+  return _res;
+}
+
 namespace Shared {
 
 struct MediaInfo {
@@ -1317,6 +1549,32 @@ inline crow::json::wvalue to_json(const Shared::MediaInfo& _value) {
   crow::json::wvalue _res;
   _res["general"] = to_json(_value.general);
   _res["audio"] = to_json(_value.audio);
+  return _res;
+}
+
+template <>
+inline std::optional<Shared::MediaInfo> from_json<Shared::MediaInfo>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::MediaInfo _res;
+
+  if (!_value.has("general"))
+    return std::nullopt;
+  auto _general_opt_ =
+      from_json<std::map<std::string, std::string>>(_value["general"]);
+  if (!_general_opt_.has_value())
+    return std::nullopt;
+  _res.general = std::move(*_general_opt_);
+
+  if (!_value.has("audio"))
+    return std::nullopt;
+  auto _audio_opt_ =
+      from_json<std::map<std::string, std::string>>(_value["audio"]);
+  if (!_audio_opt_.has_value())
+    return std::nullopt;
+  _res.audio = std::move(*_audio_opt_);
+
   return _res;
 }
 
@@ -1344,6 +1602,72 @@ inline crow::json::wvalue to_json(const Shared::SimpleMetadata& _value) {
   _res["discNum"] = to_json(_value.discNum);
   _res["discName"] = to_json(_value.discName);
   _res["compilation"] = to_json(_value.compilation);
+  return _res;
+}
+
+template <>
+inline std::optional<Shared::SimpleMetadata> from_json<Shared::SimpleMetadata>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::SimpleMetadata _res;
+
+  if (!_value.has("artist"))
+    return std::nullopt;
+  auto _artist_opt_ = from_json<std::string>(_value["artist"]);
+  if (!_artist_opt_.has_value())
+    return std::nullopt;
+  _res.artist = std::move(*_artist_opt_);
+
+  if (!_value.has("album"))
+    return std::nullopt;
+  auto _album_opt_ = from_json<std::string>(_value["album"]);
+  if (!_album_opt_.has_value())
+    return std::nullopt;
+  _res.album = std::move(*_album_opt_);
+
+  if (!_value.has("year"))
+    return std::nullopt;
+  auto _year_opt_ = from_json<std::string>(_value["year"]);
+  if (!_year_opt_.has_value())
+    return std::nullopt;
+  _res.year = std::move(*_year_opt_);
+
+  if (!_value.has("track"))
+    return std::nullopt;
+  auto _track_opt_ = from_json<std::string>(_value["track"]);
+  if (!_track_opt_.has_value())
+    return std::nullopt;
+  _res.track = std::move(*_track_opt_);
+
+  if (!_value.has("title"))
+    return std::nullopt;
+  auto _title_opt_ = from_json<std::string>(_value["title"]);
+  if (!_title_opt_.has_value())
+    return std::nullopt;
+  _res.title = std::move(*_title_opt_);
+
+  if (!_value.has("discNum"))
+    return std::nullopt;
+  auto _discNum_opt_ = from_json<std::string>(_value["discNum"]);
+  if (!_discNum_opt_.has_value())
+    return std::nullopt;
+  _res.discNum = std::move(*_discNum_opt_);
+
+  if (!_value.has("discName"))
+    return std::nullopt;
+  auto _discName_opt_ = from_json<std::string>(_value["discName"]);
+  if (!_discName_opt_.has_value())
+    return std::nullopt;
+  _res.discName = std::move(*_discName_opt_);
+
+  if (!_value.has("compilation"))
+    return std::nullopt;
+  auto _compilation_opt_ = from_json<Shared::VAType>(_value["compilation"]);
+  if (!_compilation_opt_.has_value())
+    return std::nullopt;
+  _res.compilation = std::move(*_compilation_opt_);
+
   return _res;
 }
 
@@ -1380,6 +1704,95 @@ inline crow::json::wvalue to_json(const Shared::FullMetadata& _value) {
   return _res;
 }
 
+template <>
+inline std::optional<Shared::FullMetadata> from_json<Shared::FullMetadata>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::FullMetadata _res;
+
+  if (!_value.has("originalPath"))
+    return std::nullopt;
+  auto _originalPath_opt_ = from_json<std::string>(_value["originalPath"]);
+  if (!_originalPath_opt_.has_value())
+    return std::nullopt;
+  _res.originalPath = std::move(*_originalPath_opt_);
+
+  if (!_value.has("artist"))
+    return std::nullopt;
+  auto _artist_opt_ = from_json<std::vector<std::string>>(_value["artist"]);
+  if (!_artist_opt_.has_value())
+    return std::nullopt;
+  _res.artist = std::move(*_artist_opt_);
+
+  if (!_value.has("album"))
+    return std::nullopt;
+  auto _album_opt_ = from_json<std::string>(_value["album"]);
+  if (!_album_opt_.has_value())
+    return std::nullopt;
+  _res.album = std::move(*_album_opt_);
+
+  if (!_value.has("year"))
+    return std::nullopt;
+  auto _year_opt_ = from_json<std::int16_t>(_value["year"]);
+  if (!_year_opt_.has_value())
+    return std::nullopt;
+  _res.year = std::move(*_year_opt_);
+
+  if (!_value.has("track"))
+    return std::nullopt;
+  auto _track_opt_ = from_json<std::int16_t>(_value["track"]);
+  if (!_track_opt_.has_value())
+    return std::nullopt;
+  _res.track = std::move(*_track_opt_);
+
+  if (!_value.has("title"))
+    return std::nullopt;
+  auto _title_opt_ = from_json<std::string>(_value["title"]);
+  if (!_title_opt_.has_value())
+    return std::nullopt;
+  _res.title = std::move(*_title_opt_);
+
+  if (!_value.has("vaType"))
+    return std::nullopt;
+  auto _vaType_opt_ = from_json<Shared::VAType>(_value["vaType"]);
+  if (!_vaType_opt_.has_value())
+    return std::nullopt;
+  _res.vaType = std::move(*_vaType_opt_);
+
+  if (!_value.has("moreArtists"))
+    return std::nullopt;
+  auto _moreArtists_opt_ =
+      from_json<std::vector<std::string>>(_value["moreArtists"]);
+  if (!_moreArtists_opt_.has_value())
+    return std::nullopt;
+  _res.moreArtists = std::move(*_moreArtists_opt_);
+
+  if (!_value.has("variations"))
+    return std::nullopt;
+  auto _variations_opt_ =
+      from_json<std::vector<std::string>>(_value["variations"]);
+  if (!_variations_opt_.has_value())
+    return std::nullopt;
+  _res.variations = std::move(*_variations_opt_);
+
+  if (!_value.has("disk"))
+    return std::nullopt;
+  auto _disk_opt_ = from_json<std::int16_t>(_value["disk"]);
+  if (!_disk_opt_.has_value())
+    return std::nullopt;
+  _res.disk = std::move(*_disk_opt_);
+
+  if (!_value.has("diskName"))
+    return std::nullopt;
+  auto _diskName_opt_ = from_json<std::string>(_value["diskName"]);
+  if (!_diskName_opt_.has_value())
+    return std::nullopt;
+  _res.diskName = std::move(*_diskName_opt_);
+
+  return _res;
+}
+
 namespace Shared {
 
 struct AudioFileRegexPattern {
@@ -1395,6 +1808,30 @@ inline crow::json::wvalue to_json(const Shared::AudioFileRegexPattern& _value) {
   return _res;
 }
 
+template <>
+inline std::optional<Shared::AudioFileRegexPattern>
+from_json<Shared::AudioFileRegexPattern>(const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::AudioFileRegexPattern _res;
+
+  if (!_value.has("compilation"))
+    return std::nullopt;
+  auto _compilation_opt_ = from_json<Shared::VAType>(_value["compilation"]);
+  if (!_compilation_opt_.has_value())
+    return std::nullopt;
+  _res.compilation = std::move(*_compilation_opt_);
+
+  if (!_value.has("rgx"))
+    return std::nullopt;
+  auto _rgx_opt_ = from_json<std::string>(_value["rgx"]);
+  if (!_rgx_opt_.has_value())
+    return std::nullopt;
+  _res.rgx = std::move(*_rgx_opt_);
+
+  return _res;
+}
+
 namespace Shared {
 
 struct MimeData {
@@ -1407,6 +1844,30 @@ inline crow::json::wvalue to_json(const Shared::MimeData& _value) {
   crow::json::wvalue _res;
   _res["type"] = to_json(_value.type);
   _res["data"] = to_json(_value.data);
+  return _res;
+}
+
+template <>
+inline std::optional<Shared::MimeData> from_json<Shared::MimeData>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::MimeData _res;
+
+  if (!_value.has("type"))
+    return std::nullopt;
+  auto _type_opt_ = from_json<std::string>(_value["type"]);
+  if (!_type_opt_.has_value())
+    return std::nullopt;
+  _res.type = std::move(*_type_opt_);
+
+  if (!_value.has("data"))
+    return std::nullopt;
+  auto _data_opt_ = from_json<std::string>(_value["data"]);
+  if (!_data_opt_.has_value())
+    return std::nullopt;
+  _res.data = std::move(*_data_opt_);
+
   return _res;
 }
 
