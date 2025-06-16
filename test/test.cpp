@@ -1,20 +1,11 @@
+#include <optional>
+#include <string>
+
 #include <crow.h>
 #include <gtest/gtest.h>
-#include <iostream>
-#include <optional>
-#include <sstream>
-#include <string>
 
 #include "CommonTypes.hpp"
 #include "json_pickling.hpp"
-
-// Demonstrate some basic assertions.
-TEST(Test, BasicAssertions) {
-  // Expect two strings not to be equal.
-  EXPECT_STRNE("hello", "world");
-  // Expect equality.
-  EXPECT_EQ(7 * 6, 42);
-}
 
 TEST(JsonPickling, uint32) {
   // Test the conversion of basic types to and from JSON

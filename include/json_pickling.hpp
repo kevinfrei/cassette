@@ -1,4 +1,3 @@
-#include <crow/json.h>
 #include <cstdint>
 #include <map>
 #include <optional>
@@ -9,14 +8,15 @@
 #include <unordered_set>
 #include <vector>
 
-// #include "CommonTypes.hpp"
+#include <crow/json.h>
 
 /****
 Conversion to JSON stuff
 ****/
 
 // By default, simple stuff can be converted to json
-// The enable_if_t is to prevent this version from being used by enum classes
+// The enable_if_t is to prevent this version from being used by enum classes,
+// which get extra validation to prevent stupidity from accidentally leaking.
 template <typename T>
 std::enable_if_t<!std::is_enum_v<T>, crow::json::wvalue> to_json(
     const T& value) {
@@ -28,7 +28,7 @@ crow::json::wvalue to_json(const char* value) {
   return crow::json::wvalue(std::string(value));
 }
 
-// Handle vector<T> explicity...
+// Vector<T> specialization
 template <typename T>
 crow::json::wvalue to_json(const std::vector<T>& value) {
   crow::json::wvalue vec{std::vector<crow::json::wvalue>()};
@@ -38,41 +38,41 @@ crow::json::wvalue to_json(const std::vector<T>& value) {
   return vec;
 }
 
-// Handle char's specifically:
+// Handle char's specifically. Hurray dumb Javascript?
 template <>
 crow::json::wvalue to_json<char>(const char& value) {
   return crow::json::wvalue(std::string(1, value));
 }
 
-// Tuples are just arrays which the right size & type
+// Tuples in JSON are "just" arrays with the right size & types.
+// Doing that is...complicated.
 template <typename Tuple, size_t Index, typename T>
-void to_json_tuple_element_helper(const Tuple& tuple,
+void tuple_to_json_element_helper(const Tuple& tuple,
                                   crow::json::wvalue& container) {
-  // std::cout << "Element " << Index << ": " << typeid(T).name() << std::endl;
   container[Index] = to_json(std::get<Index>(tuple));
 }
-
+// This is a compile time 'call the helper for each type' thing.
 template <typename Tuple, size_t... Is>
-void to_json_tuple_recurse(const Tuple& tuple,
+void tuple_to_json_recurse(const Tuple& tuple,
                            crow::json::wvalue& json_list,
                            std::index_sequence<Is...>) {
-  ((to_json_tuple_element_helper<Tuple, Is, std::tuple_element_t<Is, Tuple>>(
+  ((tuple_to_json_element_helper<Tuple, Is, std::tuple_element_t<Is, Tuple>>(
        tuple, json_list)),
    ...);
 }
-
+// make_index_sequence is the magic to do something different per tuple-item
 template <typename... Args>
 crow::json::wvalue to_json(const std::tuple<Args...>& value) {
   crow::json::wvalue vec{std::vector<crow::json::wvalue>()};
-  to_json_tuple_recurse(
+  tuple_to_json_recurse(
       value, vec, std::make_index_sequence<sizeof...(Args)>{});
   return vec;
 }
 
 // I didn't need this for Windows, but I do for Linux/Mac because the map
-// type is std::tuple instead of std::pair in glibcxx
+// elem type is std::tuple on one, but a std::pair on the other
 template <typename Iter>
-crow::json::wvalue to_json_vec_pair(const Iter& begin, const Iter& end) {
+crow::json::wvalue vec_pair_to_json(const Iter& begin, const Iter& end) {
   std::vector<crow::json::wvalue> vec;
   for (auto it = begin; it != end; ++it) {
     crow::json::wvalue pair{std::vector<crow::json::wvalue>()};
@@ -84,26 +84,24 @@ crow::json::wvalue to_json_vec_pair(const Iter& begin, const Iter& end) {
   return vec;
 }
 
-// My pickling framework sends Maps as this (not just objects: They're TS
-// Map<K,V>)
+// My pickling framework sends JS Maps as this:
 // {"@dataType":"freik.Map","@dataValue":[["a",1],["c",2],["b",3]]}
 template <typename K, typename V>
 crow::json::wvalue to_json(const std::map<K, V>& value) {
   crow::json::wvalue v;
   v["@dataType"] = "freik.Map";
-  v["@dataValue"] = to_json_vec_pair(value.begin(), value.end());
+  v["@dataValue"] = vec_pair_to_json(value.begin(), value.end());
   return v;
 }
 template <typename K, typename V>
 crow::json::wvalue to_json(const std::unordered_map<K, V>& value) {
   crow::json::wvalue v;
   v["@dataType"] = "freik.Map";
-  v["@dataValue"] = to_json_vec_pair(value.begin(), value.end());
+  v["@dataValue"] = vec_pair_to_json(value.begin(), value.end());
   return v;
 }
 
-// My pickling framework sends Sets as this (not just objects: They're TS
-// Set<K>'s)
+// My pickling framework sends JS Sets as this:
 // {"@dataType":"freik.Set","@dataValue":["a", "c", "b"]}
 template <typename T>
 crow::json::wvalue to_json(const std::unordered_set<T>& value) {
@@ -126,7 +124,7 @@ crow::json::wvalue to_json(const std::set<T>& value) {
   return v;
 }
 
-// Enum classes:
+// Enum classes. Look at that crazy template compile time expression stuff!
 template <typename T>
 std::enable_if_t<
     std::is_enum_v<T> &&
@@ -144,15 +142,16 @@ Conversion from JSON stuff
 // (i.e. everything must be specialized) and it's easier to
 // do this with a partial specialization of a struct :/
 template <typename T, typename Enabled = void>
-struct from_json_impl {
+struct impl_from_json {
   static std::optional<T> process(const crow::json::rvalue& json) {
     return std::nullopt;
   }
 };
-
+// Anything that doesn't either fully specialize this function,
+// or partially (or fully...) specialize the above struct gets std::nullopt.
 template <typename T>
 std::optional<T> from_json(const crow::json::rvalue& json) {
-  return from_json_impl<T>::process(json);
+  return impl_from_json<T>::process(json);
 }
 
 // Chars are a little weird, cuz, Javascript
@@ -268,7 +267,7 @@ std::optional<std::string> from_json<std::string>(
 
 // std::vector specialization:
 template <typename T>
-struct from_json_impl<std::vector<T>> {
+struct impl_from_json<std::vector<T>> {
   using value_type = T;
   static std::optional<std::vector<value_type>> process(
       const crow::json::rvalue& json) {
@@ -291,15 +290,13 @@ struct from_json_impl<std::vector<T>> {
 // std::tuple specialization:
 // TODO: Explain this, as it is rather messsy.
 template <typename... Args>
-struct from_json_impl<std::tuple<Args...>> {
+struct impl_from_json<std::tuple<Args...>> {
  private:
   using tup_type = std::tuple<Args...>;
   template <size_t Index, typename T>
   static std::optional<T> element_helper(tup_type& tuple,
                                          bool& failed,
                                          const crow::json::rvalue& container) {
-    // std::cout << "Element " << Index << ": " << typeid(T).name() <<
-    // std::endl;
     std::optional<T> res = from_json<T>(container[Index]);
     failed = failed || !res.has_value();
     if (res.has_value()) {
@@ -335,9 +332,9 @@ struct from_json_impl<std::tuple<Args...>> {
   }
 };
 
-// std::set specialization:
+// std::set/unordered_set specialization common code:
 template <template <typename...> class SetType, typename Elem>
-struct set_helper_from_json {
+struct impl_set_helper_from_json {
   static std::optional<SetType<Elem>> process(const crow::json::rvalue& json) {
     if (json.t() != crow::json::type::Object || json.size() != 2) {
       return std::nullopt;
@@ -363,24 +360,24 @@ struct set_helper_from_json {
 
 // std::set specialization
 template <typename Elem>
-struct from_json_impl<std::set<Elem>> {
+struct impl_from_json<std::set<Elem>> {
   static std::optional<std::set<Elem>> process(const crow::json::rvalue& json) {
-    return set_helper_from_json<std::set, Elem>::process(json);
+    return impl_set_helper_from_json<std::set, Elem>::process(json);
   }
 };
 
 // std::unordered_set specialization
 template <typename Elem>
-struct from_json_impl<std::unordered_set<Elem>> {
+struct impl_from_json<std::unordered_set<Elem>> {
   static std::optional<std::unordered_set<Elem>> process(
       const crow::json::rvalue& json) {
-    return set_helper_from_json<std::unordered_set, Elem>::process(json);
+    return impl_set_helper_from_json<std::unordered_set, Elem>::process(json);
   }
 };
 
-// std::set specialization:
+// std::map/unordered specialization helper:
 template <template <typename...> class MapType, typename K, typename V>
-struct map_helper_from_json {
+struct impl_map_helper_from_json {
   static std::optional<MapType<K, V>> process(const crow::json::rvalue& json) {
     if (json.t() != crow::json::type::Object || json.size() != 2) {
       return std::nullopt;
@@ -410,30 +407,32 @@ struct map_helper_from_json {
 
 // std::map specialization
 template <typename K, typename V>
-struct from_json_impl<std::map<K, V>> {
+struct impl_from_json<std::map<K, V>> {
   static std::optional<std::map<K, V>> process(const crow::json::rvalue& json) {
-    return map_helper_from_json<std::map, K, V>::process(json);
+    return impl_map_helper_from_json<std::map, K, V>::process(json);
   }
 };
 
 // std::unordered_set specialization
 template <typename K, typename V>
-struct from_json_impl<std::unordered_map<K, V>> {
+struct impl_from_json<std::unordered_map<K, V>> {
   static std::optional<std::unordered_map<K, V>> process(
       const crow::json::rvalue& json) {
-    return map_helper_from_json<std::unordered_map, K, V>::process(json);
+    return impl_map_helper_from_json<std::unordered_map, K, V>::process(json);
   }
 };
 
-// Enum's, specifically for my gen'ed enum types
+// Enum's, specifically for my gen'ed enum types, which include an
+// 'is_valid' free function overload
 template <typename T>
-struct from_json_impl<T, std::enable_if_t<std::is_enum_v<T>>> {
+struct impl_from_json<T, std::enable_if_t<std::is_enum_v<T>>> {
   static std::optional<T> process(const crow::json::rvalue& json) {
     using IntType = std::underlying_type_t<T>;
     std::optional<IntType> underlyingValue = from_json<IntType>(json);
     if (!underlyingValue.has_value())
       return std::nullopt;
     T val = static_cast<T>(underlyingValue.value());
+    // Check that the enumeration is actually defined
     if (is_valid(val))
       return val;
     return std::nullopt;
