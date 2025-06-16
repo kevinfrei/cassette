@@ -1,3 +1,4 @@
+#include <iostream>
 #include <optional>
 #include <string>
 
@@ -355,5 +356,73 @@ TEST(JsonPickling, MixAndMatch) {
   std::string s = json.dump();
   crow::json::rvalue recv = crow::json::load(s);
   auto sentMap = from_json<MapType>(recv);
+
   EXPECT_TRUE(sentMap.has_value());
+  EXPECT_EQ(sentMap->size(), 3);
+  EXPECT_EQ(sentMap->at(Shared::IgnoreItemType::DirName).size(), 2);
+
+  auto& dirname = sentMap->at(Shared::IgnoreItemType::DirName);
+  EXPECT_EQ(dirname.size(), 2);
+
+  auto& curView = std::get<0>(dirname[0]);
+  auto& name = std::get<1>(dirname[0]);
+  auto& value = std::get<2>(dirname[0]);
+  EXPECT_EQ(curView, Shared::CurrentView::albums);
+  EXPECT_EQ(name, "Albums");
+  EXPECT_EQ(value, 1.25);
+
+  curView = std::get<0>(dirname[1]);
+  name = std::get<1>(dirname[1]);
+  value = std::get<2>(dirname[1]);
+  EXPECT_EQ(curView, Shared::CurrentView::artists);
+  EXPECT_EQ(name, "Artists");
+  EXPECT_EQ(value, 2.5);
+
+  auto& pathkeyword = sentMap->at(Shared::IgnoreItemType::PathKeyword);
+  EXPECT_EQ(pathkeyword.size(), 1);
+
+  curView = std::get<0>(pathkeyword[0]);
+  name = std::get<1>(pathkeyword[0]);
+  value = std::get<2>(pathkeyword[0]);
+  EXPECT_EQ(curView, Shared::CurrentView::now_playing);
+  EXPECT_EQ(name, "Now Playing");
+  EXPECT_EQ(value, 4.125);
+
+  auto& pathroot = sentMap->at(Shared::IgnoreItemType::PathRoot);
+  EXPECT_EQ(pathroot.size(), 0);
+}
+
+TEST(JsonPickling, CustomObject) {
+  Shared::TranscodeState state;
+  state.curStatus = "Transcoding";
+  state.filesTranscoded = {"file1.mp3", "file2.mp3"};
+  state.filesFound = 10;
+  state.filesPending = 5;
+  state.filesUntouched = 2;
+  state.filesFailed = {{"file3.mp3", "Error 1"}, {"file4.mp3", "Error 2"}};
+  state.itemsRemoved = {"item1", "item2"};
+  crow::json::wvalue json = to_json(state);
+  EXPECT_EQ(json.t(), crow::json::type::Object);
+  std::string s = json.dump();
+  // std::cout << "Serialized TranscodeState: " << s << std::endl;
+  /*
+  crow::json::rvalue recv = crow::json::load(s);
+  auto sentState = from_json<Shared::TranscodeState>(recv);
+  EXPECT_TRUE(sentState.has_value());
+  EXPECT_EQ(sentState->curStatus, "Transcoding");
+  EXPECT_EQ(sentState->filesTranscoded.size(), 2);
+  EXPECT_EQ(sentState->filesTranscoded[0], "file1.mp3");
+  EXPECT_EQ(sentState->filesTranscoded[1], "file2.mp3");
+  EXPECT_EQ(sentState->filesFound, 10);
+  EXPECT_EQ(sentState->filesPending, 5);
+  EXPECT_EQ(sentState->filesUntouched, 2);
+  EXPECT_EQ(sentState->filesFailed.size(), 2);
+  EXPECT_EQ(sentState->filesFailed[0].file, "file3.mp3");
+  EXPECT_EQ(sentState->filesFailed[0].error, "Error 1");
+  EXPECT_EQ(sentState->filesFailed[1].file, "file4.mp3");
+  EXPECT_EQ(sentState->filesFailed[1].error, "Error 2");
+  EXPECT_EQ(sentState->itemsRemoved.size(), 2);
+  EXPECT_EQ(sentState->itemsRemoved[0], "item1");
+  EXPECT_EQ(sentState->itemsRemoved[1], "item2");
+  */
 }
