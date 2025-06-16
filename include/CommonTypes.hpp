@@ -1069,6 +1069,32 @@ inline crow::json::wvalue to_json(const Shared::FileFailure& _value) {
   return _res;
 }
 
+template <>
+inline std::optional<Shared::FileFailure> from_json<Shared::FileFailure>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object) {
+    return std::nullopt;
+  }
+  Shared::FileFailure _res;
+  if (!_value.has("file"))
+    return std::nullopt;
+  crow::json::rvalue _file = _value["file"];
+  auto _file_opt = from_json<std::string>(_file);
+  if (!_file_opt) {
+    return std::nullopt;
+  }
+  _res.file = std::move(*_file_opt);
+  if (!_value.has("error"))
+    return std::nullopt;
+  crow::json::rvalue _error = _value["error"];
+  auto _error_opt = from_json<std::string>(_error);
+  if (!_error_opt) {
+    return std::nullopt;
+  }
+  _res.error = std::move(*_error_opt);
+  return _res;
+}
+
 namespace Shared {
 
 struct TranscodeState {
@@ -1094,6 +1120,74 @@ inline crow::json::wvalue to_json(const Shared::TranscodeState& _value) {
   return _res;
 }
 
+inline std::optional<Shared::TranscodeState> from_json(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object) {
+    return std::nullopt;
+  }
+  Shared::TranscodeState _res;
+  if (!_value.has("curStatus"))
+    return std::nullopt;
+  crow::json::rvalue _curStatus = _value["curStatus"];
+  auto _curStatus_opt = from_json<std::string>(_curStatus);
+  if (!_curStatus_opt) {
+    return std::nullopt;
+  }
+  _res.curStatus = std::move(*_curStatus_opt);
+  if (!_value.has("filesTranscoded"))
+    return std::nullopt;
+  crow::json::rvalue _filesTranscoded = _value["filesTranscoded"];
+  auto _filesTranscoded_opt =
+      from_json<std::vector<std::string>>(_filesTranscoded);
+  if (!_filesTranscoded_opt) {
+    return std::nullopt;
+  }
+  _res.filesTranscoded = std::move(*_filesTranscoded_opt);
+  if (!_value.has("filesFound"))
+    return std::nullopt;
+  crow::json::rvalue _filesFound = _value["filesFound"];
+  auto _filesFound_opt = from_json<std::int32_t>(_filesFound);
+  if (!_filesFound_opt) {
+    return std::nullopt;
+  }
+  _res.filesFound = std::move(*_filesFound_opt);
+
+  if (!_value.has("filesPending"))
+    return std::nullopt;
+  crow::json::rvalue _filesPending = _value["filesPending"];
+  auto _filesPending_opt = from_json<std::int32_t>(_filesPending);
+  if (!_filesPending_opt) {
+    return std::nullopt;
+  }
+
+  _res.filesPending = std::move(*_filesPending_opt);
+  if (!_value.has("filesUntouched"))
+    return std::nullopt;
+  crow::json::rvalue _filesUntouched = _value["filesUntouched"];
+  auto _filesUntouched_opt = from_json<std::int32_t>(_filesUntouched);
+  if (!_filesUntouched_opt) {
+    return std::nullopt;
+  }
+  _res.filesUntouched = std::move(*_filesUntouched_opt);
+  if (!_value.has("filesFailed"))
+    return std::nullopt;
+  crow::json::rvalue _filesFailed = _value["filesFailed"];
+  auto _filesFailed_opt =
+      from_json<std::vector<Shared::FileFailure>>(_filesFailed);
+  if (!_filesFailed_opt) {
+    return std::nullopt;
+  }
+  _res.filesFailed = std::move(*_filesFailed_opt);
+  if (!_value.has("itemsRemoved"))
+    return std::nullopt;
+  crow::json::rvalue _itemsRemoved = _value["itemsRemoved"];
+  auto _itemsRemoved_opt = from_json<std::vector<std::string>>(_itemsRemoved);
+  if (!_itemsRemoved_opt) {
+    return std::nullopt;
+  }
+  _res.itemsRemoved = std::move(*_itemsRemoved_opt);
+  return _res;
+}
 namespace Shared {
 
 struct TranscodeInfo {
