@@ -111,13 +111,15 @@ function getTypeName(type: Types): string {
 }
 
 const enumType: EmitItem<Enum> = async (writer, name, item) => {
-  const typeName = isPlainIntEnumType(item.u) ? '' : `: ${getTypeName(item.u)}`;
+  const typeName = isPlainIntEnumType(item.u)
+    ? ''
+    : ` : ${getTypeName(item.u)}`;
   await writer.write(`
 enum class ${name}${typeName} {
   ${item.v.join(',\n  ')}
 };
 
-inline constexpr bool is_valiid(${name} _value) {
+inline constexpr bool is_valid(${name} _value) {
   switch (_value) {
 ${item.v.map((val) => `    case ${name}::${val}:`).join('\n')}
       return true;
@@ -129,7 +131,9 @@ ${item.v.map((val) => `    case ${name}::${val}:`).join('\n')}
 };
 
 const numEnumType: EmitItem<NEnum> = async (writer, name, item) => {
-  const typeName = isPlainIntEnumType(item.u) ? '' : `: ${getTypeName(item.u)}`;
+  const typeName = isPlainIntEnumType(item.u)
+    ? ''
+    : ` : ${getTypeName(item.u)}`;
   await writer.write(`
 enum class ${name}${typeName} {
 ${Object.entries(item.v)
@@ -137,10 +141,11 @@ ${Object.entries(item.v)
   .join('\n')}
 };
 
-inline constexpr bool is_valiid(${name} _value) {
-  switch (_value) {${Object.entries(item.v)
-    .map(([key]) => `    case ${name}::${key}:`)
-    .join('\n')}
+inline constexpr bool is_valid(${name} _value) {
+  switch (_value) {
+${Object.entries(item.v)
+  .map(([key]) => `    case ${name}::${key}:`)
+  .join('\n')}
       return true;
     default:
       return false;
@@ -157,6 +162,16 @@ enum class ${name} {
     .map((key) => `${key}`)
     .join(',\n  ')}
 };
+inline constexpr bool is_valid(${name} _value) {
+  switch (_value) {
+${Object.entries(item.v)
+  .map(([key]) => `    case ${name}::${key}:`)
+  .join('\n')}
+      return true;
+    default:
+      return false;
+  }
+}
 `);
 
   await writer.write(`
