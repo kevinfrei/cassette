@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 
+#include "CommonTypes.hpp"
 #include "json_pickling.hpp"
 
 // Demonstrate some basic assertions.
@@ -313,60 +314,55 @@ TEST(JsonPickling, std_map_and_hash) {
 // struct-specific overload going
 TEST(JsonPickling, enumClass) {
   // Test the conversion of basic types to and from JSON
-  EXPECT_STREQ("Enum Class Test NYI", "Enum Class Test NYI");
+  {
+    crow::json::wvalue json_value = to_json(Shared::VAType::OST);
+    EXPECT_EQ(json_value.t(), crow::json::type::Number);
+    std::string s = json_value.dump();
+    crow::json::rvalue json_value2 = crow::json::load(s);
+    auto enum_value = from_json<Shared::VAType>(json_value2);
+    EXPECT_TRUE(enum_value.has_value());
+    EXPECT_EQ(enum_value.value(), Shared::VAType::OST);
+    auto str_value = from_json<std::string>(json_value2);
+    EXPECT_FALSE(str_value.has_value());
+  }
+  {
+    crow::json::wvalue json_value = to_json(Shared::CurrentView::now_playing);
+    EXPECT_EQ(json_value.t(), crow::json::type::Number);
+    std::string s = json_value.dump();
+    crow::json::rvalue json_value2 = crow::json::load(s);
+    auto enum_value = from_json<Shared::CurrentView>(json_value2);
+    EXPECT_TRUE(enum_value.has_value());
+    EXPECT_EQ(enum_value.value(), Shared::CurrentView::now_playing);
+    auto str_value = from_json<std::string>(json_value2);
+    EXPECT_FALSE(str_value.has_value());
+  }
+  {
+    crow::json::wvalue json_value = to_json(Shared::IgnoreItemType::DirName);
+    EXPECT_EQ(json_value.t(), crow::json::type::Number);
+    std::string s = json_value.dump();
+    crow::json::rvalue json_value2 = crow::json::load(s);
+    auto enum_value = from_json<Shared::IgnoreItemType>(json_value2);
+    EXPECT_TRUE(enum_value.has_value());
+    EXPECT_EQ(enum_value.value(), Shared::IgnoreItemType::DirName);
+    auto str_value = from_json<std::string>(json_value2);
+    EXPECT_FALSE(str_value.has_value());
+  }
+}
 
-  // I should update my generator to have an 'isValid' function on
-  // enum_lsts and enum_nums. It's just a simple 'in range' check
-  // for enum_lsts. enum_nums could be optimized to a crazy amount
-  // of bitwise operations, but maybe just emit it as a switch and
-  // let the compiler optimize it.
-
-  // VAType is an enum_lst: no to/from string checks.
-
-  /*
-   enum class VAType : std::uint8_t { None, VA, OST };
-   */
-  // CurrentView is an enum_num
-  /*
-   enum class CurrentView {
-      disabled = -1,
-      none = 0,
-      recent = 1,
-      albums = 2,
-      artists = 3,
-      songs = 4,
-      playlists = 5,
-      now_playing = 6,
-      settings = 7,
-      search = 8,
-      tools = 9,
-    };
-   */
-  // IgnoreItemType is an enum_str
-  /*
-    enum class IgnoreItemType { PathRoot, PathKeyword, DirName };
-    inline constexpr std::string_view to_string(IgnoreItemType _value) {
-      switch (_value) {
-        case IgnoreItemType::PathRoot:
-          return "path-root";
-        case IgnoreItemType::PathKeyword:
-          return "path-keyword";
-        case IgnoreItemType::DirName:
-          return "dir-name";
-        default:
-          return "<unknown>";
-      }
-    }
-    template <>
-    inline constexpr std::optional<IgnoreItemType> from_string<IgnoreItemType>(
-        const std::string_view& str) {
-      if (str == "path-root")
-        return IgnoreItemType::PathRoot;
-      if (str == "path-keyword")
-        return IgnoreItemType::PathKeyword;
-      if (str == "dir-name")
-        return IgnoreItemType::DirName;
-      return std::nullopt;
-    }
-  */
+TEST(JsonPickling, MixAndMatch) {
+  using Tuple = std::tuple<Shared::CurrentView, std::string, double>;
+  using MapType = std::map<Shared::IgnoreItemType, std::vector<Tuple>>;
+  MapType myType;
+  myType[Shared::IgnoreItemType::DirName] =
+      std::vector<Tuple>({{Shared::CurrentView::albums, "Albums", 1.25},
+                          {Shared::CurrentView::artists, "Artists", 2.5}});
+  myType[Shared::IgnoreItemType::PathKeyword] = std::vector<Tuple>(
+      {{Shared::CurrentView::now_playing, "Now Playing", 4.125}});
+  myType[Shared::IgnoreItemType::PathRoot] = std::vector<Tuple>({});
+  crow::json::wvalue json = to_json(myType);
+  EXPECT_EQ(json.t(), crow::json::type::Object);
+  std::string s = json.dump();
+  crow::json::rvalue recv = crow::json::load(s);
+  auto sentMap = from_json<MapType>(recv);
+  EXPECT_TRUE(sentMap.has_value());
 }

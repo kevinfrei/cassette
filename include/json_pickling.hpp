@@ -16,8 +16,10 @@ Conversion to JSON stuff
 ****/
 
 // By default, simple stuff can be converted to json
+// The enable_if_t is to prevent this version from being used by enum classes
 template <typename T>
-crow::json::wvalue to_json(const T& value) {
+std::enable_if_t<!std::is_enum_v<T>, crow::json::wvalue> to_json(
+    const T& value) {
   return crow::json::wvalue{value};
 }
 
@@ -124,14 +126,15 @@ crow::json::wvalue to_json(const std::set<T>& value) {
   return v;
 }
 
-/*
+// Enum classes:
 template <typename T>
-crow::json::wvalue to_json(T value) {
-    std::enable_if_t<std::is_enum_v<T> && !std::is_convertible_v<T, typename
-std::underlying_type_t<T>>> return to_json(static_cast<typename
-std::underlying_type_t<T>>(value));
+std::enable_if_t<
+    std::is_enum_v<T> &&
+        !std::is_convertible_v<T, typename std::underlying_type_t<T>>,
+    crow::json::wvalue>
+to_json(T value) {
+  return to_json(static_cast<typename std::underlying_type_t<T>>(value));
 }
-*/
 
 /****
 Conversion from JSON stuff
@@ -140,7 +143,7 @@ Conversion from JSON stuff
 // By default, we can't read a random value from a json value
 // (i.e. everything must be specialized) and it's easier to
 // do this with a partial specialization of a struct :/
-template <typename T>
+template <typename T, typename Enabled = void>
 struct from_json_impl {
   static std::optional<T> process(const crow::json::rvalue& json) {
     return std::nullopt;
@@ -422,12 +425,17 @@ struct from_json_impl<std::unordered_map<K, V>> {
   }
 };
 
-/*
+// Enum's, specifically for my gen'ed enum types
 template <typename T>
-std::optional<T> from_json(std::istream& is, T& value) {
-    std::enable_if_t<std::is_enum_v<T> && !std::is_convertible_v<T, typename
-std::underlying_type_t<T>>> typename std::underlying_type_t<T> underlyingValue;
-    is >> underlyingValue;
-    value = static_cast<T>(underlyingValue);
-}
-*/
+struct from_json_impl<T, std::enable_if_t<std::is_enum_v<T>>> {
+  static std::optional<T> process(const crow::json::rvalue& json) {
+    using IntType = std::underlying_type_t<T>;
+    std::optional<IntType> underlyingValue = from_json<IntType>(json);
+    if (!underlyingValue.has_value())
+      return std::nullopt;
+    T val = static_cast<T>(underlyingValue.value());
+    if (is_valid(val))
+      return val;
+    return std::nullopt;
+  }
+};

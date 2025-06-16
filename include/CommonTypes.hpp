@@ -45,6 +45,31 @@ enum class Keys {
   ToggleMiniPlayer,
   Tools
 };
+inline constexpr bool is_valid(Keys _value) {
+  switch (_value) {
+    case Keys::AddFileLocation:
+    case Keys::Albums:
+    case Keys::Artists:
+    case Keys::Backward10s:
+    case Keys::Find:
+    case Keys::Forward10s:
+    case Keys::NextTrack:
+    case Keys::NowPlaying:
+    case Keys::Play:
+    case Keys::Playlists:
+    case Keys::PreviousTrack:
+    case Keys::Repeat:
+    case Keys::SavePlaylist:
+    case Keys::Settings:
+    case Keys::Shuffle:
+    case Keys::Songs:
+    case Keys::ToggleMiniPlayer:
+    case Keys::Tools:
+      return true;
+    default:
+      return false;
+  }
+}
 
 inline constexpr std::string_view to_string(Keys _value) {
   switch (_value) {
@@ -173,6 +198,52 @@ enum class StrId {
   ViewTools,
   ImportFiles
 };
+inline constexpr bool is_valid(StrId _value) {
+  switch (_value) {
+    case StrId::Mono:
+    case StrId::Stereo:
+    case StrId::Quadrophonic:
+    case StrId::Channels:
+    case StrId::BitDepth:
+    case StrId::FilePath:
+    case StrId::Duration:
+    case StrId::MDHeaderField:
+    case StrId::MDHeaderValue:
+    case StrId::FilesSelected:
+    case StrId::RawMetadata:
+    case StrId::ChooseCoverArt:
+    case StrId::ImageName:
+    case StrId::ErrNotSingleAndNotMultiple:
+    case StrId::ErrSingleAndMultiple:
+    case StrId::Title:
+    case StrId::ArtistTooltip:
+    case StrId::Artists:
+    case StrId::Album:
+    case StrId::Year:
+    case StrId::TrackNum:
+    case StrId::DiskNum:
+    case StrId::DiskName:
+    case StrId::Compilation:
+    case StrId::Soundtrack:
+    case StrId::AdditionalArtists:
+    case StrId::VariationsTooltip:
+    case StrId::Variations:
+    case StrId::AlbumCover:
+    case StrId::ChooseFile:
+    case StrId::FromClipboard:
+    case StrId::ViewNowPlaying:
+    case StrId::ViewAlbums:
+    case StrId::ViewArtists:
+    case StrId::ViewSongs:
+    case StrId::ViewPlaylists:
+    case StrId::ViewSettings:
+    case StrId::ViewTools:
+    case StrId::ImportFiles:
+      return true;
+    default:
+      return false;
+  }
+}
 
 inline constexpr std::string_view to_string(StrId _value) {
   switch (_value) {
@@ -360,7 +431,7 @@ enum class CurrentView {
   tools = 9,
 };
 
-inline constexpr bool is_valiid(CurrentView _value) {
+inline constexpr bool is_valid(CurrentView _value) {
   switch (_value) {
     case CurrentView::disabled:
     case CurrentView::none:
@@ -423,6 +494,54 @@ enum class IpcId {
   IgnoreListId,
   RescanInProgress
 };
+inline constexpr bool is_valid(IpcId _value) {
+  switch (_value) {
+    case IpcId::ClearHates:
+    case IpcId::ClearLikes:
+    case IpcId::ClearLocalOverrides:
+    case IpcId::DeletePlaylist:
+    case IpcId::FlushImageCache:
+    case IpcId::FlushMetadataCache:
+    case IpcId::GetHates:
+    case IpcId::GetLikes:
+    case IpcId::GetMediaInfo:
+    case IpcId::GetMusicDatabase:
+    case IpcId::GetPlaylists:
+    case IpcId::LoadPlaylist:
+    case IpcId::ManualRescan:
+    case IpcId::MenuAction:
+    case IpcId::MusicDBUpdate:
+    case IpcId::RenamePlaylist:
+    case IpcId::SavePlaylist:
+    case IpcId::Search:
+    case IpcId::SetHates:
+    case IpcId::SetLikes:
+    case IpcId::SetMediaInfo:
+    case IpcId::SetPlaylists:
+    case IpcId::SetSaveMenu:
+    case IpcId::ShowFile:
+    case IpcId::ShowLocFromKey:
+    case IpcId::ShowMenu:
+    case IpcId::SubstrSearch:
+    case IpcId::TranscodingUpdate:
+    case IpcId::TranscodingBegin:
+    case IpcId::UploadImage:
+    case IpcId::MinimizeWindow:
+    case IpcId::MaximizeWindow:
+    case IpcId::RestoreWindow:
+    case IpcId::CloseWindow:
+    case IpcId::GetPicUri:
+    case IpcId::GetIgnoreList:
+    case IpcId::AddIgnoreItem:
+    case IpcId::RemoveIgnoreItem:
+    case IpcId::PushIgnoreList:
+    case IpcId::IgnoreListId:
+    case IpcId::RescanInProgress:
+      return true;
+    default:
+      return false;
+  }
+}
 
 inline constexpr std::string_view to_string(IpcId _value) {
   switch (_value) {
@@ -603,6 +722,16 @@ inline constexpr std::optional<IpcId> from_string<IpcId>(
 
 // IgnoreItemType
 enum class IgnoreItemType { PathRoot, PathKeyword, DirName };
+inline constexpr bool is_valid(IgnoreItemType _value) {
+  switch (_value) {
+    case IgnoreItemType::PathRoot:
+    case IgnoreItemType::PathKeyword:
+    case IgnoreItemType::DirName:
+      return true;
+    default:
+      return false;
+  }
+}
 
 inline constexpr std::string_view to_string(IgnoreItemType _value) {
   switch (_value) {
@@ -661,6 +790,42 @@ enum class StorageId {
   TranscodeDestLoc,
   TranscodeBitRate
 };
+inline constexpr bool is_valid(StorageId _value) {
+  switch (_value) {
+    case StorageId::CurrentView:
+    case StorageId::CurrentIndex:
+    case StorageId::PlaybackOrder:
+    case StorageId::NowPlaying:
+    case StorageId::CurrentSongList:
+    case StorageId::Shuffle:
+    case StorageId::Repeat:
+    case StorageId::NeverPlayHates:
+    case StorageId::OnlyPlayLikes:
+    case StorageId::FullAlbumsOnly:
+    case StorageId::MinSongCount:
+    case StorageId::Mute:
+    case StorageId::LikedSongs:
+    case StorageId::HatedSongs:
+    case StorageId::Volume:
+    case StorageId::Locations:
+    case StorageId::DefaultLocation:
+    case StorageId::SortWithArticles:
+    case StorageId::DownloadAlbumArtwork:
+    case StorageId::DownloadArtistArtwork:
+    case StorageId::SaveAlbumArtworkWithMusic:
+    case StorageId::AlbumCoverName:
+    case StorageId::TranscodingUpdate:
+    case StorageId::TranscodeSrcLocDir:
+    case StorageId::TranscodeSrcLocPlaylist:
+    case StorageId::TranscodeSrcLocArtist:
+    case StorageId::TranscodeSrcLocAlbum:
+    case StorageId::TranscodeDestLoc:
+    case StorageId::TranscodeBitRate:
+      return true;
+    default:
+      return false;
+  }
+}
 
 inline constexpr std::string_view to_string(StorageId _value) {
   switch (_value) {
@@ -793,6 +958,16 @@ inline constexpr std::optional<StorageId> from_string<StorageId>(
 
 // TranscodeFormatTargetName
 enum class TranscodeFormatTargetName { m4a, mp3, aac };
+inline constexpr bool is_valid(TranscodeFormatTargetName _value) {
+  switch (_value) {
+    case TranscodeFormatTargetName::m4a:
+    case TranscodeFormatTargetName::mp3:
+    case TranscodeFormatTargetName::aac:
+      return true;
+    default:
+      return false;
+  }
+}
 
 inline constexpr std::string_view to_string(TranscodeFormatTargetName _value) {
   switch (_value) {
@@ -821,6 +996,17 @@ from_string<TranscodeFormatTargetName>(const std::string_view& str) {
 
 // TranscodeSource
 enum class TranscodeSource { Playlist, Artist, Album, Disk };
+inline constexpr bool is_valid(TranscodeSource _value) {
+  switch (_value) {
+    case TranscodeSource::Playlist:
+    case TranscodeSource::Artist:
+    case TranscodeSource::Album:
+    case TranscodeSource::Disk:
+      return true;
+    default:
+      return false;
+  }
+}
 
 inline constexpr std::string_view to_string(TranscodeSource _value) {
   switch (_value) {
@@ -904,7 +1090,7 @@ struct Song {
 
 enum class VAType : std::uint8_t { None, VA, OST };
 
-inline constexpr bool is_valiid(VAType _value) {
+inline constexpr bool is_valid(VAType _value) {
   switch (_value) {
     case VAType::None:
     case VAType::VA:
