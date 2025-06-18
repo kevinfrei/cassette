@@ -1,6 +1,7 @@
 enable_testing()
 add_executable(cpptesting test.cpp)
-target_link_libraries(cpptesting ${GTEST_LIB} GTest::gtest_main cassette_lib)
+target_link_libraries(cpptesting ${GTEST_LIB} ${CROW_LIB} GTest::gtest_main)
+target_include_directories(cpptesting PUBLIC ${PROJECT_SOURCE_DIR}/include)
 add_test(thetest cpptesting)
 include(GoogleTest)
 gtest_discover_tests(cpptesting)
