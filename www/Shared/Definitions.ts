@@ -16,7 +16,6 @@ import {
   str,
   Types,
   u16,
-  u32,
   u8,
 } from './IDL';
 
