@@ -18,35 +18,68 @@
 Conversion to JSON stuff
 ****/
 
+// Helper stuff I need
+// bool value for an enum-class to enable JSON specialization
+template <typename T>
+struct is_enum_class {
+  static constexpr bool value =
+      std::is_enum_v<T> && !std::is_convertible_v<T, int>;
+};
+template <typename T>
+inline constexpr bool is_enum_class_v = is_enum_class<T>::value;
+
+/****
+Conversion to JSON stuff
+****/
+
 // By default, simple stuff can be converted to json
 // The enable_if_t is to prevent this version from being used by enum classes,
 // which get extra validation to prevent stupidity from accidentally leaking.
+template <typename T, typename Enabled = void>
+struct impl_to_json {
+  static inline crow::json::wvalue process(const T& value) {
+    return crow::json::wvalue(value);
+  }
+};
+
 template <typename T>
-inline std::enable_if_t<!std::is_enum_v<T>, crow::json::wvalue> to_json(
+inline std::enable_if_t<!is_enum_class_v<T>, crow::json::wvalue> to_json(
     const T& value) {
-  return crow::json::wvalue{value};
+  return impl_to_json<T>::process(value); // impl_to_json<T>::process(value);
+}
+
+template <typename T>
+inline std::enable_if_t<is_enum_class_v<T>, crow::json::wvalue> to_json(
+    const T value) {
+  return crow::json::wvalue(static_cast<std::underlying_type_t<T>>(value));
 }
 
 // A little extra work for string constants:
-inline crow::json::wvalue to_json(const char* value) {
-  return crow::json::wvalue(std::string(value));
-}
-
+template <>
+struct impl_to_json<char*> {
+  static inline crow::json::wvalue proces(const char* value) {
+    return crow::json::wvalue(std::string(value));
+  }
+};
 // Vector<T> specialization
 template <typename T>
-inline crow::json::wvalue to_json(const std::vector<T>& value) {
-  crow::json::wvalue vec{std::vector<crow::json::wvalue>()};
-  for (size_t i = 0; i < value.size(); i++) {
-    vec[i] = to_json(value[i]);
+struct impl_to_json<std::vector<T>> {
+  static inline crow::json::wvalue process(const std::vector<T>& value) {
+    crow::json::wvalue vec{std::vector<crow::json::wvalue>()};
+    for (size_t i = 0; i < value.size(); i++) {
+      vec[i] = to_json(value[i]);
+    }
+    return vec;
   }
-  return vec;
-}
+};
 
 // Handle char's specifically. Hurray dumb Javascript?
 template <>
-inline crow::json::wvalue to_json<char>(const char& value) {
-  return crow::json::wvalue(std::string(1, value));
-}
+struct impl_to_json<char> {
+  static inline crow::json::wvalue process(char value) {
+    return crow::json::wvalue(std::string(1, value));
+  }
+};
 
 // Tuples in JSON are "just" arrays with the right size & types.
 // Doing that is...complicated.
@@ -66,12 +99,14 @@ inline void tuple_to_json_recurse(const Tuple& tuple,
 }
 // make_index_sequence is the magic to do something different per tuple-item
 template <typename... Args>
-inline crow::json::wvalue to_json(const std::tuple<Args...>& value) {
-  crow::json::wvalue vec{std::vector<crow::json::wvalue>()};
-  tuple_to_json_recurse(
-      value, vec, std::make_index_sequence<sizeof...(Args)>{});
-  return vec;
-}
+struct impl_to_json<std::tuple<Args...>> {
+  static inline crow::json::wvalue process(const std::tuple<Args...>& value) {
+    crow::json::wvalue vec{std::vector<crow::json::wvalue>()};
+    tuple_to_json_recurse(
+        value, vec, std::make_index_sequence<sizeof...(Args)>{});
+    return vec;
+  }
+};
 
 // I didn't need this for Windows, but I do for Linux/Mac because the map
 // elem type is std::tuple on one, but a std::pair on the other
@@ -91,52 +126,63 @@ inline crow::json::wvalue vec_pair_to_json(const Iter& begin, const Iter& end) {
 // My pickling framework sends JS Maps as this:
 // {"@dataType":"freik.Map","@dataValue":[["a",1],["c",2],["b",3]]}
 template <typename K, typename V>
-inline crow::json::wvalue to_json(const std::map<K, V>& value) {
-  crow::json::wvalue v;
-  v["@dataType"] = "freik.Map";
-  v["@dataValue"] = vec_pair_to_json(value.begin(), value.end());
-  return v;
-}
+struct impl_to_json<std::map<K, V>> {
+  static inline crow::json::wvalue process(const std::map<K, V>& value) {
+    crow::json::wvalue v;
+    v["@dataType"] = "freik.Map";
+    v["@dataValue"] = vec_pair_to_json(value.begin(), value.end());
+    return v;
+  }
+};
+
 template <typename K, typename V>
-inline crow::json::wvalue to_json(const std::unordered_map<K, V>& value) {
-  crow::json::wvalue v;
-  v["@dataType"] = "freik.Map";
-  v["@dataValue"] = vec_pair_to_json(value.begin(), value.end());
-  return v;
-}
+struct impl_to_json<std::unordered_map<K, V>> {
+  static inline crow::json::wvalue process(
+      const std::unordered_map<K, V>& value) {
+    crow::json::wvalue v;
+    v["@dataType"] = "freik.Map";
+    v["@dataValue"] = vec_pair_to_json(value.begin(), value.end());
+    return v;
+  }
+};
 
 // My pickling framework sends JS Sets as this:
 // {"@dataType":"freik.Set","@dataValue":["a", "c", "b"]}
 template <typename T>
-inline crow::json::wvalue to_json(const std::unordered_set<T>& value) {
-  crow::json::wvalue v;
-  v["@dataType"] = "freik.Set";
-  std::vector<T> flat;
-  flat.reserve(value.size());
-  flat.assign(value.begin(), value.end());
-  v["@dataValue"] = to_json(flat);
-  return v;
-}
+struct impl_to_json<std::unordered_set<T>> {
+  static inline crow::json::wvalue process(const std::unordered_set<T>& value) {
+    crow::json::wvalue v;
+    v["@dataType"] = "freik.Set";
+    std::vector<T> flat;
+    flat.reserve(value.size());
+    flat.assign(value.begin(), value.end());
+    v["@dataValue"] = to_json(flat);
+    return v;
+  }
+};
+
 template <typename T>
-inline crow::json::wvalue to_json(const std::set<T>& value) {
-  crow::json::wvalue v;
-  v["@dataType"] = "freik.Set";
-  std::vector<T> flat;
-  flat.reserve(value.size());
-  flat.assign(value.begin(), value.end());
-  v["@dataValue"] = to_json(flat);
-  return v;
-}
+struct impl_to_json<std::set<T>> {
+  static inline crow::json::wvalue process(const std::set<T>& value) {
+    crow::json::wvalue v;
+    v["@dataType"] = "freik.Set";
+    std::vector<T> flat;
+    flat.reserve(value.size());
+    flat.assign(value.begin(), value.end());
+    v["@dataValue"] = to_json(flat);
+    return v;
+  }
+};
 
 // Enum classes. Look at that crazy template compile time expression stuff!
-template <typename T>
+/*template <typename T>
 inline std::enable_if_t<
     std::is_enum_v<T> &&
         !std::is_convertible_v<T, typename std::underlying_type_t<T>>,
     crow::json::wvalue>
 to_json(T value) {
   return to_json(static_cast<typename std::underlying_type_t<T>>(value));
-}
+}*/
 
 /****
 Conversion from JSON stuff
@@ -151,6 +197,7 @@ struct impl_from_json {
     return std::nullopt;
   }
 };
+
 // Anything that doesn't either fully specialize this function,
 // or partially (or fully...) specialize the above struct gets std::nullopt.
 template <typename T>

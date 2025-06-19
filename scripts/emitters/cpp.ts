@@ -217,25 +217,31 @@ const objType: EmitItem<ObjType> = async (writer, name, item) => {
   await writer.write(`};
 } // namespace Shared
 
-inline crow::json::wvalue to_json(const Shared::${name}& _value) {
-  crow::json::wvalue _res;
-  ${Object.entries(item.d)
-    .map(([key]) => `_res["${key}"] = to_json(_value.${key});`)
-    .join('\n  ')}
-  return _res;
-}
+template <> 
+struct impl_to_json<Shared::${name}> { 
+  static inline crow::json::wvalue process(const Shared::${name}& _value) {
+    crow::json::wvalue _res;
+    ${Object.entries(item.d)
+      .map(([key]) => `_res["${key}"] = to_json(_value.${key});`)
+      .join('\n    ')}
+    return _res;
+  }
+};
 
 template <>
 inline std::optional<Shared::${name}> from_json<Shared::${name}>(
     const crow::json::rvalue& _value) {
-  if (_value.t() != crow::json::type::Object) return std::nullopt;
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
   Shared::${name} _res;
   ${Object.entries(item.d)
     .map(
       ([key, value]) => `
-  if (!_value.has("${key}")) return std::nullopt;
+  if (!_value.has("${key}"))
+    return std::nullopt;
   auto _${key}_opt_ = from_json<${getTypeName(value, true)}>(_value["${key}"]);
-  if (!_${key}_opt_.has_value()) return std::nullopt;
+  if (!_${key}_opt_.has_value())
+    return std::nullopt;
   _res.${key} = std::move(*_${key}_opt_);`,
     )
     .join('\n  ')}
