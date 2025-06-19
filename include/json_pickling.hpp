@@ -81,29 +81,28 @@ struct impl_to_json<char> {
   }
 };
 
-// Tuples in JSON are "just" arrays with the right size & types.
-// Doing that is...complicated.
-template <typename Tuple, size_t Index, typename T>
-inline void tuple_to_json_element_helper(const Tuple& tuple,
-                                         crow::json::wvalue& container) {
-  container[Index] = to_json(std::get<Index>(tuple));
-}
-// This is a compile time 'call the helper for each type' thing.
-template <typename Tuple, size_t... Is>
-inline void tuple_to_json_recurse(const Tuple& tuple,
-                                  crow::json::wvalue& json_list,
-                                  std::index_sequence<Is...>) {
-  ((tuple_to_json_element_helper<Tuple, Is, std::tuple_element_t<Is, Tuple>>(
-       tuple, json_list)),
-   ...);
-}
-// make_index_sequence is the magic to do something different per tuple-item
 template <typename... Args>
 struct impl_to_json<std::tuple<Args...>> {
+  using tup_type = std::tuple<Args...>;
+  // Tuples in JSON are "just" arrays with the right size & types.
+  // Doing that is...complicated.
+  template <size_t Index, typename T>
+  static inline void element_helper(const tup_type& tuple,
+                                    crow::json::wvalue& container) {
+    container[Index] = to_json(std::get<Index>(tuple));
+  }
+  // This is a compile time 'call the helper for each type' thing.
+  template <size_t... Is>
+  static inline void recurse_helper(const tup_type& tuple,
+                                    crow::json::wvalue& json_list,
+                                    std::index_sequence<Is...>) {
+    ((element_helper<Is, std::tuple_element_t<Is, tup_type>>(tuple, json_list)),
+     ...);
+  }
+  // make_index_sequence is the magic to do something different per tuple-item
   static inline crow::json::wvalue process(const std::tuple<Args...>& value) {
     crow::json::wvalue vec{std::vector<crow::json::wvalue>()};
-    tuple_to_json_recurse(
-        value, vec, std::make_index_sequence<sizeof...(Args)>{});
+    recurse_helper(value, vec, std::make_index_sequence<sizeof...(Args)>{});
     return vec;
   }
 };
@@ -111,7 +110,8 @@ struct impl_to_json<std::tuple<Args...>> {
 // I didn't need this for Windows, but I do for Linux/Mac because the map
 // elem type is std::tuple on one, but a std::pair on the other
 template <typename Iter>
-inline crow::json::wvalue vec_pair_to_json(const Iter& begin, const Iter& end) {
+inline crow::json::wvalue impl_vec_pair_to_json(const Iter& begin,
+                                                const Iter& end) {
   std::vector<crow::json::wvalue> vec;
   for (auto it = begin; it != end; ++it) {
     crow::json::wvalue pair{std::vector<crow::json::wvalue>()};
@@ -130,7 +130,7 @@ struct impl_to_json<std::map<K, V>> {
   static inline crow::json::wvalue process(const std::map<K, V>& value) {
     crow::json::wvalue v;
     v["@dataType"] = "freik.Map";
-    v["@dataValue"] = vec_pair_to_json(value.begin(), value.end());
+    v["@dataValue"] = impl_vec_pair_to_json(value.begin(), value.end());
     return v;
   }
 };
@@ -141,7 +141,7 @@ struct impl_to_json<std::unordered_map<K, V>> {
       const std::unordered_map<K, V>& value) {
     crow::json::wvalue v;
     v["@dataType"] = "freik.Map";
-    v["@dataValue"] = vec_pair_to_json(value.begin(), value.end());
+    v["@dataValue"] = impl_vec_pair_to_json(value.begin(), value.end());
     return v;
   }
 };
@@ -173,16 +173,6 @@ struct impl_to_json<std::set<T>> {
     return v;
   }
 };
-
-// Enum classes. Look at that crazy template compile time expression stuff!
-/*template <typename T>
-inline std::enable_if_t<
-    std::is_enum_v<T> &&
-        !std::is_convertible_v<T, typename std::underlying_type_t<T>>,
-    crow::json::wvalue>
-to_json(T value) {
-  return to_json(static_cast<typename std::underlying_type_t<T>>(value));
-}*/
 
 /****
 Conversion from JSON stuff
