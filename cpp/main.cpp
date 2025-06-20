@@ -17,22 +17,16 @@ std::string GetRootUrl() {
          "/www/index.html";
 }
 
-int main(void) {
-  crow::SimpleApp app;
+crow::websocket::connection* webSocket = nullptr;
 
-  files::SetProgramLocation();
-
-  const int port = GetRandomPort();
-  std::string url = GetRootUrl();
-  crow::websocket::connection* theConn = nullptr;
+void ConfigureRoutes(crow::SimpleApp& app, const std::string& url) {
   // Define the routes:
-
   // Try a websocket route:
   CROW_WEBSOCKET_ROUTE(app, "/ws")
       .onopen([&](crow::websocket::connection& conn) -> void {
         std::cout << "WebSocket connection opened from " << conn.get_remote_ip()
                   << std::endl;
-        theConn = &conn;
+        webSocket = &conn;
       })
       .onmessage([&](crow::websocket::connection& conn,
                      const std::string& data,
@@ -47,7 +41,7 @@ int main(void) {
         std::cout << "WebSocket connection closed from " << conn.get_remote_ip()
                   << " with reason: "
                   << reason /* << " and code " << code */ << std::endl;
-        theConn = nullptr;
+        webSocket = nullptr;
       });
   CROW_ROUTE(app, "/www/<path>")(handlers::file_path);
   CROW_ROUTE(app, "/api/<path>")(handlers::api);
@@ -57,16 +51,26 @@ int main(void) {
                crow::HTTPMethod::POST,
                crow::HTTPMethod::PUT)(handlers::keepalive);
   CROW_ROUTE(app, "/quit")(handlers::quit);
+}
 
+int main(void) {
+  crow::SimpleApp app;
+
+  files::SetProgramLocation();
+
+  const int port = GetRandomPort();
+  std::string url = GetRootUrl();
+  ConfigureRoutes(app, url);
   window::open(url);
   auto _a = app.port(port).multithreaded().run_async();
   int i = 0;
   while (!quitting::should_quit()) {
     _a.wait_for(std::chrono::seconds(1));
     quitting::loop_wait();
-    if (theConn) {
+    if (webSocket) {
       // Send a keepalive message every 5 seconds
-      theConn->send_text("keep alive the other way: " + std::to_string(i++));
+      if (i++ % 5 == 0)
+        webSocket->send_text("keep alive the other way: " + std::to_string(i));
     }
   }
   app.stop();

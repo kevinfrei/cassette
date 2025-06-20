@@ -22,12 +22,15 @@ export function RealTimeUpdates(): ReactElement {
     websocket.onopen = () => {
       log('WebSocket is connected');
       // Generate a unique client ID
-      const id = Math.floor(Math.random() * 32767);
+      const id = Math.floor(Math.random() * 2147483647);
       setClientId(id);
     };
 
-    websocket.onmessage = (evt) => {
+    websocket.onmessage = (evt: MessageEvent) => {
       const message = evt.data;
+      // TODO: Route the message to an appropriate handler
+      // I need to register handlers for different message types
+
       // Limit the number of messages to the last 10
       setMessages((prevMessages) => [...prevMessages.slice(-9), message]);
     };
