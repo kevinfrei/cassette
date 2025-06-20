@@ -63,10 +63,17 @@ constexpr std::optional<T> from_string(const std::string_view& str);
 `);
 }
 
+const outsideNamespace: string[] = [];
+
+function addNonShared(lines: string): void {
+  outsideNamespace.push(lines);
+}
+
 async function footer(writer: Bun.FileSink): Promise<void> {
   await writer.write(`
 
-} // namespace Shared
+} // namespace Shared 
+${outsideNamespace.join('\n')}
 
 #endif // SHARED_CONSTANTS_HPP
 `);
@@ -214,8 +221,8 @@ const objType: EmitItem<ObjType> = async (writer, name, item) => {
     const typeName = getTypeName(value);
     await writer.write(`  ${typeName} ${key};\n`);
   }
-  await writer.write(`};
-} // namespace Shared
+  await writer.write('};\n');
+  addNonShared(`
 
 template <> 
 struct impl_to_json<Shared::${name}> { 
@@ -248,12 +255,6 @@ inline std::optional<Shared::${name}> from_json<Shared::${name}>(
 
   return _res;
 }
-`);
-
-  // Add the namespace declaration
-  await writer.write(`
-
-namespace Shared {
 `);
 };
 

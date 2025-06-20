@@ -45,7 +45,7 @@ struct impl_to_json {
 template <typename T>
 inline std::enable_if_t<!is_enum_class_v<T>, crow::json::wvalue> to_json(
     const T& value) {
-  return impl_to_json<T>::process(value); // impl_to_json<T>::process(value);
+  return impl_to_json<T>::process(value);
 }
 
 template <typename T>
@@ -61,6 +61,7 @@ struct impl_to_json<char*> {
     return crow::json::wvalue(std::string(value));
   }
 };
+
 // Vector<T> specialization
 template <typename T>
 struct impl_to_json<std::vector<T>> {
