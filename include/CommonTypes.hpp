@@ -453,7 +453,7 @@ inline constexpr bool is_valid(CurrentView _value) {
   }
 }
 
-enum class IpcId : std::uint8_t {
+enum class IpcCall : std::uint8_t {
   ReadFromStorage = 0,
   WriteToStorage = 1,
   DeleteFromStorage = 2,
@@ -471,85 +471,98 @@ enum class IpcId : std::uint8_t {
   GetMusicDatabase = 14,
   GetPlaylists = 15,
   LoadPlaylist = 16,
-  ManualRescan = 17,
-  MenuAction = 18,
-  MusicDBUpdate = 19,
-  RenamePlaylist = 20,
-  SavePlaylist = 21,
-  Search = 22,
-  SetHates = 23,
-  SetLikes = 24,
-  SetMediaInfo = 25,
-  SetPlaylists = 26,
-  SetSaveMenu = 27,
-  ShowFile = 28,
-  ShowLocFromKey = 29,
-  ShowMenu = 30,
-  SubstrSearch = 31,
-  TranscodingUpdate = 32,
-  TranscodingBegin = 33,
-  UploadImage = 34,
-  MinimizeWindow = 35,
-  MaximizeWindow = 36,
-  RestoreWindow = 37,
-  CloseWindow = 38,
-  GetPicUri = 39,
-  GetIgnoreList = 40,
-  AddIgnoreItem = 41,
-  RemoveIgnoreItem = 42,
-  PushIgnoreList = 43,
-  IgnoreListId = 44,
-  RescanInProgress = 45,
+  MenuAction = 17,
+  RenamePlaylist = 18,
+  SavePlaylist = 19,
+  Search = 20,
+  SetHates = 21,
+  SetLikes = 22,
+  SetMediaInfo = 23,
+  SetPlaylists = 24,
+  SetSaveMenu = 25,
+  ShowFile = 26,
+  ShowLocFromKey = 27,
+  ShowMenu = 28,
+  SubstrSearch = 29,
+  TranscodingBegin = 30,
+  UploadImage = 31,
+  MinimizeWindow = 32,
+  MaximizeWindow = 33,
+  RestoreWindow = 34,
+  CloseWindow = 35,
+  GetPicUri = 36,
+  GetIgnoreList = 37,
+  AddIgnoreItem = 38,
+  RemoveIgnoreItem = 39,
+  PushIgnoreList = 40,
+  IgnoreListId = 41,
 };
 
-inline constexpr bool is_valid(IpcId _value) {
+inline constexpr bool is_valid(IpcCall _value) {
   switch (_value) {
-    case IpcId::ReadFromStorage:
-    case IpcId::WriteToStorage:
-    case IpcId::DeleteFromStorage:
-    case IpcId::AsyncData:
-    case IpcId::IsDev:
-    case IpcId::ClearHates:
-    case IpcId::ClearLikes:
-    case IpcId::ClearLocalOverrides:
-    case IpcId::DeletePlaylist:
-    case IpcId::FlushImageCache:
-    case IpcId::FlushMetadataCache:
-    case IpcId::GetHates:
-    case IpcId::GetLikes:
-    case IpcId::GetMediaInfo:
-    case IpcId::GetMusicDatabase:
-    case IpcId::GetPlaylists:
-    case IpcId::LoadPlaylist:
-    case IpcId::ManualRescan:
-    case IpcId::MenuAction:
-    case IpcId::MusicDBUpdate:
-    case IpcId::RenamePlaylist:
-    case IpcId::SavePlaylist:
-    case IpcId::Search:
-    case IpcId::SetHates:
-    case IpcId::SetLikes:
-    case IpcId::SetMediaInfo:
-    case IpcId::SetPlaylists:
-    case IpcId::SetSaveMenu:
-    case IpcId::ShowFile:
-    case IpcId::ShowLocFromKey:
-    case IpcId::ShowMenu:
-    case IpcId::SubstrSearch:
-    case IpcId::TranscodingUpdate:
-    case IpcId::TranscodingBegin:
-    case IpcId::UploadImage:
-    case IpcId::MinimizeWindow:
-    case IpcId::MaximizeWindow:
-    case IpcId::RestoreWindow:
-    case IpcId::CloseWindow:
-    case IpcId::GetPicUri:
-    case IpcId::GetIgnoreList:
-    case IpcId::AddIgnoreItem:
-    case IpcId::RemoveIgnoreItem:
-    case IpcId::PushIgnoreList:
-    case IpcId::IgnoreListId:
-    case IpcId::RescanInProgress:
+    case IpcCall::ReadFromStorage:
+    case IpcCall::WriteToStorage:
+    case IpcCall::DeleteFromStorage:
+    case IpcCall::AsyncData:
+    case IpcCall::IsDev:
+    case IpcCall::ClearHates:
+    case IpcCall::ClearLikes:
+    case IpcCall::ClearLocalOverrides:
+    case IpcCall::DeletePlaylist:
+    case IpcCall::FlushImageCache:
+    case IpcCall::FlushMetadataCache:
+    case IpcCall::GetHates:
+    case IpcCall::GetLikes:
+    case IpcCall::GetMediaInfo:
+    case IpcCall::GetMusicDatabase:
+    case IpcCall::GetPlaylists:
+    case IpcCall::LoadPlaylist:
+    case IpcCall::MenuAction:
+    case IpcCall::RenamePlaylist:
+    case IpcCall::SavePlaylist:
+    case IpcCall::Search:
+    case IpcCall::SetHates:
+    case IpcCall::SetLikes:
+    case IpcCall::SetMediaInfo:
+    case IpcCall::SetPlaylists:
+    case IpcCall::SetSaveMenu:
+    case IpcCall::ShowFile:
+    case IpcCall::ShowLocFromKey:
+    case IpcCall::ShowMenu:
+    case IpcCall::SubstrSearch:
+    case IpcCall::TranscodingBegin:
+    case IpcCall::UploadImage:
+    case IpcCall::MinimizeWindow:
+    case IpcCall::MaximizeWindow:
+    case IpcCall::RestoreWindow:
+    case IpcCall::CloseWindow:
+    case IpcCall::GetPicUri:
+    case IpcCall::GetIgnoreList:
+    case IpcCall::AddIgnoreItem:
+    case IpcCall::RemoveIgnoreItem:
+    case IpcCall::PushIgnoreList:
+    case IpcCall::IgnoreListId:
+      return true;
+    default:
+      return false;
+  }
+}
+
+enum class IpcMsg : std::uint8_t {
+  TranscodingUpdate = 0,
+  ManualRescan = 1,
+  RescanInProgress = 2,
+  RescanComplete = 3,
+  MusicDBUpdate = 4,
+};
+
+inline constexpr bool is_valid(IpcMsg _value) {
+  switch (_value) {
+    case IpcMsg::TranscodingUpdate:
+    case IpcMsg::ManualRescan:
+    case IpcMsg::RescanInProgress:
+    case IpcMsg::RescanComplete:
+    case IpcMsg::MusicDBUpdate:
       return true;
     default:
       return false;

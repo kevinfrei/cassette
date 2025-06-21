@@ -1,6 +1,6 @@
 import { MakeLog } from '@freik/logger';
-import { hasField, hasFieldOf, isNumber, Pickle } from '@freik/typechk';
-import { ReactElement, useEffect, useState } from 'react';
+import { hasField, hasFieldOf, isNumber } from '@freik/typechk';
+import { ReactElement, useEffect } from 'react';
 import { MyWindow } from '../Types';
 import { WireUpIpc } from './ipc';
 

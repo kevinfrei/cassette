@@ -22,8 +22,14 @@ import {
 } from 'www/State/SimpleSavedState';
 import { GetHelperText } from 'www/WebHelpers';
 
-import { IgnoreItemType, IpcId, Keys, StrId } from 'www/Shared/CommonTypes';
-import { SendMessage } from 'www/Tools/ipc';
+import {
+  IgnoreItemType,
+  IpcCall,
+  IpcMsg,
+  Keys,
+  StrId,
+} from 'www/Shared/CommonTypes';
+import { PostMain, SendMessage } from 'www/Tools/ipc';
 import './styles/Settings.css';
 
 const btnWidth: React.CSSProperties = { width: '155px', padding: 0 };
@@ -111,7 +117,7 @@ function MusicLocations(): ReactElement {
             text="Rescan Locations"
             iconProps={{ iconName: 'SearchData' }}
             disabled={true}
-            onClick={() => SendMessage(IpcId.ManualRescan)}
+            onClick={() => SendMessage(IpcMsg.ManualRescan)}
             style={btnWidth}
           />
         </TooltipHost>
@@ -286,7 +292,7 @@ function ArtworkSettings(): ReactElement {
       <DefaultButton
         text="Flush Image Cache"
         style={{ ...btnWidth, gridRow: 4 }}
-        onClick={() => SendMessage(IpcId.FlushImageCache)}
+        onClick={() => PostMain(IpcCall.FlushImageCache)}
       />
     </>
   );
@@ -318,13 +324,13 @@ export function SettingsView(): ReactElement {
           <DefaultButton
             text="Flush Metadata Cache"
             style={btnWidth}
-            onClick={() => SendMessage(IpcId.FlushMetadataCache)}
+            onClick={() => PostMain(IpcCall.FlushMetadataCache)}
           />
           &nbsp;
           <DefaultButton
             text="Clear Local Overrides"
             style={btnWidth}
-            onClick={() => SendMessage(IpcId.ClearLocalOverrides)}
+            onClick={() => PostMain(IpcCall.ClearLocalOverrides)}
           />
         </>
       </Expandable>

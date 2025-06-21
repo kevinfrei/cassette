@@ -85,7 +85,7 @@ export const CurrentView = Object.freeze({
 });
 export type CurrentView = (typeof CurrentView)[keyof typeof CurrentView];
 
-export const IpcId = Object.freeze({
+export const IpcCall = Object.freeze({
   ReadFromStorage: 0,
   WriteToStorage: 1,
   DeleteFromStorage: 2,
@@ -103,37 +103,42 @@ export const IpcId = Object.freeze({
   GetMusicDatabase: 14,
   GetPlaylists: 15,
   LoadPlaylist: 16,
-  ManualRescan: 17,
-  MenuAction: 18,
-  MusicDBUpdate: 19,
-  RenamePlaylist: 20,
-  SavePlaylist: 21,
-  Search: 22,
-  SetHates: 23,
-  SetLikes: 24,
-  SetMediaInfo: 25,
-  SetPlaylists: 26,
-  SetSaveMenu: 27,
-  ShowFile: 28,
-  ShowLocFromKey: 29,
-  ShowMenu: 30,
-  SubstrSearch: 31,
-  TranscodingUpdate: 32,
-  TranscodingBegin: 33,
-  UploadImage: 34,
-  MinimizeWindow: 35,
-  MaximizeWindow: 36,
-  RestoreWindow: 37,
-  CloseWindow: 38,
-  GetPicUri: 39,
-  GetIgnoreList: 40,
-  AddIgnoreItem: 41,
-  RemoveIgnoreItem: 42,
-  PushIgnoreList: 43,
-  IgnoreListId: 44,
-  RescanInProgress: 45,
+  MenuAction: 17,
+  RenamePlaylist: 18,
+  SavePlaylist: 19,
+  Search: 20,
+  SetHates: 21,
+  SetLikes: 22,
+  SetMediaInfo: 23,
+  SetPlaylists: 24,
+  SetSaveMenu: 25,
+  ShowFile: 26,
+  ShowLocFromKey: 27,
+  ShowMenu: 28,
+  SubstrSearch: 29,
+  TranscodingBegin: 30,
+  UploadImage: 31,
+  MinimizeWindow: 32,
+  MaximizeWindow: 33,
+  RestoreWindow: 34,
+  CloseWindow: 35,
+  GetPicUri: 36,
+  GetIgnoreList: 37,
+  AddIgnoreItem: 38,
+  RemoveIgnoreItem: 39,
+  PushIgnoreList: 40,
+  IgnoreListId: 41,
 });
-export type IpcId = (typeof IpcId)[keyof typeof IpcId];
+export type IpcCall = (typeof IpcCall)[keyof typeof IpcCall];
+
+export const IpcMsg = Object.freeze({
+  TranscodingUpdate: 0,
+  ManualRescan: 1,
+  RescanInProgress: 2,
+  RescanComplete: 3,
+  MusicDBUpdate: 4,
+});
+export type IpcMsg = (typeof IpcMsg)[keyof typeof IpcMsg];
 
 export const IgnoreItemType = Object.freeze({
   PathRoot: 'path-root',

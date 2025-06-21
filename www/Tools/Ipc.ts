@@ -8,7 +8,7 @@ import {
   SafelyUnpickle,
   typecheck,
 } from '@freik/typechk';
-import { IpcId } from 'www/Shared/CommonTypes';
+import { IpcCall, IpcMsg } from 'www/Shared/CommonTypes';
 import { ListenKey, MyWindow } from 'www/Types';
 
 const { con, log, wrn, err } = MakeLog('tools:ipc');
@@ -26,7 +26,7 @@ export async function ReadFromStorage<T>(
   key: string,
   typechk: typecheck<T>,
 ): Promise<T | void> {
-  return CallMain(IpcId.ReadFromStorage, typechk, key);
+  return CallMain(IpcCall.ReadFromStorage, typechk, key);
 }
 
 /**
@@ -37,7 +37,7 @@ export async function ReadFromStorage<T>(
  * @param data The value to be written
  */
 export function WriteToStorage<T>(key: string, data: T): void {
-  PostMain(IpcId.WriteToStorage, key, Pickle(data)).catch((err) => {
+  PostMain(IpcCall.WriteToStorage, key, Pickle(data)).catch((err) => {
     err(`Failed to write to storage for key "${key}":`, err);
   });
 }
@@ -49,7 +49,7 @@ export function WriteToStorage<T>(key: string, data: T): void {
  * @param key The key to delete
  */
 export function DeleteFromStorage(key: string): void {
-  SendMessage(IpcId.DeleteFromStorage, key).catch((err) => {
+  PostMain(IpcCall.DeleteFromStorage, key).catch((err) => {
     err(`Failed to delete from storage for key "${key}":`, err);
   });
 }
@@ -159,8 +159,8 @@ function HandleMessage(message: string): void {
     wrn('<<< Async malformed message end');
     return;
   }
-  const ipcId = maybeIpcId as IpcId;
-  if (Object.values(IpcId).indexOf(ipcId) < 0) {
+  const ipcId = maybeIpcId as IpcMsg;
+  if (Object.values(IpcMsg).indexOf(ipcId) < 0) {
     // This is a malformed message, we don't know what to do with it
     wrn('>>> Async malformed message begin');
     wrn(`Received message with unknown IpcId: ${ipcId}`);
@@ -199,7 +199,7 @@ function HandleMessage(message: string): void {
 }
 
 export async function SendMessage<T>(
-  channel: IpcId,
+  channel: IpcMsg,
   ...args: unknown[]
 ): Promise<unknown> {
   if (!window.ipc) {
@@ -238,7 +238,7 @@ export async function RawGet(endpoint: string): Promise<string | undefined> {
   return undefined;
 }
 
-async function Get(endpoint: IpcId, ...args: string[]): Promise<unknown> {
+async function Get(endpoint: IpcCall, ...args: string[]): Promise<unknown> {
   try {
     const response = await fetch(
       ['/api', endpoint.toString(10), ...args].join('/'),
@@ -257,7 +257,7 @@ async function Get(endpoint: IpcId, ...args: string[]): Promise<unknown> {
 
 async function GetAs<T>(
   validator: typecheck<T>,
-  endpoint: IpcId,
+  endpoint: IpcCall,
   ...args: string[]
 ): Promise<T | undefined> {
   const res = await Get(endpoint, ...args);
@@ -275,17 +275,16 @@ async function GetAs<T>(
  * @returns A promise that resolves to the typechecked return value of the RPC
  */
 export async function CallMain<T>(
-  channel: IpcId,
+  channel: IpcCall,
   typecheck: typecheck<T>,
   ...args: unknown[]
 ): Promise<T | void> {
   return await GetAs(typecheck, channel, ...args.map((a) => String(a)));
 }
 
-export async function PostMain(
-  channel: IpcId,
-  ...args: unknown[]
-): Promise<void> {
-  void (await CallMain(channel, (a): a is void => true, ...args));
+export function PostMain(channel: IpcCall, ...args: unknown[]): void {
+  CallMain(channel, (a): a is void => true, ...args).catch((err) => {
+    err(`Failed to post to main for channel "${channel}":`, err);
+  });
   // No return value, so we just return void
 }
