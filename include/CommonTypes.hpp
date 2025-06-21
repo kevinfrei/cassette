@@ -455,6 +455,11 @@ inline constexpr bool is_valid(CurrentView _value) {
 
 // IpcId
 enum class IpcId {
+  ReadFromStorage,
+  WriteToStorage,
+  DeleteFromStorage,
+  AsyncData,
+  IsDev,
   ClearHates,
   ClearLikes,
   ClearLocalOverrides,
@@ -499,6 +504,11 @@ enum class IpcId {
 };
 inline constexpr bool is_valid(IpcId _value) {
   switch (_value) {
+    case IpcId::ReadFromStorage:
+    case IpcId::WriteToStorage:
+    case IpcId::DeleteFromStorage:
+    case IpcId::AsyncData:
+    case IpcId::IsDev:
     case IpcId::ClearHates:
     case IpcId::ClearLikes:
     case IpcId::ClearLocalOverrides:
@@ -548,6 +558,16 @@ inline constexpr bool is_valid(IpcId _value) {
 
 inline constexpr std::string_view to_string(IpcId _value) {
   switch (_value) {
+    case IpcId::ReadFromStorage:
+      return "read-from-storage";
+    case IpcId::WriteToStorage:
+      return "write-to-storage";
+    case IpcId::DeleteFromStorage:
+      return "delete-from-storage";
+    case IpcId::AsyncData:
+      return "async-data";
+    case IpcId::IsDev:
+      return "is-dev";
     case IpcId::ClearHates:
       return "clear-hates";
     case IpcId::ClearLikes:
@@ -638,6 +658,16 @@ inline constexpr std::string_view to_string(IpcId _value) {
 template <>
 inline constexpr std::optional<IpcId> from_string<IpcId>(
     const std::string_view& str) {
+  if (str == "read-from-storage")
+    return IpcId::ReadFromStorage;
+  if (str == "write-to-storage")
+    return IpcId::WriteToStorage;
+  if (str == "delete-from-storage")
+    return IpcId::DeleteFromStorage;
+  if (str == "async-data")
+    return IpcId::AsyncData;
+  if (str == "is-dev")
+    return IpcId::IsDev;
   if (str == "clear-hates")
     return IpcId::ClearHates;
   if (str == "clear-likes")

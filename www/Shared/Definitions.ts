@@ -1,3 +1,4 @@
+import { ReadFromStorage } from 'www/Tools/ipc';
 import {
   arr,
   bool,
@@ -98,6 +99,11 @@ const Keys: SEnum = enum_str({
 });
 
 const IpcId: SEnum = enum_str({
+  ReadFromStorage: 'read-from-storage',
+  WriteToStorage: 'write-to-storage',
+  DeleteFromStorage: 'delete-from-storage',
+  AsyncData: 'async-data',
+  IsDev: 'is-dev',
   ClearHates: 'clear-hates',
   ClearLikes: 'clear-likes',
   ClearLocalOverrides: 'clear-local-overrides',

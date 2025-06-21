@@ -86,6 +86,11 @@ export const CurrentView = Object.freeze({
 export type CurrentView = (typeof CurrentView)[keyof typeof CurrentView];
 
 export const IpcId = Object.freeze({
+  ReadFromStorage: 'read-from-storage',
+  WriteToStorage: 'write-to-storage',
+  DeleteFromStorage: 'delete-from-storage',
+  AsyncData: 'async-data',
+  IsDev: 'is-dev',
   ClearHates: 'clear-hates',
   ClearLikes: 'clear-likes',
   ClearLocalOverrides: 'clear-local-overrides',

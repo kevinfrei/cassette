@@ -62,7 +62,8 @@ export function RealTimeUpdates(): ReactElement {
   const handleInputChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     setMessage(event.target.value);
   };
-
+  return <></>;
+  /*
   return (
     <div>
       <h2>Real-time Comms w/ WebSockets and React Hooks</h2>
@@ -74,4 +75,5 @@ export function RealTimeUpdates(): ReactElement {
       <button onClick={sendMessage}>Send Message</button>
     </div>
   );
+*/
 }

@@ -11,6 +11,7 @@
         "@freik/logger": "^0.4.4",
         "@freik/media-core": "^0.16.4",
         "@freik/react-tools": "^0.3.4",
+        "@freik/seqnum": "^1.3.4",
         "@freik/typechk": "^0.8.4",
         "jotai": "^2.12.5",
         "react": "18.3.1",
@@ -269,6 +270,8 @@
     "@freik/media-core": ["@freik/media-core@0.16.4", "", { "dependencies": { "@freik/typechk": "0.8.4" } }, "sha512-Igp8I0AtNFu224u1bLHdBfBLkjXY/zyJ0+POUTSR8nrm+dAsE+BT0N41Ewug/gbK/bFl5M5ez3pehzzsjyKGJQ=="],
 
     "@freik/react-tools": ["@freik/react-tools@0.3.4", "", { "dependencies": { "@freik/logger": "0.4.4", "@freik/typechk": "0.8.4" }, "peerDependencies": { "react": ">=17.0.0", "react-dom": ">=17.0.0" } }, "sha512-bwfRM56+2jVwyFi5IdLRguKUjYQQIz3eE8uY10zeD/m08UcEiI9S2NV7IREQ9OaOHFj4a5KeJ6/VzHxWRYeLPA=="],
+
+    "@freik/seqnum": ["@freik/seqnum@1.3.4", "", {}, "sha512-LQH3l5KU2/SBbwlgJ53q1ah4ZXj5hVAxh46O72/P78hq7HX4Pahto1ovwlkDSzAuACviFNIT0ZhKuvdZaUJ6lw=="],
 
     "@freik/typechk": ["@freik/typechk@0.8.4", "", {}, "sha512-F26DAFI36WzAyLdSORPxloHz/Rk8jLyeWVPb5Ovmc3H0vEEI0MhimeLMgz5G/VcLHbeAkpwevSNOjf11duuzHQ=="],
 
