@@ -1,15 +1,13 @@
 import { MakeLog } from '@freik/logger';
-import { hasFieldOf, isNumber } from '@freik/typechk';
-import { ChangeEventHandler, ReactElement, useEffect, useState } from 'react';
+import { hasField, hasFieldOf, isNumber, Pickle } from '@freik/typechk';
+import { ReactElement, useEffect, useState } from 'react';
+import { MyWindow } from '../Types';
+
+declare const window: MyWindow;
 
 const { log, err } = MakeLog('Tools:RealTimeUpdates');
 
 export function RealTimeUpdates(): ReactElement {
-  const [messages, setMessages] = useState<string[]>([]);
-  const [ws, setWs] = useState<WebSocket | null>(null);
-  const [message, setMessage] = useState('');
-  const [clientId, setClientId] = useState(-1);
-
   useEffect(() => {
     // Let's make sure the port is specified properly
     if (!hasFieldOf(window, 'wsport', isNumber)) {
@@ -22,49 +20,35 @@ export function RealTimeUpdates(): ReactElement {
     websocket.onopen = () => {
       log('WebSocket is connected');
       // Generate a unique client ID
-      const id = Math.floor(Math.random() * 2147483647);
-      setClientId(id);
-    };
-
-    websocket.onmessage = (evt: MessageEvent) => {
-      const message = evt.data;
-      // TODO: Route the message to an appropriate handler
-      // I need to register handlers for different message types
-
-      // Limit the number of messages to the last 10
-      setMessages((prevMessages) => [...prevMessages.slice(-9), message]);
+      const id = Math.floor(Math.random() * 16777216);
+      window.ws = websocket; // Store the WebSocket in the global window object
+      window.clientId = id; // Store the client ID in the global window object
     };
 
     websocket.onclose = () => {
       log('WebSocket is closed');
+      if (hasField(window, 'ws')) {
+        delete window.ws; // Clear the WebSocket reference
+      }
+      if (hasField(window, 'clientId')) {
+        delete window.clientId; // Clear the client ID reference
+      }
     };
 
-    setWs(websocket);
-
+    window.ws = websocket; // Store the WebSocket in the global window object
     return () => {
       websocket.close();
     };
   }, []);
 
-  const sendMessage = () => {
-    if (ws) {
-      ws.send(
-        JSON.stringify({
-          type: 'message',
-          payload: message,
-          clientId: clientId,
-        }),
-      );
-      setMessage('');
-    }
-  };
-
+  /*
   const handleInputChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     setMessage(event.target.value);
   };
+  */
+
   return <></>;
-  /*
-  return (
+  /*(
     <div>
       <h2>Real-time Comms w/ WebSockets and React Hooks</h2>
       <h3> Client ID {clientId}</h3>
@@ -75,5 +59,5 @@ export function RealTimeUpdates(): ReactElement {
       <button onClick={sendMessage}>Send Message</button>
     </div>
   );
-*/
+  */
 }
