@@ -453,55 +453,55 @@ inline constexpr bool is_valid(CurrentView _value) {
   }
 }
 
-// IpcId
-enum class IpcId {
-  ReadFromStorage,
-  WriteToStorage,
-  DeleteFromStorage,
-  AsyncData,
-  IsDev,
-  ClearHates,
-  ClearLikes,
-  ClearLocalOverrides,
-  DeletePlaylist,
-  FlushImageCache,
-  FlushMetadataCache,
-  GetHates,
-  GetLikes,
-  GetMediaInfo,
-  GetMusicDatabase,
-  GetPlaylists,
-  LoadPlaylist,
-  ManualRescan,
-  MenuAction,
-  MusicDBUpdate,
-  RenamePlaylist,
-  SavePlaylist,
-  Search,
-  SetHates,
-  SetLikes,
-  SetMediaInfo,
-  SetPlaylists,
-  SetSaveMenu,
-  ShowFile,
-  ShowLocFromKey,
-  ShowMenu,
-  SubstrSearch,
-  TranscodingUpdate,
-  TranscodingBegin,
-  UploadImage,
-  MinimizeWindow,
-  MaximizeWindow,
-  RestoreWindow,
-  CloseWindow,
-  GetPicUri,
-  GetIgnoreList,
-  AddIgnoreItem,
-  RemoveIgnoreItem,
-  PushIgnoreList,
-  IgnoreListId,
-  RescanInProgress
+enum class IpcId : std::uint8_t {
+  ReadFromStorage = 0,
+  WriteToStorage = 1,
+  DeleteFromStorage = 2,
+  AsyncData = 3,
+  IsDev = 4,
+  ClearHates = 5,
+  ClearLikes = 6,
+  ClearLocalOverrides = 7,
+  DeletePlaylist = 8,
+  FlushImageCache = 9,
+  FlushMetadataCache = 10,
+  GetHates = 11,
+  GetLikes = 12,
+  GetMediaInfo = 13,
+  GetMusicDatabase = 14,
+  GetPlaylists = 15,
+  LoadPlaylist = 16,
+  ManualRescan = 17,
+  MenuAction = 18,
+  MusicDBUpdate = 19,
+  RenamePlaylist = 20,
+  SavePlaylist = 21,
+  Search = 22,
+  SetHates = 23,
+  SetLikes = 24,
+  SetMediaInfo = 25,
+  SetPlaylists = 26,
+  SetSaveMenu = 27,
+  ShowFile = 28,
+  ShowLocFromKey = 29,
+  ShowMenu = 30,
+  SubstrSearch = 31,
+  TranscodingUpdate = 32,
+  TranscodingBegin = 33,
+  UploadImage = 34,
+  MinimizeWindow = 35,
+  MaximizeWindow = 36,
+  RestoreWindow = 37,
+  CloseWindow = 38,
+  GetPicUri = 39,
+  GetIgnoreList = 40,
+  AddIgnoreItem = 41,
+  RemoveIgnoreItem = 42,
+  PushIgnoreList = 43,
+  IgnoreListId = 44,
+  RescanInProgress = 45,
 };
+
 inline constexpr bool is_valid(IpcId _value) {
   switch (_value) {
     case IpcId::ReadFromStorage:
@@ -554,203 +554,6 @@ inline constexpr bool is_valid(IpcId _value) {
     default:
       return false;
   }
-}
-
-inline constexpr std::string_view to_string(IpcId _value) {
-  switch (_value) {
-    case IpcId::ReadFromStorage:
-      return "read-from-storage";
-    case IpcId::WriteToStorage:
-      return "write-to-storage";
-    case IpcId::DeleteFromStorage:
-      return "delete-from-storage";
-    case IpcId::AsyncData:
-      return "async-data";
-    case IpcId::IsDev:
-      return "is-dev";
-    case IpcId::ClearHates:
-      return "clear-hates";
-    case IpcId::ClearLikes:
-      return "clear-likes";
-    case IpcId::ClearLocalOverrides:
-      return "clear-local-overrides";
-    case IpcId::DeletePlaylist:
-      return "delete-playlist";
-    case IpcId::FlushImageCache:
-      return "flush-image-cache";
-    case IpcId::FlushMetadataCache:
-      return "flush-metadata-cache";
-    case IpcId::GetHates:
-      return "get-hates";
-    case IpcId::GetLikes:
-      return "get-likes";
-    case IpcId::GetMediaInfo:
-      return "media-info";
-    case IpcId::GetMusicDatabase:
-      return "get-music-database";
-    case IpcId::GetPlaylists:
-      return "get-playlists";
-    case IpcId::LoadPlaylist:
-      return "load-playlist";
-    case IpcId::ManualRescan:
-      return "manual-rescan";
-    case IpcId::MenuAction:
-      return "menuAction";
-    case IpcId::MusicDBUpdate:
-      return "music-database-update";
-    case IpcId::RenamePlaylist:
-      return "rename-playlist";
-    case IpcId::SavePlaylist:
-      return "save-playlist";
-    case IpcId::Search:
-      return "search";
-    case IpcId::SetHates:
-      return "set-hates";
-    case IpcId::SetLikes:
-      return "set-likes";
-    case IpcId::SetMediaInfo:
-      return "set-media-info";
-    case IpcId::SetPlaylists:
-      return "set-playlists";
-    case IpcId::SetSaveMenu:
-      return "set-save-menu";
-    case IpcId::ShowFile:
-      return "show-file";
-    case IpcId::ShowLocFromKey:
-      return "show-location-from-key";
-    case IpcId::ShowMenu:
-      return "show-menu";
-    case IpcId::SubstrSearch:
-      return "subsearch";
-    case IpcId::TranscodingUpdate:
-      return "get-xcode-update";
-    case IpcId::TranscodingBegin:
-      return "start-xcode";
-    case IpcId::UploadImage:
-      return "upload-image";
-    case IpcId::MinimizeWindow:
-      return "minimize-window";
-    case IpcId::MaximizeWindow:
-      return "maximize-window";
-    case IpcId::RestoreWindow:
-      return "restore-window";
-    case IpcId::CloseWindow:
-      return "close-window";
-    case IpcId::GetPicUri:
-      return "get-pic-uri";
-    case IpcId::GetIgnoreList:
-      return "get-ignore-list";
-    case IpcId::AddIgnoreItem:
-      return "add-ignore-item";
-    case IpcId::RemoveIgnoreItem:
-      return "del-ignore-item";
-    case IpcId::PushIgnoreList:
-      return "push-ignore-list";
-    case IpcId::IgnoreListId:
-      return "ignore-list";
-    case IpcId::RescanInProgress:
-      return "rescan-in-progress";
-    default:
-      return "<unknown>";
-  }
-}
-
-template <>
-inline constexpr std::optional<IpcId> from_string<IpcId>(
-    const std::string_view& str) {
-  if (str == "read-from-storage")
-    return IpcId::ReadFromStorage;
-  if (str == "write-to-storage")
-    return IpcId::WriteToStorage;
-  if (str == "delete-from-storage")
-    return IpcId::DeleteFromStorage;
-  if (str == "async-data")
-    return IpcId::AsyncData;
-  if (str == "is-dev")
-    return IpcId::IsDev;
-  if (str == "clear-hates")
-    return IpcId::ClearHates;
-  if (str == "clear-likes")
-    return IpcId::ClearLikes;
-  if (str == "clear-local-overrides")
-    return IpcId::ClearLocalOverrides;
-  if (str == "delete-playlist")
-    return IpcId::DeletePlaylist;
-  if (str == "flush-image-cache")
-    return IpcId::FlushImageCache;
-  if (str == "flush-metadata-cache")
-    return IpcId::FlushMetadataCache;
-  if (str == "get-hates")
-    return IpcId::GetHates;
-  if (str == "get-likes")
-    return IpcId::GetLikes;
-  if (str == "media-info")
-    return IpcId::GetMediaInfo;
-  if (str == "get-music-database")
-    return IpcId::GetMusicDatabase;
-  if (str == "get-playlists")
-    return IpcId::GetPlaylists;
-  if (str == "load-playlist")
-    return IpcId::LoadPlaylist;
-  if (str == "manual-rescan")
-    return IpcId::ManualRescan;
-  if (str == "menuAction")
-    return IpcId::MenuAction;
-  if (str == "music-database-update")
-    return IpcId::MusicDBUpdate;
-  if (str == "rename-playlist")
-    return IpcId::RenamePlaylist;
-  if (str == "save-playlist")
-    return IpcId::SavePlaylist;
-  if (str == "search")
-    return IpcId::Search;
-  if (str == "set-hates")
-    return IpcId::SetHates;
-  if (str == "set-likes")
-    return IpcId::SetLikes;
-  if (str == "set-media-info")
-    return IpcId::SetMediaInfo;
-  if (str == "set-playlists")
-    return IpcId::SetPlaylists;
-  if (str == "set-save-menu")
-    return IpcId::SetSaveMenu;
-  if (str == "show-file")
-    return IpcId::ShowFile;
-  if (str == "show-location-from-key")
-    return IpcId::ShowLocFromKey;
-  if (str == "show-menu")
-    return IpcId::ShowMenu;
-  if (str == "subsearch")
-    return IpcId::SubstrSearch;
-  if (str == "get-xcode-update")
-    return IpcId::TranscodingUpdate;
-  if (str == "start-xcode")
-    return IpcId::TranscodingBegin;
-  if (str == "upload-image")
-    return IpcId::UploadImage;
-  if (str == "minimize-window")
-    return IpcId::MinimizeWindow;
-  if (str == "maximize-window")
-    return IpcId::MaximizeWindow;
-  if (str == "restore-window")
-    return IpcId::RestoreWindow;
-  if (str == "close-window")
-    return IpcId::CloseWindow;
-  if (str == "get-pic-uri")
-    return IpcId::GetPicUri;
-  if (str == "get-ignore-list")
-    return IpcId::GetIgnoreList;
-  if (str == "add-ignore-item")
-    return IpcId::AddIgnoreItem;
-  if (str == "del-ignore-item")
-    return IpcId::RemoveIgnoreItem;
-  if (str == "push-ignore-list")
-    return IpcId::PushIgnoreList;
-  if (str == "ignore-list")
-    return IpcId::IgnoreListId;
-  if (str == "rescan-in-progress")
-    return IpcId::RescanInProgress;
-  return std::nullopt;
 }
 
 // IgnoreItemType

@@ -1,19 +1,9 @@
-import { typecheck } from '@freik/typechk';
+import { IpcId } from './Shared/CommonTypes';
 
-export type ListenKey = { key: string; id: string };
+export type ListenKey = { ipcId: IpcId; id: string };
 
 export type Ipc = {
-  invoke: <T>(
-    channel: string,
-    retval: typecheck<T>,
-    ...args: unknown[]
-  ) => Promise<T>;
-  listen: <T>(
-    key: string,
-    typechk: typecheck<T>,
-    listener: (arg: T) => void,
-  ) => ListenKey;
-  removeEventListener: (listenKey: ListenKey) => void;
+  post: (id: IpcId, ...args: unknown[]) => void;
 };
 
 export interface MyWindow extends Window {
