@@ -96,4 +96,38 @@ crow::response quit() {
   return crow::response(200);
 }
 
+void socket_message(crow::websocket::connection& conn,
+                    const std::string& data,
+                    bool is_binary) {
+  std::cout << "Got a message from the client:";
+  std::cout << data << std::endl;
+  // Message is IpcMessage;[json-formatted array of arguments]
+  size_t pos = data.find(';');
+  if (pos == data.npos) {
+    std::cerr << "Invalid websocket message received: " << data << std::endl;
+    return;
+  }
+  std::underlying_type_t<Shared::IpcMsg> val = 0;
+  for (size_t i = 0; i < pos; i++) {
+    if (data[i] < '0' || data[i] > '9') {
+      std::cerr << "Invalid websocket message received: " << data << std::endl;
+      return;
+    }
+    val = val * 10 + (data[i] - '0');
+  }
+  Shared::IpcMsg msg = static_cast<Shared::IpcMsg>(val);
+  if (!Shared::is_valid(msg)) {
+    std::cerr << "Invalid websocket message received: " << data << std::endl;
+    return;
+  }
+  switch (msg) {
+    case Shared::IpcMsg::ManualRescan:
+      std::cout << "TODO: Implement ManualRescan" << std::endl;
+      break;
+    default:
+      std::cerr << "Unsupported message received: " << val << " (" << data
+                << ")" << std::endl;
+  }
+}
+
 } // namespace handlers

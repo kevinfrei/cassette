@@ -8,7 +8,7 @@ declare const window: MyWindow;
 
 const { con, log, err } = MakeLog('Tools:RealTimeUpdates');
 
-export function RealTimeUpdates(): ReactElement {
+export function WebSocketRegistrar(): ReactElement {
   useEffect(() => {
     // Let's make sure the port is specified properly
     if (!hasFieldOf(window, 'wsport', isNumber)) {

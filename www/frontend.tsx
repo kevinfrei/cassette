@@ -10,7 +10,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { FluentInitIcons } from './FluentInit';
 import { KeepAlive } from './KeepAlive';
-import { RealTimeUpdates } from './Tools/ReactWebSocket';
+import { WebSocketRegistrar } from './Tools/ReactWebSocket';
 import { RawGet } from './Tools/ipc';
 import { App } from './UI/App';
 
@@ -20,7 +20,7 @@ const theActualApp = <App />;
 const app = (
   <StrictMode>
     <Provider>
-      <RealTimeUpdates />
+      <WebSocketRegistrar />
       <KeepAlive />
       <App />
     </Provider>
@@ -32,6 +32,7 @@ if (import.meta.hot) {
   const root = (import.meta.hot.data.root ??= createRoot(elem));
   root.render(app);
   console.log(theActualApp);
+  // TODO: Make HMR work with Crow?
 } else {
   FluentInitIcons();
   // The hot module reloading API is not available in production.
@@ -39,4 +40,4 @@ if (import.meta.hot) {
 }
 
 // This is the thing to tell the server to quit when the page is closed
-window.addEventListener('unload', () => void RawGet('/quit'));
+window.addEventListener('beforeunload', () => void RawGet('/quit'));

@@ -116,7 +116,7 @@ function MusicLocations(): ReactElement {
           <DefaultButton
             text="Rescan Locations"
             iconProps={{ iconName: 'SearchData' }}
-            disabled={true}
+            disabled={false /*rescanInProgress*/}
             onClick={() => SendMessage(IpcMsg.ManualRescan)}
             style={btnWidth}
           />

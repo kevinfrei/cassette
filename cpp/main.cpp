@@ -28,14 +28,7 @@ void ConfigureRoutes(crow::SimpleApp& app, const std::string& url) {
                   << std::endl;
         webSocket = &conn;
       })
-      .onmessage([&](crow::websocket::connection& conn,
-                     const std::string& data,
-                     bool is_binary) -> void {
-        std::cout << "Received WebSocket message: "
-                  << (is_binary ? "Binary " : "Text ") << data.size()
-                  << (is_binary ? " <not displaying> " : data) << " bytes from "
-                  << conn.get_remote_ip() << std::endl;
-      })
+      .onmessage(handlers::socket_message)
       .onclose([&](crow::websocket::connection& conn,
                    const std::string& reason /*, uint16_t code*/) {
         std::cout << "WebSocket connection closed from " << conn.get_remote_ip()
