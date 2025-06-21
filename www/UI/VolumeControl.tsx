@@ -3,8 +3,8 @@ import { useAtom } from 'jotai';
 
 import { mutedState, volumeState } from 'www/State/SimpleSavedState';
 
-import '../styles/VolumeControl.css';
 import { ReactElement } from 'react';
+import '../styles/VolumeControl.css';
 
 export const mySliderStyles: Partial<ISliderStyles> = {
   thumb: {
@@ -24,7 +24,7 @@ export function VolumeControl(): ReactElement {
   const [volume, setVolume] = useAtom(volumeState);
   // Make the icon reflect approximate volume
   const iconNum = Math.min(3, Math.floor(4 * (volume + 0.1))).toString();
-  const cls = `volume-container-mac'}`; // Yoinked Mac, cuz I have a title bar
+  const cls = 'volume-container-win-linux'; // Yoinked Mac, cuz I have a title bar
   return (
     <span className={cls} id="volume-container">
       <FontIcon
