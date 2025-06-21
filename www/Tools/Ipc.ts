@@ -11,7 +11,7 @@ import {
 import { IpcId } from 'www/Shared/CommonTypes';
 import { ListenKey, MyWindow } from 'www/Types';
 
-const { log, wrn, err } = MakeLog('tools:ipc');
+const { con, log, wrn, err } = MakeLog('tools:ipc');
 
 declare const window: MyWindow;
 
@@ -26,11 +26,7 @@ export async function ReadFromStorage<T>(
   key: string,
   typechk: typecheck<T>,
 ): Promise<T | void> {
-  const val = await CallMain(IpcId.ReadFromStorage, isString, key);
-  if (!isDefined(val)) {
-    return;
-  }
-  return SafelyUnpickle(val, typechk);
+  return CallMain(IpcId.ReadFromStorage, typechk, key);
 }
 
 /**
@@ -40,8 +36,10 @@ export async function ReadFromStorage<T>(
  * @param key The key to write
  * @param data The value to be written
  */
-export async function WriteToStorage<T>(key: string, data: T): Promise<void> {
-  await PostMain(IpcId.WriteToStorage, key, Pickle(data));
+export function WriteToStorage<T>(key: string, data: T): void {
+  PostMain(IpcId.WriteToStorage, key, Pickle(data)).catch((err) => {
+    err(`Failed to write to storage for key "${key}":`, err);
+  });
 }
 
 /**
@@ -50,8 +48,10 @@ export async function WriteToStorage<T>(key: string, data: T): Promise<void> {
  *
  * @param key The key to delete
  */
-export async function DeleteFromStorage(key: string): Promise<void> {
-  await PostMain(IpcId.DeleteFromStorage, key);
+export function DeleteFromStorage(key: string): void {
+  SendMessage(IpcId.DeleteFromStorage, key).catch((err) => {
+    err(`Failed to delete from storage for key "${key}":`, err);
+  });
 }
 
 const getNextListenerSeqNum = MakeSeqNum('Listen');
@@ -109,6 +109,7 @@ export function WireUpIpc(): void {
     }
     return;
   }
+  con(`Wiring up IPC with WebSocket: ${ws.url}`);
   ws.onmessage = (evt: MessageEvent) => {
     const message = evt.data;
     if (!isString(message)) {
@@ -197,7 +198,7 @@ function HandleMessage(message: string): void {
   }
 }
 
-export async function PostMain<T>(
+export async function SendMessage<T>(
   channel: IpcId,
   ...args: unknown[]
 ): Promise<unknown> {
@@ -216,10 +217,51 @@ export async function PostMain<T>(
     throw Error('no connector wired in');
   }
   log(`Invoking main("${channel}", "...")`);
+  // FIXME: May need a client id of some sort. Not sure...
   let result = await window.ipc.post(channel, ...args);
   log(`Invoke main ("${channel}" "...") returned:`);
   log(result);
   return result;
+}
+
+export async function RawGet(endpoint: string): Promise<string | undefined> {
+  try {
+    const response = await fetch(endpoint, {
+      method: 'GET',
+    });
+    if (response.ok) {
+      return await response.text();
+    }
+  } catch (err) {
+    console.error(`Failed to fetch ${endpoint}:`, err);
+  }
+  return undefined;
+}
+
+async function Get(endpoint: IpcId, ...args: string[]): Promise<unknown> {
+  try {
+    const response = await fetch(
+      ['/api', endpoint.toString(10), ...args].join('/'),
+      {
+        method: 'GET',
+      },
+    );
+    if (response.ok) {
+      return await response.json();
+    }
+  } catch (err) {
+    return err;
+  }
+  return { error: `Failed to fetch ${endpoint} with args: ${args.join(', ')}` };
+}
+
+async function GetAs<T>(
+  validator: typecheck<T>,
+  endpoint: IpcId,
+  ...args: string[]
+): Promise<T | undefined> {
+  const res = await Get(endpoint, ...args);
+  return validator(res) ? res : undefined;
 }
 
 /**
@@ -237,12 +279,13 @@ export async function CallMain<T>(
   typecheck: typecheck<T>,
   ...args: unknown[]
 ): Promise<T | void> {
-  const result = await TODO(channel, ...args);
-  if (typecheck(result)) {
-    return result;
-  }
-  wrn(
-    `CallMain(${channel}, ${typecheck.name}, ...) result failed typecheck`,
-    result,
-  );
+  return await GetAs(typecheck, channel, ...args.map((a) => String(a)));
+}
+
+export async function PostMain(
+  channel: IpcId,
+  ...args: unknown[]
+): Promise<void> {
+  void (await CallMain(channel, (a): a is void => true, ...args));
+  // No return value, so we just return void
 }

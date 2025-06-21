@@ -1,8 +1,8 @@
-import { ReactElement } from 'react';
 import { isString } from '@freik/typechk';
+import { ReactElement } from 'react';
 
 import { useInterval } from './hooks';
-import { RawGet } from './WebHelpers';
+import { RawGet } from './Tools/ipc';
 
 // This is a 'two-way' keep-alive mechanism.
 // It sends a request to the server every 5 seconds to keep the connection alive.

@@ -8,7 +8,7 @@ export type Ipc = {
 
 export interface MyWindow extends Window {
   ws?: WebSocket;
-  clientId?: number;
+  // clientId?: number;
   ipc?: Ipc;
   wsport?: number;
 }

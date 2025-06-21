@@ -2,10 +2,11 @@ import { MakeLog } from '@freik/logger';
 import { hasField, hasFieldOf, isNumber, Pickle } from '@freik/typechk';
 import { ReactElement, useEffect, useState } from 'react';
 import { MyWindow } from '../Types';
+import { WireUpIpc } from './ipc';
 
 declare const window: MyWindow;
 
-const { log, err } = MakeLog('Tools:RealTimeUpdates');
+const { con, log, err } = MakeLog('Tools:RealTimeUpdates');
 
 export function RealTimeUpdates(): ReactElement {
   useEffect(() => {
@@ -18,21 +19,22 @@ export function RealTimeUpdates(): ReactElement {
     const websocket = new WebSocket(`ws://localhost:${window.wsport}/ws`);
 
     websocket.onopen = () => {
-      log('WebSocket is connected');
+      con('WebSocket is connected');
       // Generate a unique client ID
-      const id = Math.floor(Math.random() * 16777216);
+      // const id = Math.floor(Math.random() * 16777216);
       window.ws = websocket; // Store the WebSocket in the global window object
-      window.clientId = id; // Store the client ID in the global window object
+      // window.clientId = id; // Store the client ID in the global window object
+      WireUpIpc(); // Trigger the IPC setup code
     };
 
     websocket.onclose = () => {
-      log('WebSocket is closed');
+      con('WebSocket is closed');
       if (hasField(window, 'ws')) {
         delete window.ws; // Clear the WebSocket reference
       }
-      if (hasField(window, 'clientId')) {
-        delete window.clientId; // Clear the client ID reference
-      }
+      // if (hasField(window, 'clientId')) {
+      //   delete window.clientId; // Clear the client ID reference
+      // }
     };
 
     window.ws = websocket; // Store the WebSocket in the global window object

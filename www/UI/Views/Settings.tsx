@@ -1,5 +1,3 @@
-import { useAtom, useAtomValue } from 'jotai';
-import React, { ReactElement, useCallback, useState } from 'react';
 import {
   DefaultButton,
   Dropdown,
@@ -11,19 +9,22 @@ import {
   TextField,
   TooltipHost,
 } from '@fluentui/react';
-import { isDefined } from '@freik/typechk';
 import { Expandable, StateToggle } from '@freik/fluentui-tools';
 import { useBoolState } from '@freik/react-tools';
+import { isDefined } from '@freik/typechk';
+import { useAtom, useAtomValue } from 'jotai';
+import React, { ReactElement, useCallback, useState } from 'react';
 
-import { GetHelperText, Post } from 'www/WebHelpers';
 import { st } from 'www/Constants';
 import {
   ignoreItemsState,
   minSongCountForArtistListState,
 } from 'www/State/SimpleSavedState';
+import { GetHelperText } from 'www/WebHelpers';
 
-import './styles/Settings.css';
 import { IgnoreItemType, IpcId, Keys, StrId } from 'www/Shared/CommonTypes';
+import { SendMessage } from 'www/Tools/ipc';
+import './styles/Settings.css';
 
 const btnWidth: React.CSSProperties = { width: '155px', padding: 0 };
 const removeFromSet = (set: string[], val: string): string[] => {
@@ -105,13 +106,12 @@ function MusicLocations(): ReactElement {
         &nbsp;
         <TooltipHost
           id="RescanLocationsHelp"
-          content="Necessary if you moved files around since launching the app"
-        >
+          content="Necessary if you moved files around since launching the app">
           <DefaultButton
             text="Rescan Locations"
             iconProps={{ iconName: 'SearchData' }}
             disabled={true}
-            onClick={() => Post(IpcId.ManualRescan)}
+            onClick={() => SendMessage(IpcId.ManualRescan)}
             style={btnWidth}
           />
         </TooltipHost>
@@ -177,8 +177,7 @@ function IgnoreList(): ReactElement {
       </span>
       <span
         style={{ gridRow: ignoreItems.length + 1 }}
-        className="ignore-value"
-      >
+        className="ignore-value">
         <TextField
           value={newValue}
           onChange={(ev: unknown, value?: string) => {
@@ -190,8 +189,7 @@ function IgnoreList(): ReactElement {
       </span>
       <span
         style={{ gridRow: ignoreItems.length + 1 }}
-        className="ignore-button"
-      >
+        className="ignore-button">
         <IconButton
           onClick={() => {
             if (newType !== '') {
@@ -288,7 +286,7 @@ function ArtworkSettings(): ReactElement {
       <DefaultButton
         text="Flush Image Cache"
         style={{ ...btnWidth, gridRow: 4 }}
-        onClick={() => Post(IpcId.FlushImageCache)}
+        onClick={() => SendMessage(IpcId.FlushImageCache)}
       />
     </>
   );
@@ -303,8 +301,7 @@ export function SettingsView(): ReactElement {
           indent={30}
           separator
           label="Ignore filters"
-          defaultShow={false}
-        >
+          defaultShow={false}>
           <IgnoreList />
         </Expandable>
       </Expandable>
@@ -321,13 +318,13 @@ export function SettingsView(): ReactElement {
           <DefaultButton
             text="Flush Metadata Cache"
             style={btnWidth}
-            onClick={() => Post(IpcId.FlushMetadataCache)}
+            onClick={() => SendMessage(IpcId.FlushMetadataCache)}
           />
           &nbsp;
           <DefaultButton
             text="Clear Local Overrides"
             style={btnWidth}
-            onClick={() => Post(IpcId.ClearLocalOverrides)}
+            onClick={() => SendMessage(IpcId.ClearLocalOverrides)}
           />
         </>
       </Expandable>

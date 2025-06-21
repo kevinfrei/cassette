@@ -10,8 +10,9 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { FluentInitIcons } from './FluentInit';
 import { KeepAlive } from './KeepAlive';
-import { App } from './UI/App';
 import { RealTimeUpdates } from './Tools/ReactWebSocket';
+import { RawGet } from './Tools/ipc';
+import { App } from './UI/App';
 
 const elem = document.getElementById('root')!;
 const theActualApp = <App />;
@@ -21,6 +22,7 @@ const app = (
     <Provider>
       <RealTimeUpdates />
       <KeepAlive />
+      <App />
     </Provider>
   </StrictMode>
 );
@@ -37,6 +39,4 @@ if (import.meta.hot) {
 }
 
 // This is the thing to tell the server to quit when the page is closed
-window.addEventListener('unload', () => {
-  fetch('/quit', { method: 'GET' });
-});
+window.addEventListener('unload', () => void RawGet('/quit'));
