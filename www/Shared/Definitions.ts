@@ -150,6 +150,7 @@ const IpcMsg: NEnum = enum_num(u8(), {
   RescanInProgress: 2,
   RescanComplete: 3,
   MusicDBUpdate: 4,
+  Unknown: 255, // This is a placeholder for unknown messages
 });
 
 const IgnoreItemType: SEnum = enum_str({

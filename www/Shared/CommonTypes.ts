@@ -137,6 +137,7 @@ export const IpcMsg = Object.freeze({
   RescanInProgress: 2,
   RescanComplete: 3,
   MusicDBUpdate: 4,
+  Unknown: 255,
 });
 export type IpcMsg = (typeof IpcMsg)[keyof typeof IpcMsg];
 

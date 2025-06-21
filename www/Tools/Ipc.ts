@@ -2,11 +2,13 @@ import { MakeLog } from '@freik/logger';
 import MakeSeqNum from '@freik/seqnum';
 import {
   isDefined,
+  isFunction,
   isObjectNonNull,
   isString,
   Pickle,
   SafelyUnpickle,
   typecheck,
+  Unpickle,
 } from '@freik/typechk';
 import { IpcCall, IpcMsg } from 'www/Shared/CommonTypes';
 import { ListenKey, MyWindow } from 'www/Types';
@@ -25,7 +27,7 @@ declare const window: MyWindow;
 export async function ReadFromStorage<T>(
   key: string,
   typechk: typecheck<T>,
-): Promise<T | void> {
+): Promise<T | undefined> {
   return CallMain(IpcCall.ReadFromStorage, typechk, key);
 }
 
@@ -57,8 +59,11 @@ export function DeleteFromStorage(key: string): void {
 const getNextListenerSeqNum = MakeSeqNum('Listen');
 
 // map of message names to map of id's to funtions
-type Handler<T> = { typechk: typecheck<T>; handler: (data: T) => void };
-const listeners = new Map<IpcId, Map<string, Handler<any>>>();
+type Handler<T> = {
+  typechk: typecheck<T> | boolean;
+  handler: (data: T) => void;
+};
+const listeners = new Map<IpcMsg, Map<string, Handler<any>>>();
 
 /**
  * This subscribes the `handler` to listen for messages coming from the
@@ -69,8 +74,16 @@ const listeners = new Map<IpcId, Map<string, Handler<any>>>();
  * @returns the key to use to unsubscribe
  */
 export function Subscribe<T>(
-  ipcId: IpcId,
+  ipcId: IpcMsg,
   typechk: typecheck<T>,
+  handler: (data: T) => void,
+): ListenKey {
+  return localSubscribe(ipcId, typechk, handler);
+}
+
+function localSubscribe<T>(
+  ipcId: IpcMsg,
+  typechk: typecheck<T> | boolean,
   handler: (data: T) => void,
 ): ListenKey {
   const theKey = { ipcId, id: getNextListenerSeqNum() };
@@ -81,6 +94,39 @@ export function Subscribe<T>(
   }
   handlerMap.set(theKey.id, { typechk, handler });
   return theKey;
+}
+
+export function SubscribeWithDefault<T>(
+  ipcId: IpcMsg,
+  typecheck: typecheck<T>,
+  handler: (data: T) => void,
+  defaultValue: T,
+): ListenKey {
+  // This is a convenience function that allows you to subscribe to a message
+  // and provide a default value to use if the message data does not match
+  // the typecheck. This is useful for cases where you want to ensure that
+  // the handler always receives a value of the expected type, even if the
+  // message data is malformed or missing.
+  const defHandler = (data: unknown) => {
+    if (typecheck(data)) {
+      handler(data);
+    } else {
+      handler(defaultValue);
+    }
+  };
+  return localSubscribe(ipcId, true, defHandler);
+}
+
+export function SubscribeUnsafe(
+  ipcId: IpcMsg,
+  handler: (data: unknown) => void,
+): ListenKey {
+  // This is a convenience function that allows you to subscribe to a message
+  // and provide a default value to use if the message data does not match
+  // the typecheck. This is useful for cases where you want to ensure that
+  // the handler always receives a value of the expected type, even if the
+  // message data is malformed or missing.
+  return localSubscribe(ipcId, true, handler);
 }
 
 /**
@@ -120,7 +166,7 @@ export function WireUpIpc(): void {
     HandleMessage(message);
   };
   window.ipc = {
-    post: (channel: IpcId, ...args: unknown[]) => {
+    post: (channel: IpcMsg, ...args: unknown[]) => {
       if (!isObjectNonNull(window.ws)) {
         err('IPC connector is not wired up, cannot invoke');
         throw Error('IPC connector is not wired up');
@@ -176,19 +222,28 @@ function HandleMessage(message: string): void {
   }
   listener.forEach((hndlr, id) => {
     const { typechk, handler } = hndlr;
-    const val = SafelyUnpickle(messageData, typechk);
-    if (!isDefined(val)) {
-      wrn(
-        `>>> Async malformed message begin for ${ipcId} with id ${id}`,
-        `Failed to unpickle message data:`,
-        messageData,
-      );
-      wrn('<<< Async malformed message end');
-      return;
+    if (isFunction(typechk)) {
+      const val = SafelyUnpickle(messageData, typechk);
+      if (!isDefined(val)) {
+        wrn(
+          `>>> Async malformed message begin for ${ipcId} with id ${id}`,
+          `Failed to unpickle message data:`,
+          messageData,
+        );
+        wrn('<<< Async malformed message end');
+        return;
+      }
+      handled = true;
+      handler(val);
+    } else {
+      // If we don't have a typechk, we assume the handler can handle anything
+      // This is a bit dangerous, but it allows us to have a "catch-all" handler
+      // that can handle any message.
+      const val = messageData.length > 0 ? Unpickle(messageData) : undefined;
+      handled = true;
+      handler(val);
     }
-    handled = true;
     log(`Handling message for ${ipcId} with id ${id}`);
-    handler(val);
   });
   if (!handled) {
     wrn('**********');
@@ -278,7 +333,7 @@ export async function CallMain<T>(
   channel: IpcCall,
   typecheck: typecheck<T>,
   ...args: unknown[]
-): Promise<T | void> {
+): Promise<T | undefined> {
   return await GetAs(typecheck, channel, ...args.map((a) => String(a)));
 }
 

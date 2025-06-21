@@ -1,8 +1,8 @@
-import { Ipc } from '@freik/electron-render';
-import { StorageIdEnum } from '@freik/emp-shared';
 import {
   Pickle,
   SafelyUnpickle,
+  isDefined,
+  isNumber,
   isString,
   isUndefined,
   typecheck,
@@ -10,6 +10,16 @@ import {
 import { createStore } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { AsyncStorage } from 'jotai/vanilla/utils/atomWithStorage';
+import { IpcMsg } from 'www/Shared/CommonTypes';
+import {
+  DeleteFromStorage,
+  ReadFromStorage,
+  Subscribe,
+  SubscribeUnsafe,
+  SubscribeWithDefault,
+  Unsubscribe,
+  WriteToStorage,
+} from '../Tools/Ipc';
 import { WritableAtomType } from './Hooks';
 
 const theStore = createStore();
@@ -27,16 +37,8 @@ function makeGetItem<T>(
   chk: typecheck<T>,
 ): (key: string, initialValue: T) => PromiseLike<T> {
   return async (key: string, initialValue: T): Promise<T> => {
-    const strValue = await Ipc.ReadFromStorage(key);
-    if (isString(strValue)) {
-      try {
-        const val = SafelyUnpickle(strValue, chk);
-        return isUndefined(val) ? initialValue : val;
-      } catch {
-        /* */
-      }
-    }
-    return initialValue;
+    const maybeValue = await ReadFromStorage(key, chk);
+    return isDefined(maybeValue) ? maybeValue : initialValue;
   };
 }
 
@@ -45,21 +47,13 @@ function makeGetTranslatedItem<T, U>(
   xlate: (val: U) => T,
 ): (key: string, initialValue: T) => PromiseLike<T> {
   return async (key: string, initialValue: T): Promise<T> => {
-    const strValue = await Ipc.ReadFromStorage(key);
-    if (isString(strValue)) {
-      try {
-        const val = SafelyUnpickle(strValue, chk);
-        return isUndefined(val) ? initialValue : xlate(val);
-      } catch {
-        /* */
-      }
-    }
-    return initialValue;
+    const value = await ReadFromStorage(key, chk);
+    return isDefined(value) ? xlate(value) : initialValue;
   };
 }
 
-async function setItem<T>(key: string, newValue: T): Promise<void> {
-  await Ipc.WriteToStorage(key, Pickle(newValue));
+async function setItem<T>(key: string, data: T): Promise<void> {
+  return WriteToStorage(key, data);
 }
 
 async function setTranslatedItem<T, U>(
@@ -67,21 +61,21 @@ async function setTranslatedItem<T, U>(
   newValue: T,
   xlate: (val: T) => U,
 ): Promise<void> {
-  await Ipc.WriteToStorage(key, Pickle(xlate(newValue)));
+  return WriteToStorage(key, xlate(newValue));
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function noSetItem<T>(_key: string, _newValue: T): Promise<void> {
-  await Promise.resolve();
+  return Promise.resolve();
 }
 
 async function removeItem(key: string): Promise<void> {
-  await Ipc.DeleteFromStorage(key);
+  await DeleteFromStorage(key);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function noRemoveItem(_key: string): Promise<void> {
-  await Promise.resolve();
+  return Promise.resolve();
 }
 
 type Unsub = () => void;
@@ -90,12 +84,26 @@ type Subscriber<T> = (
   callback: (value: T) => void,
   initVal: T,
 ) => Unsub;
+
+// TODO: This is really stupid and slow:
+function getIpcMsg(key: string): IpcMsg {
+  let theName: keyof typeof IpcMsg = 'Unknown';
+  const item = Object.entries(IpcMsg).find(([name, value]) => {
+    if (isNumber(value) && String(value) === key)
+      theName = name as keyof typeof IpcMsg;
+  });
+  return IpcMsg[theName];
+}
+
 function makeSubscribe<T>(chk: typecheck<T>): Subscriber<T> {
   return (key: string, callback: (value: T) => void, initialValue: T) => {
-    const lk = Ipc.Subscribe(key, (val: unknown) =>
-      callback(chk(val) ? val : initialValue),
+    const lk = SubscribeWithDefault(
+      getIpcMsg(key),
+      chk,
+      callback,
+      initialValue,
     );
-    return () => Ipc.Unsubscribe(lk);
+    return () => Unsubscribe(lk);
   };
 }
 
@@ -104,14 +112,14 @@ function makeTranslatedSubscribe<T, U>(
   xlate: (val: U) => T,
 ): Subscriber<T> {
   return (key: string, callback: (value: T) => void, initialValue: T) => {
-    const lk = Ipc.Subscribe(key, (val: unknown) => {
+    const lk = SubscribeUnsafe(getIpcMsg(key), (val: unknown) => {
       if (chk(val)) {
         callback(xlate(val));
       } else {
         callback(initialValue);
       }
     });
-    return () => Ipc.Unsubscribe(lk);
+    return () => Unsubscribe(lk);
   };
 }
 

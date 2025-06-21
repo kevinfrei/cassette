@@ -554,6 +554,7 @@ enum class IpcMsg : std::uint8_t {
   RescanInProgress = 2,
   RescanComplete = 3,
   MusicDBUpdate = 4,
+  Unknown = 255,
 };
 
 inline constexpr bool is_valid(IpcMsg _value) {
@@ -563,6 +564,7 @@ inline constexpr bool is_valid(IpcMsg _value) {
     case IpcMsg::RescanInProgress:
     case IpcMsg::RescanComplete:
     case IpcMsg::MusicDBUpdate:
+    case IpcMsg::Unknown:
       return true;
     default:
       return false;

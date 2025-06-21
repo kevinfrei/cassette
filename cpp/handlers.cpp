@@ -5,6 +5,7 @@
 #include <crow.h>
 
 #include "CommonTypes.hpp"
+#include "api.h"
 #include "files.h"
 #include "handlers.h"
 #include "quitting.h"
@@ -29,7 +30,7 @@ crow::response file_path(const crow::request& req, const std::string& path) {
     // Replace "window.wsport = 42;" with the actual port number
     std::ifstream file(p);
     if (!file.is_open()) {
-      e404(resp, "index.html not found");
+      tools::e404(resp, "index.html not found");
       return resp;
     }
     std::string content((std::istreambuf_iterator<char>(file)),
@@ -62,7 +63,7 @@ crow::response tune(const crow::request& req, const std::string& path) {
   crow::response resp;
   auto maybe_song = get_tune(path);
   if (!maybe_song) {
-    e404(resp, "Tune not found");
+    tools::e404(resp, "Tune not found");
     return resp;
   }
   const auto& song = maybe_song.value();
@@ -74,11 +75,45 @@ crow::response tune(const crow::request& req, const std::string& path) {
 crow::response api(const crow::request& req, const std::string& path) {
   quitting::keep_alive();
 
-  // std::cout << "API Path: " << path << std::endl;
+  std::cout << "API Path: " << path << std::endl;
   crow::response resp;
-  resp.code = 200;
-  resp.body = "{\"path\":\"" + path + "\"}";
-  resp.set_header("Content-Type", "text/json");
+  size_t slashPos = path.find('/');
+  slashPos = (slashPos == path.npos) ? path.size() : slashPos;
+  auto maybeNum =
+      tools::read_uint64_t(std::string_view{path.c_str(), slashPos});
+  if (!maybeNum) {
+    tools::e404(resp, "Invalid API arguments");
+    return resp;
+  }
+  Shared::IpcCall call = static_cast<Shared::IpcCall>(*maybeNum);
+  if (!Shared::is_valid(call)) {
+    tools::e404(resp, "Unknown API");
+    return resp;
+  }
+  auto ValidateAndCall =
+      [&](std::function<void(crow::response&, std::string_view)> handle_call)
+      -> void {
+    if (slashPos == path.size()) {
+      tools::e404(resp, "No data provided for API");
+    } else {
+      resp.code = 200;
+      handle_call(
+          resp,
+          std::string_view{path.c_str() + slashPos, path.size() - slashPos});
+    }
+  };
+  switch (call) {
+    case Shared::IpcCall::WriteToStorage:
+      ValidateAndCall(api::WriteToStorage);
+      break;
+    case Shared::IpcCall::ReadFromStorage:
+      ValidateAndCall(api::ReadFromStorage);
+      break;
+    case Shared::IpcCall::DeleteFromStorage:
+      ValidateAndCall(api::DeleteFromStorage);
+      break;
+  }
+
   return resp;
 }
 
@@ -107,15 +142,12 @@ void socket_message(crow::websocket::connection& conn,
     std::cerr << "Invalid websocket message received: " << data << std::endl;
     return;
   }
-  std::underlying_type_t<Shared::IpcMsg> val = 0;
-  for (size_t i = 0; i < pos; i++) {
-    if (data[i] < '0' || data[i] > '9') {
-      std::cerr << "Invalid websocket message received: " << data << std::endl;
-      return;
-    }
-    val = val * 10 + (data[i] - '0');
+  auto maybeNum = tools::read_uint64_t(std::string_view{data.c_str(), pos});
+  if (!maybeNum) {
+    std::cerr << "Invalid websocket message received: " << data << std::endl;
+    return;
   }
-  Shared::IpcMsg msg = static_cast<Shared::IpcMsg>(val);
+  Shared::IpcMsg msg = static_cast<Shared::IpcMsg>(*maybeNum);
   if (!Shared::is_valid(msg)) {
     std::cerr << "Invalid websocket message received: " << data << std::endl;
     return;
