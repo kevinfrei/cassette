@@ -23,6 +23,10 @@ std::filesystem::path GetWebDir() {
   return web_dir;
 }
 
+std::filesystem::path GetAppName() {
+  return program_location.stem();
+}
+
 std::string PathToMimeType(const std::filesystem::path& filePath) {
   const std::string extension = filePath.extension().generic_string();
   if (extension == ".txt") {

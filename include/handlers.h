@@ -13,5 +13,4 @@ crow::response quit();
 void socket_message(crow::websocket::connection& conn,
                     const std::string& data,
                     bool is_binary);
-
 } // namespace handlers

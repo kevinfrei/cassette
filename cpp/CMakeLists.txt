@@ -1,5 +1,6 @@
 
 set(LIB_SOURCE_FILES
+    config.cpp
     files.cpp
     from_json.cpp
     handlers.cpp

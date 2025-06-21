@@ -1,7 +1,12 @@
 enable_testing()
-add_executable(cpptesting test.cpp)
-target_link_libraries(cpptesting ${GTEST_LIB} ${CROW_LIB} GTest::gtest_main)
-target_include_directories(cpptesting PUBLIC ${PROJECT_SOURCE_DIR}/include)
-add_test(thetest cpptesting)
+
+set (TEST_SOURCE_FILES
+	json_test.cpp
+	config_test.cpp
+)
+
+add_executable(cassette_cpptst ${TEST_SOURCE_FILES})
+target_link_libraries(cassette_cpptst ${GTEST_LIB} cassette_lib ${CROW_LIB} GTest::gtest_main)
+add_test(thetest cassette_cpptst)
 include(GoogleTest)
-gtest_discover_tests(cpptesting)
+gtest_discover_tests(cassette_cpptst)
