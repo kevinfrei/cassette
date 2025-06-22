@@ -5,6 +5,8 @@
 
 #include <crow.h>
 
+namespace tools {
+
 void e404(crow::response& resp, const std::string& message) {
   std::cerr << "Error 404: " << message << std::endl;
   resp.code = 404;
@@ -22,3 +24,5 @@ std::optional<std::uint64_t> read_uint64_t(std::string_view sv) {
   }
   return value;
 }
+
+} // namespace tools

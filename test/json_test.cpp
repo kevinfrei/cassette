@@ -330,13 +330,13 @@ TEST(JsonPickling, enumClass) {
   }
   {
     crow::json::wvalue json_value = to_json(Shared::IgnoreItemType::DirName);
-    EXPECT_EQ(json_value.t(), crow::json::type::Number);
+    EXPECT_EQ(json_value.t(), crow::json::type::String);
     std::string s = json_value.dump();
     crow::json::rvalue json_value2 = crow::json::load(s);
     auto enum_value = from_json<Shared::IgnoreItemType>(json_value2);
     EXPECT_TRUE(enum_value.has_value());
     EXPECT_EQ(enum_value.value(), Shared::IgnoreItemType::DirName);
-    auto str_value = from_json<std::string>(json_value2);
+    auto str_value = from_json<uint32_t>(json_value2);
     EXPECT_FALSE(str_value.has_value());
   }
 }

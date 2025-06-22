@@ -157,8 +157,9 @@ void socket_message(crow::websocket::connection& conn,
       std::cout << "TODO: Implement ManualRescan" << std::endl;
       break;
     default:
-      std::cerr << "Unsupported message received: " << val << " (" << data
-                << ")" << std::endl;
+      std::cerr << "Unsupported message received: "
+                << static_cast<std::underlying_type_t<Shared::IpcMsg>>(msg)
+                << " (" << data << ")" << std::endl;
   }
 }
 

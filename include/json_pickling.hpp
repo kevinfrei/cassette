@@ -57,8 +57,14 @@ inline std::enable_if_t<is_enum_class_v<T>, crow::json::wvalue> to_json(
 // A little extra work for string constants:
 template <>
 struct impl_to_json<char*> {
-  static inline crow::json::wvalue proces(const char* value) {
+  static inline crow::json::wvalue process(const char* value) {
     return crow::json::wvalue(std::string(value));
+  }
+};
+template <>
+struct impl_to_json<std::string_view> {
+  static inline crow::json::wvalue process(std::string_view value) {
+    return crow::json::wvalue(std::string{value});
   }
 };
 
@@ -478,7 +484,7 @@ struct impl_from_json<std::unordered_map<K, V>> {
 // Enum's, specifically for my gen'ed enum types, which include an
 // 'is_valid' free function overload
 template <typename T>
-struct impl_from_json<T, std::enable_if_t<std::is_enum_v<T>>> {
+struct impl_from_json<T, std::enable_if_t<is_enum_class_v<T>>> {
   static inline std::optional<T> process(const crow::json::rvalue& json) {
     using IntType = std::underlying_type_t<T>;
     std::optional<IntType> underlyingValue = from_json<IntType>(json);

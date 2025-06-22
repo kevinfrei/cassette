@@ -27,7 +27,7 @@ namespace Shared {
 template <typename T>
 constexpr std::optional<T> from_string(const std::string_view& str);
 
-// Keys
+// string "enum" Keys
 enum class Keys {
   AddFileLocation,
   Albums,
@@ -48,6 +48,7 @@ enum class Keys {
   ToggleMiniPlayer,
   Tools
 };
+
 inline constexpr bool is_valid(Keys _value) {
   switch (_value) {
     case Keys::AddFileLocation:
@@ -117,6 +118,8 @@ inline constexpr std::string_view to_string(Keys _value) {
   }
 }
 
+// This is *super* simplistic, and should be optimized, cuz this is bad.
+// A deeply nested switch statement would be pretty fun to generate...
 template <>
 inline constexpr std::optional<Keys> from_string<Keys>(
     const std::string_view& str) {
@@ -159,7 +162,7 @@ inline constexpr std::optional<Keys> from_string<Keys>(
   return std::nullopt;
 }
 
-// StrId
+// string "enum" StrId
 enum class StrId {
   Mono,
   Stereo,
@@ -201,6 +204,7 @@ enum class StrId {
   ViewTools,
   ImportFiles
 };
+
 inline constexpr bool is_valid(StrId _value) {
   switch (_value) {
     case StrId::Mono:
@@ -334,6 +338,8 @@ inline constexpr std::string_view to_string(StrId _value) {
   }
 }
 
+// This is *super* simplistic, and should be optimized, cuz this is bad.
+// A deeply nested switch statement would be pretty fun to generate...
 template <>
 inline constexpr std::optional<StrId> from_string<StrId>(
     const std::string_view& str) {
@@ -420,6 +426,7 @@ inline constexpr std::optional<StrId> from_string<StrId>(
   return std::nullopt;
 }
 
+// *Arbitrary* (i.e. linear) numeric enum CurrentView
 enum class CurrentView {
   disabled = -1,
   none = 0,
@@ -453,49 +460,11 @@ inline constexpr bool is_valid(CurrentView _value) {
   }
 }
 
+// *Arbitrary* (i.e. linear) numeric enum IpcCall
 enum class IpcCall : std::uint8_t {
   ReadFromStorage = 0,
   WriteToStorage = 1,
   DeleteFromStorage = 2,
-  AsyncData = 3,
-  IsDev = 4,
-  ClearHates = 5,
-  ClearLikes = 6,
-  ClearLocalOverrides = 7,
-  DeletePlaylist = 8,
-  FlushImageCache = 9,
-  FlushMetadataCache = 10,
-  GetHates = 11,
-  GetLikes = 12,
-  GetMediaInfo = 13,
-  GetMusicDatabase = 14,
-  GetPlaylists = 15,
-  LoadPlaylist = 16,
-  MenuAction = 17,
-  RenamePlaylist = 18,
-  SavePlaylist = 19,
-  Search = 20,
-  SetHates = 21,
-  SetLikes = 22,
-  SetMediaInfo = 23,
-  SetPlaylists = 24,
-  SetSaveMenu = 25,
-  ShowFile = 26,
-  ShowLocFromKey = 27,
-  ShowMenu = 28,
-  SubstrSearch = 29,
-  TranscodingBegin = 30,
-  UploadImage = 31,
-  MinimizeWindow = 32,
-  MaximizeWindow = 33,
-  RestoreWindow = 34,
-  CloseWindow = 35,
-  GetPicUri = 36,
-  GetIgnoreList = 37,
-  AddIgnoreItem = 38,
-  RemoveIgnoreItem = 39,
-  PushIgnoreList = 40,
-  IgnoreListId = 41,
 };
 
 inline constexpr bool is_valid(IpcCall _value) {
@@ -503,51 +472,13 @@ inline constexpr bool is_valid(IpcCall _value) {
     case IpcCall::ReadFromStorage:
     case IpcCall::WriteToStorage:
     case IpcCall::DeleteFromStorage:
-    case IpcCall::AsyncData:
-    case IpcCall::IsDev:
-    case IpcCall::ClearHates:
-    case IpcCall::ClearLikes:
-    case IpcCall::ClearLocalOverrides:
-    case IpcCall::DeletePlaylist:
-    case IpcCall::FlushImageCache:
-    case IpcCall::FlushMetadataCache:
-    case IpcCall::GetHates:
-    case IpcCall::GetLikes:
-    case IpcCall::GetMediaInfo:
-    case IpcCall::GetMusicDatabase:
-    case IpcCall::GetPlaylists:
-    case IpcCall::LoadPlaylist:
-    case IpcCall::MenuAction:
-    case IpcCall::RenamePlaylist:
-    case IpcCall::SavePlaylist:
-    case IpcCall::Search:
-    case IpcCall::SetHates:
-    case IpcCall::SetLikes:
-    case IpcCall::SetMediaInfo:
-    case IpcCall::SetPlaylists:
-    case IpcCall::SetSaveMenu:
-    case IpcCall::ShowFile:
-    case IpcCall::ShowLocFromKey:
-    case IpcCall::ShowMenu:
-    case IpcCall::SubstrSearch:
-    case IpcCall::TranscodingBegin:
-    case IpcCall::UploadImage:
-    case IpcCall::MinimizeWindow:
-    case IpcCall::MaximizeWindow:
-    case IpcCall::RestoreWindow:
-    case IpcCall::CloseWindow:
-    case IpcCall::GetPicUri:
-    case IpcCall::GetIgnoreList:
-    case IpcCall::AddIgnoreItem:
-    case IpcCall::RemoveIgnoreItem:
-    case IpcCall::PushIgnoreList:
-    case IpcCall::IgnoreListId:
       return true;
     default:
       return false;
   }
 }
 
+// *Arbitrary* (i.e. linear) numeric enum IpcMsg
 enum class IpcMsg : std::uint8_t {
   TranscodingUpdate = 0,
   ManualRescan = 1,
@@ -571,8 +502,9 @@ inline constexpr bool is_valid(IpcMsg _value) {
   }
 }
 
-// IgnoreItemType
+// string "enum" IgnoreItemType
 enum class IgnoreItemType { PathRoot, PathKeyword, DirName };
+
 inline constexpr bool is_valid(IgnoreItemType _value) {
   switch (_value) {
     case IgnoreItemType::PathRoot:
@@ -597,6 +529,8 @@ inline constexpr std::string_view to_string(IgnoreItemType _value) {
   }
 }
 
+// This is *super* simplistic, and should be optimized, cuz this is bad.
+// A deeply nested switch statement would be pretty fun to generate...
 template <>
 inline constexpr std::optional<IgnoreItemType> from_string<IgnoreItemType>(
     const std::string_view& str) {
@@ -609,25 +543,25 @@ inline constexpr std::optional<IgnoreItemType> from_string<IgnoreItemType>(
   return std::nullopt;
 }
 
-// StorageId
+// string "enum" StorageId
 enum class StorageId {
   CurrentView,
+  Shuffle,
+  Repeat,
   CurrentIndex,
+  Mute,
+  Volume,
   PlaybackOrder,
   NowPlaying,
   CurrentSongList,
-  Shuffle,
-  Repeat,
-  NeverPlayHates,
-  OnlyPlayLikes,
-  FullAlbumsOnly,
-  MinSongCount,
-  Mute,
-  LikedSongs,
-  HatedSongs,
-  Volume,
   Locations,
   DefaultLocation,
+  OnlyPlayLikes,
+  NeverPlayHates,
+  FullAlbumsOnly,
+  MinSongCount,
+  LikedSongs,
+  HatedSongs,
   SortWithArticles,
   DownloadAlbumArtwork,
   DownloadArtistArtwork,
@@ -641,25 +575,26 @@ enum class StorageId {
   TranscodeDestLoc,
   TranscodeBitRate
 };
+
 inline constexpr bool is_valid(StorageId _value) {
   switch (_value) {
     case StorageId::CurrentView:
+    case StorageId::Shuffle:
+    case StorageId::Repeat:
     case StorageId::CurrentIndex:
+    case StorageId::Mute:
+    case StorageId::Volume:
     case StorageId::PlaybackOrder:
     case StorageId::NowPlaying:
     case StorageId::CurrentSongList:
-    case StorageId::Shuffle:
-    case StorageId::Repeat:
-    case StorageId::NeverPlayHates:
-    case StorageId::OnlyPlayLikes:
-    case StorageId::FullAlbumsOnly:
-    case StorageId::MinSongCount:
-    case StorageId::Mute:
-    case StorageId::LikedSongs:
-    case StorageId::HatedSongs:
-    case StorageId::Volume:
     case StorageId::Locations:
     case StorageId::DefaultLocation:
+    case StorageId::OnlyPlayLikes:
+    case StorageId::NeverPlayHates:
+    case StorageId::FullAlbumsOnly:
+    case StorageId::MinSongCount:
+    case StorageId::LikedSongs:
+    case StorageId::HatedSongs:
     case StorageId::SortWithArticles:
     case StorageId::DownloadAlbumArtwork:
     case StorageId::DownloadArtistArtwork:
@@ -681,41 +616,41 @@ inline constexpr bool is_valid(StorageId _value) {
 inline constexpr std::string_view to_string(StorageId _value) {
   switch (_value) {
     case StorageId::CurrentView:
-      return "CurrentView";
+      return "currentView";
+    case StorageId::Shuffle:
+      return "shuffle";
+    case StorageId::Repeat:
+      return "repeat";
     case StorageId::CurrentIndex:
       return "currentIndex";
+    case StorageId::Mute:
+      return "mute";
+    case StorageId::Volume:
+      return "volume";
     case StorageId::PlaybackOrder:
       return "playbackOrder";
     case StorageId::NowPlaying:
       return "nowPlaying";
     case StorageId::CurrentSongList:
       return "currentSongList";
-    case StorageId::Shuffle:
-      return "shuffle";
-    case StorageId::Repeat:
-      return "repeat";
-    case StorageId::NeverPlayHates:
-      return "neverPlayHates";
-    case StorageId::OnlyPlayLikes:
-      return "onlyPlayLikes";
-    case StorageId::FullAlbumsOnly:
-      return "FullAlbumsOnly";
-    case StorageId::MinSongCount:
-      return "MinSongCount";
-    case StorageId::Mute:
-      return "mute";
-    case StorageId::LikedSongs:
-      return "likedSongs";
-    case StorageId::HatedSongs:
-      return "hatedSongs";
-    case StorageId::Volume:
-      return "volume";
     case StorageId::Locations:
       return "locations";
     case StorageId::DefaultLocation:
       return "defaultLocation";
+    case StorageId::OnlyPlayLikes:
+      return "onlyPlayLikes";
+    case StorageId::NeverPlayHates:
+      return "neverPlayHates";
+    case StorageId::FullAlbumsOnly:
+      return "fullAlbumsOnly";
+    case StorageId::MinSongCount:
+      return "minSongCount";
+    case StorageId::LikedSongs:
+      return "likedSongs";
+    case StorageId::HatedSongs:
+      return "hatedSongs";
     case StorageId::SortWithArticles:
-      return "rSortWithArticles";
+      return "sortWithArticles";
     case StorageId::DownloadAlbumArtwork:
       return "downloadAlbumArtwork";
     case StorageId::DownloadArtistArtwork:
@@ -725,62 +660,64 @@ inline constexpr std::string_view to_string(StorageId _value) {
     case StorageId::AlbumCoverName:
       return "albumCoverName";
     case StorageId::TranscodingUpdate:
-      return "get-xcode-update";
+      return "getTranscodeUpdate";
     case StorageId::TranscodeSrcLocDir:
-      return "xcodeSrcLocDir";
+      return "transcodeSrcLocDir";
     case StorageId::TranscodeSrcLocPlaylist:
-      return "xcodeSrcLocPlaylist";
+      return "transcodeSrcLocPlaylist";
     case StorageId::TranscodeSrcLocArtist:
-      return "xcodeSrcLocArtist";
+      return "transcodeSrcLocArtist";
     case StorageId::TranscodeSrcLocAlbum:
-      return "xcodeSrcLocAlbum";
+      return "transcodeSrcLocAlbum";
     case StorageId::TranscodeDestLoc:
-      return "xcodeDestLoc";
+      return "transcodeDestLoc";
     case StorageId::TranscodeBitRate:
-      return "xcodeBitRate";
+      return "transcodeBitRate";
     default:
       return "<unknown>";
   }
 }
 
+// This is *super* simplistic, and should be optimized, cuz this is bad.
+// A deeply nested switch statement would be pretty fun to generate...
 template <>
 inline constexpr std::optional<StorageId> from_string<StorageId>(
     const std::string_view& str) {
-  if (str == "CurrentView")
+  if (str == "currentView")
     return StorageId::CurrentView;
+  if (str == "shuffle")
+    return StorageId::Shuffle;
+  if (str == "repeat")
+    return StorageId::Repeat;
   if (str == "currentIndex")
     return StorageId::CurrentIndex;
+  if (str == "mute")
+    return StorageId::Mute;
+  if (str == "volume")
+    return StorageId::Volume;
   if (str == "playbackOrder")
     return StorageId::PlaybackOrder;
   if (str == "nowPlaying")
     return StorageId::NowPlaying;
   if (str == "currentSongList")
     return StorageId::CurrentSongList;
-  if (str == "shuffle")
-    return StorageId::Shuffle;
-  if (str == "repeat")
-    return StorageId::Repeat;
-  if (str == "neverPlayHates")
-    return StorageId::NeverPlayHates;
-  if (str == "onlyPlayLikes")
-    return StorageId::OnlyPlayLikes;
-  if (str == "FullAlbumsOnly")
-    return StorageId::FullAlbumsOnly;
-  if (str == "MinSongCount")
-    return StorageId::MinSongCount;
-  if (str == "mute")
-    return StorageId::Mute;
-  if (str == "likedSongs")
-    return StorageId::LikedSongs;
-  if (str == "hatedSongs")
-    return StorageId::HatedSongs;
-  if (str == "volume")
-    return StorageId::Volume;
   if (str == "locations")
     return StorageId::Locations;
   if (str == "defaultLocation")
     return StorageId::DefaultLocation;
-  if (str == "rSortWithArticles")
+  if (str == "onlyPlayLikes")
+    return StorageId::OnlyPlayLikes;
+  if (str == "neverPlayHates")
+    return StorageId::NeverPlayHates;
+  if (str == "fullAlbumsOnly")
+    return StorageId::FullAlbumsOnly;
+  if (str == "minSongCount")
+    return StorageId::MinSongCount;
+  if (str == "likedSongs")
+    return StorageId::LikedSongs;
+  if (str == "hatedSongs")
+    return StorageId::HatedSongs;
+  if (str == "sortWithArticles")
     return StorageId::SortWithArticles;
   if (str == "downloadAlbumArtwork")
     return StorageId::DownloadAlbumArtwork;
@@ -790,25 +727,26 @@ inline constexpr std::optional<StorageId> from_string<StorageId>(
     return StorageId::SaveAlbumArtworkWithMusic;
   if (str == "albumCoverName")
     return StorageId::AlbumCoverName;
-  if (str == "get-xcode-update")
+  if (str == "getTranscodeUpdate")
     return StorageId::TranscodingUpdate;
-  if (str == "xcodeSrcLocDir")
+  if (str == "transcodeSrcLocDir")
     return StorageId::TranscodeSrcLocDir;
-  if (str == "xcodeSrcLocPlaylist")
+  if (str == "transcodeSrcLocPlaylist")
     return StorageId::TranscodeSrcLocPlaylist;
-  if (str == "xcodeSrcLocArtist")
+  if (str == "transcodeSrcLocArtist")
     return StorageId::TranscodeSrcLocArtist;
-  if (str == "xcodeSrcLocAlbum")
+  if (str == "transcodeSrcLocAlbum")
     return StorageId::TranscodeSrcLocAlbum;
-  if (str == "xcodeDestLoc")
+  if (str == "transcodeDestLoc")
     return StorageId::TranscodeDestLoc;
-  if (str == "xcodeBitRate")
+  if (str == "transcodeBitRate")
     return StorageId::TranscodeBitRate;
   return std::nullopt;
 }
 
-// TranscodeFormatTargetName
+// string "enum" TranscodeFormatTargetName
 enum class TranscodeFormatTargetName { m4a, mp3, aac };
+
 inline constexpr bool is_valid(TranscodeFormatTargetName _value) {
   switch (_value) {
     case TranscodeFormatTargetName::m4a:
@@ -833,6 +771,8 @@ inline constexpr std::string_view to_string(TranscodeFormatTargetName _value) {
   }
 }
 
+// This is *super* simplistic, and should be optimized, cuz this is bad.
+// A deeply nested switch statement would be pretty fun to generate...
 template <>
 inline constexpr std::optional<TranscodeFormatTargetName>
 from_string<TranscodeFormatTargetName>(const std::string_view& str) {
@@ -845,8 +785,9 @@ from_string<TranscodeFormatTargetName>(const std::string_view& str) {
   return std::nullopt;
 }
 
-// TranscodeSource
+// string "enum" TranscodeSource
 enum class TranscodeSource { Playlist, Artist, Album, Disk };
+
 inline constexpr bool is_valid(TranscodeSource _value) {
   switch (_value) {
     case TranscodeSource::Playlist:
@@ -874,6 +815,8 @@ inline constexpr std::string_view to_string(TranscodeSource _value) {
   }
 }
 
+// This is *super* simplistic, and should be optimized, cuz this is bad.
+// A deeply nested switch statement would be pretty fun to generate...
 template <>
 inline constexpr std::optional<TranscodeSource> from_string<TranscodeSource>(
     const std::string_view& str) {
@@ -939,6 +882,7 @@ struct Song {
   std::vector<std::string> variations;
 };
 
+// *Specific* numeric enum VAType
 enum class VAType : std::uint8_t { None, VA, OST };
 
 inline constexpr bool is_valid(VAType _value) {
@@ -1010,6 +954,110 @@ struct MimeData {
 };
 
 } // namespace Shared
+// JSON (de)serialization for string enum Keys
+template <>
+inline crow::json::wvalue to_json<Shared::Keys>(Shared::Keys _value) {
+  return to_json(to_string(_value));
+}
+template <>
+struct impl_from_json<Shared::Keys> {
+  static inline std::optional<Shared::Keys> process(
+      const crow::json::rvalue& _value) {
+    if (_value.t() != crow::json::type::String)
+      return std::nullopt;
+    auto _str = _value.s();
+    return Shared::from_string<Shared::Keys>(
+        std::string_view{_str.begin(), _str.size()});
+  }
+};
+
+// JSON (de)serialization for string enum StrId
+template <>
+inline crow::json::wvalue to_json<Shared::StrId>(Shared::StrId _value) {
+  return to_json(to_string(_value));
+}
+template <>
+struct impl_from_json<Shared::StrId> {
+  static inline std::optional<Shared::StrId> process(
+      const crow::json::rvalue& _value) {
+    if (_value.t() != crow::json::type::String)
+      return std::nullopt;
+    auto _str = _value.s();
+    return Shared::from_string<Shared::StrId>(
+        std::string_view{_str.begin(), _str.size()});
+  }
+};
+
+// JSON (de)serialization for string enum IgnoreItemType
+template <>
+inline crow::json::wvalue to_json<Shared::IgnoreItemType>(
+    Shared::IgnoreItemType _value) {
+  return to_json(to_string(_value));
+}
+template <>
+struct impl_from_json<Shared::IgnoreItemType> {
+  static inline std::optional<Shared::IgnoreItemType> process(
+      const crow::json::rvalue& _value) {
+    if (_value.t() != crow::json::type::String)
+      return std::nullopt;
+    auto _str = _value.s();
+    return Shared::from_string<Shared::IgnoreItemType>(
+        std::string_view{_str.begin(), _str.size()});
+  }
+};
+
+// JSON (de)serialization for string enum StorageId
+template <>
+inline crow::json::wvalue to_json<Shared::StorageId>(Shared::StorageId _value) {
+  return to_json(to_string(_value));
+}
+template <>
+struct impl_from_json<Shared::StorageId> {
+  static inline std::optional<Shared::StorageId> process(
+      const crow::json::rvalue& _value) {
+    if (_value.t() != crow::json::type::String)
+      return std::nullopt;
+    auto _str = _value.s();
+    return Shared::from_string<Shared::StorageId>(
+        std::string_view{_str.begin(), _str.size()});
+  }
+};
+
+// JSON (de)serialization for string enum TranscodeFormatTargetName
+template <>
+inline crow::json::wvalue to_json<Shared::TranscodeFormatTargetName>(
+    Shared::TranscodeFormatTargetName _value) {
+  return to_json(to_string(_value));
+}
+template <>
+struct impl_from_json<Shared::TranscodeFormatTargetName> {
+  static inline std::optional<Shared::TranscodeFormatTargetName> process(
+      const crow::json::rvalue& _value) {
+    if (_value.t() != crow::json::type::String)
+      return std::nullopt;
+    auto _str = _value.s();
+    return Shared::from_string<Shared::TranscodeFormatTargetName>(
+        std::string_view{_str.begin(), _str.size()});
+  }
+};
+
+// JSON (de)serialization for string enum TranscodeSource
+template <>
+inline crow::json::wvalue to_json<Shared::TranscodeSource>(
+    Shared::TranscodeSource _value) {
+  return to_json(to_string(_value));
+}
+template <>
+struct impl_from_json<Shared::TranscodeSource> {
+  static inline std::optional<Shared::TranscodeSource> process(
+      const crow::json::rvalue& _value) {
+    if (_value.t() != crow::json::type::String)
+      return std::nullopt;
+    auto _str = _value.s();
+    return Shared::from_string<Shared::TranscodeSource>(
+        std::string_view{_str.begin(), _str.size()});
+  }
+};
 
 template <>
 struct impl_to_json<Shared::TranscodeSourceLocation> {

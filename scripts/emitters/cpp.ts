@@ -125,6 +125,7 @@ const enumType: EmitItem<Enum> = async (writer, name, item) => {
     ? ''
     : ` : ${getTypeName(item.u)}`;
   await writer.write(`
+// *Specific* numeric enum ${name}
 enum class ${name}${typeName} {
   ${item.v.join(',\n  ')}
 };
@@ -145,6 +146,7 @@ const numEnumType: EmitItem<NEnum> = async (writer, name, item) => {
     ? ''
     : ` : ${getTypeName(item.u)}`;
   await writer.write(`
+// *Arbitrary* (i.e. linear) numeric enum ${name}
 enum class ${name}${typeName} {
 ${Object.entries(item.v)
   .map(([key, value]) => `  ${key} = ${value},`)
@@ -166,12 +168,13 @@ ${Object.entries(item.v)
 
 const strEnumType: EmitItem<SEnum> = async (writer, name, item) => {
   await writer.write(`
-// ${name}
+// string "enum" ${name}
 enum class ${name} {
   ${Object.keys(item.v)
     .map((key) => `${key}`)
     .join(',\n  ')}
 };
+
 inline constexpr bool is_valid(${name} _value) {
   switch (_value) {
 ${Object.entries(item.v)
@@ -182,9 +185,7 @@ ${Object.entries(item.v)
       return false;
   }
 }
-`);
 
-  await writer.write(`
 inline constexpr std::string_view to_string(${name} _value) {
   switch (_value) {
 ${Object.entries(item.v)
@@ -197,13 +198,12 @@ ${Object.entries(item.v)
       return "<unknown>";
   }
 }
-`);
 
-  // This is *super* simplistic, and could be optimized in various ways...
-  await writer.write(`
+// This is *super* simplistic, and should be optimized, cuz this is bad.
+// A deeply nested switch statement would be pretty fun to generate...
 template <>
-inline constexpr std::optional<${name}> from_string<${name}>(
-    const std::string_view& str) {
+inline constexpr std::optional<${name}>
+from_string<${name}>(const std::string_view& str) {
 ${Object.entries(item.v)
   .map(
     ([key, val]) => `  if (str == "${val}")
@@ -213,8 +213,26 @@ ${Object.entries(item.v)
   return std::nullopt;
 }
 `);
-};
 
+  addNonShared(`// JSON (de)serialization for string enum ${name}
+template <>
+inline crow::json::wvalue to_json<Shared::${name}>(
+    Shared::${name} _value) {
+  return to_json(to_string(_value));
+} 
+template <>
+struct impl_from_json<Shared::${name}> {
+  static inline std::optional<Shared::${name}> process(
+      const crow::json::rvalue& _value) {
+    if (_value.t() != crow::json::type::String)
+      return std::nullopt;
+    auto _str = _value.s();
+    return Shared::from_string<Shared::${name}>(
+        std::string_view{_str.begin(), _str.size()});
+  }
+};
+`);
+};
 const objType: EmitItem<ObjType> = async (writer, name, item) => {
   await writer.write(`\nstruct ${name} {\n`);
   for (const [key, value] of Object.entries(item.d)) {
@@ -226,7 +244,8 @@ const objType: EmitItem<ObjType> = async (writer, name, item) => {
 
 template <> 
 struct impl_to_json<Shared::${name}> { 
-  static inline crow::json::wvalue process(const Shared::${name}& _value) {
+  static inline crow::json::wvalue process(
+      const Shared::${name}& _value) {
     crow::json::wvalue _res;
     ${Object.entries(item.d)
       .map(([key]) => `_res["${key}"] = to_json(_value.${key});`)
@@ -236,7 +255,8 @@ struct impl_to_json<Shared::${name}> {
 };
 
 template <>
-inline std::optional<Shared::${name}> from_json<Shared::${name}>(
+inline std::optional<Shared::${name}>
+from_json<Shared::${name}>(
     const crow::json::rvalue& _value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
