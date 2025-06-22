@@ -10,9 +10,9 @@
 #include "files.h"
 
 TEST(Config, TheBasics) {
-  files::SetProgramLocation();
-  std::filesystem::path res = config::getPath();
+  files::set_program_location();
+  std::filesystem::path res = config::get_path();
   EXPECT_FALSE(res.empty());
-  EXPECT_EQ(res.stem(), files::GetAppName());
+  EXPECT_EQ(res.stem(), files::get_app_name());
   std::cout << "Config path: " << res.generic_string() << std::endl;
 }

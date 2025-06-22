@@ -11,11 +11,11 @@ namespace files {
 std::filesystem::path program_location;
 std::filesystem::path web_dir;
 
-void SetProgramLocation() {
+void set_program_location() {
   program_location = boost::dll::program_location().string();
 }
 
-std::filesystem::path GetWebDir() {
+std::filesystem::path get_web_dir() {
   if (web_dir.empty()) {
     std::filesystem::path cur = program_location.parent_path().parent_path();
     web_dir = cur / "www";
@@ -23,12 +23,12 @@ std::filesystem::path GetWebDir() {
   return web_dir;
 }
 
-std::filesystem::path GetAppName() {
+std::filesystem::path get_app_name() {
   return program_location.stem();
 }
 
-std::string PathToMimeType(const std::filesystem::path& filePath) {
-  const std::string extension = filePath.extension().generic_string();
+std::string path_to_mime_type(const std::filesystem::path& file_path) {
+  const std::string extension = file_path.extension().generic_string();
   if (extension == ".txt") {
     return "text/plain";
   } else if (extension == ".css" || extension == ".scss") {

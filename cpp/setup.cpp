@@ -6,7 +6,7 @@ namespace {
 uint16_t port = 0;
 }
 
-int GetRandomPort() {
+int get_random_port() {
   if (port == 0) {
     std::random_device rd;
     std::uniform_int_distribution<int> dist(0, 16383);

@@ -1,1 +1,1 @@
-int GetRandomPort();
+int get_random_port();

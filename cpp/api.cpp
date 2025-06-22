@@ -19,11 +19,11 @@ std::string_view get_key(std::string_view data) {
   return data; // Return the whole data if no space found
 }
 
-void ReadFromStorage(crow::response& resp, std::string_view data) {
+void read_from_storage(crow::response& resp, std::string_view data) {
   auto key = get_key(data);
   std::cout << "Reading " << key << "  from storage: [" << data << "]"
             << std::endl;
-  auto result = config::readFromStorage(key);
+  auto result = config::read_from_storage(key);
   if (!result) {
     resp.code = 204; // No Content
   } else {
@@ -33,7 +33,7 @@ void ReadFromStorage(crow::response& resp, std::string_view data) {
   }
 }
 
-void WriteToStorage(crow::response& resp, std::string_view data) {
+void write_to_storage(crow::response& resp, std::string_view data) {
   auto key = get_key(data);
   if (key.length() == data.length()) {
     // If the key is the same as the data, it means no slash was found
@@ -52,18 +52,18 @@ void WriteToStorage(crow::response& resp, std::string_view data) {
             << std::endl;
   std::ostringstream os;
   os << json;
-  if (!config::writeToStorage(key, os.str())) {
+  if (!config::write_to_storage(key, os.str())) {
     resp.code = 500; // Internal Server Error
   } else {
     resp.code = 200; // OK
   }
 }
 
-void DeleteFromStorage(crow::response& resp, std::string_view data) {
+void delete_from_storage(crow::response& resp, std::string_view data) {
   auto key = get_key(data);
   std::cout << "Deleting " << key << " from storage: [" << data << "]"
             << std::endl;
-  if (!config::removeFromStorage(key)) {
+  if (!config::delete_from_storage(key)) {
     resp.code = 500; // Internal Server Error
   } else {
     resp.code = 200; // OK

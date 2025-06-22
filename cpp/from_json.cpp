@@ -1,5 +1,5 @@
 #include "json_pickling.hpp"
 
-void doStuff() {
+void do_stuff() {
   // Dunno what I'll be doing here...
 }

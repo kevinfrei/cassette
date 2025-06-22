@@ -13,7 +13,7 @@
 #include "window.h"
 
 std::string GetRootUrl() {
-  return "http://localhost:" + std::to_string(GetRandomPort()) +
+  return "http://localhost:" + std::to_string(get_random_port()) +
          "/www/index.html";
 }
 
@@ -49,9 +49,9 @@ void ConfigureRoutes(crow::SimpleApp& app, const std::string& url) {
 int main(void) {
   crow::SimpleApp app;
 
-  files::SetProgramLocation();
+  files::set_program_location();
 
-  const int port = GetRandomPort();
+  const int port = get_random_port();
   std::string url = GetRootUrl();
   ConfigureRoutes(app, url);
   window::open(url);

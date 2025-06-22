@@ -21,7 +21,7 @@ crow::response file_path(const crow::request& req, const std::string& path) {
   std::cout << "Path: " << path << std::endl;
   crow::response resp;
   std::filesystem::path p =
-      files::GetWebDir() / (path.empty() ? "index.html" : path);
+      files::get_web_dir() / (path.empty() ? "index.html" : path);
   if (p.filename() == "index.html") {
     // We need to process the index.html file to replace the websocket URL
     // with the correct one.
@@ -37,7 +37,7 @@ crow::response file_path(const crow::request& req, const std::string& path) {
                         std::istreambuf_iterator<char>());
     file.close();
     // Replace the placeholder with the actual port number
-    std::string wsport = std::to_string(GetRandomPort());
+    std::string wsport = std::to_string(get_random_port());
     size_t pos = content.find("window.wsport = 42;");
     if (pos != std::string::npos) {
       content.replace(pos, 20, "window.wsport = " + wsport + ";");
@@ -53,7 +53,7 @@ crow::response file_path(const crow::request& req, const std::string& path) {
     }
   } else {
     resp.set_static_file_info_unsafe(p.generic_string());
-    resp.set_header("Content-type", files::PathToMimeType(p));
+    resp.set_header("Content-type", files::path_to_mime_type(p));
   }
   return resp;
 }
@@ -68,7 +68,7 @@ crow::response tune(const crow::request& req, const std::string& path) {
   }
   const auto& song = maybe_song.value();
   resp.set_static_file_info_unsafe(song.generic_string());
-  resp.set_header("Content-type", files::PathToMimeType(song));
+  resp.set_header("Content-type", files::path_to_mime_type(song));
   return resp;
 }
 
@@ -104,13 +104,13 @@ crow::response api(const crow::request& req, const std::string& path) {
   };
   switch (call) {
     case Shared::IpcCall::WriteToStorage:
-      ValidateAndCall(api::WriteToStorage);
+      ValidateAndCall(api::write_to_storage);
       break;
     case Shared::IpcCall::ReadFromStorage:
-      ValidateAndCall(api::ReadFromStorage);
+      ValidateAndCall(api::read_from_storage);
       break;
     case Shared::IpcCall::DeleteFromStorage:
-      ValidateAndCall(api::DeleteFromStorage);
+      ValidateAndCall(api::delete_from_storage);
       break;
   }
 
