@@ -478,14 +478,14 @@ inline constexpr bool is_valid(IpcCall _value) {
   }
 }
 
-// *Arbitrary* (i.e. linear) numeric enum IpcMsg
-enum class IpcMsg : std::uint8_t {
-  TranscodingUpdate = 0,
-  ManualRescan = 1,
-  RescanInProgress = 2,
-  RescanComplete = 3,
-  MusicDBUpdate = 4,
-  Unknown = 255,
+// string "enum" IpcMsg
+enum class IpcMsg {
+  TranscodingUpdate,
+  ManualRescan,
+  RescanInProgress,
+  RescanComplete,
+  MusicDBUpdate,
+  Unknown
 };
 
 inline constexpr bool is_valid(IpcMsg _value) {
@@ -500,6 +500,45 @@ inline constexpr bool is_valid(IpcMsg _value) {
     default:
       return false;
   }
+}
+
+inline constexpr std::string_view to_string(IpcMsg _value) {
+  switch (_value) {
+    case IpcMsg::TranscodingUpdate:
+      return "transcoding-update";
+    case IpcMsg::ManualRescan:
+      return "manual-rescan";
+    case IpcMsg::RescanInProgress:
+      return "rescan-in-progress";
+    case IpcMsg::RescanComplete:
+      return "rescan-complete";
+    case IpcMsg::MusicDBUpdate:
+      return "music-db-update";
+    case IpcMsg::Unknown:
+      return "unknown";
+    default:
+      return "<unknown>";
+  }
+}
+
+// This is *super* simplistic, and should be optimized, cuz this is bad.
+// A deeply nested switch statement would be pretty fun to generate...
+template <>
+inline constexpr std::optional<IpcMsg> from_string<IpcMsg>(
+    const std::string_view& str) {
+  if (str == "transcoding-update")
+    return IpcMsg::TranscodingUpdate;
+  if (str == "manual-rescan")
+    return IpcMsg::ManualRescan;
+  if (str == "rescan-in-progress")
+    return IpcMsg::RescanInProgress;
+  if (str == "rescan-complete")
+    return IpcMsg::RescanComplete;
+  if (str == "music-db-update")
+    return IpcMsg::MusicDBUpdate;
+  if (str == "unknown")
+    return IpcMsg::Unknown;
+  return std::nullopt;
 }
 
 // string "enum" IgnoreItemType
@@ -984,6 +1023,23 @@ struct impl_from_json<Shared::StrId> {
       return std::nullopt;
     auto _str = _value.s();
     return Shared::from_string<Shared::StrId>(
+        std::string_view{_str.begin(), _str.size()});
+  }
+};
+
+// JSON (de)serialization for string enum IpcMsg
+template <>
+inline crow::json::wvalue to_json<Shared::IpcMsg>(Shared::IpcMsg _value) {
+  return to_json(to_string(_value));
+}
+template <>
+struct impl_from_json<Shared::IpcMsg> {
+  static inline std::optional<Shared::IpcMsg> process(
+      const crow::json::rvalue& _value) {
+    if (_value.t() != crow::json::type::String)
+      return std::nullopt;
+    auto _str = _value.s();
+    return Shared::from_string<Shared::IpcMsg>(
         std::string_view{_str.begin(), _str.size()});
   }
 };

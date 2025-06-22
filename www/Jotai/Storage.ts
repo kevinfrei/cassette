@@ -10,7 +10,7 @@ import {
 import { createStore } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { AsyncStorage } from 'jotai/vanilla/utils/atomWithStorage';
-import { IpcMsg } from 'www/Shared/CommonTypes';
+import { IpcMsg, StorageId } from 'www/Shared/CommonTypes';
 import {
   DeleteFromStorage,
   ReadFromStorage,
@@ -80,19 +80,17 @@ async function noRemoveItem(_key: string): Promise<void> {
 
 type Unsub = () => void;
 type Subscriber<T> = (
-  key: string,
+  key: string, // Jotai key, which is the same as the IpcMsg key
   callback: (value: T) => void,
   initVal: T,
 ) => Unsub;
 
 // TODO: This is really stupid and slow:
 function getIpcMsg(key: string): IpcMsg {
-  let theName: keyof typeof IpcMsg = 'Unknown';
-  const item = Object.entries(IpcMsg).find(([name, value]) => {
-    if (isNumber(value) && String(value) === key)
-      theName = name as keyof typeof IpcMsg;
-  });
-  return IpcMsg[theName];
+  for (let [, value] of Object.entries(IpcMsg)) {
+    if (value === key) return value;
+  }
+  return IpcMsg.Unknown;
 }
 
 function makeSubscribe<T>(chk: typecheck<T>): Subscriber<T> {
@@ -142,7 +140,7 @@ export function getMainReadOnlyStorage<T>(chk: typecheck<T>): AsyncStorage<T> {
 }
 
 export function atomWithMainStorage<T>(
-  key: StorageIdEnum,
+  key: StorageId,
   init: T,
   chk: typecheck<T>,
 ): WritableAtomType<T> {

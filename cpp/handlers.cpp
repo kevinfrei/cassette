@@ -97,9 +97,9 @@ crow::response api(const crow::request& req, const std::string& path) {
       tools::e404(resp, "No data provided for API");
     } else {
       resp.code = 200;
-      handle_call(
-          resp,
-          std::string_view{path.c_str() + slashPos, path.size() - slashPos});
+      handle_call(resp,
+                  std::string_view{path.c_str() + slashPos + 1,
+                                   path.size() - slashPos - 1});
     }
   };
   switch (call) {
@@ -142,16 +142,13 @@ void socket_message(crow::websocket::connection& conn,
     std::cerr << "Invalid websocket message received: " << data << std::endl;
     return;
   }
-  auto maybeNum = tools::read_uint64_t(std::string_view{data.c_str(), pos});
-  if (!maybeNum) {
+  auto maybeMsg =
+      Shared::from_string<Shared::IpcMsg>(std::string_view{data.c_str(), pos});
+  if (!maybeMsg) {
     std::cerr << "Invalid websocket message received: " << data << std::endl;
     return;
   }
-  Shared::IpcMsg msg = static_cast<Shared::IpcMsg>(*maybeNum);
-  if (!Shared::is_valid(msg)) {
-    std::cerr << "Invalid websocket message received: " << data << std::endl;
-    return;
-  }
+  Shared::IpcMsg msg = *maybeMsg;
   switch (msg) {
     case Shared::IpcMsg::ManualRescan:
       std::cout << "TODO: Implement ManualRescan" << std::endl;

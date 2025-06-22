@@ -93,12 +93,12 @@ export const IpcCall = Object.freeze({
 export type IpcCall = (typeof IpcCall)[keyof typeof IpcCall];
 
 export const IpcMsg = Object.freeze({
-  TranscodingUpdate: 0,
-  ManualRescan: 1,
-  RescanInProgress: 2,
-  RescanComplete: 3,
-  MusicDBUpdate: 4,
-  Unknown: 255,
+  TranscodingUpdate: 'transcoding-update',
+  ManualRescan: 'manual-rescan',
+  RescanInProgress: 'rescan-in-progress',
+  RescanComplete: 'rescan-complete',
+  MusicDBUpdate: 'music-db-update',
+  Unknown: 'unknown',
 });
 export type IpcMsg = (typeof IpcMsg)[keyof typeof IpcMsg];
 

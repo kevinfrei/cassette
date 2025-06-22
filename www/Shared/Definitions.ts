@@ -146,13 +146,13 @@ const IpcCall: NEnum = enum_num(u8(), {
   */
 });
 
-const IpcMsg: NEnum = enum_num(u8(), {
-  TranscodingUpdate: 0,
-  ManualRescan: 1,
-  RescanInProgress: 2,
-  RescanComplete: 3,
-  MusicDBUpdate: 4,
-  Unknown: 255, // This is a placeholder for unknown messages
+const IpcMsg: SEnum = enum_str({
+  TranscodingUpdate: 'transcoding-update',
+  ManualRescan: 'manual-rescan',
+  RescanInProgress: 'rescan-in-progress',
+  RescanComplete: 'rescan-complete',
+  MusicDBUpdate: 'music-db-update',
+  Unknown: 'unknown',
 });
 
 const IgnoreItemType: SEnum = enum_str({
