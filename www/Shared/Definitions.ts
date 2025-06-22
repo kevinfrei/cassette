@@ -103,6 +103,7 @@ const IpcCall: NEnum = enum_num(u8(), {
   ReadFromStorage: 0,
   WriteToStorage: 1,
   DeleteFromStorage: 2,
+  /*
   AsyncData: 3,
   IsDev: 4,
   ClearHates: 5,
@@ -142,6 +143,7 @@ const IpcCall: NEnum = enum_num(u8(), {
   RemoveIgnoreItem: 39,
   PushIgnoreList: 40,
   IgnoreListId: 41,
+  */
 });
 
 const IpcMsg: NEnum = enum_num(u8(), {
@@ -160,35 +162,35 @@ const IgnoreItemType: SEnum = enum_str({
 });
 
 const StorageId: SEnum = enum_str({
-  CurrentView: 'CurrentView',
+  CurrentView: 'currentView',
+  Shuffle: 'shuffle',
+  Repeat: 'repeat',
   CurrentIndex: 'currentIndex',
+  Mute: 'mute',
+  Volume: 'volume',
   PlaybackOrder: 'playbackOrder',
   NowPlaying: 'nowPlaying',
   CurrentSongList: 'currentSongList',
-  Shuffle: 'shuffle',
-  Repeat: 'repeat',
-  NeverPlayHates: 'neverPlayHates',
-  OnlyPlayLikes: 'onlyPlayLikes',
-  FullAlbumsOnly: 'FullAlbumsOnly',
-  MinSongCount: 'MinSongCount',
-  Mute: 'mute',
-  LikedSongs: 'likedSongs',
-  HatedSongs: 'hatedSongs',
-  Volume: 'volume',
   Locations: 'locations',
   DefaultLocation: 'defaultLocation',
-  SortWithArticles: 'rSortWithArticles',
+  OnlyPlayLikes: 'onlyPlayLikes',
+  NeverPlayHates: 'neverPlayHates',
+  FullAlbumsOnly: 'fullAlbumsOnly',
+  MinSongCount: 'minSongCount',
+  LikedSongs: 'likedSongs',
+  HatedSongs: 'hatedSongs',
+  SortWithArticles: 'sortWithArticles',
   DownloadAlbumArtwork: 'downloadAlbumArtwork',
   DownloadArtistArtwork: 'downloadArtistArtwork',
   SaveAlbumArtworkWithMusic: 'saveAlbumArtworkWithMusic',
   AlbumCoverName: 'albumCoverName',
-  TranscodingUpdate: 'get-xcode-update',
-  TranscodeSrcLocDir: 'xcodeSrcLocDir',
-  TranscodeSrcLocPlaylist: 'xcodeSrcLocPlaylist',
-  TranscodeSrcLocArtist: 'xcodeSrcLocArtist',
-  TranscodeSrcLocAlbum: 'xcodeSrcLocAlbum',
-  TranscodeDestLoc: 'xcodeDestLoc',
-  TranscodeBitRate: 'xcodeBitRate',
+  TranscodingUpdate: 'getTranscodeUpdate',
+  TranscodeSrcLocDir: 'transcodeSrcLocDir',
+  TranscodeSrcLocPlaylist: 'transcodeSrcLocPlaylist',
+  TranscodeSrcLocArtist: 'transcodeSrcLocArtist',
+  TranscodeSrcLocAlbum: 'transcodeSrcLocAlbum',
+  TranscodeDestLoc: 'transcodeDestLoc',
+  TranscodeBitRate: 'transcodeBitRate',
 });
 
 const TranscodeFormatTargetName: SEnum = enum_str({
