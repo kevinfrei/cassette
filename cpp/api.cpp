@@ -21,14 +21,14 @@ std::string_view get_key(std::string_view data) {
 
 void read_from_storage(crow::response& resp, std::string_view data) {
   auto key = get_key(data);
-  std::cout << "Reading " << key << "  from storage: [" << data << "]"
+  std::cout << "Reading " << key << " from storage: [" << data << "]"
             << std::endl;
   auto result = config::read_from_storage(key);
   if (!result) {
     resp.code = 204; // No Content
   } else {
     resp.code = 200; // OK
-    resp.set_header("Content-Type", "application/json");
+    resp.set_header("Content-Type", "text/plain");
     resp.body = *result;
   }
 }

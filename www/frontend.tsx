@@ -40,4 +40,4 @@ if (import.meta.hot) {
 }
 
 // This is the thing to tell the server to quit when the page is closed
-window.addEventListener('beforeunload', () => void RawGet('/quit'));
+// window.addEventListener('beforeunload', () => {}); void RawGet('/quit'));

@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 
 #include <boost/dll/runtime_symbol_info.hpp>
@@ -255,11 +256,11 @@ std::optional<std::string> file_name_decode(std::string_view filename) {
       if (std::isdigit(c)) {
         oss << static_cast<char>(c - '0'); // Convert to character
       } else if (std::isalpha(c)) {
-        char c = tolower(c) - 'a' + 10;
-        if (c > 31) {
+        char l = tolower(c) - 'a' + 10;
+        if (l > 31) {
           return std::nullopt;
         }
-        oss << c;
+        oss << l;
       } else {
         return std::nullopt; // Invalid control character
       }
@@ -274,6 +275,24 @@ std::optional<std::string> file_name_decode(std::string_view filename) {
   } else {
     return oss.str();
   }
+}
+
+std::optional<std::string> read_file(std::filesystem::path file_path) {
+  constexpr size_t read_size = 4096;
+  std::ifstream stream(file_path);
+  stream.exceptions(std::ios_base::badbit);
+
+  if (!stream) {
+    return std::nullopt;
+  }
+
+  std::string out;
+  std::string buf(read_size, '\0');
+  while (stream.read(&buf[0], read_size))
+    out.append(buf, 0, stream.gcount());
+
+  out.append(buf, 0, stream.gcount());
+  return out;
 }
 
 } // namespace files
