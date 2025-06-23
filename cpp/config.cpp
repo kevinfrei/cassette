@@ -73,29 +73,30 @@ bool write_to_storage(std::string_view key, std::string_view value) {
 }
 
 std::optional<std::string> read_from_storage(std::string_view key) {
-  read_lock lock(the_mutex);
   std::string key_str{key};
-  auto it = cache.find(key_str);
-  if (it == cache.end()) {
-    auto path_to_data = get_persistence_path() / files::file_name_encode(key);
-    if (!std::filesystem::exists(path_to_data)) {
-      return std::nullopt; // Key does not exist
+  // Read from the cache first
+  {
+    read_lock lock(the_mutex);
+    auto it = cache.find(key_str);
+    if (it != cache.end()) {
+      return it->second;
     }
-    auto maybe_value = files::read_file(path_to_data);
-    if (!maybe_value) {
-      return std::nullopt; // Failed to read the file
-    }
-    // Release the read lock before modifying the cache
-    lock.release();
-    write_lock write_lock(the_mutex);
-    cache[key_str] = *maybe_value; // Cache the value
-    return *maybe_value;
   }
-  it = cache.find(key_str);
-  if (it != cache.end()) {
-    return it->second;
+  // We're going to have to modify the cache, so we'll need a write lock.
+  // It's helpful to grab it before we do the disk read, so we don't have to
+  // deal with races from the write_to_storage function.
+  auto path_to_data = get_persistence_path() / files::file_name_encode(key);
+  write_lock write_lock(the_mutex);
+  if (!std::filesystem::exists(path_to_data)) {
+    return std::nullopt; // Key does not exist
   }
-  return std::nullopt;
+  auto maybe_value = files::read_file(path_to_data);
+  if (!maybe_value) {
+    return std::nullopt; // Failed to read the file
+  }
+  // Release the read lock before modifying the cache
+  cache[key_str] = *maybe_value; // Cache the value
+  return *maybe_value;
 }
 
 bool delete_from_storage(std::string_view key) {
