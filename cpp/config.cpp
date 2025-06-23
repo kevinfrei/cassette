@@ -1,6 +1,8 @@
 #include <filesystem>
+#include <fstream>
+#include <iostream>
 #include <optional>
-#include <sstream>
+#include <shared_mutex>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -33,18 +35,63 @@ std::filesystem::path get_path() {
 std::unordered_map<std::string, std::string> cache;
 
 std::filesystem::path get_persistence_path() {
-  // TODO: Ensure the directory exists
-  return get_path() / "persistence";
+  std::filesystem::path res = get_path() / "persistence";
+  if (std::filesystem::exists(res)) {
+    return res;
+  }
+  if (!std::filesystem::create_directories(res)) {
+    std::cerr << "Failed to create persistence directory: " << res.string()
+              << std::endl;
+  }
+  return res;
 }
 
-// TODO: Make this stuff write to disk (and make it thread-safe :O)
+// Stuff to keep the cache & disk storage in sync & thread-safe.
+std::shared_mutex the_mutex;
+using read_lock = std::shared_lock<std::shared_mutex>;
+using write_lock = std::unique_lock<std::shared_mutex>;
+
 bool write_to_storage(std::string_view key, std::string_view value) {
+  auto path_to_data = get_persistence_path() / files::file_name_encode(key);
+  write_lock lock(the_mutex);
+  if (std::filesystem::exists(path_to_data)) {
+    if (!std::filesystem::remove(path_to_data)) {
+      std::cerr << "Failed to remove existing file: " << path_to_data.string()
+                << std::endl;
+      return false;
+    }
+  }
+  std::ofstream out(path_to_data);
+  if (!out) {
+    std::cerr << "Failed to open file for writing: " << path_to_data.string()
+              << std::endl;
+    return false;
+  }
+  out << value;
   cache[std::string{key}] = value;
   return true;
 }
 
 std::optional<std::string> read_from_storage(std::string_view key) {
-  auto it = cache.find(std::string{key});
+  read_lock lock(the_mutex);
+  std::string key_str{key};
+  auto it = cache.find(key_str);
+  if (it == cache.end()) {
+    auto path_to_data = get_persistence_path() / files::file_name_encode(key);
+    if (!std::filesystem::exists(path_to_data)) {
+      return std::nullopt; // Key does not exist
+    }
+    auto maybe_value = files::read_file(path_to_data);
+    if (!maybe_value) {
+      return std::nullopt; // Failed to read the file
+    }
+    // Release the read lock before modifying the cache
+    lock.release();
+    write_lock write_lock(the_mutex);
+    cache[key_str] = *maybe_value; // Cache the value
+    return *maybe_value;
+  }
+  it = cache.find(key_str);
   if (it != cache.end()) {
     return it->second;
   }
@@ -52,10 +99,22 @@ std::optional<std::string> read_from_storage(std::string_view key) {
 }
 
 bool delete_from_storage(std::string_view key) {
-  return !!cache.erase(std::string{key});
+  write_lock lock(the_mutex);
+  cache.erase(std::string{key});
+  auto path_to_data = get_persistence_path() / files::file_name_encode(key);
+  if (!std::filesystem::exists(path_to_data)) {
+    return false; // Key does not exist
+  }
+  if (!std::filesystem::remove(path_to_data)) {
+    std::cerr << "Failed to remove file: " << path_to_data.string()
+              << std::endl;
+    return false; // Failed to delete the file
+  }
+  return true;
 }
 
 void flush_storage_cache() {
+  write_lock lock(the_mutex);
   cache.clear();
 }
 
