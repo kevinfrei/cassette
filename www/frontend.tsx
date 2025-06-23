@@ -10,8 +10,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { FluentInitIcons } from './FluentInit';
 import { KeepAlive } from './KeepAlive';
+import { RawGet } from './Tools/Ipc';
 import { WebSocketRegistrar } from './Tools/ReactWebSocket';
-import { RawGet } from './Tools/ipc';
 import { App } from './UI/App';
 
 const elem = document.getElementById('root')!;

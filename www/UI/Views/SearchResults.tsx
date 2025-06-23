@@ -20,7 +20,7 @@ import {
 import { hasFieldType, isBoolean } from '@freik/typechk';
 import { ReactElement, useCallback, useState } from 'react';
 import { GetDataForSong, SongData } from '../../DataSchema';
-import { SearchResults } from '../../ipc';
+import { SearchResults } from '../../Ipc';
 import { AddSongs } from '../../Jotai/API';
 import {
   allAlbumsFunc,

@@ -3,7 +3,7 @@ import { SongKey } from '@freik/media-core';
 import { Fail } from '@freik/web-utils';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
-import * as ipc from '../ipc';
+import * as ipc from '../Ipc';
 import { diskNumName, MetadataProps, SongInfo } from '../MusicLibrarySchema';
 import { albumByKey } from './Albums';
 import { artistStringStateFamily } from './Artists';

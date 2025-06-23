@@ -2,7 +2,7 @@ import { MakeLog } from '@freik/logger';
 import { hasField, hasFieldOf, isNumber } from '@freik/typechk';
 import { ReactElement, useEffect } from 'react';
 import { MyWindow } from '../Types';
-import { WireUpIpc } from './ipc';
+import { WireUpIpc } from './Ipc';
 
 declare const window: MyWindow;
 

@@ -1,5 +1,3 @@
-import { RenamePlaylist } from 'www/Jotai/PlaylistControl';
-import { ReadFromStorage } from 'www/Tools/ipc';
 import {
   arr,
   bool,

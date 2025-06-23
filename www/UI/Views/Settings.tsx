@@ -29,7 +29,7 @@ import {
   Keys,
   StrId,
 } from 'www/Shared/CommonTypes';
-import { PostMain, SendMessage } from 'www/Tools/ipc';
+import { PostMain, SendMessage } from 'www/Tools/Ipc';
 import './styles/Settings.css';
 
 const btnWidth: React.CSSProperties = { width: '155px', padding: 0 };
