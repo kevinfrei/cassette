@@ -149,14 +149,13 @@ void socket_message(crow::websocket::connection& conn,
     return;
   }
   Shared::IpcMsg msg = *maybeMsg;
-  switch (msg) {
-    case Shared::IpcMsg::ManualRescan:
-      std::cout << "TODO: Implement ManualRescan" << std::endl;
-      break;
-    default:
-      std::cerr << "Unsupported message received: "
-                << static_cast<std::underlying_type_t<Shared::IpcMsg>>(msg)
-                << " (" << data << ")" << std::endl;
+  if (msg == Shared::IpcMsg::ManualRescan) {
+    std::cout << "TODO: Implement ManualRescan" << std::endl;
+
+  } else {
+    std::cerr << "Unsupported message received: "
+              << static_cast<std::underlying_type_t<Shared::IpcMsg>>(msg)
+              << " (" << data << ")" << std::endl;
   }
 }
 
