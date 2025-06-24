@@ -125,7 +125,7 @@ const enumType: EmitItem<Enum> = async (writer, name, item) => {
     ? ''
     : ` : ${getTypeName(item.u)}`;
   await writer.write(`
-// *Specific* numeric enum ${name}
+#pragma region numeric enum ${name}
 enum class ${name}${typeName} {
   ${item.v.join(',\n  ')}
 };
@@ -138,6 +138,8 @@ ${item.v.map((val) => `    case ${name}::${val}:`).join('\n')}
       return false;
   }
 }
+#pragma endregion numeric enum ${name}
+
 `);
 };
 
@@ -146,7 +148,7 @@ const numEnumType: EmitItem<NEnum> = async (writer, name, item) => {
     ? ''
     : ` : ${getTypeName(item.u)}`;
   await writer.write(`
-// *Arbitrary* (i.e. linear) numeric enum ${name}
+#pragma region linear enum ${name}
 enum class ${name}${typeName} {
 ${Object.entries(item.v)
   .map(([key, value]) => `  ${key} = ${value},`)
@@ -163,12 +165,15 @@ ${Object.entries(item.v)
       return false;
   }
 }
+
+#pragma endregion linear enum ${name}
 `);
 };
 
 const strEnumType: EmitItem<SEnum> = async (writer, name, item) => {
   await writer.write(`
-// string "enum" ${name}
+#pragma region string enum ${name}
+
 enum class ${name} {
   ${Object.keys(item.v)
     .map((key) => `${key}`)
@@ -212,9 +217,11 @@ ${Object.entries(item.v)
   .join('\n')}
   return std::nullopt;
 }
+
+#pragma endregion string enum ${name}
 `);
 
-  addNonShared(`// JSON (de)serialization for string enum ${name}
+  addNonShared(`#pragma region JSON serialization for string enum ${name}
 template <>
 inline crow::json::wvalue to_json<Shared::${name}>(
     Shared::${name} _value) {
@@ -231,6 +238,7 @@ struct impl_from_json<Shared::${name}> {
         std::string_view{_str.begin(), _str.size()});
   }
 };
+#pragma endregion JSON serialization for string enum ${name}
 `);
 };
 const objType: EmitItem<ObjType> = async (writer, name, item) => {
@@ -241,7 +249,7 @@ const objType: EmitItem<ObjType> = async (writer, name, item) => {
   }
   await writer.write('};\n');
   addNonShared(`
-
+#pragma region JSON serialization for object ${name}
 template <> 
 struct impl_to_json<Shared::${name}> { 
   static inline crow::json::wvalue process(
@@ -275,6 +283,7 @@ from_json<Shared::${name}>(
 
   return _res;
 }
+#pragma endregion JSON serialization for object ${name}
 `);
 };
 

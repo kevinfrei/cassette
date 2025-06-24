@@ -1,6 +1,8 @@
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <iostream>
+#include <map>
 #include <optional>
 #include <shared_mutex>
 #include <string>
@@ -123,5 +125,21 @@ void clear_storage() {
   flush_storage_cache();
   // TODO: Do this on disk, yeah?
 }
+
+std::unordered_map<
+    std::string,
+    std::map<std::int32_t,
+             std::function<void(std::string_view, std::string_view)>>>
+    listeners;
+
+std::int32_t subscribe_to_change(
+    std::string_view key,
+    std::function<void(std::string_view, std::string_view)> callback) {
+  // This is a placeholder for a subscription mechanism.
+  // In a real implementation, you would store the callback and notify it
+  // when the value changes.
+  std::cerr << "Subscription to changes for key: " << key
+            << " is not implemented." << std::endl;
+  return nullptr; // Return a handle for unsubscribing later
 
 } // namespace config

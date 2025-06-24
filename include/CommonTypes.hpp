@@ -27,7 +27,8 @@ namespace Shared {
 template <typename T>
 constexpr std::optional<T> from_string(const std::string_view& str);
 
-// string "enum" Keys
+#pragma region string enum Keys
+
 enum class Keys {
   AddFileLocation,
   Albums,
@@ -162,7 +163,10 @@ inline constexpr std::optional<Keys> from_string<Keys>(
   return std::nullopt;
 }
 
-// string "enum" StrId
+#pragma endregion string enum Keys
+
+#pragma region string enum StrId
+
 enum class StrId {
   Mono,
   Stereo,
@@ -426,7 +430,9 @@ inline constexpr std::optional<StrId> from_string<StrId>(
   return std::nullopt;
 }
 
-// *Arbitrary* (i.e. linear) numeric enum CurrentView
+#pragma endregion string enum StrId
+
+#pragma region linear enum CurrentView
 enum class CurrentView {
   disabled = -1,
   none = 0,
@@ -460,7 +466,9 @@ inline constexpr bool is_valid(CurrentView _value) {
   }
 }
 
-// *Arbitrary* (i.e. linear) numeric enum IpcCall
+#pragma endregion linear enum CurrentView
+
+#pragma region linear enum IpcCall
 enum class IpcCall : std::uint8_t {
   ReadFromStorage = 0,
   WriteToStorage = 1,
@@ -478,7 +486,10 @@ inline constexpr bool is_valid(IpcCall _value) {
   }
 }
 
-// string "enum" IpcMsg
+#pragma endregion linear enum IpcCall
+
+#pragma region string enum IpcMsg
+
 enum class IpcMsg {
   TranscodingUpdate,
   ManualRescan,
@@ -541,7 +552,10 @@ inline constexpr std::optional<IpcMsg> from_string<IpcMsg>(
   return std::nullopt;
 }
 
-// string "enum" IgnoreItemType
+#pragma endregion string enum IpcMsg
+
+#pragma region string enum IgnoreItemType
+
 enum class IgnoreItemType { PathRoot, PathKeyword, DirName };
 
 inline constexpr bool is_valid(IgnoreItemType _value) {
@@ -582,7 +596,10 @@ inline constexpr std::optional<IgnoreItemType> from_string<IgnoreItemType>(
   return std::nullopt;
 }
 
-// string "enum" StorageId
+#pragma endregion string enum IgnoreItemType
+
+#pragma region string enum StorageId
+
 enum class StorageId {
   CurrentView,
   Shuffle,
@@ -783,7 +800,10 @@ inline constexpr std::optional<StorageId> from_string<StorageId>(
   return std::nullopt;
 }
 
-// string "enum" TranscodeFormatTargetName
+#pragma endregion string enum StorageId
+
+#pragma region string enum TranscodeFormatTargetName
+
 enum class TranscodeFormatTargetName { m4a, mp3, aac };
 
 inline constexpr bool is_valid(TranscodeFormatTargetName _value) {
@@ -824,7 +844,10 @@ from_string<TranscodeFormatTargetName>(const std::string_view& str) {
   return std::nullopt;
 }
 
-// string "enum" TranscodeSource
+#pragma endregion string enum TranscodeFormatTargetName
+
+#pragma region string enum TranscodeSource
+
 enum class TranscodeSource { Playlist, Artist, Album, Disk };
 
 inline constexpr bool is_valid(TranscodeSource _value) {
@@ -869,6 +892,8 @@ inline constexpr std::optional<TranscodeSource> from_string<TranscodeSource>(
     return TranscodeSource::Disk;
   return std::nullopt;
 }
+
+#pragma endregion string enum TranscodeSource
 
 struct TranscodeSourceLocation {
   TranscodeSource type;
@@ -921,7 +946,7 @@ struct Song {
   std::vector<std::string> variations;
 };
 
-// *Specific* numeric enum VAType
+#pragma region numeric enum VAType
 enum class VAType : std::uint8_t { None, VA, OST };
 
 inline constexpr bool is_valid(VAType _value) {
@@ -934,6 +959,7 @@ inline constexpr bool is_valid(VAType _value) {
       return false;
   }
 }
+#pragma endregion numeric enum VAType
 
 struct Artist {
   ArtistKey key;
@@ -993,7 +1019,7 @@ struct MimeData {
 };
 
 } // namespace Shared
-// JSON (de)serialization for string enum Keys
+#pragma region JSON serialization for string enum Keys
 template <>
 inline crow::json::wvalue to_json<Shared::Keys>(Shared::Keys _value) {
   return to_json(to_string(_value));
@@ -1009,8 +1035,9 @@ struct impl_from_json<Shared::Keys> {
         std::string_view{_str.begin(), _str.size()});
   }
 };
+#pragma endregion JSON serialization for string enum Keys
 
-// JSON (de)serialization for string enum StrId
+#pragma region JSON serialization for string enum StrId
 template <>
 inline crow::json::wvalue to_json<Shared::StrId>(Shared::StrId _value) {
   return to_json(to_string(_value));
@@ -1026,8 +1053,9 @@ struct impl_from_json<Shared::StrId> {
         std::string_view{_str.begin(), _str.size()});
   }
 };
+#pragma endregion JSON serialization for string enum StrId
 
-// JSON (de)serialization for string enum IpcMsg
+#pragma region JSON serialization for string enum IpcMsg
 template <>
 inline crow::json::wvalue to_json<Shared::IpcMsg>(Shared::IpcMsg _value) {
   return to_json(to_string(_value));
@@ -1043,8 +1071,9 @@ struct impl_from_json<Shared::IpcMsg> {
         std::string_view{_str.begin(), _str.size()});
   }
 };
+#pragma endregion JSON serialization for string enum IpcMsg
 
-// JSON (de)serialization for string enum IgnoreItemType
+#pragma region JSON serialization for string enum IgnoreItemType
 template <>
 inline crow::json::wvalue to_json<Shared::IgnoreItemType>(
     Shared::IgnoreItemType _value) {
@@ -1061,8 +1090,9 @@ struct impl_from_json<Shared::IgnoreItemType> {
         std::string_view{_str.begin(), _str.size()});
   }
 };
+#pragma endregion JSON serialization for string enum IgnoreItemType
 
-// JSON (de)serialization for string enum StorageId
+#pragma region JSON serialization for string enum StorageId
 template <>
 inline crow::json::wvalue to_json<Shared::StorageId>(Shared::StorageId _value) {
   return to_json(to_string(_value));
@@ -1078,8 +1108,9 @@ struct impl_from_json<Shared::StorageId> {
         std::string_view{_str.begin(), _str.size()});
   }
 };
+#pragma endregion JSON serialization for string enum StorageId
 
-// JSON (de)serialization for string enum TranscodeFormatTargetName
+#pragma region JSON serialization for string enum TranscodeFormatTargetName
 template <>
 inline crow::json::wvalue to_json<Shared::TranscodeFormatTargetName>(
     Shared::TranscodeFormatTargetName _value) {
@@ -1096,8 +1127,9 @@ struct impl_from_json<Shared::TranscodeFormatTargetName> {
         std::string_view{_str.begin(), _str.size()});
   }
 };
+#pragma endregion JSON serialization for string enum TranscodeFormatTargetName
 
-// JSON (de)serialization for string enum TranscodeSource
+#pragma region JSON serialization for string enum TranscodeSource
 template <>
 inline crow::json::wvalue to_json<Shared::TranscodeSource>(
     Shared::TranscodeSource _value) {
@@ -1114,7 +1146,9 @@ struct impl_from_json<Shared::TranscodeSource> {
         std::string_view{_str.begin(), _str.size()});
   }
 };
+#pragma endregion JSON serialization for string enum TranscodeSource
 
+#pragma region JSON serialization for object TranscodeSourceLocation
 template <>
 struct impl_to_json<Shared::TranscodeSourceLocation> {
   static inline crow::json::wvalue process(
@@ -1149,7 +1183,9 @@ from_json<Shared::TranscodeSourceLocation>(const crow::json::rvalue& _value) {
 
   return _res;
 }
+#pragma endregion JSON serialization for object TranscodeSourceLocation
 
+#pragma region JSON serialization for object FileFailure
 template <>
 struct impl_to_json<Shared::FileFailure> {
   static inline crow::json::wvalue process(const Shared::FileFailure& _value) {
@@ -1183,7 +1219,9 @@ inline std::optional<Shared::FileFailure> from_json<Shared::FileFailure>(
 
   return _res;
 }
+#pragma endregion JSON serialization for object FileFailure
 
+#pragma region JSON serialization for object TranscodeState
 template <>
 struct impl_to_json<Shared::TranscodeState> {
   static inline crow::json::wvalue process(
@@ -1261,7 +1299,9 @@ inline std::optional<Shared::TranscodeState> from_json<Shared::TranscodeState>(
 
   return _res;
 }
+#pragma endregion JSON serialization for object TranscodeState
 
+#pragma region JSON serialization for object TranscodeInfo
 template <>
 struct impl_to_json<Shared::TranscodeInfo> {
   static inline crow::json::wvalue process(
@@ -1330,7 +1370,9 @@ inline std::optional<Shared::TranscodeInfo> from_json<Shared::TranscodeInfo>(
 
   return _res;
 }
+#pragma endregion JSON serialization for object TranscodeInfo
 
+#pragma region JSON serialization for object Song
 template <>
 struct impl_to_json<Shared::Song> {
   static inline crow::json::wvalue process(const Shared::Song& _value) {
@@ -1407,7 +1449,9 @@ inline std::optional<Shared::Song> from_json<Shared::Song>(
 
   return _res;
 }
+#pragma endregion JSON serialization for object Song
 
+#pragma region JSON serialization for object Artist
 template <>
 struct impl_to_json<Shared::Artist> {
   static inline crow::json::wvalue process(const Shared::Artist& _value) {
@@ -1458,7 +1502,9 @@ inline std::optional<Shared::Artist> from_json<Shared::Artist>(
 
   return _res;
 }
+#pragma endregion JSON serialization for object Artist
 
+#pragma region JSON serialization for object Album
 template <>
 struct impl_to_json<Shared::Album> {
   static inline crow::json::wvalue process(const Shared::Album& _value) {
@@ -1534,7 +1580,9 @@ inline std::optional<Shared::Album> from_json<Shared::Album>(
 
   return _res;
 }
+#pragma endregion JSON serialization for object Album
 
+#pragma region JSON serialization for object MediaInfo
 template <>
 struct impl_to_json<Shared::MediaInfo> {
   static inline crow::json::wvalue process(const Shared::MediaInfo& _value) {
@@ -1570,7 +1618,9 @@ inline std::optional<Shared::MediaInfo> from_json<Shared::MediaInfo>(
 
   return _res;
 }
+#pragma endregion JSON serialization for object MediaInfo
 
+#pragma region JSON serialization for object SimpleMetadata
 template <>
 struct impl_to_json<Shared::SimpleMetadata> {
   static inline crow::json::wvalue process(
@@ -1653,7 +1703,9 @@ inline std::optional<Shared::SimpleMetadata> from_json<Shared::SimpleMetadata>(
 
   return _res;
 }
+#pragma endregion JSON serialization for object SimpleMetadata
 
+#pragma region JSON serialization for object FullMetadata
 template <>
 struct impl_to_json<Shared::FullMetadata> {
   static inline crow::json::wvalue process(const Shared::FullMetadata& _value) {
@@ -1761,7 +1813,9 @@ inline std::optional<Shared::FullMetadata> from_json<Shared::FullMetadata>(
 
   return _res;
 }
+#pragma endregion JSON serialization for object FullMetadata
 
+#pragma region JSON serialization for object AudioFileRegexPattern
 template <>
 struct impl_to_json<Shared::AudioFileRegexPattern> {
   static inline crow::json::wvalue process(
@@ -1796,7 +1850,9 @@ from_json<Shared::AudioFileRegexPattern>(const crow::json::rvalue& _value) {
 
   return _res;
 }
+#pragma endregion JSON serialization for object AudioFileRegexPattern
 
+#pragma region JSON serialization for object MimeData
 template <>
 struct impl_to_json<Shared::MimeData> {
   static inline crow::json::wvalue process(const Shared::MimeData& _value) {
@@ -1830,5 +1886,6 @@ inline std::optional<Shared::MimeData> from_json<Shared::MimeData>(
 
   return _res;
 }
+#pragma endregion JSON serialization for object MimeData
 
 #endif // SHARED_CONSTANTS_HPP
