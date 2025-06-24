@@ -210,16 +210,16 @@ std::int32_t subscribe_to_change(std::string_view key,
 
 bool unsubscribe_from_change(std::int32_t listener_id) {
   write_lock lock(the_mutex);
-  auto& lk = listening_keys.find(listener_id);
+  auto lk = listening_keys.find(listener_id);
   if (lk == listening_keys.end()) {
     return false; // Listener ID not found
   }
   auto& key = lk->second;
-  auto& listeners_for_key = listeners.find(key);
+  auto listeners_for_key = listeners.find(key);
   if (listeners_for_key == listeners.end()) {
     return false; // Key not found in listeners
   }
-  auto& listener = listeners_for_key->second.find(listener_id);
+  auto listener = listeners_for_key->second.find(listener_id);
   if (listener == listeners_for_key->second.end()) {
     return false; // Listener ID not found for the key
   }
