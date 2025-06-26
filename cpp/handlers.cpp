@@ -15,7 +15,7 @@
 
 namespace handlers {
 
-crow::response file_path(const crow::request& req, const std::string& path) {
+crow::response file_path(const crow::request&, const std::string& path) {
   quitting::keep_alive();
 
   std::cout << "Path: " << path << std::endl;
@@ -58,7 +58,7 @@ crow::response file_path(const crow::request& req, const std::string& path) {
   return resp;
 }
 
-crow::response tune(const crow::request& req, const std::string& path) {
+crow::response tune(const crow::request&, const std::string& path) {
   quitting::keep_alive();
   crow::response resp;
   auto maybe_song = get_tune(path);
@@ -72,7 +72,7 @@ crow::response tune(const crow::request& req, const std::string& path) {
   return resp;
 }
 
-crow::response api(const crow::request& req, const std::string& path) {
+crow::response api(const crow::request&, const std::string& path) {
   quitting::keep_alive();
 
   std::cout << "API Path: " << path << std::endl;
@@ -131,9 +131,9 @@ crow::response quit() {
   return crow::response(200);
 }
 
-void socket_message(crow::websocket::connection& conn,
+void socket_message(crow::websocket::connection&,
                     const std::string& data,
-                    bool is_binary) {
+                    bool /* is_binary */) {
   std::cout << "Got a message from the client:";
   std::cout << data << std::endl;
   // Message is IpcMessage;[json-formatted array of arguments]

@@ -256,7 +256,7 @@ std::optional<std::string> file_name_decode(std::string_view filename) {
       if (std::isdigit(c)) {
         oss << static_cast<char>(c - '0'); // Convert to character
       } else if (std::isalpha(c)) {
-        char l = tolower(c) - 'a' + 10;
+        char l = static_cast<char>(tolower(c) - 'a' + 10);
         if (l > 31) {
           return std::nullopt;
         }

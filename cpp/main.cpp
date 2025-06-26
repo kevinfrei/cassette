@@ -19,7 +19,7 @@ std::string GetRootUrl() {
 
 crow::websocket::connection* webSocket = nullptr;
 
-void ConfigureRoutes(crow::SimpleApp& app, const std::string& url) {
+void ConfigureRoutes(crow::SimpleApp& app, const std::string& /*url*/) {
   // Define the routes:
   // Try a websocket route:
   CROW_WEBSOCKET_ROUTE(app, "/ws")
@@ -51,7 +51,7 @@ int main(void) {
 
   files::set_program_location();
 
-  const int port = get_random_port();
+  const uint16_t port = get_random_port();
   std::string url = GetRootUrl();
   ConfigureRoutes(app, url);
   window::open(url);

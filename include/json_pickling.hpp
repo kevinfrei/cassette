@@ -73,7 +73,7 @@ template <typename T>
 struct impl_to_json<std::vector<T>> {
   static inline crow::json::wvalue process(const std::vector<T>& value) {
     crow::json::wvalue vec{std::vector<crow::json::wvalue>()};
-    for (size_t i = 0; i < value.size(); i++) {
+    for (uint32_t i = 0; i < value.size(); i++) {
       vec[i] = to_json(value[i]);
     }
     return vec;
@@ -190,7 +190,7 @@ Conversion from JSON stuff
 // do this with a partial specialization of a struct :/
 template <typename T, typename Enabled = void>
 struct impl_from_json {
-  static inline std::optional<T> process(const crow::json::rvalue& json) {
+  static inline std::optional<T> process(const crow::json::rvalue&) {
     return std::nullopt;
   }
 };
