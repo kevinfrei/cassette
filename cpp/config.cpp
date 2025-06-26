@@ -164,16 +164,18 @@ bool delete_from_storage(std::string_view key) {
     }
   }
 
-  write_lock lock(the_mutex);
-  cache.erase(std::string{key});
-  auto path_to_data = get_persistence_path() / files::file_name_encode(key);
-  if (!std::filesystem::exists(path_to_data)) {
-    return false; // Key does not exist
-  }
-  if (!std::filesystem::remove(path_to_data)) {
-    std::cerr << "Failed to remove file: " << path_to_data.string()
-              << std::endl;
-    return false; // Failed to delete the file
+  {
+    write_lock lock(the_mutex);
+    cache.erase(std::string{key});
+    auto path_to_data = get_persistence_path() / files::file_name_encode(key);
+    if (!std::filesystem::exists(path_to_data)) {
+      return false; // Key does not exist
+    }
+    if (!std::filesystem::remove(path_to_data)) {
+      std::cerr << "Failed to remove file: " << path_to_data.string()
+                << std::endl;
+      return false; // Failed to delete the file
+    }
   }
   if (need_notification) {
     // Notify listeners about the deletion
@@ -189,7 +191,15 @@ void flush_storage_cache() {
 
 void clear_storage() {
   flush_storage_cache();
-  // TODO: Do this on disk, yeah?
+  auto path_to_data = get_persistence_path();
+  if (std::filesystem::exists(path_to_data)) {
+    write_lock lock(the_mutex);
+    if (!std::filesystem::remove_all(path_to_data)) {
+      std::cerr << "Failed to clear storage directory: "
+                << path_to_data.string() << std::endl;
+      return;
+    }
+  }
 }
 
 int32_t next_listener_id = 0;
@@ -203,8 +213,8 @@ std::int32_t subscribe_to_change(std::string_view key,
   }
   listeners[key_str][next_listener_id] = callback;
   listening_keys.insert({next_listener_id, key_str});
-  std::cout << "Subscribed to changes for key: " << key_str
-            << " with listener ID: " << next_listener_id << std::endl;
+  // std::cout << "Subscribed to changes for key: " << key_str
+  //           << " with listener ID: " << next_listener_id << std::endl;
   return next_listener_id++;
 }
 
@@ -223,10 +233,10 @@ bool unsubscribe_from_change(std::int32_t listener_id) {
   if (listener == listeners_for_key->second.end()) {
     return false; // Listener ID not found for the key
   }
+  // std::cout << "Unsubscribed from changes for key: " << key
+  //           << " with listener ID: " << listener_id << std::endl;
   listeners_for_key->second.erase(listener);
   listening_keys.erase(lk);
-  std::cout << "Unsubscribed from changes for key: " << key
-            << " with listener ID: " << listener_id << std::endl;
   return true;
 }
 

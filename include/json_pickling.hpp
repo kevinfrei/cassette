@@ -190,7 +190,7 @@ Conversion from JSON stuff
 // do this with a partial specialization of a struct :/
 template <typename T, typename Enabled = void>
 struct impl_from_json {
-  static inline std::optional<T> process(const crow::json::rvalue& json) {
+  static inline std::optional<T> process(const crow::json::rvalue&) {
     return std::nullopt;
   }
 };

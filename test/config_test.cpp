@@ -44,7 +44,7 @@ TEST(Config, StorageNotifcations) {
   files::set_program_location();
   // Test if the item is writable
   std::int32_t id1, id2, id3;
-  std::optional<std::string_view> old1, new1, old2, new2;
+  std::optional<std::string> old1, new1, old2, new2;
   config::listening_function listener1 =
       [&](std::optional<std::string_view> old_value,
           std::optional<std::string_view> new_value) {
@@ -57,6 +57,7 @@ TEST(Config, StorageNotifcations) {
         old2 = old_value;
         new2 = new_value;
       };
+  config::clear_storage();
   id1 = config::subscribe_to_change("lk1", listener1);
   id2 = config::subscribe_to_change("lk2", listener2);
   id3 = config::subscribe_to_change("lk1", listener2);
@@ -132,4 +133,9 @@ TEST(Config, StorageNotifcations) {
   EXPECT_FALSE(new2.has_value());
   EXPECT_EQ(old1.value(), "new-value");
   EXPECT_EQ(old2.value(), "new-value2");
+  EXPECT_TRUE(config::unsubscribe_from_change(id1));
+  EXPECT_TRUE(config::unsubscribe_from_change(id2));
+  EXPECT_FALSE(config::unsubscribe_from_change(id1)); // Already unsubscribed
+  EXPECT_FALSE(config::unsubscribe_from_change(id2)); // Already unsubscribed
+  config::clear_storage();
 }

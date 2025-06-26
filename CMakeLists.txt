@@ -10,7 +10,22 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 if(MSVC)
   # For windows/VC++, run normal exception handling & windows 10 APIs
   set(CMAKE_CXX_FLAGS "/EHsc /D_WIN32_WINNT=0x0A00 /DWINVER=0x0A00")
-endif(MSVC)
+  if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    # untested.
+    # I wonder if RTC still works. I should use it, since I did the work:
+    add_compile_options("/W4 /WX /Od /RTC1")
+  endif()
+else()
+  # For non-windows compilers, enable C++17 features
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Werror")
+  if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
+    add_compile_options(-fsanitize=address,undefined)
+    add_link_options(-fsanitize=address,undefined)
+  else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+  endif()
+endif()
 
 # Find Conan2 generated libraries
 include(cmake/ConanLibImports.cmake)
