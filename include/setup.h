@@ -1,1 +1,3 @@
-int get_random_port();
+#include <cstdint>
+
+uint16_t get_random_port();

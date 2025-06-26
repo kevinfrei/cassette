@@ -232,7 +232,7 @@ void testSet(const T& theSet) {
   EXPECT_EQ(val.t(), crow::json::type::List);
   EXPECT_EQ(val.size(), 4);
   bool z = false, b = false, c = false, q = false;
-  for (size_t i = 0; i < 4; i++) {
+  for (uint32_t i = 0; i < 4; i++) {
     auto elem = val[i];
     EXPECT_EQ(elem.t(), crow::json::type::String);
     std::string contents =

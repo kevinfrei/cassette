@@ -13,7 +13,7 @@ if(MSVC)
   if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     # untested.
     # I wonder if RTC still works. I should use it, since I did the work:
-    add_compile_options("/W4 /WX /Od /RTC1")
+    add_compile_options(/W4 /Od /RTC1 /D_CRT_SECURE_NO_WARNINGS)
   endif()
 else()
   # For non-windows compilers, enable C++17 features
