@@ -14,16 +14,18 @@ if(MSVC)
     # untested.
     # I wonder if RTC still works. I should use it, since I did the work:
     add_compile_options(/W4 /Od /RTC1 /D_CRT_SECURE_NO_WARNINGS)
+  else()
+    add_compile_options(/W4 /O2 /D_CRT_SECURE_NO_WARNINGS)
   endif()
 else()
   # For non-windows compilers, enable C++17 features
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Werror")
+  add_compile_options(-Wpedantic -Wall -Wextra -Werror -pedantic)
   if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
-    add_compile_options(-fsanitize=address,undefined)
-    add_link_options(-fsanitize=address,undefined)
+    add_compile_options(-fsanitize=address,undefined -O0 -g)
+    add_link_options(-fsanitize=address,undefined -O0 -g)
   else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+    add_compile_options(-flto -O2)
+    add_link_options(-flto)
   endif()
 endif()
 

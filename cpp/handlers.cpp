@@ -148,14 +148,17 @@ void socket_message(crow::websocket::connection&,
     std::cerr << "Invalid websocket message received: " << data << std::endl;
     return;
   }
-  Shared::IpcMsg msg = *maybeMsg;
+  auto msg = *maybeMsg;
+  // This is the only message we support *receiving* from the client
   if (msg == Shared::IpcMsg::ManualRescan) {
     std::cout << "TODO: Implement ManualRescan" << std::endl;
 
   } else {
-    std::cerr << "Unsupported message received: "
+    // Unsupported message
+    std::cerr << "Unsupported message received: " << Shared::to_string(msg)
+              << " ("
               << static_cast<std::underlying_type_t<Shared::IpcMsg>>(msg)
-              << " (" << data << ")" << std::endl;
+              << ") [" << data << "]" << std::endl;
   }
 }
 
