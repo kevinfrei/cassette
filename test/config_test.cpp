@@ -139,3 +139,8 @@ TEST(Config, StorageNotifcations) {
   EXPECT_FALSE(config::unsubscribe_from_change(id2)); // Already unsubscribed
   config::clear_storage();
 }
+
+TEST(File, FilePicker) {
+  auto resp = crow::response();
+  files::folder_picker(resp, "Test data");
+}

@@ -89,6 +89,7 @@ export const IpcCall = Object.freeze({
   ReadFromStorage: 0,
   WriteToStorage: 1,
   DeleteFromStorage: 2,
+  FolderPicker: 42,
 });
 export type IpcCall = (typeof IpcCall)[keyof typeof IpcCall];
 

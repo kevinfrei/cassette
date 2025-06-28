@@ -142,6 +142,7 @@ const IpcCall: NEnum = enum_num(u8(), {
   PushIgnoreList: 40,
   IgnoreListId: 41,
   */
+  FolderPicker: 42,
 });
 
 const IpcMsg: SEnum = enum_str({

@@ -473,6 +473,7 @@ enum class IpcCall : std::uint8_t {
   ReadFromStorage = 0,
   WriteToStorage = 1,
   DeleteFromStorage = 2,
+  FolderPicker = 42,
 };
 
 inline constexpr bool is_valid(IpcCall _value) {
@@ -480,6 +481,7 @@ inline constexpr bool is_valid(IpcCall _value) {
     case IpcCall::ReadFromStorage:
     case IpcCall::WriteToStorage:
     case IpcCall::DeleteFromStorage:
+    case IpcCall::FolderPicker:
       return true;
     default:
       return false;

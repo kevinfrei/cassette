@@ -19,5 +19,5 @@ target_include_directories(cassette_lib PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 # Link the dependencies with our binary
 target_link_libraries(cassette_lib PUBLIC ${BOOST_LIB} ${CROW_LIB}
-                                          ${MEDIAINFO_LIB})
+                                          ${MEDIAINFO_LIB} ${PFD_LIB})
 target_link_libraries(cassette PRIVATE cassette_lib)

@@ -16,6 +16,9 @@ set(PNG_LIB PNG::PNG)
 find_package(TIFF REQUIRED)
 set(TIFF_LIB TIFF::TIFF)
 
+find_package(portable-file-dialogs REQUIRED)
+set(PFD_LIB portable-file-dialogs::portable-file-dialogs)
+
 find_package(ZLIB REQUIRED)
 set(ZLIB_LIB ZLIB::ZLIB)
 

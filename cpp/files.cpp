@@ -3,6 +3,8 @@
 #include <iostream>
 
 #include <boost/dll/runtime_symbol_info.hpp>
+#include <crow/http_response.h>
+#include <portable-file-dialogs.h>
 
 #include "CommonTypes.hpp"
 #include "files.h"
@@ -293,6 +295,24 @@ std::optional<std::string> read_file(std::filesystem::path file_path) {
 
   out.append(buf, 0, stream.gcount());
   return out;
+}
+
+void folder_picker(crow::response& /*resp*/, std::string_view /*data*/) {
+  // TODO: Allow data to specify a title, default path or a platform path.
+  // For now, I'm waiting on platform folders to get updated (see the
+  // conan file)
+  auto result = pfd::select_folder("Select a folder", "", pfd::opt::none);
+  /*  auto json = crow::json::load(*maybe_value);
+    std::cout << "Writing data " << json << " for " << key << " to storage"
+              << std::endl;
+    std::ostringstream os;
+    os << json;
+    if (!config::write_to_storage(key, os.str())) {
+      resp.code = 500; // Internal Server Error
+    } else {
+      resp.code = 200; // OK
+    }
+      */
 }
 
 } // namespace files
