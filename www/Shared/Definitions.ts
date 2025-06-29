@@ -1,6 +1,7 @@
 import {
   arr,
   bool,
+  Enum,
   enum_lst,
   enum_num,
   enum_str,
@@ -101,7 +102,6 @@ const IpcCall: NEnum = enum_num(u8(), {
   ReadFromStorage: 0,
   WriteToStorage: 1,
   DeleteFromStorage: 2,
-  /*
   AsyncData: 3,
   IsDev: 4,
   ClearHates: 5,
@@ -141,18 +141,17 @@ const IpcCall: NEnum = enum_num(u8(), {
   RemoveIgnoreItem: 39,
   PushIgnoreList: 40,
   IgnoreListId: 41,
-  */
   FolderPicker: 42,
 });
 
-const IpcMsg: SEnum = enum_str({
-  TranscodingUpdate: 'transcoding-update',
-  ManualRescan: 'manual-rescan',
-  RescanInProgress: 'rescan-in-progress',
-  RescanComplete: 'rescan-complete',
-  MusicDBUpdate: 'music-db-update',
-  Unknown: 'unknown',
-});
+const IpcMsg: Enum = enum_lst(u8(), [
+  'TranscodingUpdate',
+  'ManualRescan',
+  'RescanInProgress',
+  'RescanComplete',
+  'MusicDBUpdate',
+  'ContentLoaded',
+]);
 
 const IgnoreItemType: SEnum = enum_str({
   PathRoot: 'path-root',

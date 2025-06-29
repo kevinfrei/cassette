@@ -22,4 +22,8 @@ bool unsubscribe_from_change(std::int32_t listener_id);
 void flush_storage_cache();
 void clear_storage();
 
+void set_ready();
+bool is_ready();
+void not_ready();
+
 } // namespace config

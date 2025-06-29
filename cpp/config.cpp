@@ -14,6 +14,19 @@
 
 namespace config {
 
+bool is_ready_storage = false;
+void set_ready() {
+  is_ready_storage = true;
+}
+
+bool is_ready() {
+  return is_ready_storage;
+}
+
+void not_ready() {
+  is_ready_storage = false;
+}
+
 // This is fugly, most hopefully it's the only truly fugly thing here.
 #if defined(_WIN32)
 const char* env_var = "LOCALAPPDATA";

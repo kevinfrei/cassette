@@ -138,6 +138,19 @@ ${item.v.map((val) => `    case ${name}::${val}:`).join('\n')}
       return false;
   }
 }
+
+inline constexpr std::string_view to_string(${name} _value) {
+  switch (_value) {
+${item.v
+  .map(
+    (val) => `    case ${name}::${val}:
+      return "${val}";`,
+  )
+  .join('\n')}
+    default:
+      return "<unknown>";
+  }
+}
 #pragma endregion numeric enum ${name}
 
 `);

@@ -280,4 +280,19 @@ Shared::MusicDatabase* get_music_db() {
   return music_db = db;
 }
 
+void send_music_db(crow::websocket::connection& conn) {
+  // Send the music database to the client.
+  if (!music_db) {
+    std::cerr << "Music database is not initialized!" << std::endl;
+    return;
+  }
+  Shared::MusicDatabase* music_db = get_music_db();
+  if (!music_db) {
+    std::cerr << "Failed to get music database!" << std::endl;
+    return;
+  }
+  auto response = to_json(*music_db);
+  conn.send_text(response.dump());
+}
+
 } // namespace afi

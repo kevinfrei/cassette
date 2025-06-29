@@ -473,6 +473,45 @@ enum class IpcCall : std::uint8_t {
   ReadFromStorage = 0,
   WriteToStorage = 1,
   DeleteFromStorage = 2,
+  AsyncData = 3,
+  IsDev = 4,
+  ClearHates = 5,
+  ClearLikes = 6,
+  ClearLocalOverrides = 7,
+  DeletePlaylist = 8,
+  FlushImageCache = 9,
+  FlushMetadataCache = 10,
+  GetHates = 11,
+  GetLikes = 12,
+  GetMediaInfo = 13,
+  GetMusicDatabase = 14,
+  GetPlaylists = 15,
+  LoadPlaylist = 16,
+  MenuAction = 17,
+  RenamePlaylist = 18,
+  SavePlaylist = 19,
+  Search = 20,
+  SetHates = 21,
+  SetLikes = 22,
+  SetMediaInfo = 23,
+  SetPlaylists = 24,
+  SetSaveMenu = 25,
+  ShowFile = 26,
+  ShowLocFromKey = 27,
+  ShowMenu = 28,
+  SubstrSearch = 29,
+  TranscodingBegin = 30,
+  UploadImage = 31,
+  MinimizeWindow = 32,
+  MaximizeWindow = 33,
+  RestoreWindow = 34,
+  CloseWindow = 35,
+  GetPicUri = 36,
+  GetIgnoreList = 37,
+  AddIgnoreItem = 38,
+  RemoveIgnoreItem = 39,
+  PushIgnoreList = 40,
+  IgnoreListId = 41,
   FolderPicker = 42,
 };
 
@@ -481,6 +520,45 @@ inline constexpr bool is_valid(IpcCall _value) {
     case IpcCall::ReadFromStorage:
     case IpcCall::WriteToStorage:
     case IpcCall::DeleteFromStorage:
+    case IpcCall::AsyncData:
+    case IpcCall::IsDev:
+    case IpcCall::ClearHates:
+    case IpcCall::ClearLikes:
+    case IpcCall::ClearLocalOverrides:
+    case IpcCall::DeletePlaylist:
+    case IpcCall::FlushImageCache:
+    case IpcCall::FlushMetadataCache:
+    case IpcCall::GetHates:
+    case IpcCall::GetLikes:
+    case IpcCall::GetMediaInfo:
+    case IpcCall::GetMusicDatabase:
+    case IpcCall::GetPlaylists:
+    case IpcCall::LoadPlaylist:
+    case IpcCall::MenuAction:
+    case IpcCall::RenamePlaylist:
+    case IpcCall::SavePlaylist:
+    case IpcCall::Search:
+    case IpcCall::SetHates:
+    case IpcCall::SetLikes:
+    case IpcCall::SetMediaInfo:
+    case IpcCall::SetPlaylists:
+    case IpcCall::SetSaveMenu:
+    case IpcCall::ShowFile:
+    case IpcCall::ShowLocFromKey:
+    case IpcCall::ShowMenu:
+    case IpcCall::SubstrSearch:
+    case IpcCall::TranscodingBegin:
+    case IpcCall::UploadImage:
+    case IpcCall::MinimizeWindow:
+    case IpcCall::MaximizeWindow:
+    case IpcCall::RestoreWindow:
+    case IpcCall::CloseWindow:
+    case IpcCall::GetPicUri:
+    case IpcCall::GetIgnoreList:
+    case IpcCall::AddIgnoreItem:
+    case IpcCall::RemoveIgnoreItem:
+    case IpcCall::PushIgnoreList:
+    case IpcCall::IgnoreListId:
     case IpcCall::FolderPicker:
       return true;
     default:
@@ -490,15 +568,14 @@ inline constexpr bool is_valid(IpcCall _value) {
 
 #pragma endregion linear enum IpcCall
 
-#pragma region string enum IpcMsg
-
-enum class IpcMsg {
+#pragma region numeric enum IpcMsg
+enum class IpcMsg : std::uint8_t {
   TranscodingUpdate,
   ManualRescan,
   RescanInProgress,
   RescanComplete,
   MusicDBUpdate,
-  Unknown
+  ContentLoaded
 };
 
 inline constexpr bool is_valid(IpcMsg _value) {
@@ -508,7 +585,7 @@ inline constexpr bool is_valid(IpcMsg _value) {
     case IpcMsg::RescanInProgress:
     case IpcMsg::RescanComplete:
     case IpcMsg::MusicDBUpdate:
-    case IpcMsg::Unknown:
+    case IpcMsg::ContentLoaded:
       return true;
     default:
       return false;
@@ -518,43 +595,22 @@ inline constexpr bool is_valid(IpcMsg _value) {
 inline constexpr std::string_view to_string(IpcMsg _value) {
   switch (_value) {
     case IpcMsg::TranscodingUpdate:
-      return "transcoding-update";
+      return "TranscodingUpdate";
     case IpcMsg::ManualRescan:
-      return "manual-rescan";
+      return "ManualRescan";
     case IpcMsg::RescanInProgress:
-      return "rescan-in-progress";
+      return "RescanInProgress";
     case IpcMsg::RescanComplete:
-      return "rescan-complete";
+      return "RescanComplete";
     case IpcMsg::MusicDBUpdate:
-      return "music-db-update";
-    case IpcMsg::Unknown:
-      return "unknown";
+      return "MusicDBUpdate";
+    case IpcMsg::ContentLoaded:
+      return "ContentLoaded";
     default:
       return "<unknown>";
   }
 }
-
-// This is *super* simplistic, and should be optimized, cuz this is bad.
-// A deeply nested switch statement would be pretty fun to generate...
-template <>
-inline constexpr std::optional<IpcMsg> from_string<IpcMsg>(
-    const std::string_view& str) {
-  if (str == "transcoding-update")
-    return IpcMsg::TranscodingUpdate;
-  if (str == "manual-rescan")
-    return IpcMsg::ManualRescan;
-  if (str == "rescan-in-progress")
-    return IpcMsg::RescanInProgress;
-  if (str == "rescan-complete")
-    return IpcMsg::RescanComplete;
-  if (str == "music-db-update")
-    return IpcMsg::MusicDBUpdate;
-  if (str == "unknown")
-    return IpcMsg::Unknown;
-  return std::nullopt;
-}
-
-#pragma endregion string enum IpcMsg
+#pragma endregion numeric enum IpcMsg
 
 #pragma region string enum IgnoreItemType
 
@@ -962,6 +1018,19 @@ inline constexpr bool is_valid(VAType _value) {
       return false;
   }
 }
+
+inline constexpr std::string_view to_string(VAType _value) {
+  switch (_value) {
+    case VAType::None:
+      return "None";
+    case VAType::VA:
+      return "VA";
+    case VAType::OST:
+      return "OST";
+    default:
+      return "<unknown>";
+  }
+}
 #pragma endregion numeric enum VAType
 
 struct Artist {
@@ -1064,24 +1133,6 @@ struct impl_from_json<Shared::StrId> {
   }
 };
 #pragma endregion JSON serialization for string enum StrId
-
-#pragma region JSON serialization for string enum IpcMsg
-template <>
-inline crow::json::wvalue to_json<Shared::IpcMsg>(Shared::IpcMsg _value) {
-  return to_json(to_string(_value));
-}
-template <>
-struct impl_from_json<Shared::IpcMsg> {
-  static inline std::optional<Shared::IpcMsg> process(
-      const crow::json::rvalue& _value) {
-    if (_value.t() != crow::json::type::String)
-      return std::nullopt;
-    auto _str = _value.s();
-    return Shared::from_string<Shared::IpcMsg>(
-        std::string_view{_str.begin(), _str.size()});
-  }
-};
-#pragma endregion JSON serialization for string enum IpcMsg
 
 #pragma region JSON serialization for string enum IgnoreItemType
 template <>

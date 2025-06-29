@@ -10,7 +10,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { FluentInitIcons } from './FluentInit';
 import { KeepAlive } from './KeepAlive';
-import { RawGet } from './Tools/Ipc';
+import { IpcMsg } from './Shared/CommonTypes';
+import { PostMain, RawGet, SendMessage } from './Tools/Ipc';
 import { WebSocketRegistrar } from './Tools/ReactWebSocket';
 import { App } from './UI/App';
 
@@ -41,3 +42,7 @@ if (import.meta.hot) {
 
 // This is the thing to tell the server to quit when the page is closed
 // window.addEventListener('beforeunload', () => {}); void RawGet('/quit'));
+window.addEventListener('DOMContentLoaded', () => {
+  // This is the thing to tell the server everything's loaded
+  SendMessage(IpcMsg.ContentLoaded);
+});

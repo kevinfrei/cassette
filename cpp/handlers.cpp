@@ -6,6 +6,8 @@
 
 #include "CommonTypes.hpp"
 #include "api.h"
+#include "audiofileindex.hpp"
+#include "config.h"
 #include "files.h"
 #include "handlers.h"
 #include "quitting.h"
@@ -23,6 +25,9 @@ crow::response file_path(const crow::request&, const std::string& path) {
   std::filesystem::path p =
       files::get_web_dir() / (path.empty() ? "index.html" : path);
   if (p.filename() == "index.html") {
+    // If we're sending index.html, we should *clear* ready
+    config::not_ready();
+
     // We need to process the index.html file to replace the websocket URL
     // with the correct one.
 
@@ -139,7 +144,7 @@ crow::response quit() {
   return crow::response(200);
 }
 
-void socket_message(crow::websocket::connection&,
+void socket_message(crow::websocket::connection& conn,
                     const std::string& data,
                     bool /* is_binary */) {
   std::cout << "Got a message from the client:";
@@ -150,23 +155,30 @@ void socket_message(crow::websocket::connection&,
     std::cerr << "Invalid websocket message received: " << data << std::endl;
     return;
   }
-  auto maybeMsg =
-      Shared::from_string<Shared::IpcMsg>(std::string_view{data.c_str(), pos});
+  auto maybeMsg = tools::read_uint64_t(std::string_view{data.c_str(), pos});
   if (!maybeMsg) {
     std::cerr << "Invalid websocket message received: " << data << std::endl;
     return;
   }
-  auto msg = *maybeMsg;
+  Shared::IpcMsg ipcMsg = static_cast<Shared::IpcMsg>(*maybeMsg);
+  if (!Shared::is_valid(ipcMsg)) {
+    std::cerr << "Invalid IPC message received: " << data << std::endl;
+    return;
+  }
   // This is the only message we support *receiving* from the client
-  if (msg == Shared::IpcMsg::ManualRescan) {
-    std::cout << "TODO: Implement ManualRescan" << std::endl;
-
-  } else {
-    // Unsupported message
-    std::cerr << "Unsupported message received: " << Shared::to_string(msg)
-              << " ("
-              << static_cast<std::underlying_type_t<Shared::IpcMsg>>(msg)
-              << ") [" << data << "]" << std::endl;
+  switch (ipcMsg) {
+    case Shared::IpcMsg::ManualRescan:
+      std::cout << "TODO: Implement ManualRescan" << std::endl;
+      break;
+    case Shared::IpcMsg::ContentLoaded:
+      config::set_ready();
+      afi::send_music_db(conn);
+      break;
+    default: // Unsupported message
+      std::cerr << "Unsupported message received: " << Shared::to_string(ipcMsg)
+                << " ("
+                << static_cast<std::underlying_type_t<Shared::IpcMsg>>(ipcMsg)
+                << ") [" << data << "]" << std::endl;
   }
 }
 
