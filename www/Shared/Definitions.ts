@@ -5,6 +5,7 @@ import {
   enum_lst,
   enum_num,
   enum_str,
+  fmap,
   i16,
   i32,
   map,
@@ -295,9 +296,9 @@ const Album = obj({
 });
 
 const MusicDatabase = obj({
-  artists: map(ref('ArtistKey'), ref('Artist')),
-  albums: map(ref('AlbumKey'), ref('Album')),
-  songs: map(ref('SongKey'), ref('Song')),
+  artists: fmap(ref('ArtistKey'), ref('Artist')),
+  albums: fmap(ref('AlbumKey'), ref('Album')),
+  songs: fmap(ref('SongKey'), ref('Song')),
   playlists: map(PlaylistName, ref('Playlist')),
 });
 

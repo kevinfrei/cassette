@@ -26,7 +26,9 @@ export type Simple = Str | Char | Int | Bool | Flt | Dbl;
 export type ObjType = { t: 'O'; d: Of<Anonymous> };
 export type ArrType = { t: 'A'; d: Anonymous };
 export type SetType = { t: 'S'; d: Anonymous };
+export type FastSetType = { t: 'H'; d: Anonymous }; // Fast Set, used for std::unordered_set in C++
 export type MapType = { t: 'M'; k: Anonymous; v: Anonymous };
+export type FastMapType = { t: 'F'; k: Anonymous; v: Anonymous }; // Fast Map, used for std::unordered_map in C++
 export type TupType = { t: 'T'; l: Anonymous[] };
 export type RefType = { t: 'R'; r: string }; // Reference type, Points at a type by name
 
@@ -41,7 +43,9 @@ export type Anonymous =
   | RefType
   | ArrType
   | SetType
+  | FastSetType
   | MapType
+  | FastMapType
   | TupType;
 export type Types = Anonymous | ObjType | EnumType | I;
 export type NamedTypes = ObjType | EnumType;
@@ -62,8 +66,14 @@ export const flt = (): Flt => 'f';
 export const dbl = (): Dbl => 'd';
 export const arr = (d: Anonymous): ArrType => ({ t: 'A', d });
 export const set = (d: Anonymous): SetType => ({ t: 'S', d });
+export const fset = (d: Anonymous): FastSetType => ({ t: 'H', d });
 export const map = (k: Anonymous, v: Anonymous): MapType => ({
   t: 'M',
+  k,
+  v,
+});
+export const fmap = (k: Anonymous, v: Anonymous): FastMapType => ({
+  t: 'F',
   k,
   v,
 });
@@ -133,8 +143,14 @@ export function isArrayType(x: Types): x is ArrType {
 export function isSetType(x: Types): x is SetType {
   return isObjectNonNull(x) && x.t === 'S';
 }
+export function isFastSetType(x: Types): x is FastSetType {
+  return isObjectNonNull(x) && x.t === 'H';
+}
 export function isMapType(x: Types): x is MapType {
   return isObjectNonNull(x) && x.t === 'M';
+}
+export function isFastMapType(x: Types): x is FastMapType {
+  return isObjectNonNull(x) && x.t === 'F';
 }
 export function isTupleType(x: Types): x is TupType {
   return isObjectNonNull(x) && x.t === 'T';

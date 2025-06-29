@@ -5,6 +5,8 @@ import {
   isBoolType,
   isCharType,
   isDoubleType,
+  isFastMapType,
+  isFastSetType,
   isFloatType,
   isI16Type,
   isI32Type,
@@ -51,6 +53,8 @@ async function header(writer: Bun.FileSink): Promise<void> {
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include <crow/json.h>
@@ -112,8 +116,12 @@ function getTypeName(type: Types, scoped?: boolean): string {
     return `std::vector<${getTypeName(type.d, !!scoped)}>`;
   } else if (isSetType(type)) {
     return `std::set<${getTypeName(type.d, !!scoped)}>`;
+  } else if (isFastSetType(type)) {
+    return `std::unordered_set<${getTypeName(type.d, !!scoped)}>`;
   } else if (isMapType(type)) {
     return `std::map<${getTypeName(type.k, !!scoped)}, ${getTypeName(type.v, !!scoped)}>`;
+  } else if (isFastMapType(type)) {
+    return `std::unordered_map<${getTypeName(type.k, !!scoped)}, ${getTypeName(type.v, !!scoped)}>`;
   } else if (isTupleType(type)) {
     return `std::tuple<${type.l.map((a) => getTypeName(a, !!scoped)).join(', ')}>`;
   }
@@ -314,7 +322,9 @@ export const CppEmitter: Emitter = {
     objType,
     arrType: usingType,
     setType: usingType,
+    fastSetType: usingType,
     mapType: usingType,
+    fastMapType: usingType,
     tupType: usingType,
     enumType,
     strType: usingType,

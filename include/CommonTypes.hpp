@@ -17,6 +17,8 @@
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include <crow/json.h>
@@ -1091,9 +1093,9 @@ struct MimeData {
 };
 
 struct MusicDatabase {
-  std::map<ArtistKey, Artist> artists;
-  std::map<AlbumKey, Album> albums;
-  std::map<SongKey, Song> songs;
+  std::unordered_map<ArtistKey, Artist> artists;
+  std::unordered_map<AlbumKey, Album> albums;
+  std::unordered_map<SongKey, Song> songs;
   std::map<std::string, Playlist> playlists;
 };
 
@@ -1981,7 +1983,8 @@ inline std::optional<Shared::MusicDatabase> from_json<Shared::MusicDatabase>(
   if (!_value.has("artists"))
     return std::nullopt;
   auto _artists_opt_ =
-      from_json<std::map<Shared::ArtistKey, Shared::Artist>>(_value["artists"]);
+      from_json<std::unordered_map<Shared::ArtistKey, Shared::Artist>>(
+          _value["artists"]);
   if (!_artists_opt_.has_value())
     return std::nullopt;
   _res.artists = std::move(*_artists_opt_);
@@ -1989,7 +1992,8 @@ inline std::optional<Shared::MusicDatabase> from_json<Shared::MusicDatabase>(
   if (!_value.has("albums"))
     return std::nullopt;
   auto _albums_opt_ =
-      from_json<std::map<Shared::AlbumKey, Shared::Album>>(_value["albums"]);
+      from_json<std::unordered_map<Shared::AlbumKey, Shared::Album>>(
+          _value["albums"]);
   if (!_albums_opt_.has_value())
     return std::nullopt;
   _res.albums = std::move(*_albums_opt_);
@@ -1997,7 +2001,8 @@ inline std::optional<Shared::MusicDatabase> from_json<Shared::MusicDatabase>(
   if (!_value.has("songs"))
     return std::nullopt;
   auto _songs_opt_ =
-      from_json<std::map<Shared::SongKey, Shared::Song>>(_value["songs"]);
+      from_json<std::unordered_map<Shared::SongKey, Shared::Song>>(
+          _value["songs"]);
   if (!_songs_opt_.has_value())
     return std::nullopt;
   _res.songs = std::move(*_songs_opt_);

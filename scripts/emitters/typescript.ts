@@ -12,6 +12,8 @@ import {
   isBoolType,
   isCharType,
   isDoubleType,
+  isFastMapType,
+  isFastSetType,
   isFloatType,
   isI16Type,
   isI32Type,
@@ -71,9 +73,9 @@ function getTypeName(type: Types): string {
     return type.r; // Reference type, just return the name
   } else if (isArrayType(type)) {
     return `${getTypeName(type.d)}[]`;
-  } else if (isSetType(type)) {
+  } else if (isSetType(type) || isFastSetType(type)) {
     return `Set<${getTypeName(type.d)}>`;
-  } else if (isMapType(type)) {
+  } else if (isMapType(type) || isFastMapType(type)) {
     return `Map<${getTypeName(type.k)}, ${getTypeName(type.v)}>`;
   } else if (isTupleType(type)) {
     return `[${type.l.map(getTypeName).join(', ')}]`;
@@ -135,7 +137,9 @@ export const TypescriptEmitter: Emitter = {
     objType,
     arrType: simpleType,
     setType: simpleType,
+    fastSetType: simpleType,
     mapType: simpleType,
+    fastMapType: simpleType,
     tupType: simpleType,
     enumType,
     strType: simpleType,

@@ -1,7 +1,11 @@
 import {
   ArrType,
   Enum,
+  FastMapType,
+  FastSetType,
   isArrayType,
+  isFastMapType,
+  isFastSetType,
   isMapType,
   isNumericEnumType,
   isObjectType,
@@ -15,6 +19,7 @@ import {
   ObjType,
   SEnum,
   SetType,
+  Str,
   TupType,
   Types,
 } from '../../www/Shared/IDL';
@@ -32,7 +37,9 @@ export type Emitter = {
     objType: EmitItem<ObjType>;
     arrType: EmitItem<ArrType>;
     setType: EmitItem<SetType>;
+    fastSetType: EmitItem<FastSetType>;
     mapType: EmitItem<MapType>;
+    fastMapType: EmitItem<FastMapType>;
     tupType: EmitItem<TupType>;
     strType: EmitItem<Str>;
     enumType: EmitItem<Enum>;
@@ -49,8 +56,12 @@ function forElement(emit: Emitter, adt: Types): EmitItem<any> {
     return emit.types.arrType;
   } else if (isSetType(adt)) {
     return emit.types.setType;
+  } else if (isFastSetType(adt)) {
+    return emit.types.fastSetType;
   } else if (isMapType(adt)) {
     return emit.types.mapType;
+  } else if (isFastMapType(adt)) {
+    return emit.types.fastMapType;
   } else if (isTupleType(adt)) {
     return emit.types.tupType;
   } else if (isPlainEnumType(adt)) {
