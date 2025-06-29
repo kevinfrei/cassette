@@ -9,7 +9,8 @@ set(LIB_SOURCE_FILES
     setup.cpp
     tools.cpp
     tunes.cpp
-    window.cpp)
+    window.cpp
+    musicdb/audiofileindex.cpp)
 
 # Compile main.cpp
 add_library(cassette_lib ${LIB_SOURCE_FILES})

@@ -4,8 +4,12 @@ cmake_minimum_required(VERSION 3.28.0)
 # Name of the project
 project(cassette)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+# Why not?
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(MSVC)
   # For windows/VC++, run normal exception handling & windows 10 APIs
@@ -18,7 +22,7 @@ if(MSVC)
     add_compile_options(/W4 /O2 /D_CRT_SECURE_NO_WARNINGS)
   endif()
 else()
-  # For non-windows compilers, enable C++17 features
+  # For non-windows compilers, enable sanitizers and stuff
   add_compile_options(-Wpedantic -Wall -Wextra -Werror -pedantic)
   if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-fsanitize=address,undefined -O0 -g)

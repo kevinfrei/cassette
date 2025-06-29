@@ -244,6 +244,7 @@ const Playlist = arr(ref('SongKey'));
 const VAType = enum_lst(u8(), ['None', 'VA', 'OST']);
 
 const Song = obj({
+  path: str(),
   key: ref('SongKey'),
   track: i16(),
   title: str(),
@@ -292,6 +293,13 @@ const Album = obj({
   primaryArtists: arr(ref('ArtistKey')),
   songs: arr(ref('SongKey')),
   diskNames: arr(str()),
+});
+
+const MusicDatabase = obj({
+  artists: map(ref('ArtistKey'), ref('Artist')),
+  albums: map(ref('AlbumKey'), ref('Album')),
+  songs: map(ref('SongKey'), ref('Song')),
+  playlists: map(PlaylistName, ref('Playlist')),
 });
 
 const MediaInfo = obj({
@@ -377,6 +385,7 @@ export const TypesToGenerate: Record<string, Types> = {
   FullMetadata,
   AudioFileRegexPattern,
   MimeData,
+  MusicDatabase,
 };
 
 export const PicklersToGenerate: Record<string, Types> = {};

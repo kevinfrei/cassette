@@ -203,6 +203,7 @@ export type PlaylistName = string;
 export type Playlist = SongKey[];
 
 export type Song = {
+  path: string;
   key: SongKey;
   track: number;
   title: string;
@@ -274,6 +275,13 @@ export type AudioFileRegexPattern = {
 export type MimeData = {
   type: string;
   data: string;
+};
+
+export type MusicDatabase = {
+  artists: Map<ArtistKey, Artist>;
+  albums: Map<AlbumKey, Album>;
+  songs: Map<SongKey, Song>;
+  playlists: Map<string, Playlist>;
 };
 
 // End of generated code

@@ -939,6 +939,7 @@ using PlaylistName = std::string;
 using Playlist = std::vector<SongKey>;
 
 struct Song {
+  std::string path;
   SongKey key;
   std::int16_t track;
   std::string title;
@@ -1018,6 +1019,13 @@ struct AudioFileRegexPattern {
 struct MimeData {
   std::string type;
   std::string data;
+};
+
+struct MusicDatabase {
+  std::map<ArtistKey, Artist> artists;
+  std::map<AlbumKey, Album> albums;
+  std::map<SongKey, Song> songs;
+  std::map<std::string, Playlist> playlists;
 };
 
 } // namespace Shared
@@ -1379,6 +1387,7 @@ template <>
 struct impl_to_json<Shared::Song> {
   static inline crow::json::wvalue process(const Shared::Song& _value) {
     crow::json::wvalue _res;
+    _res["path"] = to_json(_value.path);
     _res["key"] = to_json(_value.key);
     _res["track"] = to_json(_value.track);
     _res["title"] = to_json(_value.title);
@@ -1396,6 +1405,13 @@ inline std::optional<Shared::Song> from_json<Shared::Song>(
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::Song _res;
+
+  if (!_value.has("path"))
+    return std::nullopt;
+  auto _path_opt_ = from_json<std::string>(_value["path"]);
+  if (!_path_opt_.has_value())
+    return std::nullopt;
+  _res.path = std::move(*_path_opt_);
 
   if (!_value.has("key"))
     return std::nullopt;
@@ -1889,5 +1905,62 @@ inline std::optional<Shared::MimeData> from_json<Shared::MimeData>(
   return _res;
 }
 #pragma endregion JSON serialization for object MimeData
+
+#pragma region JSON serialization for object MusicDatabase
+template <>
+struct impl_to_json<Shared::MusicDatabase> {
+  static inline crow::json::wvalue process(
+      const Shared::MusicDatabase& _value) {
+    crow::json::wvalue _res;
+    _res["artists"] = to_json(_value.artists);
+    _res["albums"] = to_json(_value.albums);
+    _res["songs"] = to_json(_value.songs);
+    _res["playlists"] = to_json(_value.playlists);
+    return _res;
+  }
+};
+
+template <>
+inline std::optional<Shared::MusicDatabase> from_json<Shared::MusicDatabase>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::MusicDatabase _res;
+
+  if (!_value.has("artists"))
+    return std::nullopt;
+  auto _artists_opt_ =
+      from_json<std::map<Shared::ArtistKey, Shared::Artist>>(_value["artists"]);
+  if (!_artists_opt_.has_value())
+    return std::nullopt;
+  _res.artists = std::move(*_artists_opt_);
+
+  if (!_value.has("albums"))
+    return std::nullopt;
+  auto _albums_opt_ =
+      from_json<std::map<Shared::AlbumKey, Shared::Album>>(_value["albums"]);
+  if (!_albums_opt_.has_value())
+    return std::nullopt;
+  _res.albums = std::move(*_albums_opt_);
+
+  if (!_value.has("songs"))
+    return std::nullopt;
+  auto _songs_opt_ =
+      from_json<std::map<Shared::SongKey, Shared::Song>>(_value["songs"]);
+  if (!_songs_opt_.has_value())
+    return std::nullopt;
+  _res.songs = std::move(*_songs_opt_);
+
+  if (!_value.has("playlists"))
+    return std::nullopt;
+  auto _playlists_opt_ =
+      from_json<std::map<std::string, Shared::Playlist>>(_value["playlists"]);
+  if (!_playlists_opt_.has_value())
+    return std::nullopt;
+  _res.playlists = std::move(*_playlists_opt_);
+
+  return _res;
+}
+#pragma endregion JSON serialization for object MusicDatabase
 
 #endif // SHARED_CONSTANTS_HPP
