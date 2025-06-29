@@ -179,7 +179,7 @@ export function WireUpIpc(): void {
   };
 }
 
-const messageFormat = new RegExp(`^([0-9]+);`);
+const messageFormat = /^([0-9]+);/;
 // Called when an async message comes in from the main process
 // I think these should just be subscribed to as part of a useEffect?
 function HandleMessage(message: string): void {
@@ -189,6 +189,7 @@ function HandleMessage(message: string): void {
   // send multiple "messages" in a single message:
   // { artists: ..., albums: ..., songs: ... } will invoke listeners for
   // all three of those 'messages'
+  debugger;
   let handled = false;
   // Messages should come in as a IpcId, a semicolon, then a JSON string
   const match = message.match(messageFormat);

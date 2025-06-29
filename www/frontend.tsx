@@ -11,7 +11,7 @@ import { createRoot } from 'react-dom/client';
 import { FluentInitIcons } from './FluentInit';
 import { KeepAlive } from './KeepAlive';
 import { IpcMsg } from './Shared/CommonTypes';
-import { PostMain, RawGet, SendMessage } from './Tools/Ipc';
+import { SendMessage } from './Tools/Ipc';
 import { WebSocketRegistrar } from './Tools/ReactWebSocket';
 import { App } from './UI/App';
 
