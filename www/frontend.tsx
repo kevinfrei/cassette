@@ -20,11 +20,7 @@ const theActualApp = <App />;
 
 const app = (
   <StrictMode>
-    <Provider>
-      <WebSocketRegistrar />
-      <KeepAlive />
-      <App />
-    </Provider>
+    <App />
   </StrictMode>
 );
 

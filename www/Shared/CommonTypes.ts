@@ -242,7 +242,6 @@ export type PlaylistName = string;
 export type Playlist = SongKey[];
 
 export type Song = {
-  path: string;
   key: SongKey;
   track: number;
   title: string;
@@ -250,6 +249,10 @@ export type Song = {
   artistIds: ArtistKey[];
   secondaryIds: ArtistKey[];
   variations: string[];
+};
+
+export type SongWithPath = Song & {
+  path: string;
 };
 
 export const VAType = Object.freeze({

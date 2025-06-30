@@ -997,7 +997,6 @@ using PlaylistName = std::string;
 using Playlist = std::vector<SongKey>;
 
 struct Song {
-  std::string path;
   SongKey key;
   std::int16_t track;
   std::string title;
@@ -1005,6 +1004,10 @@ struct Song {
   std::vector<ArtistKey> artistIds;
   std::vector<ArtistKey> secondaryIds;
   std::vector<std::string> variations;
+};
+
+struct SongWithPath : Song {
+  std::string path;
 };
 
 #pragma region numeric enum VAType
@@ -1440,7 +1443,6 @@ template <>
 struct impl_to_json<Shared::Song> {
   static inline crow::json::wvalue process(const Shared::Song& _value) {
     crow::json::wvalue _res;
-    _res["path"] = to_json(_value.path);
     _res["key"] = to_json(_value.key);
     _res["track"] = to_json(_value.track);
     _res["title"] = to_json(_value.title);
@@ -1458,13 +1460,6 @@ inline std::optional<Shared::Song> from_json<Shared::Song>(
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::Song _res;
-
-  if (!_value.has("path"))
-    return std::nullopt;
-  auto _path_opt_ = from_json<std::string>(_value["path"]);
-  if (!_path_opt_.has_value())
-    return std::nullopt;
-  _res.path = std::move(*_path_opt_);
 
   if (!_value.has("key"))
     return std::nullopt;
@@ -1521,6 +1516,37 @@ inline std::optional<Shared::Song> from_json<Shared::Song>(
   return _res;
 }
 #pragma endregion JSON serialization for object Song
+
+#pragma region JSON serialization for object SongWithPath
+template <>
+struct impl_to_json<Shared::SongWithPath> {
+  static inline crow::json::wvalue process(const Shared::SongWithPath& _value) {
+    crow::json::wvalue _res = impl_to_json<Shared::Song>::process(_value);
+    _res["path"] = to_json(_value.path);
+    return _res;
+  }
+};
+
+template <>
+inline std::optional<Shared::SongWithPath> from_json<Shared::SongWithPath>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  std::optional<Shared::Song> _base = from_json<Shared::Song>(_value);
+  if (!_base.has_value())
+    return std::nullopt;
+  Shared::SongWithPath _res{std::move(*_base)};
+
+  if (!_value.has("path"))
+    return std::nullopt;
+  auto _path_opt_ = from_json<std::string>(_value["path"]);
+  if (!_path_opt_.has_value())
+    return std::nullopt;
+  _res.path = std::move(*_path_opt_);
+
+  return _res;
+}
+#pragma endregion JSON serialization for object SongWithPath
 
 #pragma region JSON serialization for object Artist
 template <>

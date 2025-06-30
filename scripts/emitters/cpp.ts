@@ -28,6 +28,7 @@ import {
   SEnum,
   SetType,
   Str,
+  SubType,
   TupType,
   Types,
 } from '../../www/Shared/IDL';
@@ -308,6 +309,55 @@ from_json<Shared::${name}>(
 `);
 };
 
+const subType: EmitItem<SubType> = async (writer, name, item) => {
+  await writer.write(`\nstruct ${name} : ${item.p} {\n`);
+  for (const [key, value] of Object.entries(item.d)) {
+    const typeName = getTypeName(value);
+    await writer.write(`  ${typeName} ${key};\n`);
+  }
+  await writer.write('};\n');
+  addNonShared(`
+#pragma region JSON serialization for object ${name}
+template <> 
+struct impl_to_json<Shared::${name}> { 
+  static inline crow::json::wvalue process(
+      const Shared::${name}& _value) {
+    crow::json::wvalue _res = impl_to_json<Shared::${item.p}>::process(_value);
+    ${Object.entries(item.d)
+      .map(([key]) => `_res["${key}"] = to_json(_value.${key});`)
+      .join('\n    ')}
+    return _res;
+  }
+};
+
+template <>
+inline std::optional<Shared::${name}>
+from_json<Shared::${name}>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  std::optional<Shared::${item.p}> _base = from_json<Shared::${item.p}>(_value);
+  if (!_base.has_value())
+    return std::nullopt;
+  Shared::${name} _res{std::move(*_base)};
+  ${Object.entries(item.d)
+    .map(
+      ([key, value]) => `
+  if (!_value.has("${key}"))
+    return std::nullopt;
+  auto _${key}_opt_ = from_json<${getTypeName(value, true)}>(_value["${key}"]);
+  if (!_${key}_opt_.has_value())
+    return std::nullopt;
+  _res.${key} = std::move(*_${key}_opt_);`,
+    )
+    .join('\n  ')}
+
+  return _res;
+}
+#pragma endregion JSON serialization for object ${name}
+`);
+};
+
 const usingType: EmitItem<Types> = async (writer, name, item) => {
   // This is a base type, so we don't need to do anything special
   await writer.write(`
@@ -320,6 +370,7 @@ export const CppEmitter: Emitter = {
   footer,
   types: {
     objType,
+    subType,
     arrType: usingType,
     setType: usingType,
     fastSetType: usingType,

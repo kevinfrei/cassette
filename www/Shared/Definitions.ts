@@ -16,6 +16,7 @@ import {
   ref,
   SEnum,
   str,
+  sub,
   Types,
   u16,
   u8,
@@ -244,7 +245,6 @@ const Playlist = arr(ref('SongKey'));
 const VAType = enum_lst(u8(), ['None', 'VA', 'OST']);
 
 const Song = obj({
-  path: str(),
   key: ref('SongKey'),
   track: i16(),
   title: str(),
@@ -253,6 +253,8 @@ const Song = obj({
   secondaryIds: arr(ref('ArtistKey')),
   variations: arr(str()),
 });
+
+const SongWithPath = sub('Song', { path: str() });
 
 const SongObj = obj({
   track: i16(),
@@ -293,6 +295,13 @@ const Album = obj({
   primaryArtists: arr(ref('ArtistKey')),
   songs: arr(ref('SongKey')),
   diskNames: arr(str()),
+});
+
+const FlatMusicDatabase = obj({
+  artists: arr(ref('Artist')),
+  albums: arr(ref('Album')),
+  songs: arr(ref('Song')),
+  playlists: map(PlaylistName, ref('Playlist')),
 });
 
 const MusicDatabase = obj({
@@ -372,6 +381,7 @@ export const TypesToGenerate: Record<string, Types> = {
   PlaylistName,
   Playlist,
   Song,
+  SongWithPath,
   VAType,
   /* 
   SongObj,

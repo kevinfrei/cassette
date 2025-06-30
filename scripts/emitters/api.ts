@@ -13,6 +13,7 @@ import {
   isSetType,
   isStringEnumType,
   isStringType,
+  isSubType,
   isTupleType,
   MapType,
   NEnum,
@@ -20,6 +21,7 @@ import {
   SEnum,
   SetType,
   Str,
+  SubType,
   TupType,
   Types,
 } from '../../www/Shared/IDL';
@@ -35,6 +37,7 @@ export type Emitter = {
   footer: (writer: Bun.FileSink) => Promise<void>;
   types: {
     objType: EmitItem<ObjType>;
+    subType: EmitItem<SubType>;
     arrType: EmitItem<ArrType>;
     setType: EmitItem<SetType>;
     fastSetType: EmitItem<FastSetType>;
@@ -52,6 +55,8 @@ function forElement(emit: Emitter, adt: Types): EmitItem<any> {
   // Returns the type emitter for the given ADT
   if (isObjectType(adt)) {
     return emit.types.objType;
+  } else if (isSubType(adt)) {
+    return emit.types.subType;
   } else if (isArrayType(adt)) {
     return emit.types.arrType;
   } else if (isSetType(adt)) {

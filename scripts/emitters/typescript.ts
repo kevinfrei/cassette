@@ -6,6 +6,7 @@ import {
   ObjType,
   SEnum,
   SetType,
+  SubType,
   TupType,
   Types,
   isArrayType,
@@ -124,6 +125,16 @@ export type ${name} = {`);
   await writer.write('\n};\n');
 };
 
+const subType: EmitItem<SubType> = async (writer, name, item) => {
+  await writer.write(`
+export type ${name} = ${item.p} & {`);
+  for (const [key, value] of Object.entries(item.d)) {
+    const typeName = getTypeName(value);
+    await writer.write(`\n  ${key}: ${typeName};`);
+  }
+  await writer.write('\n};\n');
+};
+
 const simpleType: EmitItem<Types> = async (writer, name, item) => {
   await writer.write(`
 export type ${name} = ${getTypeName(item)};
@@ -135,6 +146,7 @@ export const TypescriptEmitter: Emitter = {
   footer,
   types: {
     objType,
+    subType,
     arrType: simpleType,
     setType: simpleType,
     fastSetType: simpleType,
