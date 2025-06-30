@@ -1,9 +1,32 @@
+import {
+  chkCustomType,
+  chkMapOf,
+  chkObjectOfType,
+  hasFieldOf,
+  isObjectNonNull,
+  isString,
+  typecheck,
+} from '@freik/typechk';
 import { ReactElement, useEffect } from 'react';
-import { IpcMsg, MusicDatabase } from 'www/Shared/CommonTypes';
+import { IpcMsg, MusicDatabase, Song, SongKey } from 'www/Shared/CommonTypes';
 import { Subscribe, Unsubscribe } from './Ipc';
 
+const isSongKey: typecheck<SongKey> = isString;
+const isSong = chkObjectOfType<Song>({
+  track: 'number',
+  title: 'string',
+  album: 'object', // This should be a more specific type if available
+  artists: 'array', // This should be a more specific type if available
+  secondaryArtists: 'array', // This should be a more specific type if available
+  variations: 'array',
+});
 // TODO: Fix this, like maybe generate the typeguard from the IDL compiler?
 function isMusicDatabase(data: unknown): data is MusicDatabase {
+  if (!isObjectNonNull(data)) {
+    return false;
+  }
+  if (hasFieldOf(data, 'songs', chkMapOf(isSongKey, isSong)) /* && */) {
+  }
   const db = data as MusicDatabase;
   return (
     db !== null &&
