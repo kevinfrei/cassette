@@ -7,6 +7,47 @@
 
 import * as TypeChk from '@freik/typechk';
 
+const chkIdlU8: TypeChk.typecheck<number> = (v: unknown): v is number =>
+  TypeChk.isNumber(v) && v >= 0 && v <= 255 && Number.isInteger(v);
+const chkIdlI8: TypeChk.typecheck<number> = (v: unknown): v is number =>
+  TypeChk.isNumber(v) && v >= -256 && v <= 255 && Number.isInteger(v);
+const chkIdlU16: TypeChk.typecheck<number> = (v: unknown): v is number =>
+  TypeChk.isNumber(v) && v >= 0 && v <= 65535 && Number.isInteger(v);
+const chkIdlI16: TypeChk.typecheck<number> = (v: unknown): v is number =>
+  TypeChk.isNumber(v) && v >= -32768 && v <= 32767 && Number.isInteger(v);
+const chkIdlU32: TypeChk.typecheck<number> = (v: unknown): v is number =>
+  TypeChk.isNumber(v) && v >= 0 && v <= 4294967295 && Number.isInteger(v);
+const chkIdlI32: TypeChk.typecheck<number> = (v: unknown): v is number =>
+  TypeChk.isNumber(v) &&
+  v >= -2147483648 &&
+  v <= 2147483647 &&
+  Number.isInteger(v);
+const chkIdlU64: TypeChk.typecheck<number> = (v: unknown): v is number => {
+  if (chkIdlU32(v)) {
+    return true;
+  }
+  if (TypeChk.isNumber(v) && Number.isInteger(v) && v >= 0 && v < 2 << 54) {
+    return true;
+  }
+  return true; // TODO: Check for a BigInt
+};
+const chkIdlI64: TypeChk.typecheck<number> = (v: unknown): v is number => {
+  if (chkIdlI32(v)) {
+    return true;
+  }
+  if (
+    TypeChk.isNumber(v) &&
+    Number.isInteger(v) &&
+    v >= -(2 << 53) &&
+    v < 2 << 53
+  ) {
+    return true;
+  }
+  return true; // TODO: Check for a BigInt
+};
+const chkIdlChar: TypeChk.typecheck<string> = (v: unknown): v is string =>
+  TypeChk.isString(v) && v.length === 1;
+
 export const Keys = Object.freeze({
   AddFileLocation: 'O',
   Albums: '2',
@@ -302,12 +343,12 @@ export const chkTranscodeState: TypeChk.typecheck<TranscodeState> = (
 ): val is TranscodeState => {
   return TypeChk.isObjectOfType(val, {
     curStatus: TypeChk.isString,
-    filesTranscoded: chkArrayOf(string),
+    filesTranscoded: TypeChk.chkArrayOf(TypeChk.isString),
     filesFound: chkIdlI32,
     filesPending: chkIdlI32,
     filesUntouched: chkIdlI32,
-    filesFailed: chkArrayOf(FileFailure),
-    itemsRemoved: chkArrayOf(string),
+    filesFailed: TypeChk.chkArrayOf(chkFileFailure),
+    itemsRemoved: TypeChk.chkArrayOf(TypeChk.isString),
   });
 };
 export type TranscodeInfo = {
@@ -331,16 +372,22 @@ export const chkTranscodeInfo: TypeChk.typecheck<TranscodeInfo> = (
   });
 };
 export type SongKey = string;
+export const chkSongKey = TypeChk.isString;
 
 export type AlbumKey = string;
+export const chkAlbumKey = TypeChk.isString;
 
 export type ArtistKey = string;
+export const chkArtistKey = TypeChk.isString;
 
 export type MediaKey = string;
+export const chkMediaKey = TypeChk.isString;
 
 export type PlaylistName = string;
+export const chkPlaylistName = TypeChk.isString;
 
 export type Playlist = SongKey[];
+export const chkPlaylist = TypeChk.chkArrayOf(chkSongKey);
 
 export type Song = {
   key: SongKey;
@@ -357,9 +404,9 @@ export const chkSong: TypeChk.typecheck<Song> = (val: unknown): val is Song => {
     track: chkIdlI16,
     title: TypeChk.isString,
     albumId: chkAlbumKey,
-    artistIds: chkArrayOf(ArtistKey),
-    secondaryIds: chkArrayOf(ArtistKey),
-    variations: chkArrayOf(string),
+    artistIds: TypeChk.chkArrayOf(chkArtistKey),
+    secondaryIds: TypeChk.chkArrayOf(chkArtistKey),
+    variations: TypeChk.chkArrayOf(TypeChk.isString),
   });
 };
 export type SongWithPath = Song & {
@@ -390,8 +437,8 @@ export const chkArtist: TypeChk.typecheck<Artist> = (
   return TypeChk.isObjectOfType(val, {
     key: chkArtistKey,
     name: TypeChk.isString,
-    albums: chkArrayOf(AlbumKey),
-    songs: chkArrayOf(SongKey),
+    albums: TypeChk.chkArrayOf(chkAlbumKey),
+    songs: TypeChk.chkArrayOf(chkSongKey),
   });
 };
 export type Album = {
@@ -411,9 +458,9 @@ export const chkAlbum: TypeChk.typecheck<Album> = (
     year: chkIdlI16,
     title: TypeChk.isString,
     vatype: chkVAType,
-    primaryArtists: chkArrayOf(ArtistKey),
-    songs: chkArrayOf(SongKey),
-    diskNames: chkArrayOf(string),
+    primaryArtists: TypeChk.chkArrayOf(chkArtistKey),
+    songs: TypeChk.chkArrayOf(chkSongKey),
+    diskNames: TypeChk.chkArrayOf(TypeChk.isString),
   });
 };
 export type MediaInfo = {
@@ -424,8 +471,8 @@ export const chkMediaInfo: TypeChk.typecheck<MediaInfo> = (
   val: unknown,
 ): val is MediaInfo => {
   return TypeChk.isObjectOfType(val, {
-    general: chkMapOf(string, string),
-    audio: chkMapOf(string, string),
+    general: TypeChk.chkMapOf(TypeChk.isString, TypeChk.isString),
+    audio: TypeChk.chkMapOf(TypeChk.isString, TypeChk.isString),
   });
 };
 export type SimpleMetadata = {
@@ -470,14 +517,14 @@ export const chkFullMetadata: TypeChk.typecheck<FullMetadata> = (
 ): val is FullMetadata => {
   return TypeChk.isObjectOfType(val, {
     originalPath: TypeChk.isString,
-    artist: chkArrayOf(string),
+    artist: TypeChk.chkArrayOf(TypeChk.isString),
     album: TypeChk.isString,
     year: chkIdlI16,
     track: chkIdlI16,
     title: TypeChk.isString,
     vaType: chkVAType,
-    moreArtists: chkArrayOf(string),
-    variations: chkArrayOf(string),
+    moreArtists: TypeChk.chkArrayOf(TypeChk.isString),
+    variations: TypeChk.chkArrayOf(TypeChk.isString),
     disk: chkIdlI16,
     diskName: TypeChk.isString,
   });
@@ -516,10 +563,10 @@ export const chkMusicDatabase: TypeChk.typecheck<MusicDatabase> = (
   val: unknown,
 ): val is MusicDatabase => {
   return TypeChk.isObjectOfType(val, {
-    artists: chkMapOf(ArtistKey, Artist),
-    albums: chkMapOf(AlbumKey, Album),
-    songs: chkMapOf(SongKey, Song),
-    playlists: chkMapOf(string, Playlist),
+    artists: TypeChk.chkMapOf(chkArtistKey, chkArtist),
+    albums: TypeChk.chkMapOf(chkAlbumKey, chkAlbum),
+    songs: TypeChk.chkMapOf(chkSongKey, chkSong),
+    playlists: TypeChk.chkMapOf(TypeChk.isString, chkPlaylist),
   });
 };
 // End of generated code
