@@ -1,5 +1,5 @@
 import { AlbumKey, SongKey } from '@freik/media-core';
-import { Fail } from '@freik/web-utils';
+import { Fail } from '@freik/react-tools';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import { musicLibraryState } from './MusicLibrary';

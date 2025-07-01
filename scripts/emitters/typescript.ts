@@ -1,4 +1,5 @@
 import {
+  Anonymous,
   ArrType,
   Enum,
   MapType,
@@ -91,27 +92,27 @@ function getTypeName(type: Types): string {
   throw new Error(`Unsupported unnamed type: ${JSON.stringify(type)}`);
 }
 
-function getTypeCheckName(type: Types): string {
-  if (isU8Type(type)) { 
-    return "chkIdlU8";
+function getTypeCheckName(type: Anonymous): string {
+  if (isU8Type(type)) {
+    return 'chkIdlU8';
   } else if (isI8Type(type)) {
-    return "chkIdlI8";
+    return 'chkIdlI8';
   } else if (isU16Type(type)) {
-    return "chkIdlU16";
+    return 'chkIdlU16';
   } else if (isI16Type(type)) {
-    return "chkIdlI16";
+    return 'chkIdlI16';
   } else if (isU32Type(type)) {
-    return "chkIdlU32";
+    return 'chkIdlU32';
   } else if (isI32Type(type)) {
-    return "chkIdlI32";
+    return 'chkIdlI32';
   } else if (isU64Type(type)) {
-    return "chkIdlU64";
+    return 'chkIdlU64';
   } else if (isI64Type(type)) {
-    return "chkIdlI64";
+    return 'chkIdlI64';
   } else if (isFloatType(type)) {
-    return "chkIdlFloat";
+    return 'chkIdlFloat';
   } else if (isDoubleType(type)) {
-    return "TypeChk.isNumber";
+    return 'TypeChk.isNumber';
   } else if (isU64Type(type)) {
     return 'chkIdlU64';
   } else if (isI64Type(type)) {
@@ -131,13 +132,11 @@ function getTypeCheckName(type: Types): string {
   } else if (isMapType(type) || isFastMapType(type)) {
     return `chkMapOf(${getTypeName(type.k)}, ${getTypeName(type.v)})`;
   } else if (isTupleType(type)) {
-    return `[${type.l.map(getTypeName).join(', ')}]`;
-  } else if (isObjectType(type) || isSubType(type)) {
-    return 'chkObjectOfType(...)';
-  } else if (isEnumType(type)) {
-    return `chkEnumType(${type.})`;
+    return `chkTuple(${type.l.map(getTypeName).join(', ')})`;
   }
-  throw new Error(`Unsupported unnamed type: ${JSON.stringify(type)}`);
+  throw new Error(
+    `Unsupported unnamed type for checking: ${JSON.stringify(type)}\n(Probably use a reference)`,
+  );
 }
 const enumType: EmitItem<Enum> = async (writer, name, item) => {
   await writer.write(`
@@ -145,7 +144,7 @@ export const ${name} = Object.freeze({
   ${item.v.map((val, idx) => `${val}: ${idx}`).join(',\n  ')}
 });
 export type ${name} = (typeof ${name})[keyof typeof ${name}];
-export const is${name}: TypeChk.typecheck<${name}> = (val: unknown): val is ${name} => {
+export const chk${name}: TypeChk.typecheck<${name}> = (val: unknown): val is ${name} => {
   return TypeChk.isString(val) && Object.values(${name}).includes(val as ${name});
 };
 `);
@@ -155,11 +154,11 @@ const numEnumType: EmitItem<NEnum> = async (writer, name, item) => {
   await writer.write(`
 export const ${name} = Object.freeze({
 ${Object.entries(item.v)
-      .map(([key, value]) => `  ${key}: ${value},`)
-      .join('\n')}
+  .map(([key, value]) => `  ${key}: ${value},`)
+  .join('\n')}
 });
 export type ${name} = (typeof ${name})[keyof typeof ${name}];
-export const is${name}: TypeChk.typecheck<${name}> = (val: unknown): val is ${name} => {
+export const chk${name}: TypeChk.typecheck<${name}> = (val: unknown): val is ${name} => {
   return TypeChk.isNumber(val) && Object.values(${name}).includes(val as ${name});
 }
 `);
@@ -169,11 +168,11 @@ const strEnumType: EmitItem<SEnum> = async (writer, name, item) => {
   await writer.write(`
 export const ${name} = Object.freeze({
 ${Object.entries(item.v)
-      .map(([key, val]) => `  ${key}: '${SingleQuoteSafe(val)}',`)
-      .join('\n')}
+  .map(([key, val]) => `  ${key}: '${SingleQuoteSafe(val)}',`)
+  .join('\n')}
 });
 export type ${name} = (typeof ${name})[keyof typeof ${name}];
-export const is${name}: TypeChk.typecheck<${name}> = (val: unknown): val is ${name} => {
+export const chk${name}: TypeChk.typecheck<${name}> = (val: unknown): val is ${name} => {
   return TypeChk.isString(val) && Object.values(${name}).includes(val as ${name});
 };
 `);
@@ -188,26 +187,28 @@ export type ${name} = {`);
   }
   await writer.write(`
 }
-export const is${name}: TypeChk.typecheck<${name}> = (val: unknown): val is ${name} => {
+export const chk${name}: TypeChk.typecheck<${name}> = (val: unknown): val is ${name} => {
     return TypeChk.isObjectOfType(val, {
-    ${Object.entries(item.d).map(([key, value]) => `  ${key}: ${getTypeCheckName(value)};`).join('\n')}
+    ${Object.entries(item.d)
+      .map(([key, value]) => `  ${key}: ${getTypeCheckName(value)},`)
+      .join('\n')}
     });
 }`);
 };
 
 const subType: EmitItem<SubType> = async (writer, name, item) => {
   await writer.write(`
-export type ${ name } = ${ item.p } & {`);
+export type ${name} = ${item.p} & {`);
   for (const [key, value] of Object.entries(item.d)) {
     const typeName = getTypeName(value);
-    await writer.write(`\n  ${ key }: ${ typeName }; `);
+    await writer.write(`\n  ${key}: ${typeName}; `);
   }
   await writer.write('\n};\n');
 };
 
 const simpleType: EmitItem<Types> = async (writer, name, item) => {
   await writer.write(`
-export type ${ name } = ${ getTypeName(item) };
+export type ${name} = ${getTypeName(item)};
 `);
 };
 

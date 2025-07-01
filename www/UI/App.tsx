@@ -7,6 +7,7 @@ import { VolumeControl } from './VolumeControl';
 import { Provider } from 'jotai';
 import { getStore } from 'www/Jotai/Storage';
 import { KeepAlive } from 'www/KeepAlive';
+import { DataListener } from 'www/Tools/DataListener';
 import { WebSocketRegistrar } from 'www/Tools/ReactWebSocket';
 import '../styles/App.css';
 import { ViewSelector } from './Views/Selector';

@@ -1535,14 +1535,14 @@ inline std::optional<Shared::SongWithPath> from_json<Shared::SongWithPath>(
   std::optional<Shared::Song> _base = from_json<Shared::Song>(_value);
   if (!_base.has_value())
     return std::nullopt;
+
   if (!_value.has("path"))
     return std::nullopt;
   auto _path_opt_ = from_json<std::string>(_value["path"]);
   if (!_path_opt_.has_value())
     return std::nullopt;
-  Shared::SongWithPath _res{std::move(*_base), std::move(*_path_opt_)};
 
-  // _res.path = std::move(*_path_opt_);
+  Shared::SongWithPath _res{std::move(*_base), std::move(*_path_opt_)};
 
   return _res;
 }
