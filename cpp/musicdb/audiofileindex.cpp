@@ -135,6 +135,7 @@ Shared::MusicDatabase* get_music_db() {
                       .title = "Gun",
                       .albumId = album_bones,
                       .artistIds = {artist_chv},
+                      .secondaryIds = {},
                       .variations = {}};
   Shared::Song cb4 = {//.path = "C/CHVRCHES/2013 - The Bones of What You
                       // Believe/04 - Tether.flac",
