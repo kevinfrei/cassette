@@ -339,7 +339,7 @@ from_json<Shared::${name}>(
   std::optional<Shared::${item.p}> _base = from_json<Shared::${item.p}>(_value);
   if (!_base.has_value())
     return std::nullopt;
-  Shared::${name} _res{std::move(*_base)};
+  
   ${Object.entries(item.d)
     .map(
       ([key, value]) => `
@@ -348,16 +348,21 @@ from_json<Shared::${name}>(
   auto _${key}_opt_ = from_json<${getTypeName(value, true)}>(_value["${key}"]);
   if (!_${key}_opt_.has_value())
     return std::nullopt;
-  _res.${key} = std::move(*_${key}_opt_);`,
+  `,
     )
     .join('\n  ')}
+  Shared::${name} _res{std::move(*_base), ${
+    // std::move the fields of the base, plus the inherited fields
+    Object.entries(item.d)
+      .map(([key, value]) => `std::move(*_${key}_opt_)`)
+      .join(', ')
+  }};
 
   return _res;
 }
 #pragma endregion JSON serialization for object ${name}
 `);
 };
-
 const usingType: EmitItem<Types> = async (writer, name, item) => {
   // This is a base type, so we don't need to do anything special
   await writer.write(`

@@ -1,4 +1,4 @@
-import { BoolState } from '@freik/web-utils';
+import { BoolState } from '@freik/react-tools';
 import { PrimitiveAtom, WritableAtom, atom, useAtom } from 'jotai';
 import { RESET, atomFamily } from 'jotai/utils';
 
