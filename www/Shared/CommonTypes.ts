@@ -7,22 +7,22 @@
 
 import * as TypeChk from '@freik/typechk';
 
-const chkIdlU8: TypeChk.typecheck<number> = (v: unknown): v is number =>
+const chkIdlU8 = (v: unknown): v is number =>
   TypeChk.isNumber(v) && v >= 0 && v <= 255 && Number.isInteger(v);
-const chkIdlI8: TypeChk.typecheck<number> = (v: unknown): v is number =>
+const chkIdlI8 = (v: unknown): v is number =>
   TypeChk.isNumber(v) && v >= -256 && v <= 255 && Number.isInteger(v);
-const chkIdlU16: TypeChk.typecheck<number> = (v: unknown): v is number =>
+const chkIdlU16 = (v: unknown): v is number =>
   TypeChk.isNumber(v) && v >= 0 && v <= 65535 && Number.isInteger(v);
-const chkIdlI16: TypeChk.typecheck<number> = (v: unknown): v is number =>
+const chkIdlI16 = (v: unknown): v is number =>
   TypeChk.isNumber(v) && v >= -32768 && v <= 32767 && Number.isInteger(v);
-const chkIdlU32: TypeChk.typecheck<number> = (v: unknown): v is number =>
+const chkIdlU32 = (v: unknown): v is number =>
   TypeChk.isNumber(v) && v >= 0 && v <= 4294967295 && Number.isInteger(v);
-const chkIdlI32: TypeChk.typecheck<number> = (v: unknown): v is number =>
+const chkIdlI32 = (v: unknown): v is number =>
   TypeChk.isNumber(v) &&
   v >= -2147483648 &&
   v <= 2147483647 &&
   Number.isInteger(v);
-const chkIdlU64: TypeChk.typecheck<number> = (v: unknown): v is number => {
+function chkIdlU64(v: unknown): v is number {
   if (chkIdlU32(v)) {
     return true;
   }
@@ -30,8 +30,8 @@ const chkIdlU64: TypeChk.typecheck<number> = (v: unknown): v is number => {
     return true;
   }
   return true; // TODO: Check for a BigInt
-};
-const chkIdlI64: TypeChk.typecheck<number> = (v: unknown): v is number => {
+}
+function chkIdlI64(v: unknown): v is number {
   if (chkIdlI32(v)) {
     return true;
   }
@@ -44,7 +44,7 @@ const chkIdlI64: TypeChk.typecheck<number> = (v: unknown): v is number => {
     return true;
   }
   return true; // TODO: Check for a BigInt
-};
+}
 const chkIdlChar: TypeChk.typecheck<string> = (v: unknown): v is string =>
   TypeChk.isString(v) && v.length === 1;
 
@@ -69,9 +69,9 @@ export const Keys = Object.freeze({
   Tools: 'L',
 });
 export type Keys = (typeof Keys)[keyof typeof Keys];
-export const chkKeys: TypeChk.typecheck<Keys> = (val: unknown): val is Keys => {
+export function chkKeys(val: unknown): val is Keys {
   return TypeChk.isString(val) && Object.values(Keys).includes(val as Keys);
-};
+}
 
 export const StrId = Object.freeze({
   Mono: 'mono',
@@ -116,11 +116,9 @@ export const StrId = Object.freeze({
   ImportFiles: 'Import Files...',
 });
 export type StrId = (typeof StrId)[keyof typeof StrId];
-export const chkStrId: TypeChk.typecheck<StrId> = (
-  val: unknown,
-): val is StrId => {
+export function chkStrId(val: unknown): val is StrId {
   return TypeChk.isString(val) && Object.values(StrId).includes(val as StrId);
-};
+}
 
 export const CurrentView = Object.freeze({
   disabled: -1,
@@ -136,14 +134,12 @@ export const CurrentView = Object.freeze({
   tools: 9,
 });
 export type CurrentView = (typeof CurrentView)[keyof typeof CurrentView];
-export const chkCurrentView: TypeChk.typecheck<CurrentView> = (
-  val: unknown,
-): val is CurrentView => {
+export function chkCurrentView(val: unknown): val is CurrentView {
   return (
     TypeChk.isNumber(val) &&
     Object.values(CurrentView).includes(val as CurrentView)
   );
-};
+}
 
 export const IpcCall = Object.freeze({
   ReadFromStorage: 0,
@@ -191,13 +187,11 @@ export const IpcCall = Object.freeze({
   FolderPicker: 42,
 });
 export type IpcCall = (typeof IpcCall)[keyof typeof IpcCall];
-export const chkIpcCall: TypeChk.typecheck<IpcCall> = (
-  val: unknown,
-): val is IpcCall => {
+export function chkIpcCall(val: unknown): val is IpcCall {
   return (
     TypeChk.isNumber(val) && Object.values(IpcCall).includes(val as IpcCall)
   );
-};
+}
 
 export const IpcMsg = Object.freeze({
   TranscodingUpdate: 0,
@@ -208,11 +202,9 @@ export const IpcMsg = Object.freeze({
   ContentLoaded: 5,
 });
 export type IpcMsg = (typeof IpcMsg)[keyof typeof IpcMsg];
-export const chkIpcMsg: TypeChk.typecheck<IpcMsg> = (
-  val: unknown,
-): val is IpcMsg => {
+export function chkIpcMsg(val: unknown): val is IpcMsg {
   return TypeChk.isString(val) && Object.values(IpcMsg).includes(val as IpcMsg);
-};
+}
 
 export const IgnoreItemType = Object.freeze({
   PathRoot: 'path-root',
@@ -221,14 +213,12 @@ export const IgnoreItemType = Object.freeze({
 });
 export type IgnoreItemType =
   (typeof IgnoreItemType)[keyof typeof IgnoreItemType];
-export const chkIgnoreItemType: TypeChk.typecheck<IgnoreItemType> = (
-  val: unknown,
-): val is IgnoreItemType => {
+export function chkIgnoreItemType(val: unknown): val is IgnoreItemType {
   return (
     TypeChk.isString(val) &&
     Object.values(IgnoreItemType).includes(val as IgnoreItemType)
   );
-};
+}
 
 export const StorageId = Object.freeze({
   CurrentView: 'currentView',
@@ -262,13 +252,11 @@ export const StorageId = Object.freeze({
   TranscodeBitRate: 'transcodeBitRate',
 });
 export type StorageId = (typeof StorageId)[keyof typeof StorageId];
-export const chkStorageId: TypeChk.typecheck<StorageId> = (
-  val: unknown,
-): val is StorageId => {
+export function chkStorageId(val: unknown): val is StorageId {
   return (
     TypeChk.isString(val) && Object.values(StorageId).includes(val as StorageId)
   );
-};
+}
 
 export const TranscodeFormatTargetName = Object.freeze({
   m4a: 'm4a',
@@ -277,16 +265,16 @@ export const TranscodeFormatTargetName = Object.freeze({
 });
 export type TranscodeFormatTargetName =
   (typeof TranscodeFormatTargetName)[keyof typeof TranscodeFormatTargetName];
-export const chkTranscodeFormatTargetName: TypeChk.typecheck<
-  TranscodeFormatTargetName
-> = (val: unknown): val is TranscodeFormatTargetName => {
+export function chkTranscodeFormatTargetName(
+  val: unknown,
+): val is TranscodeFormatTargetName {
   return (
     TypeChk.isString(val) &&
     Object.values(TranscodeFormatTargetName).includes(
       val as TranscodeFormatTargetName,
     )
   );
-};
+}
 
 export const TranscodeSource = Object.freeze({
   Playlist: 'p',
@@ -296,39 +284,33 @@ export const TranscodeSource = Object.freeze({
 });
 export type TranscodeSource =
   (typeof TranscodeSource)[keyof typeof TranscodeSource];
-export const chkTranscodeSource: TypeChk.typecheck<TranscodeSource> = (
-  val: unknown,
-): val is TranscodeSource => {
+export function chkTranscodeSource(val: unknown): val is TranscodeSource {
   return (
     TypeChk.isString(val) &&
     Object.values(TranscodeSource).includes(val as TranscodeSource)
   );
-};
+}
 
 export type TranscodeSourceLocation = {
   type: TranscodeSource;
   loc: string;
 };
-export const chkTranscodeSourceLocation: TypeChk.typecheck<
-  TranscodeSourceLocation
-> = (val: unknown): val is TranscodeSourceLocation => {
-  return TypeChk.isObjectOfType(val, {
+export const chkTranscodeSourceLocation: TypeChk.typecheck<TranscodeSourceLocation> =
+  TypeChk.chkObjectOfType({
     type: chkTranscodeSource,
     loc: TypeChk.isString,
   });
-};
+
 export type FileFailure = {
   file: string;
   error: string;
 };
-export const chkFileFailure: TypeChk.typecheck<FileFailure> = (
-  val: unknown,
-): val is FileFailure => {
-  return TypeChk.isObjectOfType(val, {
+export const chkFileFailure: TypeChk.typecheck<FileFailure> =
+  TypeChk.chkObjectOfType({
     file: TypeChk.isString,
     error: TypeChk.isString,
   });
-};
+
 export type TranscodeState = {
   curStatus: string;
   filesTranscoded: string[];
@@ -338,10 +320,8 @@ export type TranscodeState = {
   filesFailed: FileFailure[];
   itemsRemoved: string[];
 };
-export const chkTranscodeState: TypeChk.typecheck<TranscodeState> = (
-  val: unknown,
-): val is TranscodeState => {
-  return TypeChk.isObjectOfType(val, {
+export const chkTranscodeState: TypeChk.typecheck<TranscodeState> =
+  TypeChk.chkObjectOfType({
     curStatus: TypeChk.isString,
     filesTranscoded: TypeChk.chkArrayOf(TypeChk.isString),
     filesFound: chkIdlI32,
@@ -350,7 +330,7 @@ export const chkTranscodeState: TypeChk.typecheck<TranscodeState> = (
     filesFailed: TypeChk.chkArrayOf(chkFileFailure),
     itemsRemoved: TypeChk.chkArrayOf(TypeChk.isString),
   });
-};
+
 export type TranscodeInfo = {
   source: TranscodeSourceLocation;
   dest: string;
@@ -359,10 +339,8 @@ export type TranscodeInfo = {
   format: TranscodeFormatTargetName;
   bitrate: number;
 };
-export const chkTranscodeInfo: TypeChk.typecheck<TranscodeInfo> = (
-  val: unknown,
-): val is TranscodeInfo => {
-  return TypeChk.isObjectOfType(val, {
+export const chkTranscodeInfo: TypeChk.typecheck<TranscodeInfo> =
+  TypeChk.chkObjectOfType({
     source: chkTranscodeSourceLocation,
     dest: TypeChk.isString,
     artwork: TypeChk.isBoolean,
@@ -370,7 +348,7 @@ export const chkTranscodeInfo: TypeChk.typecheck<TranscodeInfo> = (
     format: chkTranscodeFormatTargetName,
     bitrate: chkIdlU16,
   });
-};
+
 export type SongKey = string;
 export const chkSongKey = TypeChk.isString;
 
@@ -398,17 +376,16 @@ export type Song = {
   secondaryIds: ArtistKey[];
   variations: string[];
 };
-export const chkSong: TypeChk.typecheck<Song> = (val: unknown): val is Song => {
-  return TypeChk.isObjectOfType(val, {
-    key: chkSongKey,
-    track: chkIdlI16,
-    title: TypeChk.isString,
-    albumId: chkAlbumKey,
-    artistIds: TypeChk.chkArrayOf(chkArtistKey),
-    secondaryIds: TypeChk.chkArrayOf(chkArtistKey),
-    variations: TypeChk.chkArrayOf(TypeChk.isString),
-  });
-};
+export const chkSong: TypeChk.typecheck<Song> = TypeChk.chkObjectOfType({
+  key: chkSongKey,
+  track: chkIdlI16,
+  title: TypeChk.isString,
+  albumId: chkAlbumKey,
+  artistIds: TypeChk.chkArrayOf(chkArtistKey),
+  secondaryIds: TypeChk.chkArrayOf(chkArtistKey),
+  variations: TypeChk.chkArrayOf(TypeChk.isString),
+});
+
 export type SongWithPath = Song & {
   path: string;
 };
@@ -419,11 +396,9 @@ export const VAType = Object.freeze({
   OST: 2,
 });
 export type VAType = (typeof VAType)[keyof typeof VAType];
-export const chkVAType: TypeChk.typecheck<VAType> = (
-  val: unknown,
-): val is VAType => {
+export function chkVAType(val: unknown): val is VAType {
   return TypeChk.isString(val) && Object.values(VAType).includes(val as VAType);
-};
+}
 
 export type Artist = {
   key: ArtistKey;
@@ -431,16 +406,13 @@ export type Artist = {
   albums: AlbumKey[];
   songs: SongKey[];
 };
-export const chkArtist: TypeChk.typecheck<Artist> = (
-  val: unknown,
-): val is Artist => {
-  return TypeChk.isObjectOfType(val, {
-    key: chkArtistKey,
-    name: TypeChk.isString,
-    albums: TypeChk.chkArrayOf(chkAlbumKey),
-    songs: TypeChk.chkArrayOf(chkSongKey),
-  });
-};
+export const chkArtist: TypeChk.typecheck<Artist> = TypeChk.chkObjectOfType({
+  key: chkArtistKey,
+  name: TypeChk.isString,
+  albums: TypeChk.chkArrayOf(chkAlbumKey),
+  songs: TypeChk.chkArrayOf(chkSongKey),
+});
+
 export type Album = {
   key: AlbumKey;
   year: number;
@@ -450,31 +422,26 @@ export type Album = {
   songs: SongKey[];
   diskNames: string[];
 };
-export const chkAlbum: TypeChk.typecheck<Album> = (
-  val: unknown,
-): val is Album => {
-  return TypeChk.isObjectOfType(val, {
-    key: chkAlbumKey,
-    year: chkIdlI16,
-    title: TypeChk.isString,
-    vatype: chkVAType,
-    primaryArtists: TypeChk.chkArrayOf(chkArtistKey),
-    songs: TypeChk.chkArrayOf(chkSongKey),
-    diskNames: TypeChk.chkArrayOf(TypeChk.isString),
-  });
-};
+export const chkAlbum: TypeChk.typecheck<Album> = TypeChk.chkObjectOfType({
+  key: chkAlbumKey,
+  year: chkIdlI16,
+  title: TypeChk.isString,
+  vatype: chkVAType,
+  primaryArtists: TypeChk.chkArrayOf(chkArtistKey),
+  songs: TypeChk.chkArrayOf(chkSongKey),
+  diskNames: TypeChk.chkArrayOf(TypeChk.isString),
+});
+
 export type MediaInfo = {
   general: Map<string, string>;
   audio: Map<string, string>;
 };
-export const chkMediaInfo: TypeChk.typecheck<MediaInfo> = (
-  val: unknown,
-): val is MediaInfo => {
-  return TypeChk.isObjectOfType(val, {
+export const chkMediaInfo: TypeChk.typecheck<MediaInfo> =
+  TypeChk.chkObjectOfType({
     general: TypeChk.chkMapOf(TypeChk.isString, TypeChk.isString),
     audio: TypeChk.chkMapOf(TypeChk.isString, TypeChk.isString),
   });
-};
+
 export type SimpleMetadata = {
   artist: string;
   album: string;
@@ -485,10 +452,8 @@ export type SimpleMetadata = {
   discName: string;
   compilation: VAType;
 };
-export const chkSimpleMetadata: TypeChk.typecheck<SimpleMetadata> = (
-  val: unknown,
-): val is SimpleMetadata => {
-  return TypeChk.isObjectOfType(val, {
+export const chkSimpleMetadata: TypeChk.typecheck<SimpleMetadata> =
+  TypeChk.chkObjectOfType({
     artist: TypeChk.isString,
     album: TypeChk.isString,
     year: TypeChk.isString,
@@ -498,7 +463,7 @@ export const chkSimpleMetadata: TypeChk.typecheck<SimpleMetadata> = (
     discName: TypeChk.isString,
     compilation: chkVAType,
   });
-};
+
 export type FullMetadata = {
   originalPath: string;
   artist: string[];
@@ -512,10 +477,8 @@ export type FullMetadata = {
   disk: number;
   diskName: string;
 };
-export const chkFullMetadata: TypeChk.typecheck<FullMetadata> = (
-  val: unknown,
-): val is FullMetadata => {
-  return TypeChk.isObjectOfType(val, {
+export const chkFullMetadata: TypeChk.typecheck<FullMetadata> =
+  TypeChk.chkObjectOfType({
     originalPath: TypeChk.isString,
     artist: TypeChk.chkArrayOf(TypeChk.isString),
     album: TypeChk.isString,
@@ -528,45 +491,40 @@ export const chkFullMetadata: TypeChk.typecheck<FullMetadata> = (
     disk: chkIdlI16,
     diskName: TypeChk.isString,
   });
-};
+
 export type AudioFileRegexPattern = {
   compilation: VAType;
   rgx: string;
 };
-export const chkAudioFileRegexPattern: TypeChk.typecheck<
-  AudioFileRegexPattern
-> = (val: unknown): val is AudioFileRegexPattern => {
-  return TypeChk.isObjectOfType(val, {
+export const chkAudioFileRegexPattern: TypeChk.typecheck<AudioFileRegexPattern> =
+  TypeChk.chkObjectOfType({
     compilation: chkVAType,
     rgx: TypeChk.isString,
   });
-};
+
 export type MimeData = {
   type: string;
   data: string;
 };
-export const chkMimeData: TypeChk.typecheck<MimeData> = (
-  val: unknown,
-): val is MimeData => {
-  return TypeChk.isObjectOfType(val, {
+export const chkMimeData: TypeChk.typecheck<MimeData> = TypeChk.chkObjectOfType(
+  {
     type: TypeChk.isString,
     data: TypeChk.isString,
-  });
-};
+  },
+);
+
 export type MusicDatabase = {
   artists: Map<ArtistKey, Artist>;
   albums: Map<AlbumKey, Album>;
   songs: Map<SongKey, Song>;
   playlists: Map<string, Playlist>;
 };
-export const chkMusicDatabase: TypeChk.typecheck<MusicDatabase> = (
-  val: unknown,
-): val is MusicDatabase => {
-  return TypeChk.isObjectOfType(val, {
+export const chkMusicDatabase: TypeChk.typecheck<MusicDatabase> =
+  TypeChk.chkObjectOfType({
     artists: TypeChk.chkMapOf(chkArtistKey, chkArtist),
     albums: TypeChk.chkMapOf(chkAlbumKey, chkAlbum),
     songs: TypeChk.chkMapOf(chkSongKey, chkSong),
     playlists: TypeChk.chkMapOf(TypeChk.isString, chkPlaylist),
   });
-};
+
 // End of generated code

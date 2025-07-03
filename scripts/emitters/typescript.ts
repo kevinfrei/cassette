@@ -52,22 +52,22 @@ async function header(writer: Bun.FileSink): Promise<void> {
  
 import * as TypeChk from '@freik/typechk';
 
-const chkIdlU8: TypeChk.typecheck<number> = (v: unknown): v is number =>
+const chkIdlU8 = (v: unknown): v is number =>
   TypeChk.isNumber(v) && v >= 0 && v <= 255 && Number.isInteger(v);
-const chkIdlI8: TypeChk.typecheck<number> = (v: unknown): v is number =>
+const chkIdlI8 = (v: unknown): v is number =>
   TypeChk.isNumber(v) && v >= -256 && v <= 255 && Number.isInteger(v);
-const chkIdlU16: TypeChk.typecheck<number> = (v: unknown): v is number =>
+const chkIdlU16 = (v: unknown): v is number =>
   TypeChk.isNumber(v) && v >= 0 && v <= 65535 && Number.isInteger(v);
-const chkIdlI16: TypeChk.typecheck<number> = (v: unknown): v is number =>
+const chkIdlI16 = (v: unknown): v is number =>
   TypeChk.isNumber(v) && v >= -32768 && v <= 32767 && Number.isInteger(v);
-const chkIdlU32: TypeChk.typecheck<number> = (v: unknown): v is number =>
+const chkIdlU32 = (v: unknown): v is number =>
   TypeChk.isNumber(v) && v >= 0 && v <= 4294967295 && Number.isInteger(v);
-const chkIdlI32: TypeChk.typecheck<number> = (v: unknown): v is number =>
+const chkIdlI32 = (v: unknown): v is number =>
   TypeChk.isNumber(v) &&
   v >= -2147483648 &&
   v <= 2147483647 &&
   Number.isInteger(v);
-const chkIdlU64: TypeChk.typecheck<number> = (v: unknown): v is number => {
+function chkIdlU64(v: unknown): v is number {
   if (chkIdlU32(v)) {
     return true;
   }
@@ -75,8 +75,8 @@ const chkIdlU64: TypeChk.typecheck<number> = (v: unknown): v is number => {
     return true;
   }
   return true; // TODO: Check for a BigInt
-};
-const chkIdlI64: TypeChk.typecheck<number> = (v: unknown): v is number => {
+}
+function chkIdlI64(v: unknown): v is number {
   if (chkIdlI32(v)) {
     return true;
   }
@@ -89,7 +89,7 @@ const chkIdlI64: TypeChk.typecheck<number> = (v: unknown): v is number => {
     return true;
   }
   return true; // TODO: Check for a BigInt
-};
+}
 const chkIdlChar: TypeChk.typecheck<string> = (v: unknown): v is string =>
   TypeChk.isString(v) && v.length === 1;
 
@@ -186,9 +186,9 @@ export const ${name} = Object.freeze({
   ${item.v.map((val, idx) => `${val}: ${idx}`).join(',\n  ')}
 });
 export type ${name} = (typeof ${name})[keyof typeof ${name}];
-export const chk${name}: TypeChk.typecheck<${name}> = (val: unknown): val is ${name} => {
+export function chk${name}(val: unknown): val is ${name} {
   return TypeChk.isString(val) && Object.values(${name}).includes(val as ${name});
-};
+}
 `);
 };
 
@@ -200,7 +200,7 @@ ${Object.entries(item.v)
   .join('\n')}
 });
 export type ${name} = (typeof ${name})[keyof typeof ${name}];
-export const chk${name}: TypeChk.typecheck<${name}> = (val: unknown): val is ${name} => {
+export function chk${name}(val: unknown): val is ${name} {
   return TypeChk.isNumber(val) && Object.values(${name}).includes(val as ${name});
 }
 `);
@@ -214,9 +214,9 @@ ${Object.entries(item.v)
   .join('\n')}
 });
 export type ${name} = (typeof ${name})[keyof typeof ${name}];
-export const chk${name}: TypeChk.typecheck<${name}> = (val: unknown): val is ${name} => {
+export function chk${name}(val: unknown): val is ${name} {
   return TypeChk.isString(val) && Object.values(${name}).includes(val as ${name});
-};
+}
 `);
 };
 
@@ -229,13 +229,12 @@ export type ${name} = {`);
   }
   await writer.write(`
 }
-export const chk${name}: TypeChk.typecheck<${name}> = (val: unknown): val is ${name} => {
-    return TypeChk.isObjectOfType(val, {
-    ${Object.entries(item.d)
-      .map(([key, value]) => `  ${key}: ${getTypeCheckName(value)},`)
-      .join('\n')}
+export const chk${name}: TypeChk.typecheck<${name}> = TypeChk.chkObjectOfType({
+${Object.entries(item.d)
+  .map(([key, value]) => `  ${key}: ${getTypeCheckName(value)},`)
+  .join('\n')}
     });
-}`);
+`);
 };
 
 const subType: EmitItem<SubType> = async (writer, name, item) => {
