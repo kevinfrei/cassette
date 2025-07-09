@@ -80,7 +80,7 @@ async function noRemoveItem(_key: string): Promise<void> {
 
 type Unsub = () => void;
 type Subscriber<T> = (
-  key: string, // Jotai key, which is the same as the IpcMsg key
+  key: SocketMsg, // Jotai key, which is the same as the SocketMsg key
   callback: (value: T) => void,
   initVal: T,
 ) => Unsub;
@@ -94,7 +94,7 @@ function getIpcCall(key: number): IpcCall {
 }
 
 function makeSubscribe<T>(chk: typecheck<T>): Subscriber<T> {
-  return (key: IpcCall, callback: (value: T) => void, initialValue: T) => {
+  return (key: SocketMsg, callback: (value: T) => void, initialValue: T) => {
     const lk = SubscribeWithDefault(key, chk, callback, initialValue);
     return () => Unsubscribe(lk);
   };
@@ -105,12 +105,13 @@ function makeTranslatedSubscribe<T, U>(
   xlate: (val: T) => U | undefined,
   def: U,
 ): Subscriber<U> {
-  return (key: IpcCall, callback: (value: T) => void, initialValue: T) => {
-    const lk = SubscribeUnsafe(key.toString(), (val: unknown) => {
+  return (key: SocketMsg, callback: (value: U) => void, defaultValue: U) => {
+    const lk = SubscribeUnsafe(key, (val: unknown) => {
       if (chk(val)) {
-        callback(xlate(val));
+        const xlateVal = xlate(val);
+        callback(isDefined(xlateVal) ? xlateVal : def);
       } else {
-        callback(initialValue);
+        callback(def);
       }
     });
     return () => Unsubscribe(lk);
