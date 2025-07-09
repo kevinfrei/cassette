@@ -25,8 +25,8 @@ import { GetHelperText } from 'www/WebHelpers';
 import {
   IgnoreItemType,
   IpcCall,
-  IpcMsg,
   Keys,
+  SocketMsg,
   StrId,
 } from 'www/Shared/CommonTypes';
 import { PostMain, SendMessage } from 'www/Tools/Ipc';
@@ -117,7 +117,7 @@ function MusicLocations(): ReactElement {
             text="Rescan Locations"
             iconProps={{ iconName: 'SearchData' }}
             disabled={false /*rescanInProgress*/}
-            onClick={() => SendMessage(IpcMsg.ManualRescan)}
+            onClick={() => SendMessage(SocketMsg.ManualRescan)}
             style={btnWidth}
           />
         </TooltipHost>

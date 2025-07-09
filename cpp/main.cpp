@@ -10,6 +10,7 @@
 #include "handlers.h"
 #include "quitting.h"
 #include "setup.h"
+#include "websocket.h"
 #include "window.h"
 
 std::string GetRootUrl() {
@@ -17,25 +18,10 @@ std::string GetRootUrl() {
          "/www/index.html";
 }
 
-crow::websocket::connection* webSocket = nullptr;
-
 void ConfigureRoutes(crow::SimpleApp& app, const std::string& /*url*/) {
   // Define the routes:
   // Try a websocket route:
-  CROW_WEBSOCKET_ROUTE(app, "/ws")
-      .onopen([&](crow::websocket::connection& conn) -> void {
-        std::cout << "WebSocket connection opened from " << conn.get_remote_ip()
-                  << std::endl;
-        webSocket = &conn;
-      })
-      .onmessage(handlers::socket_message)
-      .onclose([&](crow::websocket::connection& conn,
-                   const std::string& reason /*, uint16_t code*/) {
-        std::cout << "WebSocket connection closed from " << conn.get_remote_ip()
-                  << " with reason: "
-                  << reason /* << " and code " << code */ << std::endl;
-        webSocket = nullptr;
-      });
+  websocket::configure(app);
   CROW_ROUTE(app, "/www/<path>")(handlers::file_path);
   CROW_ROUTE(app, "/api/<path>")(handlers::api);
   CROW_ROUTE(app, "/tune/<path>")(handlers::tune);
@@ -60,11 +46,8 @@ int main(void) {
   while (!quitting::should_quit()) {
     _a.wait_for(std::chrono::seconds(1));
     quitting::loop_wait();
-    if (webSocket) {
-      // Send a keepalive message every 5 seconds
-      if (i++ % 5 == 0)
-        webSocket->send_text("keep alive the other way: " + std::to_string(i));
-    }
+    if (i++ % 5 == 0)
+      websocket::keep_alive();
   }
   app.stop();
   return 0;

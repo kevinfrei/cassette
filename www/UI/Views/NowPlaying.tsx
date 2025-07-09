@@ -14,7 +14,7 @@ import {
   Text,
   TooltipHost,
 } from '@fluentui/react';
-import { Keys } from '@freik/emp-shared';
+import { Dialogs } from '@freik/fluentui-tools';
 import { MakeLog } from '@freik/logger';
 import {
   Album,
@@ -24,9 +24,8 @@ import {
   Song,
   SongKey,
 } from '@freik/media-core';
-import { isNumber } from '@freik/typechk';
-import { Dialogs } from '@freik/fluentui-tools';
 import { useDialogState } from '@freik/react-tools';
+import { isNumber } from '@freik/typechk';
 import { atom as jatom, useAtom, useAtomValue } from 'jotai';
 import { ReactElement, useCallback, useState } from 'react';
 import { RemoveSongFromNowPlaying, StopAndClear } from '../../Jotai/API';
@@ -134,24 +133,21 @@ function TopLine(): ReactElement {
           className="np-clear-queue"
           onClick={clickClearQueue}
           disabled={emptyQueue}
-          style={{ width: 120 }}
-        >
+          style={{ width: 120 }}>
           Clear Queue
         </DefaultButton>
         <Text
           className="np-current-playlist"
           variant="large"
           block={true}
-          nowrap={true}
-        >
+          nowrap={true}>
           {header}
         </Text>
         <DefaultButton
           className="save-playlist-as"
           onClick={showSaveAs}
           disabled={emptyQueue}
-          style={{ width: 120 }}
-        >
+          style={{ width: 120 }}>
           Save As...
         </DefaultButton>
         <DefaultButton
@@ -159,8 +155,7 @@ function TopLine(): ReactElement {
           className="save-playlist"
           disabled={!saveEnabled}
           style={{ width: 120 }}
-          title={GetHelperText(Keys.SavePlaylist)}
-        >
+          title={GetHelperText(Keys.SavePlaylist)}>
           Save
         </DefaultButton>
       </div>
@@ -182,8 +177,7 @@ function StickyDetailsHeader(
     <Sticky stickyPosition={StickyPositionType.Header} isScrollSynced>
       <div
         id="nowPlayingSticky"
-        style={{ background: 'white', paddingTop: 0.1 }}
-      >
+        style={{ background: 'white', paddingTop: 0.1 }}>
         <TopLine />
         {defaultRender({
           ...theProps,

@@ -142,49 +142,50 @@ export function chkCurrentView(val: unknown): val is CurrentView {
 }
 
 export const IpcCall = Object.freeze({
-  ReadFromStorage: 0,
-  WriteToStorage: 1,
-  DeleteFromStorage: 2,
-  AsyncData: 3,
-  IsDev: 4,
-  ClearHates: 5,
-  ClearLikes: 6,
-  ClearLocalOverrides: 7,
-  DeletePlaylist: 8,
-  FlushImageCache: 9,
-  FlushMetadataCache: 10,
-  GetHates: 11,
-  GetLikes: 12,
-  GetMediaInfo: 13,
-  GetMusicDatabase: 14,
-  GetPlaylists: 15,
-  LoadPlaylist: 16,
-  MenuAction: 17,
-  RenamePlaylist: 18,
-  SavePlaylist: 19,
-  Search: 20,
-  SetHates: 21,
-  SetLikes: 22,
-  SetMediaInfo: 23,
-  SetPlaylists: 24,
-  SetSaveMenu: 25,
-  ShowFile: 26,
-  ShowLocFromKey: 27,
-  ShowMenu: 28,
-  SubstrSearch: 29,
-  TranscodingBegin: 30,
-  UploadImage: 31,
-  MinimizeWindow: 32,
-  MaximizeWindow: 33,
-  RestoreWindow: 34,
-  CloseWindow: 35,
-  GetPicUri: 36,
-  GetIgnoreList: 37,
-  AddIgnoreItem: 38,
-  RemoveIgnoreItem: 39,
-  PushIgnoreList: 40,
-  IgnoreListId: 41,
-  FolderPicker: 42,
+  Unknown: 0,
+  ReadFromStorage: 1,
+  WriteToStorage: 2,
+  DeleteFromStorage: 3,
+  AsyncData: 4,
+  IsDev: 5,
+  ClearHates: 6,
+  ClearLikes: 7,
+  ClearLocalOverrides: 8,
+  DeletePlaylist: 9,
+  FlushImageCache: 10,
+  FlushMetadataCache: 11,
+  GetHates: 12,
+  GetLikes: 13,
+  GetMediaInfo: 14,
+  GetMusicDatabase: 15,
+  GetPlaylists: 16,
+  LoadPlaylist: 17,
+  MenuAction: 18,
+  RenamePlaylist: 19,
+  SavePlaylist: 20,
+  Search: 21,
+  SetHates: 22,
+  SetLikes: 23,
+  SetMediaInfo: 24,
+  SetPlaylists: 25,
+  SetSaveMenu: 26,
+  ShowFile: 27,
+  ShowLocFromKey: 28,
+  ShowMenu: 29,
+  SubstrSearch: 30,
+  TranscodingBegin: 31,
+  UploadImage: 32,
+  MinimizeWindow: 33,
+  MaximizeWindow: 34,
+  RestoreWindow: 35,
+  CloseWindow: 36,
+  GetPicUri: 37,
+  GetIgnoreList: 38,
+  AddIgnoreItem: 39,
+  RemoveIgnoreItem: 40,
+  PushIgnoreList: 41,
+  IgnoreListId: 42,
+  FolderPicker: 43,
 });
 export type IpcCall = (typeof IpcCall)[keyof typeof IpcCall];
 export function chkIpcCall(val: unknown): val is IpcCall {
@@ -193,17 +194,21 @@ export function chkIpcCall(val: unknown): val is IpcCall {
   );
 }
 
-export const IpcMsg = Object.freeze({
-  TranscodingUpdate: 0,
-  ManualRescan: 1,
-  RescanInProgress: 2,
-  RescanComplete: 3,
-  MusicDBUpdate: 4,
-  ContentLoaded: 5,
+export const SocketMsg = Object.freeze({
+  Unknown: 0,
+  TranscodingUpdate: 1,
+  ManualRescan: 2,
+  RescanInProgress: 3,
+  RescanComplete: 4,
+  MusicDBUpdate: 5,
+  ContentLoaded: 6,
+  KeepAlive: 7,
 });
-export type IpcMsg = (typeof IpcMsg)[keyof typeof IpcMsg];
-export function chkIpcMsg(val: unknown): val is IpcMsg {
-  return TypeChk.isString(val) && Object.values(IpcMsg).includes(val as IpcMsg);
+export type SocketMsg = (typeof SocketMsg)[keyof typeof SocketMsg];
+export function chkSocketMsg(val: unknown): val is SocketMsg {
+  return (
+    TypeChk.isNumber(val) && Object.values(SocketMsg).includes(val as SocketMsg)
+  );
 }
 
 export const IgnoreItemType = Object.freeze({
@@ -397,7 +402,7 @@ export const VAType = Object.freeze({
 });
 export type VAType = (typeof VAType)[keyof typeof VAType];
 export function chkVAType(val: unknown): val is VAType {
-  return TypeChk.isString(val) && Object.values(VAType).includes(val as VAType);
+  return TypeChk.isNumber(val) && Object.values(VAType).includes(val as VAType);
 }
 
 export type Artist = {

@@ -9,6 +9,7 @@ set(LIB_SOURCE_FILES
     setup.cpp
     tools.cpp
     tunes.cpp
+    websocket.cpp
     window.cpp
     musicdb/audiofileindex.cpp)
 

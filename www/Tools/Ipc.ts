@@ -10,7 +10,7 @@ import {
   typecheck,
   Unpickle,
 } from '@freik/typechk';
-import { IpcCall, IpcMsg } from 'www/Shared/CommonTypes';
+import { chkSocketMsg, IpcCall, SocketMsg } from 'www/Shared/CommonTypes';
 import { ListenKey, MyWindow } from 'www/Types';
 
 const { con, log, wrn, err } = MakeLog('tools:ipc');
@@ -63,7 +63,7 @@ type Handler<T> = {
   typechk: typecheck<T> | boolean;
   handler: (data: T) => void;
 };
-const listeners = new Map<IpcMsg, Map<string, Handler<any>>>();
+const listeners = new Map<SocketMsg, Map<string, Handler<any>>>();
 
 /**
  * This subscribes the `handler` to listen for messages coming from the
@@ -74,7 +74,7 @@ const listeners = new Map<IpcMsg, Map<string, Handler<any>>>();
  * @returns the key to use to unsubscribe
  */
 export function Subscribe<T>(
-  ipcId: IpcMsg,
+  ipcId: SocketMsg,
   typechk: typecheck<T>,
   handler: (data: T) => void,
 ): ListenKey {
@@ -82,7 +82,7 @@ export function Subscribe<T>(
 }
 
 function localSubscribe<T>(
-  ipcId: IpcMsg,
+  ipcId: SocketMsg,
   typechk: typecheck<T> | boolean,
   handler: (data: T) => void,
 ): ListenKey {
@@ -97,7 +97,7 @@ function localSubscribe<T>(
 }
 
 export function SubscribeWithDefault<T>(
-  ipcId: IpcMsg,
+  ipcId: SocketMsg,
   typecheck: typecheck<T>,
   handler: (data: T) => void,
   defaultValue: T,
@@ -118,7 +118,7 @@ export function SubscribeWithDefault<T>(
 }
 
 export function SubscribeUnsafe(
-  ipcId: IpcMsg,
+  ipcId: SocketMsg,
   handler: (data: unknown) => void,
 ): ListenKey {
   // This is a convenience function that allows you to subscribe to a message
@@ -166,7 +166,7 @@ export function WireUpIpc(): void {
     HandleMessage(message);
   };
   window.ipc = {
-    post: (channel: IpcMsg, ...args: unknown[]) => {
+    post: (channel: IpcCall, ...args: unknown[]) => {
       if (!isObjectNonNull(window.ws)) {
         err('IPC connector is not wired up, cannot invoke');
         throw Error('IPC connector is not wired up');
@@ -189,36 +189,29 @@ function HandleMessage(message: string): void {
   // send multiple "messages" in a single message:
   // { artists: ..., albums: ..., songs: ... } will invoke listeners for
   // all three of those 'messages'
-  debugger;
+  // debugger;
   let handled = false;
   // Messages should come in as a IpcId, a semicolon, then a JSON string
   const match = message.match(messageFormat);
   if (!match || match.length < 2) {
-    wrn('>>> Async malformed message begin');
-    wrn(message);
-    wrn('<<< Async malformed message end');
+    con('>>> Async malformed message begin');
+    con(message);
+    con('<<< Async malformed message end');
     return;
   }
-  const maybeIpcId = Number.parseInt(match[1], 10);
-  if (isNaN(maybeIpcId)) {
-    wrn('>>> Async malformed message begin');
-    wrn(message);
-    wrn('<<< Async malformed message end');
-    return;
-  }
-  const ipcId = maybeIpcId as IpcMsg;
-  if (Object.values(IpcMsg).indexOf(ipcId) < 0) {
+  const socketId = Number.parseInt(match[1], 10);
+  if (!chkSocketMsg(socketId)) {
     // This is a malformed message, we don't know what to do with it
-    wrn('>>> Async malformed message begin');
-    wrn(`Received message with unknown IpcId: ${ipcId}`);
-    wrn(message);
-    wrn('<<< Async malformed message end');
+    con('>>> Async malformed message begin');
+    con(`Received message with unknown SocketId: ${socketId}`);
+    con(message);
+    con('<<< Async malformed message end');
     return;
   }
   const messageData = message.substring(match[0].length);
-  const listener = listeners.get(ipcId);
+  const listener = listeners.get(socketId);
   if (!listener) {
-    wrn(`>>> Received message with no listeners: ${ipcId}`, message);
+    con(`>>> Received message with no listeners: ${socketId}`, message);
     return;
   }
   listener.forEach((hndlr, id) => {
@@ -226,12 +219,12 @@ function HandleMessage(message: string): void {
     if (isFunction(typechk)) {
       const val = SafelyUnpickle(messageData, typechk);
       if (!isDefined(val)) {
-        wrn(
-          `>>> Async malformed message begin for ${ipcId} with id ${id}`,
+        con(
+          `>>> Async malformed message for ${socketId} with id ${id}: `,
           `Failed to unpickle message data:`,
           messageData,
         );
-        wrn('<<< Async malformed message end');
+        con('<<< Async malformed message end');
         return;
       }
       handled = true;
@@ -244,18 +237,18 @@ function HandleMessage(message: string): void {
       handled = true;
       handler(val);
     }
-    log(`Handling message for ${ipcId} with id ${id}`);
+    log(`Handling message for ${socketId} with id ${id}`);
   });
   if (!handled) {
-    wrn('**********');
-    wrn('Unhandled message (IpcId: ', ipcId, ')');
-    wrn(message);
-    wrn('**********');
+    con('**********');
+    con('Unhandled message (SocketId: ', socketId, ')');
+    con(message);
+    con('**********');
   }
 }
 
 export async function SendMessage<T>(
-  channel: IpcMsg,
+  channel: IpcCall,
   ...args: unknown[]
 ): Promise<unknown> {
   if (!window.ipc) {
@@ -338,9 +331,28 @@ export async function CallMain<T>(
   return await GetAs(typecheck, channel, ...args.map((a) => String(a)));
 }
 
-export function PostMain(channel: IpcCall, ...args: unknown[]): void {
-  CallMain(channel, (a): a is void => true, ...args).catch((err) => {
-    err(`Failed to post to main for channel "${channel}":`, err);
+export async function PostMain(
+  channel: IpcCall,
+  ...args: unknown[]
+): Promise<void> {
+  try {
+    await CallMain(channel, (a): a is void => true, ...args);
+  } catch (e) {
+    // Get the name of the IpcCall, cuz it's useful:
+    const key = Object.keys(IpcCall).find(
+      (c) => IpcCall[c as keyof typeof IpcCall] === channel,
+    );
+    err(`Failed PostMain "${key || channel.toString()}":`, e);
+    throw e;
+  }
+}
+
+export function SendMain(channel: IpcCall, ...args: unknown[]): void {
+  PostMain(channel, ...args).catch((e) => {
+    // Get the name of the IpcCall, cuz it's useful:
+    const key = Object.keys(IpcCall).find(
+      (c) => IpcCall[c as keyof typeof IpcCall] === channel,
+    );
+    err(`Failed SendMain "${key || channel.toString()}":`, e);
   });
-  // No return value, so we just return void
 }

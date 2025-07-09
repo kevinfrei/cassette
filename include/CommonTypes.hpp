@@ -472,53 +472,55 @@ inline constexpr bool is_valid(CurrentView _value) {
 
 #pragma region linear enum IpcCall
 enum class IpcCall : std::uint8_t {
-  ReadFromStorage = 0,
-  WriteToStorage = 1,
-  DeleteFromStorage = 2,
-  AsyncData = 3,
-  IsDev = 4,
-  ClearHates = 5,
-  ClearLikes = 6,
-  ClearLocalOverrides = 7,
-  DeletePlaylist = 8,
-  FlushImageCache = 9,
-  FlushMetadataCache = 10,
-  GetHates = 11,
-  GetLikes = 12,
-  GetMediaInfo = 13,
-  GetMusicDatabase = 14,
-  GetPlaylists = 15,
-  LoadPlaylist = 16,
-  MenuAction = 17,
-  RenamePlaylist = 18,
-  SavePlaylist = 19,
-  Search = 20,
-  SetHates = 21,
-  SetLikes = 22,
-  SetMediaInfo = 23,
-  SetPlaylists = 24,
-  SetSaveMenu = 25,
-  ShowFile = 26,
-  ShowLocFromKey = 27,
-  ShowMenu = 28,
-  SubstrSearch = 29,
-  TranscodingBegin = 30,
-  UploadImage = 31,
-  MinimizeWindow = 32,
-  MaximizeWindow = 33,
-  RestoreWindow = 34,
-  CloseWindow = 35,
-  GetPicUri = 36,
-  GetIgnoreList = 37,
-  AddIgnoreItem = 38,
-  RemoveIgnoreItem = 39,
-  PushIgnoreList = 40,
-  IgnoreListId = 41,
-  FolderPicker = 42,
+  Unknown = 0,
+  ReadFromStorage = 1,
+  WriteToStorage = 2,
+  DeleteFromStorage = 3,
+  AsyncData = 4,
+  IsDev = 5,
+  ClearHates = 6,
+  ClearLikes = 7,
+  ClearLocalOverrides = 8,
+  DeletePlaylist = 9,
+  FlushImageCache = 10,
+  FlushMetadataCache = 11,
+  GetHates = 12,
+  GetLikes = 13,
+  GetMediaInfo = 14,
+  GetMusicDatabase = 15,
+  GetPlaylists = 16,
+  LoadPlaylist = 17,
+  MenuAction = 18,
+  RenamePlaylist = 19,
+  SavePlaylist = 20,
+  Search = 21,
+  SetHates = 22,
+  SetLikes = 23,
+  SetMediaInfo = 24,
+  SetPlaylists = 25,
+  SetSaveMenu = 26,
+  ShowFile = 27,
+  ShowLocFromKey = 28,
+  ShowMenu = 29,
+  SubstrSearch = 30,
+  TranscodingBegin = 31,
+  UploadImage = 32,
+  MinimizeWindow = 33,
+  MaximizeWindow = 34,
+  RestoreWindow = 35,
+  CloseWindow = 36,
+  GetPicUri = 37,
+  GetIgnoreList = 38,
+  AddIgnoreItem = 39,
+  RemoveIgnoreItem = 40,
+  PushIgnoreList = 41,
+  IgnoreListId = 42,
+  FolderPicker = 43,
 };
 
 inline constexpr bool is_valid(IpcCall _value) {
   switch (_value) {
+    case IpcCall::Unknown:
     case IpcCall::ReadFromStorage:
     case IpcCall::WriteToStorage:
     case IpcCall::DeleteFromStorage:
@@ -570,49 +572,57 @@ inline constexpr bool is_valid(IpcCall _value) {
 
 #pragma endregion linear enum IpcCall
 
-#pragma region numeric enum IpcMsg
-enum class IpcMsg : std::uint8_t {
+#pragma region numeric enum SocketMsg
+enum class SocketMsg : std::uint8_t {
+  Unknown,
   TranscodingUpdate,
   ManualRescan,
   RescanInProgress,
   RescanComplete,
   MusicDBUpdate,
-  ContentLoaded
+  ContentLoaded,
+  KeepAlive
 };
 
-inline constexpr bool is_valid(IpcMsg _value) {
+inline constexpr bool is_valid(SocketMsg _value) {
   switch (_value) {
-    case IpcMsg::TranscodingUpdate:
-    case IpcMsg::ManualRescan:
-    case IpcMsg::RescanInProgress:
-    case IpcMsg::RescanComplete:
-    case IpcMsg::MusicDBUpdate:
-    case IpcMsg::ContentLoaded:
+    case SocketMsg::Unknown:
+    case SocketMsg::TranscodingUpdate:
+    case SocketMsg::ManualRescan:
+    case SocketMsg::RescanInProgress:
+    case SocketMsg::RescanComplete:
+    case SocketMsg::MusicDBUpdate:
+    case SocketMsg::ContentLoaded:
+    case SocketMsg::KeepAlive:
       return true;
     default:
       return false;
   }
 }
 
-inline constexpr std::string_view to_string(IpcMsg _value) {
+inline constexpr std::string_view to_string(SocketMsg _value) {
   switch (_value) {
-    case IpcMsg::TranscodingUpdate:
+    case SocketMsg::Unknown:
+      return "Unknown";
+    case SocketMsg::TranscodingUpdate:
       return "TranscodingUpdate";
-    case IpcMsg::ManualRescan:
+    case SocketMsg::ManualRescan:
       return "ManualRescan";
-    case IpcMsg::RescanInProgress:
+    case SocketMsg::RescanInProgress:
       return "RescanInProgress";
-    case IpcMsg::RescanComplete:
+    case SocketMsg::RescanComplete:
       return "RescanComplete";
-    case IpcMsg::MusicDBUpdate:
+    case SocketMsg::MusicDBUpdate:
       return "MusicDBUpdate";
-    case IpcMsg::ContentLoaded:
+    case SocketMsg::ContentLoaded:
       return "ContentLoaded";
+    case SocketMsg::KeepAlive:
+      return "KeepAlive";
     default:
       return "<unknown>";
   }
 }
-#pragma endregion numeric enum IpcMsg
+#pragma endregion numeric enum SocketMsg
 
 #pragma region string enum IgnoreItemType
 
