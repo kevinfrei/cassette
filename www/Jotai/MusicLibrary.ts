@@ -1,27 +1,25 @@
-import { Ipc } from '@freik/electron-render';
-import { IpcId } from '@freik/emp-shared';
 import { MakeLog } from '@freik/logger';
+import { isDefined, typecheck } from '@freik/typechk';
 import { atomWithStorage } from 'jotai/utils';
+import { chkMusicDatabase, IpcCall, SocketMsg } from 'www/Shared/CommonTypes';
+import { CallMain, Subscribe, Unsubscribe } from 'www/Tools/Ipc';
 import {
   emptyLibrary,
   isFlatAudioDatabase,
   MakeMusicLibraryFromFlatAudioDatabase,
   MusicLibrary,
 } from '../MusicLibrarySchema';
+import { getTranslatedSubscribe } from './Storage';
 
 const { log, err } = MakeLog('EMP:render:Jotai:MusicLibrary');
 
 async function getTranslatedMusicDB(): Promise<MusicLibrary> {
   try {
     log('Calling GetMusicDatabase');
-    const strValue = await Ipc.CallMain(
-      IpcId.GetMusicDatabase,
-      undefined,
-      isFlatAudioDatabase,
-    );
-    if (strValue) {
+    const mdb = await CallMain(IpcCall.GetMusicDatabase, chkMusicDatabase);
+    if (isDefined(mdb)) {
       log('Got a value from GetMusicDatabase');
-      return MakeMusicLibraryFromFlatAudioDatabase(strValue);
+      return mdb;
     }
   } catch {
     /* */
@@ -30,30 +28,12 @@ async function getTranslatedMusicDB(): Promise<MusicLibrary> {
   return emptyLibrary;
 }
 
-function getTranslatedSubscribe(
-  key: string,
-  callback: (value: MusicLibrary) => void,
-  initialValue: MusicLibrary,
-) {
-  const lk = Ipc.Subscribe(key, (val: unknown) => {
-    log('Got a value from the MusicDBUpdate subscription');
-    if (isFlatAudioDatabase(val)) {
-      log("It's a flat audio database: Calling subscriber.");
-      callback(MakeMusicLibraryFromFlatAudioDatabase(val));
-      log('Subscriber completed.');
-    } else {
-      log(
-        "It's not a flat audio database: Calling subscriber with initial value.",
-      );
-      callback(initialValue);
-      log('Subscriber completed (initValue).');
-    }
-  });
-  return () => Ipc.Unsubscribe(lk);
-}
+const subscribe = {
+  getItem: getTranslatedMusicDB,
+};
 
 export const musicLibraryState = atomWithStorage(
-  IpcId.MusicDBUpdate,
+  SocketMsg.MusicDBUpdate,
   emptyLibrary,
   {
     getItem: getTranslatedMusicDB,

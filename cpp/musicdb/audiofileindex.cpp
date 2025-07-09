@@ -261,7 +261,7 @@ void send_music_db(crow::websocket::connection& conn) {
     return;
   }
   std::ostringstream oss;
-  oss << static_cast<uint64_t>(Shared::IpcMsg::MusicDBUpdate) << ";"
+  oss << static_cast<uint64_t>(Shared::SocketMsg::MusicDBUpdate) << ";"
       << to_json(*db).dump();
 
   conn.send_text(oss.str());

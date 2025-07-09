@@ -187,7 +187,7 @@ export const ${name} = Object.freeze({
 });
 export type ${name} = (typeof ${name})[keyof typeof ${name}];
 export function chk${name}(val: unknown): val is ${name} {
-  return TypeChk.isString(val) && Object.values(${name}).includes(val as ${name});
+  return TypeChk.isNumber(val) && Object.values(${name}).includes(val as ${name});
 }
 `);
 };

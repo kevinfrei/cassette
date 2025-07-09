@@ -160,24 +160,24 @@ void socket_message(crow::websocket::connection& conn,
     std::cerr << "Invalid websocket message received: " << data << std::endl;
     return;
   }
-  Shared::IpcMsg ipcMsg = static_cast<Shared::IpcMsg>(*maybeMsg);
-  if (!Shared::is_valid(ipcMsg)) {
-    std::cerr << "Invalid IPC message received: " << data << std::endl;
+  Shared::SocketMsg msg = static_cast<Shared::SocketMsg>(*maybeMsg);
+  if (!Shared::is_valid(msg)) {
+    std::cerr << "Invalid Socket message received: " << data << std::endl;
     return;
   }
   // This is the only message we support *receiving* from the client
-  switch (ipcMsg) {
-    case Shared::IpcMsg::ManualRescan:
+  switch (msg) {
+    case Shared::SocketMsg::ManualRescan:
       std::cout << "TODO: Implement ManualRescan" << std::endl;
       break;
-    case Shared::IpcMsg::ContentLoaded:
+    case Shared::SocketMsg::ContentLoaded:
       config::set_ready();
       afi::send_music_db(conn);
       break;
     default: // Unsupported message
-      std::cerr << "Unsupported message received: " << Shared::to_string(ipcMsg)
+      std::cerr << "Unsupported message received: " << Shared::to_string(msg)
                 << " ("
-                << static_cast<std::underlying_type_t<Shared::IpcMsg>>(ipcMsg)
+                << static_cast<std::underlying_type_t<Shared::SocketMsg>>(msg)
                 << ") [" << data << "]" << std::endl;
   }
 }

@@ -10,7 +10,7 @@ import {
 import { createStore } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { AsyncStorage } from 'jotai/vanilla/utils/atomWithStorage';
-import { IpcMsg, StorageId } from 'www/Shared/CommonTypes';
+import { IpcCall, SocketMsg, StorageId } from 'www/Shared/CommonTypes';
 import {
   DeleteFromStorage,
   ReadFromStorage,
@@ -86,31 +86,27 @@ type Subscriber<T> = (
 ) => Unsub;
 
 // TODO: This is really stupid and slow:
-function getIpcMsg(key: string): IpcMsg {
-  for (let [, value] of Object.entries(IpcMsg)) {
+function getIpcCall(key: number): IpcCall {
+  for (let [, value] of Object.entries(IpcCall)) {
     if (value === key) return value;
   }
-  return IpcMsg.Unknown;
+  return IpcCall.Unknown;
 }
 
 function makeSubscribe<T>(chk: typecheck<T>): Subscriber<T> {
-  return (key: string, callback: (value: T) => void, initialValue: T) => {
-    const lk = SubscribeWithDefault(
-      getIpcMsg(key),
-      chk,
-      callback,
-      initialValue,
-    );
+  return (key: IpcCall, callback: (value: T) => void, initialValue: T) => {
+    const lk = SubscribeWithDefault(key, chk, callback, initialValue);
     return () => Unsubscribe(lk);
   };
 }
 
 function makeTranslatedSubscribe<T, U>(
-  chk: typecheck<U>,
-  xlate: (val: U) => T,
-): Subscriber<T> {
-  return (key: string, callback: (value: T) => void, initialValue: T) => {
-    const lk = SubscribeUnsafe(getIpcMsg(key), (val: unknown) => {
+  chk: typecheck<T>,
+  xlate: (val: T) => U | undefined,
+  def: U,
+): Subscriber<U> {
+  return (key: IpcCall, callback: (value: T) => void, initialValue: T) => {
+    const lk = SubscribeUnsafe(key.toString(), (val: unknown) => {
       if (chk(val)) {
         callback(xlate(val));
       } else {
@@ -205,4 +201,22 @@ export function atomFromTranslatedStorageFromMain<T, U>(
     init,
     getTranslatedMainReadOnlyStorage<T, U>(chk, fromMain),
   );
+}
+
+export function getTranslatedSubscribe<T, U>(
+  key: IpcMsg,
+  typechk: typecheck<T>,
+  translate: (value: T) => U | undefined,
+  callback: (value: U) => void,
+  initialValue: U,
+): () => void {
+  const lk = Subscribe(key, typechk, (val: T) => {
+    const xlate = translate(val);
+    if (isDefined(xlate)) {
+      callback(xlate);
+    } else {
+      callback(initialValue);
+    }
+  });
+  return () => Unsubscribe(lk);
 }
