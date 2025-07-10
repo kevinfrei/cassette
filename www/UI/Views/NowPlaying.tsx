@@ -26,11 +26,22 @@ import {
 } from '@freik/media-core';
 import { useDialogState } from '@freik/react-tools';
 import { isNumber } from '@freik/typechk';
-import { atom as jatom, useAtom, useAtomValue } from 'jotai';
+import { atom, useAtom, useAtomValue } from 'jotai';
 import { ReactElement, useCallback, useState } from 'react';
+
 import { allAlbumsState } from 'www/Jotai/Albums';
 import { allArtistsState } from 'www/Jotai/Artists';
+import { Keys } from 'www/Shared/CommonTypes';
+import {
+  AlbumForSongRender,
+  ArtistsForSongRender,
+  YearForSongRender,
+} from 'www/Tools/SimpleTags';
+import { altRowRenderer, MakeColumns } from 'www/Tools/SongList';
+import { SongListMenu, SongListMenuData } from 'www/Tools/SongMenus';
+import { SortKey, SortSongList } from 'www/Tools/Sorting';
 import { isPlaylistName } from 'www/Utils';
+import { GetHelperText } from 'www/WebHelpers';
 import { RemoveSongFromNowPlaying, StopAndClear } from '../../Jotai/API';
 import { useJotaiAsyncCallback, useJotaiCallback } from '../../Jotai/Helpers';
 import { isMiniplayerState, nowPlayingSortState } from '../../Jotai/Local';
@@ -40,32 +51,22 @@ import {
   saveableState,
 } from '../../Jotai/PlaylistControl';
 import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
-import { activePlaylistState, curSongsState } from '../../Jotai/SongPlayback';
 import {
-  allAlbumsFunc,
-  allArtistsFunc,
-  curSongsFunc,
-} from '../../Recoil/ReadOnly';
-import {
-  currentSongIndexFunc,
+  activePlaylistState,
+  currentSongIndexState,
+  curSongsState,
   songListState,
   songPlaybackOrderState,
-} from '../../Recoil/SongPlaying';
-import { SortKey, SortSongList } from '../../Sorting';
-import { GetHelperText } from '../MenuHelpers';
-import {
-  AlbumForSongRender,
-  ArtistsForSongRender,
-  YearForSongRender,
-} from '../SimpleTags';
-import { MakeColumns, altRowRenderer } from '../SongList';
-import { SongListMenu, SongListMenuData } from '../SongMenus';
-import { LikeOrHate } from './MixedSongs';
+} from '../../Jotai/SongPlayback';
+
+import { LikeOrHate } from '../Liker';
 import './styles/NowPlaying.css';
 
 const { wrn } = MakeLog('EMP:render:NowPlaying');
 
-const nowPlayingContextState = jatom<SongListMenuData>({
+// JODO: Why is this an atom, and not just local state?
+// I think it's used in some code that's been temporarily disabled.
+const nowPlayingContextState = atom<SongListMenuData>({
   data: '',
   spot: { left: 0, top: 0 },
 });
@@ -73,7 +74,7 @@ const nowPlayingContextState = jatom<SongListMenuData>({
 // The top line of the Now Playing view: Buttons & dialogs & stuff
 function TopLine(): ReactElement {
   const nowPlaying = useAtomValue(activePlaylistState);
-  const songList = useRecoilValue(songListState);
+  const songList = useAtomValue(songListState);
   const saveEnabled = useAtomValue(saveableState);
 
   const [showSaveAs, saveAsData] = useDialogState();
@@ -197,15 +198,13 @@ export function NowPlayingView(): ReactElement {
   const albums: Map<AlbumKey, Album> = useAtomValue(allAlbumsState);
   const artists: Map<ArtistKey, Artist> = useAtomValue(allArtistsState);
   const articles = useAtomValue(ignoreArticlesState);
-  const [curIndex, setCurIndex] = useRecoilState(currentSongIndexFunc);
-  const [songList, setSongList] = useRecoilState(songListState);
+  const [curIndex, setCurIndex] = useAtom(currentSongIndexState);
+  const [songList, setSongList] = useAtom(songListState);
   const [sortBy, setSortBy] = useAtom(nowPlayingSortState);
   const curSongs = useAtomValue(curSongsState);
   const isMini = useAtomValue(isMiniplayerState);
   const [songContext, setSongContext] = useAtom(nowPlayingContextState);
-  const [playbackOrder, setPlaybackOrder] = useRecoilState(
-    songPlaybackOrderState,
-  );
+  const [playbackOrder, setPlaybackOrder] = useAtom(songPlaybackOrderState);
   const onRightClick = (item?: Song, index?: number, ev?: Event) => {
     const event = ev as unknown as MouseEvent;
     if (ev && item) {
@@ -320,9 +319,7 @@ export function NowPlayingView(): ReactElement {
           onClearContext={() =>
             setSongContext({ data: '', spot: { left: 0, top: 0 } })
           }
-          onGetSongList={(_xact: MyTransactionInterface, data: string) =>
-            data.length > 0 ? [data] : []
-          }
+          onGetSongList={(data: string) => (data.length > 0 ? [data] : [])}
           items={['prop', 'show', '-', 'like', 'hate']}
         />
       </ScrollablePane>

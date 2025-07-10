@@ -20,7 +20,7 @@ import {
 } from '../../Jotai/LikesAndHates';
 import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
 import { getStore } from '../../Jotai/Storage';
-import {
+/*import {
   allAlbumsFunc,
   allArtistsFunc,
   allSongsFunc,
@@ -32,13 +32,14 @@ import {
   ArtistsForSongRender,
   YearForSongRender,
 } from '../SimpleTags';
+ 
 import {
   MakeColumns,
   StickyRenderDetailsHeader,
   altRowRenderer,
 } from '../SongList';
 import { SongListMenu, SongListMenuData } from '../SongMenus';
-
+*/
 import './styles/MixedSongs.css';
 
 const { wrn } = MakeLog('EMP:render:MixedSongs');
@@ -64,38 +65,6 @@ const songContextState = atom<SongListMenuData>({
   key: 'mixedSongContext',
   default: { data: '', spot: { left: 0, top: 0 } },
 });
-
-function Liker({ songId }: { songId: SongKey }): ReactElement {
-  const likeNum = useAtomValue(songListLikeNumberFromStringFam(songId));
-  const strings = ['⋯', '👍', '👎', '⋮'];
-  const onClick = useJotaiCallback(
-    (get, set) => {
-      switch (likeNum) {
-        case 0: // neutral
-          set(isSongLikedFam(songId), true);
-          break;
-        case 1: // like
-          set(isSongHatedFam(songId), true);
-          break;
-        case 2: // hate
-          set(isSongHatedFam(songId), false);
-          break;
-        case 3: // mixed
-          set(isSongLikedFam(songId), false);
-          set(isSongHatedFam(songId), false);
-          break;
-      }
-    },
-    [songId, likeNum],
-  );
-  return <div onClick={onClick}>{strings[likeNum]}</div>;
-}
-
-// This is a function, and not a React Function Component, so you can't
-// have state in it: Gotta wrap it. Kinda weird, but whatever...
-export function LikeOrHate(song: Song): ReactElement {
-  return <Liker songId={song.key} />;
-}
 
 export function MixedSongsList(): ReactElement {
   const sortedItems = useRecoilValue(sortedSongsState);

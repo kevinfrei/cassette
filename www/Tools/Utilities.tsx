@@ -7,7 +7,6 @@ import {
   SpinButton,
 } from '@fluentui/react';
 import { Ipc, useListener, useMediaEffect } from '@freik/electron-render';
-import { IpcId } from '@freik/emp-shared';
 import { MakeLog } from '@freik/logger';
 import { BoolState, Catch } from '@freik/react-tools';
 import { DebouncedDelay } from '@freik/sync';
@@ -21,7 +20,6 @@ import {
   SyntheticEvent,
   useEffect,
 } from 'react';
-import { RecoilState, useRecoilState } from 'recoil';
 import { keyBufferState } from '../Jotai/KeyBuffer';
 import { isMiniplayerState } from '../Jotai/Local';
 import { saveableState } from '../Jotai/PlaylistControl';
