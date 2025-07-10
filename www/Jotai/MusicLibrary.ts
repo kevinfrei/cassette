@@ -1,44 +1,35 @@
 import { MakeLog } from '@freik/logger';
-import { isDefined, typecheck } from '@freik/typechk';
 import { atomWithStorage } from 'jotai/utils';
-import { chkMusicDatabase, IpcCall, SocketMsg } from 'www/Shared/CommonTypes';
-import { CallMain, Subscribe, Unsubscribe } from 'www/Tools/Ipc';
 import {
-  emptyLibrary,
-  isFlatAudioDatabase,
-  MakeMusicLibraryFromFlatAudioDatabase,
-  MusicLibrary,
-} from '../MusicLibrarySchema';
-import { getTranslatedSubscribe } from './Storage';
+  Album,
+  AlbumKey,
+  Artist,
+  ArtistKey,
+  chkMusicDatabase,
+  MusicDatabase,
+  Playlist,
+  SocketMsg,
+  Song,
+  SongKey,
+} from 'www/Shared/CommonTypes';
+import { makeSubscribe } from './Storage';
 
 const { log, err } = MakeLog('EMP:render:Jotai:MusicLibrary');
 
-async function getTranslatedMusicDB(): Promise<MusicLibrary> {
-  try {
-    log('Calling GetMusicDatabase');
-    const mdb = await CallMain(IpcCall.GetMusicDatabase, chkMusicDatabase);
-    if (isDefined(mdb)) {
-      log('Got a value from GetMusicDatabase');
-      return mdb;
-    }
-  } catch {
-    /* */
-  }
-  err('Failed to get a value from GetMusicDatabase');
-  return emptyLibrary;
-}
-
-const subscribe = {
-  getItem: getTranslatedMusicDB,
+const emptyLibrary: MusicDatabase = {
+  artists: new Map<ArtistKey, Artist>(),
+  albums: new Map<AlbumKey, Album>(),
+  songs: new Map<SongKey, Song>(),
+  playlists: new Map<string, Playlist>(),
 };
 
 export const musicLibraryState = atomWithStorage(
-  SocketMsg.MusicDBUpdate,
+  SocketMsg.MusicDBUpdate.toString(),
   emptyLibrary,
   {
-    getItem: getTranslatedMusicDB,
+    getItem: () => emptyLibrary,
     setItem: Promise.resolve,
     removeItem: Promise.resolve,
-    subscribe: getTranslatedSubscribe,
+    subscribe: makeSubscribe(chkMusicDatabase),
   },
 );

@@ -6,7 +6,7 @@ import {
   Position,
   SpinButton,
 } from '@fluentui/react';
-import { Ipc, useListener, useMediaEffect } from '@freik/electron-render';
+// import { Ipc, useListener, useMediaEffect } from '@freik/electron-render';
 import { MakeLog } from '@freik/logger';
 import { BoolState, Catch } from '@freik/react-tools';
 import { DebouncedDelay } from '@freik/sync';
@@ -20,11 +20,14 @@ import {
   SyntheticEvent,
   useEffect,
 } from 'react';
+import { IpcCall } from 'www/Shared/CommonTypes';
+import { isSearchBox } from 'www/UI/Sidebar';
 import { keyBufferState } from '../Jotai/KeyBuffer';
 import { isMiniplayerState } from '../Jotai/Local';
 import { saveableState } from '../Jotai/PlaylistControl';
-import { isSearchBox } from '../Sidebar';
-import { MenuHandler } from './MenuHandler';
+import { SendMain } from './Ipc';
+// import { MenuHandler } from './MenuHandler';
+import { useMediaEffect } from './MediaEffect';
 
 const { wrn } = MakeLog('EMP:render:Utilities');
 
@@ -66,9 +69,7 @@ function TypingListener(): ReactElement {
 function SaveMenuUpdater(): ReactElement {
   /* Save menu state maintenance */
   const saveable = useAtomValue(saveableState);
-  useEffect(() => {
-    Ipc.PostMain(IpcId.SetSaveMenu, saveable).catch(Catch);
-  }, [saveable]);
+  useEffect(() => SendMain(IpcCall.SetSaveMenu, saveable), [saveable]);
   return <></>;
 }
 
@@ -92,11 +93,13 @@ function MediaAndMenuListeners({
 }): ReactElement {
   /* Menu handlers coming from the Main process */
   wrn('MenuAndMenuListers');
-  const menuCallback = useMyTransaction(
+  /*const menuCallback = useMyTransaction(
     (xact) => (data: unknown) => MenuHandler(xact, data, audioRef),
   );
   useListener(IpcId.MenuAction, menuCallback);
+  */
   /* OS-level media control event handlers */
+  /*
   const useMediaAction = (ev: MediaSessionAction, state: string) => {
     useEffect(() => {
       navigator.mediaSession.setActionHandler(ev, () =>
@@ -110,6 +113,7 @@ function MediaAndMenuListeners({
   useMediaAction('stop', 'playback');
   useMediaAction('nexttrack', 'nextTrack');
   useMediaAction('previoustrack', 'prevTrack');
+  */
   return <></>;
 }
 // This is a react component to enable the IPC subsystem to talk to the store,

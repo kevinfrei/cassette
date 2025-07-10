@@ -107,7 +107,7 @@ function SocketMsgFromString(key: string): SocketMsg {
   }
 }
 
-export function makeSubscribeWithDefault<T>(chk: typecheck<T>): Subscriber<T> {
+export function makeSubscribe<T>(chk: typecheck<T>): Subscriber<T> {
   return (key: string, callback: (value: T) => void, initialValue: T) => {
     const lk = SubscribeWithDefault(
       SocketMsgFromString(key),
@@ -115,13 +115,6 @@ export function makeSubscribeWithDefault<T>(chk: typecheck<T>): Subscriber<T> {
       callback,
       initialValue,
     );
-    return () => Unsubscribe(lk);
-  };
-}
-
-export function makeSubscribe<T>(chk: typecheck<T>): Subscriber<T> {
-  return (key: string, callback: (value: T) => void) => {
-    const lk = Subscribe(SocketMsgFromString(key), chk, callback);
     return () => Unsubscribe(lk);
   };
 }
