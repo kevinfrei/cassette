@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { RESET, atomWithReset } from 'jotai/utils';
-import { secondsToTime } from '../Tools';
+import { secondsToTime } from 'www/Utils';
 
 export type MediaTime = {
   duration: number;

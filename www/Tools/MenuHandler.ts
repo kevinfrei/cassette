@@ -1,6 +1,6 @@
-import { ForwardedRef } from 'react';
 import { MakeLog } from '@freik/logger';
 import { hasStrField } from '@freik/typechk';
+import { ForwardedRef } from 'react';
 
 import { MaybePlayNext, MaybePlayPrev } from '../Jotai/API';
 import { curViewFunc } from '../Jotai/CurrentView';
@@ -9,10 +9,10 @@ import { playlistStateFamily } from '../Jotai/PlaylistControl';
 import { mutedState, volumeState } from '../Jotai/SimpleSettings';
 import { repeatState, shuffleState } from '../Jotai/SongPlayback';
 import { getStore, MaybeStore } from '../Jotai/Storage';
-import { FocusSearch } from '../MyWindow';
-import { activePlaylistState, songListState } from '../Recoil/SongPlaying';
-import { onClickPlayPause } from './PlaybackControls';
-import { addLocation } from './Views/Settings';
+// import { onClickPlayPause } from './PlaybackControls';
+// imp ort { addLocation } from './Views/Settings';
+import { FocusSearch } from 'www/Globals';
+import { CurrentView } from 'www/Shared/CommonTypes';
 
 const { wrn, log } = MakeLog('EMP:render:MenuHandler');
 // log.enabled = true;
@@ -30,7 +30,7 @@ function updateTime(offset: number, mstore?: MaybeStore) {
     store.set(mediaTimePercentFunc, position / curTime.duration);
   }
 }
-
+/*
 export function MenuHandler(
   xact: MyTransactionInterface,
   message: unknown,
@@ -98,7 +98,7 @@ export function MenuHandler(
         break;
       case 'view':
         if (hasStrField(message, 'select')) {
-          let theView: CurrentViewEnum = CurrentView.none;
+          let theView: CurrentView = CurrentView.none;
           switch (message.select) {
             case 'NowPlaying':
               theView = CurrentView.now_playing;
@@ -143,3 +143,4 @@ export function MenuHandler(
     wrn(message);
   }
 }
+*/
