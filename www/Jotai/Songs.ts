@@ -1,7 +1,7 @@
-import { SongKey } from '@freik/media-core';
 import { Fail } from '@freik/react-tools';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
+import { SongKey } from 'www/Shared/CommonTypes';
 import { musicLibraryState } from './MusicLibrary';
 
 export const allSongsState = atom(

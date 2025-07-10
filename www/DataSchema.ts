@@ -1,5 +1,11 @@
-import { Album, AlbumKey, Artist, ArtistKey, Song } from '@freik/media-core';
 import { isDefined } from '@freik/typechk';
+import {
+  Album,
+  AlbumKey,
+  Artist,
+  ArtistKey,
+  Song,
+} from 'www/Shared/CommonTypes';
 
 export type SongData = {
   song: Song;

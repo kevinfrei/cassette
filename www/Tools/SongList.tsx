@@ -13,9 +13,9 @@ import {
   StickyPositionType,
   TooltipHost,
 } from '@fluentui/react';
-import { ArtistKey } from '@freik/media-core';
 import { hasFieldType, isDefined } from '@freik/typechk';
 import { Dispatch, ReactElement, SetStateAction } from 'react';
+import { ArtistKey } from 'www/Shared/CommonTypes';
 import { SortKey } from './Sorting';
 
 type ColumnRenderTuple<T> = [

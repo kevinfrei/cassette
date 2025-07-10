@@ -3,14 +3,6 @@
 
 import { IGroup } from '@fluentui/react';
 import { MakeMultiMap, MultiMap, isMultiMapOf } from '@freik/containers';
-import {
-  Album,
-  AlbumKey,
-  Artist,
-  ArtistKey,
-  Song,
-  SongKey,
-} from '@freik/media-core';
 import { Fail } from '@freik/react-tools';
 import {
   isArrayOfString,
@@ -24,6 +16,14 @@ import {
   GetArtistStringFromKeys,
   GetArtistStringFromSong,
 } from 'www/DataSchema';
+import {
+  Album,
+  AlbumKey,
+  Artist,
+  ArtistKey,
+  Song,
+  SongKey,
+} from 'www/Shared/CommonTypes';
 
 export type ArtistSong = Song & { sortedArtistId: ArtistKey; comboKey: string };
 export type SongWithIndex = Song & { index: number };

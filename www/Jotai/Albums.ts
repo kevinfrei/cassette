@@ -1,12 +1,12 @@
-import { AlbumKey, SongKey } from '@freik/media-core';
 import { Fail } from '@freik/react-tools';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
+import { Album, AlbumKey, SongKey } from 'www/Shared/CommonTypes';
 import { musicLibraryState } from './MusicLibrary';
 import { maybeSongByKey } from './Songs';
 
 export const allAlbumsState = atom(async (get) => {
-  return (await get(musicLibraryState)).albums;
+  return (await get(musicLibraryState)).albums as Map<AlbumKey, Album>;
 });
 
 export const maybeAlbumByKey = atomFamily((ak: AlbumKey) =>

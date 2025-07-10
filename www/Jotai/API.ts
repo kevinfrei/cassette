@@ -8,9 +8,9 @@
  *  false otherwise
  */
 
-import { PlaylistName, SongKey } from '@freik/media-core';
 import { isNumber } from '@freik/typechk';
 import { RESET } from 'jotai/utils';
+import { PlaylistName, SongKey } from 'www/Shared/CommonTypes';
 import { isPlaylistName, ShuffleArray } from 'www/Utils';
 import {
   isSongHatedFam,

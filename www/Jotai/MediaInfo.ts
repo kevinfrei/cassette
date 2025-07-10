@@ -1,8 +1,8 @@
 import { MakeLog } from '@freik/logger';
-import { SongKey } from '@freik/media-core';
 import { Fail } from '@freik/react-tools';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
+import { SongKey } from 'www/Shared/CommonTypes';
 import { diskNumName, MetadataProps, SongInfo } from '../MusicLibrarySchema';
 import * as ipc from '../Tools/Ipc';
 import { albumByKey } from './Albums';

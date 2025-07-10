@@ -1,7 +1,7 @@
-import { AlbumKey, ArtistKey, Song } from '@freik/media-core';
 import { hasFieldType, isArrayOfString } from '@freik/typechk';
 import { useAtomValue } from 'jotai';
 import { ReactElement } from 'react';
+import { AlbumKey, ArtistKey, Song } from 'www/Shared/CommonTypes';
 
 import { albumByKey } from '../Jotai/Albums';
 import { artistStringStateFamily } from '../Jotai/Artists';
