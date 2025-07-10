@@ -9,7 +9,7 @@ import { SongKey } from '@freik/media-core';
 import { Catch } from '@freik/react-tools';
 import { isString } from '@freik/typechk';
 import { useAtomValue } from 'jotai';
-import { ReactElement } from 'react';
+import { ReactElement, useCallback } from 'react';
 import { AddSongs, PlaySongs } from '../Jotai/API';
 import { AsyncHandler } from '../Jotai/Helpers';
 import { songListLikeNumberFromStringFam } from '../Jotai/LikesAndHates';
@@ -23,8 +23,8 @@ type SongListMenuArgs = {
   context: SongListMenuData;
   onClearContext: () => void;
   onGetSongList:
-    | ((xact: MyTransactionInterface, data: string) => SongKey[])
-    | ((xact: MyTransactionInterface, data: string) => Promise<SongKey[]>);
+    | ((data: string) => SongKey[])
+    | ((data: string) => Promise<SongKey[]>);
   onGetPlaylistName?: (data: string) => string;
   items?: (IContextualMenuItem | string)[];
 };
@@ -56,27 +56,36 @@ export function SongListMenu({
     itemType: ContextualMenuItemType.Divider,
   });
 
-  const onAdd = useMyTransaction((xact) =>
+  const onAdd = useCallback(() => {
+    /* JODO */
+  }, []);
+  /* useMyTransaction((xact) =>
     AsyncHandler(async () =>
       AddSongs(
         await onGetSongList(xact, context.data),
         onGetPlaylistName ? onGetPlaylistName(context.data) : undefined,
       ),
     ),
-  );
-  const onReplace = useMyTransaction((xact) =>
+  );*/
+  const onReplace = useCallback(() => {
+    /* JODO */
+  }, []);
+  /* useMyTransaction((xact) =>
     AsyncHandler(async () =>
       PlaySongs(
         await onGetSongList(xact, context.data),
         onGetPlaylistName ? onGetPlaylistName(context.data) : undefined,
       ),
     ),
-  );
-  const onProps = useMyTransaction((xact) =>
+  );*/
+  const onProps = useCallback(() => {
+    /* JODO */
+  }, []);
+  /* useMyTransaction((xact) =>
     AsyncHandler(async () =>
       SongListDetailClick(await onGetSongList(xact, context.data), false),
     ),
-  );
+  );*/
   // JODO: Update this once we've got the song list from the media interface
   const onLove = () => {}; /*
   useMyTransaction((xact) => () => {
@@ -100,7 +109,8 @@ export function SongListMenu({
   });
   */
   const onShow = () => {
-    Ipc.InvokeMain(IpcId.ShowLocFromKey, context.data).catch(Catch);
+    // JODO
+    // Ipc.InvokeMain(IpcId.ShowLocFromKey, context.data).catch(Catch);
   };
   const likeNum = useAtomValue(songListLikeNumberFromStringFam(context.data));
   const likeIcons = ['Like', 'LikeSolid', 'Like', 'More'];

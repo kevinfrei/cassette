@@ -1,10 +1,10 @@
-import { Ipc } from '@freik/electron-render';
-import { IpcId } from '@freik/emp-shared';
 import { ArraySetEqual } from '@freik/helpers';
 import { Playlist, PlaylistName, SongKey } from '@freik/media-core';
 import { isArrayOfString, isFunction } from '@freik/typechk';
 import { atom } from 'jotai';
 import { atomFamily, RESET } from 'jotai/utils';
+import { IpcCall } from 'www/Shared/CommonTypes';
+import { CallMain, PostMain } from 'www/Tools/Ipc';
 import { SetStateActionWithReset, WritableAtomType } from './Hooks';
 import { activePlaylistState } from './SongPlayback';
 import { getStore, MyStore } from './Storage';
@@ -15,19 +15,15 @@ let theCache: Map<PlaylistName, Playlist> | undefined = undefined;
 
 async function getCache(): Promise<Map<PlaylistName, Playlist>> {
   if (!theCache) {
-    const names = await Ipc.CallMain(
-      IpcId.GetPlaylists,
-      undefined,
-      isArrayOfString,
-    );
+    const names = await CallMain(IpcCall.GetPlaylists, isArrayOfString);
     if (names) {
       theCache = new Map();
       await Promise.all(
         names.map(async (name) => {
-          const contents = await Ipc.CallMain(
-            IpcId.LoadPlaylist,
-            name,
+          const contents = await CallMain(
+            IpcCall.LoadPlaylist,
             isArrayOfString,
+            name,
           );
           if (contents) {
             theCache!.set(name, contents);
@@ -54,10 +50,10 @@ export const allPlaylistsState = atom(
       const toAdd = [...newKeys].filter((k) => !oldKeys.has(k));
       await Promise.all([
         ...toDelete.map(async (key) => {
-          await Ipc.PostMain(IpcId.DeletePlaylist, key);
+          await PostMain(IpcCall.DeletePlaylist, key);
         }),
         ...toAdd.map(async (key) => {
-          await Ipc.PostMain(IpcId.SavePlaylist, {
+          await PostMain(IpcCall.SavePlaylist, {
             name: key,
             songs: newVal.get(key),
           });
@@ -74,7 +70,7 @@ export const allPlaylistsState = atom(
           news &&
           (olds.length !== news.length || !ArraySetEqual([...olds], [...news]))
         ) {
-          await Ipc.PostMain(IpcId.SavePlaylist, { name: key, songs: news });
+          await PostMain(IpcCall.SavePlaylist, { name: key, songs: news });
         }
       }),
     );

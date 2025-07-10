@@ -1,13 +1,13 @@
 import { useAtomValue } from 'jotai';
 import { CSSProperties, ReactElement, useState } from 'react';
-import { SettingsView } from './Settings';
-import { curViewState } from 'www/State/SimpleSavedState';
 import { CurrentView } from 'www/Shared/CommonTypes';
+import { curViewState } from 'www/State/SimpleSavedState';
+import { NowPlayingView } from './NowPlaying';
+import { SettingsView } from './Settings';
 /*
 import { GroupedAlbumList } from './Albums';
 import { GroupedAristList } from './Artists';
 import { MixedSongsList } from './MixedSongs';
-import { NowPlayingView } from './NowPlaying';
 import { PlaybackOrder } from './PlaybackOrder';
 import { PlaylistView } from './Playlists';
 import { SearchResultsView } from './SearchResults';
@@ -45,13 +45,14 @@ export function ViewSelector(): ReactElement {
   }
   if (rendered.has(CurrentView.playlists) || which === CurrentView.playlists) {
     contents.push([CurrentView.playlists, <PlaylistView />]);
-  }
+  }*/
   if (
     rendered.has(CurrentView.now_playing) ||
     which === CurrentView.now_playing
   ) {
     contents.push([CurrentView.now_playing, <NowPlayingView />]);
   }
+  /*
   // if (false) {
   //   // (rendered.has(CurrentView.albums) || which === CurrentView.recent)
   //   contents.push([CurrentView.recent, <RecentlyAddedView />]);
