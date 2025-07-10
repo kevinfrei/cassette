@@ -1,6 +1,6 @@
-import { Album, AlbumKey, SongKey } from '@freik/media-core';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
+import { Album, AlbumKey, SongKey } from 'www/Shared/CommonTypes';
 import { AlbumDescriptionWithKey, SongDescription } from 'www/State/SongState';
 import { albumByKey, allAlbumsState } from './Albums';
 import { artistStringStateFamily } from './Artists';

@@ -1,7 +1,7 @@
-import { Artist, ArtistKey } from '@freik/media-core';
 import { Fail } from '@freik/react-tools';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
+import { Artist, ArtistKey } from 'www/Shared/CommonTypes';
 import { musicLibraryState } from './MusicLibrary';
 
 export const allArtistsState = atom(async (get) => {

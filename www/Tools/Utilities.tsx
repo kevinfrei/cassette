@@ -27,6 +27,7 @@ import { isMiniplayerState } from '../Jotai/Local';
 import { saveableState } from '../Jotai/PlaylistControl';
 import { SendMain } from './Ipc';
 // import { MenuHandler } from './MenuHandler';
+import { Atom, WritableAtom } from 'jotai';
 import { useMediaEffect } from './MediaEffect';
 
 const { wrn } = MakeLog('EMP:render:Utilities');
@@ -144,8 +145,10 @@ export const mySliderStyles: Partial<ISliderStyles> = {
   },
 };
 
-export function useRecoilBoolState(st: RecoilState<boolean>): BoolState {
-  const [value, setter] = useRecoilState(st);
+export function useJotaiBoolState(
+  st: WritableAtom<boolean, [boolean], boolean>,
+): BoolState {
+  const [value, setter] = useAtom(st);
   return [value, () => setter(true), () => setter(false)];
 }
 

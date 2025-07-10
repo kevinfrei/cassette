@@ -1,9 +1,13 @@
 import { ArraySetEqual } from '@freik/helpers';
-import { Playlist, PlaylistName, SongKey } from '@freik/media-core';
 import { isArrayOfString, isFunction } from '@freik/typechk';
 import { atom } from 'jotai';
 import { atomFamily, RESET } from 'jotai/utils';
-import { IpcCall } from 'www/Shared/CommonTypes';
+import {
+  IpcCall,
+  Playlist,
+  PlaylistName,
+  SongKey,
+} from 'www/Shared/CommonTypes';
 import { CallMain, PostMain } from 'www/Tools/Ipc';
 import { SetStateActionWithReset, WritableAtomType } from './Hooks';
 import { activePlaylistState } from './SongPlayback';

@@ -1,5 +1,5 @@
 // import { StorageId } from '@freik/emp-shared';
-import { isSongKey, Song, SongKey } from '@freik/media-core';
+import { isSongKey } from '@freik/media-core';
 import { Catch } from '@freik/react-tools';
 import {
   chkArrayOf,
@@ -9,7 +9,7 @@ import {
   isString,
 } from '@freik/typechk';
 import { atom } from 'jotai';
-import { StorageId } from 'www/Shared/CommonTypes';
+import { Song, SongKey, StorageId } from 'www/Shared/CommonTypes';
 import { songByKey } from './Songs';
 import { atomWithMainStorage } from './Storage';
 

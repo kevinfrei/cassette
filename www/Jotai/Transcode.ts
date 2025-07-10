@@ -1,11 +1,4 @@
-import {
-  AlbumKey,
-  ArtistKey,
-  isAlbumKey,
-  isArtistKey,
-  Playlist,
-  PlaylistName,
-} from '@freik/media-core';
+import { isAlbumKey, isArtistKey } from '@freik/media-core';
 import {
   chkArrayOf,
   chkObjectOfType,
@@ -15,6 +8,12 @@ import {
 } from '@freik/typechk';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
+import {
+  AlbumKey,
+  ArtistKey,
+  Playlist,
+  PlaylistName,
+} from 'www/Shared/CommonTypes';
 import { atomWithMainStorage } from './Storage';
 
 type FailType = { file: string; error: string };

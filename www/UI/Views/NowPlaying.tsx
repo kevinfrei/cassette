@@ -16,14 +16,6 @@ import {
 } from '@fluentui/react';
 import { Dialogs } from '@freik/fluentui-tools';
 import { MakeLog } from '@freik/logger';
-import {
-  Album,
-  AlbumKey,
-  Artist,
-  ArtistKey,
-  Song,
-  SongKey,
-} from '@freik/media-core';
 import { useDialogState } from '@freik/react-tools';
 import { isNumber } from '@freik/typechk';
 import { atom, useAtom, useAtomValue } from 'jotai';
@@ -31,7 +23,15 @@ import { ReactElement, useCallback, useState } from 'react';
 
 import { allAlbumsState } from 'www/Jotai/Albums';
 import { allArtistsState } from 'www/Jotai/Artists';
-import { Keys } from 'www/Shared/CommonTypes';
+import {
+  Album,
+  AlbumKey,
+  Artist,
+  ArtistKey,
+  Keys,
+  Song,
+  SongKey,
+} from 'www/Shared/CommonTypes';
 import {
   AlbumForSongRender,
   ArtistsForSongRender,
