@@ -1,4 +1,3 @@
-import { StorageId } from '@freik/emp-shared';
 import {
   AlbumKey,
   ArtistKey,
@@ -9,6 +8,7 @@ import {
 import { isArrayOfString, isBoolean } from '@freik/typechk';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
+import { StorageId } from 'www/Shared/CommonTypes';
 import {
   atomWithMainStorage,
   atomWithTranslatedStorageInMain,
