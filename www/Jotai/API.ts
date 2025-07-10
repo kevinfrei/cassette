@@ -9,9 +9,9 @@
  */
 
 import { PlaylistName, SongKey } from '@freik/media-core';
-import { isDefined, isNumber } from '@freik/typechk';
+import { isNumber } from '@freik/typechk';
 import { RESET } from 'jotai/utils';
-import { isPlaylist, ShuffleArray } from '../Utils';
+import { isPlaylistName, ShuffleArray } from 'www/Utils';
 import {
   isSongHatedFam,
   isSongLikedFam,
@@ -183,7 +183,7 @@ export async function PlaySongs(
 ): Promise<void> {
   const store = getStore(mstore);
   const playList = await GetFilteredSongs(listToPlay, store);
-  if (isPlaylist(playlistName)) {
+  if (isPlaylistName(playlistName)) {
     await store.set(activePlaylistState, playlistName);
   } else {
     store.set(activePlaylistState, RESET);

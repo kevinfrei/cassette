@@ -28,7 +28,7 @@ import { useDialogState } from '@freik/react-tools';
 import { isNumber } from '@freik/typechk';
 import { atom as jatom, useAtom, useAtomValue } from 'jotai';
 import { ReactElement, useCallback, useState } from 'react';
-import { isPlaylist } from 'www/Utils';
+import { isPlaylistName } from 'www/Utils';
 import { RemoveSongFromNowPlaying, StopAndClear } from '../../Jotai/API';
 import { useJotaiAsyncCallback, useJotaiCallback } from '../../Jotai/Helpers';
 import { isMiniplayerState, nowPlayingSortState } from '../../Jotai/Local';
@@ -91,7 +91,7 @@ function TopLine(): ReactElement {
   );
   const stopAndClear = useCallback(() => StopAndClear().catch(wrn), []);
   const clickClearQueue = useCallback(() => {
-    if (isPlaylist(nowPlaying)) {
+    if (isPlaylistName(nowPlaying)) {
       StopAndClear().catch(wrn);
     } else {
       showConfirm();
@@ -105,7 +105,7 @@ function TopLine(): ReactElement {
   );
 
   const emptyQueue = songList.length === 0;
-  const isPL = isPlaylist(nowPlaying);
+  const isPL = isPlaylistName(nowPlaying);
   const header = isPL ? nowPlaying : 'Now Playing';
 
   const sepStyle: Partial<ISeparatorStyles> = {
