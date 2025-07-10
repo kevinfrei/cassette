@@ -28,6 +28,7 @@ import { useDialogState } from '@freik/react-tools';
 import { isNumber } from '@freik/typechk';
 import { atom as jatom, useAtom, useAtomValue } from 'jotai';
 import { ReactElement, useCallback, useState } from 'react';
+import { isPlaylist } from 'www/Utils';
 import { RemoveSongFromNowPlaying, StopAndClear } from '../../Jotai/API';
 import { useJotaiAsyncCallback, useJotaiCallback } from '../../Jotai/Helpers';
 import { isMiniplayerState, nowPlayingSortState } from '../../Jotai/Local';
@@ -49,7 +50,6 @@ import {
   songPlaybackOrderState,
 } from '../../Recoil/SongPlaying';
 import { SortKey, SortSongList } from '../../Sorting';
-import { isPlaylist } from '../../Tools';
 import { GetHelperText } from '../MenuHelpers';
 import {
   AlbumForSongRender,

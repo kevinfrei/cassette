@@ -1,16 +1,21 @@
 import {
-  Pickle,
-  SafelyUnpickle,
   isDefined,
   isNumber,
   isString,
   isUndefined,
+  Pickle,
+  SafelyUnpickle,
   typecheck,
 } from '@freik/typechk';
 import { createStore } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { AsyncStorage } from 'jotai/vanilla/utils/atomWithStorage';
-import { IpcCall, SocketMsg, StorageId } from 'www/Shared/CommonTypes';
+import {
+  chkSocketMsg,
+  IpcCall,
+  SocketMsg,
+  StorageId,
+} from 'www/Shared/CommonTypes';
 import {
   DeleteFromStorage,
   ReadFromStorage,
@@ -80,7 +85,7 @@ async function noRemoveItem(_key: string): Promise<void> {
 
 type Unsub = () => void;
 type Subscriber<T> = (
-  key: SocketMsg, // Jotai key, which is the same as the SocketMsg key
+  key: string, // Jotai key, which I use as the stringified SocketMsg key
   callback: (value: T) => void,
   initVal: T,
 ) => Unsub;
@@ -93,20 +98,34 @@ function getIpcCall(key: number): IpcCall {
   return IpcCall.Unknown;
 }
 
+function SocketMsgFromString(key: string): SocketMsg {
+  const msg = Number.parseInt(key);
+  if (chkSocketMsg(msg)) {
+    return msg;
+  } else {
+    throw new Error(`Invalid SocketMsg key: ${key}`);
+  }
+}
+
 function makeSubscribe<T>(chk: typecheck<T>): Subscriber<T> {
-  return (key: SocketMsg, callback: (value: T) => void, initialValue: T) => {
-    const lk = SubscribeWithDefault(key, chk, callback, initialValue);
+  return (key: string, callback: (value: T) => void, initialValue: T) => {
+    const lk = SubscribeWithDefault(
+      SocketMsgFromString(key),
+      chk,
+      callback,
+      initialValue,
+    );
     return () => Unsubscribe(lk);
   };
 }
 
 function makeTranslatedSubscribe<T, U>(
+  def: U,
   chk: typecheck<T>,
   xlate: (val: T) => U | undefined,
-  def: U,
 ): Subscriber<U> {
-  return (key: SocketMsg, callback: (value: U) => void, defaultValue: U) => {
-    const lk = SubscribeUnsafe(key, (val: unknown) => {
+  return (key: string, callback: (value: U) => void, defaultValue: U) => {
+    const lk = SubscribeUnsafe(SocketMsgFromString(key), (val: unknown) => {
       if (chk(val)) {
         const xlateVal = xlate(val);
         callback(isDefined(xlateVal) ? xlateVal : def);
@@ -153,6 +172,7 @@ export function atomFromMain<T>(
 }
 
 function getTranslatedMainStorage<T, U>(
+  def: T,
   chk: typecheck<U>,
   fromMain: (val: U) => T,
   toMain: (val: T) => U,
@@ -161,11 +181,12 @@ function getTranslatedMainStorage<T, U>(
     getItem: makeGetTranslatedItem(chk, fromMain),
     setItem: async (k, v) => setTranslatedItem(k, toMain(v), fromMain),
     removeItem,
-    subscribe: makeTranslatedSubscribe(chk, fromMain),
+    subscribe: makeTranslatedSubscribe(def, chk, fromMain),
   };
 }
 
 function getTranslatedMainReadOnlyStorage<T, U>(
+  def: T,
   chk: typecheck<U>,
   fromMain: (val: U) => T,
 ): AsyncStorage<T> {
@@ -173,7 +194,7 @@ function getTranslatedMainReadOnlyStorage<T, U>(
     getItem: makeGetTranslatedItem(chk, fromMain),
     setItem: noSetItem,
     removeItem: noRemoveItem,
-    subscribe: makeTranslatedSubscribe(chk, fromMain),
+    subscribe: makeTranslatedSubscribe(def, chk, fromMain),
   };
 }
 
@@ -187,7 +208,7 @@ export function atomWithTranslatedStorageInMain<T, U>(
   return atomWithStorage(
     key,
     init,
-    getTranslatedMainStorage<T, U>(chk, fromMain, toMain),
+    getTranslatedMainStorage<T, U>(init, chk, fromMain, toMain),
   );
 }
 
@@ -200,12 +221,12 @@ export function atomFromTranslatedStorageFromMain<T, U>(
   return atomWithStorage(
     key,
     init,
-    getTranslatedMainReadOnlyStorage<T, U>(chk, fromMain),
+    getTranslatedMainReadOnlyStorage<T, U>(init, chk, fromMain),
   );
 }
 
 export function getTranslatedSubscribe<T, U>(
-  key: IpcMsg,
+  key: SocketMsg,
   typechk: typecheck<T>,
   translate: (value: T) => U | undefined,
   callback: (value: U) => void,
