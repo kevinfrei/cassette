@@ -241,14 +241,14 @@ function HandleMessage(message: string): void {
   });
   if (!handled) {
     con('**********');
-    con('Unhandled message (SocketId: ', socketId, ')');
+    con(`Unhandled message (SocketMsg: ${socketId})`);
     con(message);
     con('**********');
   }
 }
 
 export async function SendMessage<T>(
-  channel: IpcCall,
+  channel: SocketMsg,
   ...args: unknown[]
 ): Promise<unknown> {
   if (!window.ipc) {
