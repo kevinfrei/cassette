@@ -142,7 +142,6 @@ export function getMainStorage<T>(chk: typecheck<T>): AsyncStorage<T> {
     getItem: makeGetItem(chk),
     setItem,
     removeItem,
-    subscribe: makeSubscribe(chk),
   };
 }
 
@@ -151,7 +150,6 @@ export function getMainReadOnlyStorage<T>(chk: typecheck<T>): AsyncStorage<T> {
     getItem: makeGetItem(chk),
     setItem: noSetItem,
     removeItem: noRemoveItem,
-    subscribe: makeSubscribe(chk),
   };
 }
 
@@ -181,7 +179,6 @@ function getTranslatedMainStorage<T, U>(
     getItem: makeGetTranslatedItem(chk, fromMain),
     setItem: async (k, v) => setTranslatedItem(k, toMain(v), fromMain),
     removeItem,
-    subscribe: makeTranslatedSubscribe(def, chk, fromMain),
   };
 }
 
@@ -194,7 +191,6 @@ function getTranslatedMainReadOnlyStorage<T, U>(
     getItem: makeGetTranslatedItem(chk, fromMain),
     setItem: noSetItem,
     removeItem: noRemoveItem,
-    subscribe: makeTranslatedSubscribe(def, chk, fromMain),
   };
 }
 
