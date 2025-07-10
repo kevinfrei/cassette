@@ -55,8 +55,8 @@ export function GetIndexOf<T, E>(
  * Miscellaney
  */
 
-export function isPlaylist(playlist?: string): playlist is PlaylistName {
-  return isString(playlist) && playlist.length > 0;
+export function isPlaylistName(plName?: string): plName is PlaylistName {
+  return isString(plName) && plName.length > 0;
 }
 
 export function RandomInt(max: number): number {
