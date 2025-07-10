@@ -7,6 +7,7 @@
         "@fluentui/react": "^8.123.0",
         "@fluentui/react-components": "^9.66.4",
         "@fluentui/react-icons-mdl2": "^1.3.87",
+        "@freik/containers": "^0.4.4",
         "@freik/fluentui-tools": "^1.2.4",
         "@freik/logger": "^0.4.4",
         "@freik/media-core": "^0.16.4",
@@ -263,7 +264,11 @@
 
     "@fluentui/utilities": ["@fluentui/utilities@8.15.22", "", { "dependencies": { "@fluentui/dom-utilities": "^2.3.10", "@fluentui/merge-styles": "^8.6.14", "@fluentui/react-window-provider": "^2.2.30", "@fluentui/set-version": "^8.2.24", "tslib": "^2.1.0" }, "peerDependencies": { "@types/react": ">=16.8.0 <19.0.0", "react": ">=16.8.0 <19.0.0" } }, "sha512-ZhDO+6dVLjf2BbHizCA2bnVFLPmOSpemsTMtEY/Nr5fhot5+xeoZVBJrr10X6wN0fTdfMketj/+rnkh5hWXljg=="],
 
+    "@freik/containers": ["@freik/containers@0.4.4", "", { "dependencies": { "@freik/helpers": "0.5.4", "@freik/typechk": "0.8.4" } }, "sha512-oGpiu3NeluQ1ZjR7Q/Ct71MMYDECybW5jUhoRGtx2Yk910MgO3ZfK5fiAqciO8i5ygTwKj3rxwRpWc6sg7eEew=="],
+
     "@freik/fluentui-tools": ["@freik/fluentui-tools@1.2.4", "", { "dependencies": { "@freik/logger": "0.4.4", "@freik/react-tools": "0.3.4", "@freik/typechk": "0.8.4" }, "peerDependencies": { "@fluentui/react": ">=8.50.0", "@fluentui/react-components": ">=9.21.0", "@fluentui/react-hooks": ">=8.1.0", "react": ">=17.0.0", "react-dom": ">=17.0.0" } }, "sha512-UZodqrbDsz7gGvUC9rVxS+7tXbGIjcoMaJ8zKlXRC/8IPNLIwc5sMEb/dSAQ5Yc3Qa2fLBteT0xQFiXrExbTWg=="],
+
+    "@freik/helpers": ["@freik/helpers@0.5.4", "", { "dependencies": { "@freik/typechk": "0.8.4" } }, "sha512-dygaTJqwt/MrPl8rHQ1DIzUVVEsvB+tDPcrIxH5hEIXh29gTHCfQe0/+jJreJluai1KP7NePdzv2p2wU7V3clw=="],
 
     "@freik/logger": ["@freik/logger@0.4.4", "", { "dependencies": { "debug": "^4.4.0" } }, "sha512-7+VUY7rOHy5zZiQMuJ0CUO7QgtCzKfbnVqqYuhuIh+V+f53PVP5u72lielk0+wc2M0L2y7nDk8k1eO/kHviTvw=="],
 

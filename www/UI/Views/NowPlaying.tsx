@@ -28,6 +28,8 @@ import { useDialogState } from '@freik/react-tools';
 import { isNumber } from '@freik/typechk';
 import { atom as jatom, useAtom, useAtomValue } from 'jotai';
 import { ReactElement, useCallback, useState } from 'react';
+import { allAlbumsState } from 'www/Jotai/Albums';
+import { allArtistsState } from 'www/Jotai/Artists';
 import { isPlaylistName } from 'www/Utils';
 import { RemoveSongFromNowPlaying, StopAndClear } from '../../Jotai/API';
 import { useJotaiAsyncCallback, useJotaiCallback } from '../../Jotai/Helpers';
@@ -38,7 +40,7 @@ import {
   saveableState,
 } from '../../Jotai/PlaylistControl';
 import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
-import { activePlaylistState } from '../../Jotai/SongPlayback';
+import { activePlaylistState, curSongsState } from '../../Jotai/SongPlayback';
 import {
   allAlbumsFunc,
   allArtistsFunc,
@@ -192,13 +194,13 @@ function StickyDetailsHeader(
 export function NowPlayingView(): ReactElement {
   const [detailRef, setDetailRef] = useState<IDetailsList | null>(null);
 
-  const albums: Map<AlbumKey, Album> = useRecoilValue(allAlbumsFunc);
-  const artists: Map<ArtistKey, Artist> = useRecoilValue(allArtistsFunc);
+  const albums: Map<AlbumKey, Album> = useAtomValue(allAlbumsState);
+  const artists: Map<ArtistKey, Artist> = useAtomValue(allArtistsState);
   const articles = useAtomValue(ignoreArticlesState);
   const [curIndex, setCurIndex] = useRecoilState(currentSongIndexFunc);
   const [songList, setSongList] = useRecoilState(songListState);
   const [sortBy, setSortBy] = useAtom(nowPlayingSortState);
-  const curSongs = useRecoilValue(curSongsFunc);
+  const curSongs = useAtomValue(curSongsState);
   const isMini = useAtomValue(isMiniplayerState);
   const [songContext, setSongContext] = useAtom(nowPlayingContextState);
   const [playbackOrder, setPlaybackOrder] = useRecoilState(

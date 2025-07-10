@@ -1,7 +1,7 @@
 import { SongKey } from '@freik/media-core';
 import { atom } from 'jotai';
 import { atomWithReset } from 'jotai/utils';
-import { MakeSortKey } from '../Sorting';
+import { MakeSortKey } from 'www/Tools/Sorting';
 
 export const isMiniplayerState = atom(false);
 

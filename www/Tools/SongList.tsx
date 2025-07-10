@@ -16,8 +16,7 @@ import {
 import { ArtistKey } from '@freik/media-core';
 import { hasFieldType, isDefined } from '@freik/typechk';
 import { Dispatch, ReactElement, SetStateAction } from 'react';
-
-import { SortKey } from '../Sorting';
+import { SortKey } from './Sorting';
 
 type ColumnRenderTuple<T> = [
   string, // key

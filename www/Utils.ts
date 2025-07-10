@@ -1,8 +1,15 @@
 // This is for getting at "global" stuff from the window object
 import { MakeLog } from '@freik/logger';
 import { AlbumKey, ArtistKey, PlaylistName } from '@freik/media-core';
-import { hasField, isObjectNonNull, isString } from '@freik/typechk';
+import {
+  hasField,
+  hasFieldOf,
+  isArrayOfString,
+  isObjectNonNull,
+  isString,
+} from '@freik/typechk';
 import { ForwardedRef, MutableRefObject } from 'react';
+import { SongInfo } from './Types';
 
 const { log } = MakeLog('EMP:render:Tools');
 
@@ -122,4 +129,18 @@ export function getAlbumImageUrl(albumKey: AlbumKey) {
 
 export function getArtistImageUrl(artistKey: ArtistKey) {
   return `pic://key/${artistKey}`;
+}
+
+export function diskNumName(
+  songData: SongInfo,
+): [string | null, string | null] {
+  const diskNo = Math.floor(songData.song.track / 100);
+  if (diskNo > 0) {
+    if (hasFieldOf(songData.album, 'diskNames', isArrayOfString)) {
+      return [diskNo.toString(), songData.album.diskNames[diskNo - 1]];
+    }
+    return [diskNo.toString(), null];
+  } else {
+    return [null, null];
+  }
 }

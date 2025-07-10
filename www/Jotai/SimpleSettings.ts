@@ -1,5 +1,5 @@
-import { StorageId } from '@freik/emp-shared';
 import { isArrayOfString, isBoolean, isNumber, isString } from '@freik/typechk';
+import { StorageId } from 'www/Shared/CommonTypes';
 import { atomWithMainStorage } from './Storage';
 
 export const mutedState = atomWithMainStorage('mute', false, isBoolean);
