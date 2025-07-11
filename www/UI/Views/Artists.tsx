@@ -10,46 +10,60 @@ import {
   SelectionMode,
   Text,
 } from '@fluentui/react';
-import { CurrentView } from '@freik/emp-shared';
-import { Album, AlbumKey, Artist, ArtistKey } from '@freik/media-core';
+import { MakeLog } from '@freik/logger';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
 import { ReactElement, useCallback, useState } from 'react';
-import { useRecoilValue } from 'recoil';
-import { useJotaiCallback } from '../../Jotai/Helpers';
-import { MakeSetAtomFamily } from '../../Jotai/Hooks';
-import { focusedKeysFuncFam } from '../../Jotai/KeyBuffer';
-import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
-import { SongListFromKey } from '../../Recoil/api';
 import {
-  allAlbumsFunc,
-  allArtistsFunc,
-  allSongsFunc,
-  artistByKeyFuncFam,
-  filteredArtistsFunc,
-} from '../../Recoil/ReadOnly';
+  Album,
+  AlbumKey,
+  Artist,
+  ArtistKey,
+  CurrentView,
+} from 'www/Shared/CommonTypes';
+import {
+  AlbumForSongRender,
+  ArtistNameFromArtistIds,
+  YearForSongRender,
+} from 'www/Tools/SimpleTags';
 import {
   articlesCmp,
   ArtistSong,
   MakeSortKey,
   noArticlesCmp,
   SortSongsFromArtists,
-} from '../../Sorting';
-import { getArtistImageUrl, GetIndexOf } from '../../Tools';
-import {
-  AlbumForSongRender,
-  ArtistNameFromArtistIds,
-  YearForSongRender,
-} from '../SimpleTags';
+} from 'www/Tools/Sorting';
+import { AddSongs } from '../../Jotai/API';
+import { useJotaiCallback } from '../../Jotai/Helpers';
+import { MakeSetAtomFamily } from '../../Jotai/Hooks';
+import { focusedKeysFuncFam } from '../../Jotai/KeyBuffer';
+import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
+// import { SongListFromKey } from '../../Recoil/api';
+// import {
+//   allAlbumsFunc,
+//   allArtistsFunc,
+//   allSongsFunc,
+//   artistByKeyFuncFam,
+//   filteredArtistsFunc,
+// } from '../../Recoil/ReadOnly';
+// import { getArtistImageUrl, GetIndexOf } from '../../Tools';
+// import {
+//   altRowRenderer,
+//   ProcessSongGroupData,
+//   StickyRenderDetailsHeader,
+// } from '../SongList';
+// import { SongListMenu, SongListMenuData } from '../SongMenus';
+
+import { allAlbumsState } from 'www/Jotai/Albums';
+import { allArtistsState, artistByKey } from 'www/Jotai/Artists';
+import { allSongsState } from 'www/Jotai/Songs';
 import {
   altRowRenderer,
   ProcessSongGroupData,
   StickyRenderDetailsHeader,
-} from '../SongList';
-import { SongListMenu, SongListMenuData } from '../SongMenus';
-
-import { MakeLog } from '@freik/logger';
-import { AddSongs } from '../../Jotai/API';
+} from 'www/Tools/SongList';
+import { SongListMenu, SongListMenuData } from 'www/Tools/SongMenus';
+import { getArtistImageUrl, GetIndexOf } from 'www/Utils';
 import './styles/Artists.css';
 
 const { wrn } = MakeLog('EMP:render:Artists');
@@ -69,7 +83,7 @@ const sortOrderState = jatom(MakeSortKey(['r', ''], ['r', 'ylnt']));
 
 function ArtistHeaderDisplay({ group }: { group: IGroup }): ReactElement {
   const expansionState = artistIsExpandedState(group.key);
-  const artist = useRecoilValue(artistByKeyFuncFam(group.key));
+  const artist = useAtomValue(artistByKey(group.key));
   const picurl = getArtistImageUrl(group.key);
   const setArtistContext = useSetAtom(artistContextState);
   const onAddSongsClick = useCallback(() => {
@@ -96,8 +110,7 @@ function ArtistHeaderDisplay({ group }: { group: IGroup }): ReactElement {
       <div
         className="artist-header-info"
         onDoubleClick={onAddSongsClick}
-        style={{ padding: '2px 0px', cursor: 'pointer' }}
-      >
+        style={{ padding: '2px 0px', cursor: 'pointer' }}>
         <Image
           imageFit={ImageFit.centerContain}
           height={50}
@@ -141,13 +154,13 @@ export function getFilteredArtists(
 export function GroupedAristList(): ReactElement {
   const [detailRef, setDetailRef] = useState<IDetailsList | null>(null);
 
-  const artists = useRecoilValue(allArtistsFunc);
-  const albums = useRecoilValue(allAlbumsFunc);
-  const songs = useRecoilValue(allSongsFunc);
+  const artists = useAtomValue(allArtistsState);
+  const albums = useAtomValue(allAlbumsState);
+  const songs = useAtomValue(allSongsState);
   const ignoreArticles = useAtomValue(ignoreArticlesState);
   const keyBuffer = useAtomValue(focusedKeysFuncFam(CurrentView.artists));
   const [artistContext, setArtistContext] = useAtom(artistContextState);
-  const filteredArtists = useRecoilValue(filteredArtistsFunc);
+  const filteredArtists = useAtomValue(filteredArtistsFunc);
   const [curSort, setSort] = useAtom(sortOrderState);
   const curExpandedState = useAtom(artistExpandedState);
   const resetArtistContext = useResetAtom(artistContextState);
@@ -234,9 +247,7 @@ export function GroupedAristList(): ReactElement {
         <SongListMenu
           context={artistContext}
           onClearContext={resetArtistContext}
-          onGetSongList={(xact: MyTransactionInterface, data: string) =>
-            SongListFromKey(xact, data)
-          }
+          onGetSongList={(data: string) => SongListFromKey(data)}
         />
       </ScrollablePane>
     </div>

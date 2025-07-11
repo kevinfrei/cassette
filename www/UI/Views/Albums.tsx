@@ -11,28 +11,28 @@ import {
   Text,
 } from '@fluentui/react';
 import { MakeLog } from '@freik/logger';
-import { AlbumKey, Song } from '@freik/media-core';
 import { hasFieldType, isDefined, isNumber } from '@freik/typechk';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
 import { ReactElement, useCallback, useState } from 'react';
+import { AlbumKey, Song } from 'www/Shared/CommonTypes';
 
-import { AddSongs } from '../../Jotai/API';
-import { useJotaiCallback } from '../../Jotai/Helpers';
-import { MakeSetAtomFamily } from '../../Jotai/Hooks';
-import { focusedKeysFuncFam } from '../../Jotai/KeyBuffer';
-import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
+import {
+  AlbumForSongRender,
+  ArtistsForSongRender,
+  YearForSongRender,
+} from 'www/Tools/SimpleTags';
 import {
   articlesCmp,
   MakeSortKey,
   noArticlesCmp,
   SortSongsFromAlbums,
-} from '../../Sorting';
-import {
-  AlbumForSongRender,
-  ArtistsForSongRender,
-  YearForSongRender,
-} from '../SimpleTags';
+} from 'www/Tools/Sorting';
+import { AddSongs } from '../../Jotai/API';
+import { useJotaiCallback } from '../../Jotai/Helpers';
+import { MakeSetAtomFamily } from '../../Jotai/Hooks';
+import { focusedKeysFuncFam } from '../../Jotai/KeyBuffer';
+import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
 import {
   altRowRenderer,
   ProcessSongGroupData,
@@ -90,8 +90,7 @@ function AlbumHeaderDisplay({ group }: AHDProps): ReactElement {
       <div
         className="album-header-info"
         onDoubleClick={onAddSongsClick}
-        style={{ padding: '2px 0px', cursor: 'pointer' }}
-      >
+        style={{ padding: '2px 0px', cursor: 'pointer' }}>
         <Image
           imageFit={ImageFit.centerContain}
           height={50}

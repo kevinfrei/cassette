@@ -274,8 +274,7 @@ export function MakeSortKey(
       ],
       [
         'V', // VA Type
-        (a, b) =>
-          cmpFail(a, b, getAlbum, (i, j) => strComp(i.vatype, j.vatype)),
+        (a, b) => cmpFail(a, b, getAlbum, (i, j) => i.vatype - j.vatype),
       ],
     ]);
   }
@@ -315,7 +314,7 @@ export function MakeSortKey(
       ],
       [
         'V', // VA type
-        (a, b) => strComp(a.vatype, b.vatype),
+        (a, b) => a.vatype - b.vatype,
       ],
     ]);
   }

@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
-import { Album, AlbumKey, SongKey } from 'www/Shared/CommonTypes';
+import { Album, AlbumKey, SongKey, VAType } from 'www/Shared/CommonTypes';
 import { AlbumDescriptionWithKey, SongDescription } from 'www/State/SongState';
 import { albumByKey, allAlbumsState } from './Albums';
 import { artistStringStateFamily } from './Artists';
@@ -25,9 +25,9 @@ export const descriptionFromAlbumKey = atomFamily((ak: AlbumKey) =>
       if (maybeArtistName) {
         res.artist = maybeArtistName;
       }
-    } else if (album.vatype === 'ost') {
+    } else if (album.vatype === VAType.OST) {
       res.artist = 'Soundtrack';
-    } else if (album.vatype === 'va') {
+    } else if (album.vatype === VAType.VA) {
       res.artist = 'Compilation';
     } else {
       res.artist = '???';

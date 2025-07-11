@@ -1,8 +1,13 @@
-import { ReactElement } from 'react';
 import { ComboBox, IComboBox, IComboBoxOption } from '@fluentui/react';
-import { AlbumKey, Artist, ArtistKey, PlaylistName } from '@freik/media-core';
 import { isDefined, isString } from '@freik/typechk';
 import { useAtom, useAtomValue } from 'jotai';
+import { ReactElement } from 'react';
+import {
+  AlbumKey,
+  Artist,
+  ArtistKey,
+  PlaylistName,
+} from 'www/Shared/CommonTypes';
 
 import { useJotaiCallback } from '../../../Jotai/Helpers';
 import { WritableAtomType } from '../../../Jotai/Hooks';

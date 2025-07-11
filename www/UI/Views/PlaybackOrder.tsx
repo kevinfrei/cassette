@@ -1,22 +1,21 @@
 import { IDetailsRowProps, Panel, PanelType } from '@fluentui/react';
 import { useAtom, useAtomValue } from 'jotai';
-import { useRecoilValue } from 'recoil';
-import { isMiniplayerState, playOrderDisplayingState } from '../../Jotai/Local';
-import { shuffleFunc } from '../../Recoil/ReadWrite';
+import { ReactElement } from 'react';
 import {
   currentIndexState,
+  shuffleState,
   songListState,
   songPlaybackOrderState,
-} from '../../Recoil/SongPlaying';
+} from 'www/Jotai/SongPlayback';
+import { isMiniplayerState, playOrderDisplayingState } from '../../Jotai/Local';
 import { SimpleSongsList } from './MixedSongs';
-import { ReactElement } from 'react';
 
 export function PlaybackOrder(): ReactElement {
-  const curIndex = useRecoilValue(currentIndexState);
-  const isShuffle = useRecoilValue(shuffleFunc);
+  const curIndex = useAtomValue(currentIndexState);
+  const isShuffle = useAtomValue(shuffleState);
   const isMiniplayer = useAtomValue(isMiniplayerState);
-  const pbOrder = useRecoilValue(songPlaybackOrderState);
-  const unsortedSongKeys = useRecoilValue(songListState);
+  const pbOrder = useAtomValue(songPlaybackOrderState);
+  const unsortedSongKeys = useAtomValue(songListState);
   const sortedSongKeys =
     pbOrder !== 'ordered'
       ? pbOrder.map((val) => unsortedSongKeys[val])
@@ -35,8 +34,7 @@ export function PlaybackOrder(): ReactElement {
       closeButtonAriaLabel="Close"
       headerText="Playback Order"
       type={PanelType.medium}
-      isBlocking={false}
-    >
+      isBlocking={false}>
       <SimpleSongsList
         forSongs={sortedSongKeys}
         bold={isBold}

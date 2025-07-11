@@ -7,14 +7,14 @@ import {
   SelectionMode,
   Text,
 } from '@fluentui/react';
-import { PlaylistName, Song, SongKey } from '@freik/media-core';
-import { hasFieldType, isDefined, isNumber, isUndefined } from '@freik/typechk';
 import { Dialogs } from '@freik/fluentui-tools';
 import { useDialogState } from '@freik/react-tools';
+import { hasFieldType, isDefined, isNumber, isUndefined } from '@freik/typechk';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
 import { ReactElement, useCallback, useState } from 'react';
 import { useRecoilValue } from 'recoil';
+import { PlaylistName, Song, SongKey } from 'www/Shared/CommonTypes';
 import { useJotaiAsyncCallback, useJotaiCallback } from '../../Jotai/Helpers';
 import { MakeSetAtomFamily } from '../../Jotai/Hooks';
 import { allSongsFunc } from '../../Recoil/ReadOnly';
@@ -98,8 +98,7 @@ function PlaylistHeaderDisplay({
       />
       <div
         onDoubleClick={onAddSongsClick}
-        style={{ padding: '2px 0px', cursor: 'pointer' }}
-      >
+        style={{ padding: '2px 0px', cursor: 'pointer' }}>
         <Text>
           {group.name}: {group.count} Song{group.count !== 1 ? 's' : ''}
         </Text>
