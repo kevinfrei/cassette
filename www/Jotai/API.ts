@@ -9,9 +9,19 @@
  */
 
 import { isNumber } from '@freik/typechk';
-import { RESET } from 'jotai/utils';
-import { PlaylistName, SongKey } from 'www/Shared/CommonTypes';
+import { atom, Atom } from 'jotai';
+import { atomFamily, RESET } from 'jotai/utils';
+import { AtomFamily } from 'jotai/vanilla/utils/atomFamily';
+import {
+  AlbumKey,
+  PlaylistName,
+  SongKey,
+  VAType,
+} from 'www/Shared/CommonTypes';
+import { AlbumDescriptionWithKey, SongDescription } from 'www/State/SongState';
 import { isPlaylistName, ShuffleArray } from 'www/Utils';
+import { albumByKey, maybeAlbumByKey } from './Albums';
+import { artistStringStateFamily } from './Artists';
 import {
   isSongHatedFam,
   isSongLikedFam,
@@ -33,6 +43,7 @@ import {
   songListState,
   songPlaybackOrderState,
 } from './SongPlayback';
+import { maybeSongByKey } from './Songs';
 import { getStore, MaybeStore } from './Storage';
 
 /**
@@ -277,3 +288,65 @@ export async function RemoveSongFromNowPlaying(
     songList.filter((v, i) => i !== listLocation),
   );
 }
+
+export const dataForAlbumByKey: AtomFamily<
+  AlbumKey,
+  Atom<Promise<AlbumDescriptionWithKey>>
+> = atomFamily((ak: AlbumKey) =>
+  atom(async (get): Promise<AlbumDescriptionWithKey> => {
+    const res = { artist: '', album: '', year: '', key: '' };
+    if (!ak) {
+      return res;
+    }
+    const album = await get(maybeAlbumByKey(ak));
+    if (album) {
+      res.key = ak;
+      res.album = album.title;
+      res.year = album.year ? album.year.toString() : '';
+      if (album.primaryArtists.length) {
+        const maybeArtistName = await get(
+          artistStringStateFamily(album.primaryArtists),
+        );
+        if (maybeArtistName) {
+          res.artist = maybeArtistName;
+        }
+      } else if (album.vatype === VAType.OST) {
+        res.artist = 'Soundtrack';
+      } else if (album.vatype === VAType.VA) {
+        res.artist = 'Compilation';
+      } else {
+        res.artist = '???';
+      }
+    }
+    return res;
+  }),
+);
+
+// SongDescription, SongKey
+export const dataForSongByKey: AtomFamily<
+  SongKey,
+  Atom<Promise<SongDescription>>
+> = atomFamily((sk: SongKey) =>
+  atom(async (get) => {
+    const res: SongDescription = {
+      title: '',
+      track: 0,
+      artist: '',
+      album: '',
+      year: '',
+    };
+
+    if (sk.length === 0) {
+      return res;
+    }
+    const song = await get(maybeSongByKey(sk));
+    if (!song) {
+      return res;
+    }
+    const title = song.title;
+    const track = song.track;
+
+    const albumData = await get(dataForAlbumByKey(song.albumId));
+    return { title, track, ...albumData };
+  }),
+);
