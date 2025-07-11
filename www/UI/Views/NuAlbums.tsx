@@ -5,9 +5,9 @@ import {
   List,
   mergeStyleSets,
 } from '@fluentui/react';
-import { Album } from '@freik/media-core';
 import { ReactElement, useCallback, useRef } from 'react';
 import { useRecoilValue } from 'recoil';
+import { Album } from 'www/Shared/CommonTypes';
 import { allAlbumsFunc, dataForAlbumFuncFam } from '../../Recoil/ReadOnly';
 import { getAlbumImageUrl } from '../../Tools';
 import './styles/Albums.css';
@@ -90,8 +90,7 @@ function AlbumCoverView({
       data-is-focusable
       style={{
         width: `${100 / cols}%`,
-      }}
-    >
+      }}>
       <div className={classNames.listGridExampleSizer}>
         <div className={classNames.listGridExamplePadder}>
           <img
@@ -100,8 +99,9 @@ function AlbumCoverView({
             className={classNames.listGridExampleImage}
           />
           <span
-            className={classNames.listGridExampleLabel}
-          >{`${albumData.album}- ${albumData.year} [${albumData.artist}]`}</span>
+            className={
+              classNames.listGridExampleLabel
+            }>{`${albumData.album}- ${albumData.year} [${albumData.artist}]`}</span>
         </div>
       </div>
     </div>

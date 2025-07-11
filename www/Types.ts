@@ -1,5 +1,12 @@
-import { AlbumKey, SongKey } from '@freik/media-core';
-import { Album, IpcCall, SocketMsg, Song } from './Shared/CommonTypes';
+import {
+  Album,
+  AlbumKey,
+  IpcCall,
+  SocketMsg,
+  Song,
+  SongKey,
+  VAType,
+} from './Shared/CommonTypes';
 
 export type ListenKey = { ipcId: SocketMsg; id: string };
 
@@ -22,7 +29,7 @@ export type MetadataProps = {
   track?: string;
   title?: string;
   year?: string;
-  va?: string;
+  va?: VAType;
   variations?: string;
   moreArtists?: string;
   albumId?: AlbumKey;

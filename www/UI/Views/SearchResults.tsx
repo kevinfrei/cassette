@@ -9,6 +9,8 @@ import {
   Text,
 } from '@fluentui/react';
 import { MakeLog } from '@freik/logger';
+import { hasFieldType, isBoolean } from '@freik/typechk';
+import { ReactElement, useCallback, useState } from 'react';
 import {
   Album,
   AlbumKey,
@@ -16,9 +18,7 @@ import {
   ArtistKey,
   Song,
   SongKey,
-} from '@freik/media-core';
-import { hasFieldType, isBoolean } from '@freik/typechk';
-import { ReactElement, useCallback, useState } from 'react';
+} from 'www/Shared/CommonTypes';
 import { GetDataForSong, SongData } from '../../DataSchema';
 import { SearchResults } from '../../Ipc';
 import { AddSongs } from '../../Jotai/API';

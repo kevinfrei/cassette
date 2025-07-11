@@ -1,6 +1,5 @@
 // This is for getting at "global" stuff from the window object
 import { MakeLog } from '@freik/logger';
-import { AlbumKey, ArtistKey, PlaylistName } from '@freik/media-core';
 import {
   hasField,
   hasFieldOf,
@@ -9,6 +8,7 @@ import {
   isString,
 } from '@freik/typechk';
 import { ForwardedRef, MutableRefObject } from 'react';
+import { AlbumKey, ArtistKey, PlaylistName } from 'www/Shared/CommonTypes';
 import { SongInfo } from './Types';
 
 const { log } = MakeLog('EMP:render:Tools');

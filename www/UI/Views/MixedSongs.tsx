@@ -6,11 +6,11 @@ import {
   SelectionMode,
 } from '@fluentui/react';
 import { MakeLog } from '@freik/logger';
-import { Song, SongKey } from '@freik/media-core';
 import { isNumber } from '@freik/typechk';
 import { useAtomValue } from 'jotai';
 import { ReactElement, useCallback } from 'react';
 import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
+import { Song, SongKey } from 'www/Shared/CommonTypes';
 import { AddSongs } from '../../Jotai/API';
 import { useJotaiCallback } from '../../Jotai/Helpers';
 import {
