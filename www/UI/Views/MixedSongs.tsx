@@ -11,7 +11,7 @@ import { atom, useAtom, useAtomValue } from 'jotai';
 import { ReactElement, useCallback } from 'react';
 import { allAlbumsState } from 'www/Jotai/Albums';
 import { allArtistsState } from 'www/Jotai/Artists';
-import { getAll, useJotaiCallback } from 'www/Jotai/Helpers';
+import { getAll } from 'www/Jotai/Helpers';
 import {
   isSongHatedFam,
   isSongLikedFam,
@@ -29,11 +29,12 @@ import {
   MakeColumns,
   StickyRenderDetailsHeader,
 } from 'www/Tools/SongList';
-import { SongListMenuData } from 'www/Tools/SongMenus';
+import { SongListMenu, SongListMenuData } from 'www/Tools/SongMenus';
 import { MakeSortKey, SortSongList } from 'www/Tools/Sorting';
 import { AddSongs } from '../../Jotai/API';
 import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
 import { LikeOrHate } from '../Liker';
+
 import './styles/MixedSongs.css';
 
 const { wrn } = MakeLog('EMP:render:MixedSongs');
@@ -109,7 +110,7 @@ export function MixedSongsList(): ReactElement {
           onClearContext={() =>
             setSongContext({ data: '', spot: { left: 0, top: 0 } })
           }
-          onGetSongList={(_xact, data) => (data.length > 0 ? [data] : [])}
+          onGetSongList={(data) => (data.length > 0 ? [data] : [])}
         />
       </ScrollablePane>
     </div>
