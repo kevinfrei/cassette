@@ -15,31 +15,34 @@ import { hasFieldType, isDefined, isNumber } from '@freik/typechk';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
 import { ReactElement, useCallback, useState } from 'react';
-import { AlbumKey, Song } from 'www/Shared/CommonTypes';
-
+import { AlbumKey, CurrentView, Song } from 'www/Shared/CommonTypes';
 import {
   AlbumForSongRender,
   ArtistsForSongRender,
   YearForSongRender,
 } from 'www/Tools/SimpleTags';
 import {
+  altRowRenderer,
+  ProcessSongGroupData,
+  StickyRenderDetailsHeader,
+} from 'www/Tools/SongList';
+import { SongListMenu, SongListMenuData } from 'www/Tools/SongMenus';
+import {
   articlesCmp,
   MakeSortKey,
   noArticlesCmp,
   SortSongsFromAlbums,
 } from 'www/Tools/Sorting';
+import { getAlbumImageUrl, GetIndexOf } from 'www/Utils';
 import { AddSongs } from '../../Jotai/API';
 import { useJotaiCallback } from '../../Jotai/Helpers';
 import { MakeSetAtomFamily } from '../../Jotai/Hooks';
 import { focusedKeysFuncFam } from '../../Jotai/KeyBuffer';
 import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
-import {
-  altRowRenderer,
-  ProcessSongGroupData,
-  StickyRenderDetailsHeader,
-} from '../SongList';
-import { SongListMenu, SongListMenuData } from '../SongMenus';
 
+import { albumByKey, allAlbumsState } from 'www/Jotai/Albums';
+import { allArtistsState } from 'www/Jotai/Artists';
+import { allSongsState } from 'www/Jotai/Songs';
 import './styles/Albums.css';
 
 const { wrn } = MakeLog('EMP:render:Albums');
@@ -61,8 +64,8 @@ const albumSortState = jatom(MakeSortKey(['l', 'n'], ['lry', 'nrt']));
 
 type AHDProps = { group: IGroup };
 function AlbumHeaderDisplay({ group }: AHDProps): ReactElement {
-  const album = useRecoilValue(albumByKeyFuncFam(group.key));
-  const albumData = useRecoilValue(dataForAlbumFuncFam(group.key));
+  const album = useAtomValue(albumByKey(group.key));
+  const albumData = useAtomValue(dataForAlbumFuncFam(group.key));
   const picurl = getAlbumImageUrl(group.key);
   const onAddSongsClick = useCallback(() => {
     AddSongs(album.songs).catch(wrn);
@@ -112,11 +115,11 @@ function AlbumHeaderDisplay({ group }: AHDProps): ReactElement {
 export function GroupedAlbumList(): ReactElement {
   const [detailRef, setDetailRef] = useState<IDetailsList | null>(null);
 
-  const albums = useRecoilValue(allAlbumsFunc);
+  const albums = useAtomValue(allAlbumsState);
   const ignoreArticles = useAtomValue(ignoreArticlesState);
   const keyBuffer = useAtomValue(focusedKeysFuncFam(CurrentView.albums));
-  const allSongs = useRecoilValue(allSongsFunc);
-  const allArtists = useRecoilValue(allArtistsFunc);
+  const allSongs = useAtomValue(allSongsState);
+  const allArtists = useAtomValue(allArtistsState);
   const newAlbumSort = useAtomValue(albumSortState);
   const [albumContext, setAlbumContext] = useAtom(albumContextState);
 
@@ -175,7 +178,6 @@ export function GroupedAlbumList(): ReactElement {
     );
     detailRef.focusIndex(index);
   }
-
   return (
     <div className="songListForAlbum" data-is-scrollable="true">
       <ScrollablePane scrollbarVisibility={ScrollbarVisibility.always}>
@@ -195,9 +197,7 @@ export function GroupedAlbumList(): ReactElement {
         <SongListMenu
           context={albumContext}
           onClearContext={resetAlbumContext}
-          onGetSongList={(xact: MyTransactionInterface, data: string) =>
-            SongListFromKey(xact, data)
-          }
+          onGetSongList={(data: string) => SongListFromKey(data)}
         />
       </ScrollablePane>
     </div>

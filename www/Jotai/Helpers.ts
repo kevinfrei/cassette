@@ -1,4 +1,4 @@
-import { Getter, Setter, useSetAtom } from 'jotai';
+import { Atom, Getter, Setter, useSetAtom } from 'jotai';
 import { useAtomCallback } from 'jotai/utils';
 import { useCallback } from 'react';
 
@@ -26,4 +26,17 @@ export function useJotaiAsyncCallback<Result, Args extends unknown[]>(
   options?: Options,
 ): (...args: Args) => Promise<Result> {
   return useAtomCallback(useCallback(fn, deps), options);
+}
+
+// Typescript magic is...not particularly obvious, here. We're passing the return
+// types of each get up to the resulting tuple, whether it's a promise or not.
+export function getAll<Atoms extends readonly Atom<any>[]>(
+  get: Getter,
+  ...atoms: Atoms
+): Promise<{
+  [K in keyof Atoms]: Atoms[K] extends Atom<infer T> ? Awaited<T> : never;
+}> {
+  return Promise.all(atoms.map(get)) as Promise<{
+    [K in keyof Atoms]: Atoms[K] extends Atom<infer T> ? Awaited<T> : never;
+  }>;
 }
