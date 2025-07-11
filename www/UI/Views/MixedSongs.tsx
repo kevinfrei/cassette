@@ -7,73 +7,69 @@ import {
 } from '@fluentui/react';
 import { MakeLog } from '@freik/logger';
 import { isNumber } from '@freik/typechk';
-import { useAtomValue } from 'jotai';
+import { atom, useAtom, useAtomValue } from 'jotai';
 import { ReactElement, useCallback } from 'react';
-import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
-import { Song, SongKey } from 'www/Shared/CommonTypes';
-import { AddSongs } from '../../Jotai/API';
-import { useJotaiCallback } from '../../Jotai/Helpers';
+import { allAlbumsState } from 'www/Jotai/Albums';
+import { allArtistsState } from 'www/Jotai/Artists';
+import { getAll, useJotaiCallback } from 'www/Jotai/Helpers';
 import {
   isSongHatedFam,
   isSongLikedFam,
   songListLikeNumberFromStringFam,
-} from '../../Jotai/LikesAndHates';
-import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
-import { getStore } from '../../Jotai/Storage';
-/*import {
-  allAlbumsFunc,
-  allArtistsFunc,
-  allSongsFunc,
-  dataForSongListFuncFam,
-} from '../../Recoil/ReadOnly';
-import { MakeSortKey, SortSongList } from '../../Sorting';
+} from 'www/Jotai/LikesAndHates';
+import { allSongsState } from 'www/Jotai/Songs';
+import { Song, SongKey } from 'www/Shared/CommonTypes';
 import {
   AlbumForSongRender,
   ArtistsForSongRender,
   YearForSongRender,
-} from '../SimpleTags';
- 
+} from 'www/Tools/SimpleTags';
 import {
+  altRowRenderer,
   MakeColumns,
   StickyRenderDetailsHeader,
-  altRowRenderer,
-} from '../SongList';
-import { SongListMenu, SongListMenuData } from '../SongMenus';
-*/
+} from 'www/Tools/SongList';
+import { SongListMenuData } from 'www/Tools/SongMenus';
+import { MakeSortKey, SortSongList } from 'www/Tools/Sorting';
+import { AddSongs } from '../../Jotai/API';
+import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
+import { LikeOrHate } from '../Liker';
 import './styles/MixedSongs.css';
 
 const { wrn } = MakeLog('EMP:render:MixedSongs');
 
-const sortOrderState = atom({
-  key: 'mixedSongSortOrder',
-  default: MakeSortKey([''], ['nrlyt']),
-});
-const sortedSongsState = selector({
-  key: 'msSorted',
-  get: async ({ get }) => {
-    const store = getStore();
-    return SortSongList(
-      [...get(allSongsFunc).values()],
-      get(allAlbumsFunc),
-      get(allArtistsFunc),
-      await store.get(ignoreArticlesState),
-      get(sortOrderState),
+const sortOrderState = atom(MakeSortKey([''], ['nrlyt']));
+const sortedSongsState = atom(async (get) => {
+  const [allSongs, allAlbums, allArtists, ignoreArticles, sortOrder] =
+    await getAll(
+      get,
+      allSongsState,
+      allAlbumsState,
+      allArtistsState,
+      ignoreArticlesState,
+      sortOrderState,
     );
-  },
+  return SortSongList(
+    [...allSongs.values()],
+    allAlbums,
+    allArtists,
+    ignoreArticles,
+    sortOrder,
+  );
 });
 const songContextState = atom<SongListMenuData>({
-  key: 'mixedSongContext',
-  default: { data: '', spot: { left: 0, top: 0 } },
+  data: '',
+  spot: { left: 0, top: 0 },
 });
 
 export function MixedSongsList(): ReactElement {
-  const sortedItems = useRecoilValue(sortedSongsState);
-  const [sortOrder, setSortOrder] = useRecoilState(sortOrderState);
+  const sortedItems = useAtomValue(sortedSongsState);
+  const [sortOrder, setSortOrder] = useAtom(sortOrderState);
   const onAddSongClick = useCallback(
     (item: Song) => AddSongs([item.key]).catch(wrn),
     [],
   );
-  const [songContext, setSongContext] = useRecoilState(songContextState);
+  const [songContext, setSongContext] = useAtom(songContextState);
   const onRightClick = (item?: Song, index?: number, ev?: Event) => {
     const event = ev as any as MouseEvent;
     if (ev && item) {
@@ -130,7 +126,7 @@ export function SimpleSongsList({
   keyprefix?: string;
 }): ReactElement {
   const pfx = keyprefix || 'ssl';
-  const songList = useRecoilValue(dataForSongListFuncFam(forSongs));
+  const songList = useAtomValue(dataForSongListFuncFam(forSongs));
   if (!songList) {
     return <></>;
   }

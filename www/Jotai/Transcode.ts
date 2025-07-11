@@ -1,41 +1,18 @@
 import { isAlbumKey, isArtistKey } from '@freik/media-core';
-import {
-  chkArrayOf,
-  chkObjectOfType,
-  isArrayOfString,
-  isNumber,
-  isString,
-} from '@freik/typechk';
+import { isNumber, isString } from '@freik/typechk';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import {
   AlbumKey,
   ArtistKey,
+  chkTranscodeState,
   Playlist,
   PlaylistName,
+  StorageId,
+  TranscodeSource,
+  TranscodeState,
 } from 'www/Shared/CommonTypes';
 import { atomWithMainStorage } from './Storage';
-
-type FailType = { file: string; error: string };
-
-const isFailType = chkObjectOfType<FailType>({
-  file: isString,
-  error: isString,
-});
-
-const isTranscodeState = chkObjectOfType<TranscodeState>(
-  {
-    curStatus: isString,
-    filesFound: isNumber,
-    filesPending: isNumber,
-    filesTranscoded: isArrayOfString,
-    filesUntouched: isNumber,
-  },
-  {
-    filesFailed: chkArrayOf<FailType>(isFailType),
-    itemsRemoved: isArrayOfString,
-  },
-);
 
 const emptyXcodeInfo: TranscodeState = {
   curStatus: '',
@@ -43,10 +20,12 @@ const emptyXcodeInfo: TranscodeState = {
   filesPending: 0,
   filesUntouched: 0,
   filesTranscoded: [],
+  filesFailed: [],
+  itemsRemoved: [],
 };
 
 export type TranscodeSourceLocation = {
-  type: TranscodeSourceEnum;
+  type: TranscodeSource;
   loc: Playlist | ArtistKey | AlbumKey | string;
 };
 
@@ -56,10 +35,10 @@ export type TranscodeSourceLocation = {
 export const transcodeStatusState = atomWithMainStorage<TranscodeState>(
   StorageId.TranscodingUpdate,
   emptyXcodeInfo,
-  isTranscodeState,
+  chkTranscodeState,
 );
 
-export const sourceLocationTypeState = atom<TranscodeSourceEnum>(
+export const sourceLocationTypeState = atom<TranscodeSource>(
   TranscodeSource.Playlist,
 );
 
