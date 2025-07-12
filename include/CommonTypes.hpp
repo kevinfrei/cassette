@@ -2128,23 +2128,23 @@ struct impl_to_json<Shared::OpenDialogOptions> {
       const Shared::OpenDialogOptions& _value) {
     crow::json::wvalue _res;
 
-    if (_value.folder.has_value()) {
-      _res["folder"] = to_json(_value.folder.value());
+    if (_value.folder) {
+      _res["folder"] = to_json(*_value.folder);
     }
-    if (_value.title.has_value()) {
-      _res["title"] = to_json(_value.title.value());
+    if (_value.title) {
+      _res["title"] = to_json(*_value.title);
     }
-    if (_value.defaultPath.has_value()) {
-      _res["defaultPath"] = to_json(_value.defaultPath.value());
+    if (_value.defaultPath) {
+      _res["defaultPath"] = to_json(*_value.defaultPath);
     }
-    if (_value.buttonLabel.has_value()) {
-      _res["buttonLabel"] = to_json(_value.buttonLabel.value());
+    if (_value.buttonLabel) {
+      _res["buttonLabel"] = to_json(*_value.buttonLabel);
     }
-    if (_value.multiSelections.has_value()) {
-      _res["multiSelections"] = to_json(_value.multiSelections.value());
+    if (_value.multiSelections) {
+      _res["multiSelections"] = to_json(*_value.multiSelections);
     }
-    if (_value.filters.has_value()) {
-      _res["filters"] = to_json(_value.filters.value());
+    if (_value.filters) {
+      _res["filters"] = to_json(*_value.filters);
     }
     return _res;
   }
@@ -2157,53 +2157,60 @@ from_json<Shared::OpenDialogOptions>(const crow::json::rvalue& _value) {
     return std::nullopt;
   Shared::OpenDialogOptions _res;
 
-  if (!_value.has("folder"))
-    return std::nullopt;
-  auto _folder_opt_ = from_json<std::optional<bool>>(_value["folder"]);
-  if (!_folder_opt_.has_value())
-    return std::nullopt;
-  _res.folder = std::move(*_folder_opt_);
+  if (_value.has("folder")) {
+    auto _folder_opt_ = from_json<bool>(_value["folder"]);
+    if (!_folder_opt_.has_value())
+      return std::nullopt;
+    _res.folder = std::move(*_folder_opt_);
+  } else {
+    _res.folder = std::nullopt;
+  }
 
-  if (!_value.has("title"))
-    return std::nullopt;
-  auto _title_opt_ = from_json<std::optional<std::string>>(_value["title"]);
-  if (!_title_opt_.has_value())
-    return std::nullopt;
-  _res.title = std::move(*_title_opt_);
+  if (_value.has("title")) {
+    auto _title_opt_ = from_json<std::string>(_value["title"]);
+    if (!_title_opt_.has_value())
+      return std::nullopt;
+    _res.title = std::move(*_title_opt_);
+  } else {
+    _res.title = std::nullopt;
+  }
 
-  if (!_value.has("defaultPath"))
-    return std::nullopt;
-  auto _defaultPath_opt_ =
-      from_json<std::optional<std::string>>(_value["defaultPath"]);
-  if (!_defaultPath_opt_.has_value())
-    return std::nullopt;
-  _res.defaultPath = std::move(*_defaultPath_opt_);
+  if (_value.has("defaultPath")) {
+    auto _defaultPath_opt_ = from_json<std::string>(_value["defaultPath"]);
+    if (!_defaultPath_opt_.has_value())
+      return std::nullopt;
+    _res.defaultPath = std::move(*_defaultPath_opt_);
+  } else {
+    _res.defaultPath = std::nullopt;
+  }
 
-  if (!_value.has("buttonLabel"))
-    return std::nullopt;
-  auto _buttonLabel_opt_ =
-      from_json<std::optional<std::string>>(_value["buttonLabel"]);
-  if (!_buttonLabel_opt_.has_value())
-    return std::nullopt;
-  _res.buttonLabel = std::move(*_buttonLabel_opt_);
+  if (_value.has("buttonLabel")) {
+    auto _buttonLabel_opt_ = from_json<std::string>(_value["buttonLabel"]);
+    if (!_buttonLabel_opt_.has_value())
+      return std::nullopt;
+    _res.buttonLabel = std::move(*_buttonLabel_opt_);
+  } else {
+    _res.buttonLabel = std::nullopt;
+  }
 
-  if (!_value.has("multiSelections"))
-    return std::nullopt;
-  auto _multiSelections_opt_ =
-      from_json<std::optional<bool>>(_value["multiSelections"]);
-  if (!_multiSelections_opt_.has_value())
-    return std::nullopt;
-  _res.multiSelections = std::move(*_multiSelections_opt_);
+  if (_value.has("multiSelections")) {
+    auto _multiSelections_opt_ = from_json<bool>(_value["multiSelections"]);
+    if (!_multiSelections_opt_.has_value())
+      return std::nullopt;
+    _res.multiSelections = std::move(*_multiSelections_opt_);
+  } else {
+    _res.multiSelections = std::nullopt;
+  }
 
-  if (!_value.has("filters"))
-    return std::nullopt;
-  auto _filters_opt_ =
-      from_json<std::optional<std::vector<Shared::FileFilterItem>>>(
-          _value["filters"]);
-  if (!_filters_opt_.has_value())
-    return std::nullopt;
-  _res.filters = std::move(*_filters_opt_);
-
+  if (_value.has("filters")) {
+    auto _filters_opt_ =
+        from_json<std::vector<Shared::FileFilterItem>>(_value["filters"]);
+    if (!_filters_opt_.has_value())
+      return std::nullopt;
+    _res.filters = std::move(*_filters_opt_);
+  } else {
+    _res.filters = std::nullopt;
+  }
   return _res;
 }
 #pragma endregion JSON serialization for object OpenDialogOptions
