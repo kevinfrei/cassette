@@ -1,4 +1,3 @@
-import { StateToggle } from '@freik/fluentui-tools';
 import {
   DefaultButton,
   Dropdown,
@@ -7,11 +6,13 @@ import {
   Text,
   TextField,
 } from '@fluentui/react';
-import { isArrayOfString, isDefined } from '@freik/typechk';
+import { StateToggle } from '@freik/fluentui-tools';
 import { useBoolState } from '@freik/react-tools';
+import { isArrayOfString, isDefined } from '@freik/typechk';
 import { useAtom, useAtomValue } from 'jotai';
 import { ReactElement, useState } from 'react';
-
+import { chkTranscodeSource, TranscodeSource } from 'www/Shared/CommonTypes';
+import { StringSpinButton } from 'www/Tools/Utilities';
 import { useJotaiCallback } from '../../../Jotai/Helpers';
 import {
   destLocationState,
@@ -24,7 +25,6 @@ import {
   validSourceState,
   xcodeBitRateState,
 } from '../../../Jotai/Transcode';
-import { StringSpinButton } from '../../Utilities';
 import {
   AlbumSelector,
   ArtistSelector,
@@ -32,6 +32,7 @@ import {
 } from './SourceSelectors';
 import { TranscodeStatus } from './TranscodeStatus';
 
+import { Setter } from 'www/Types';
 import '../styles/Tools.css';
 
 /*
@@ -49,10 +50,7 @@ const sourceOptions: IComboBoxOption[] = [
   { key: TranscodeSource.Disk, text: 'Disk location' },
 ];
 
-function getDir(
-  setter: (arg: string) => void,
-  setError: SetterOrUpdater<string>,
-) {
+function getDir(setter: Setter<string>, setError: Setter<string>) {
   Util.ShowOpenDialog({ properties: ['openDirectory'] })
     .then((val) => {
       if (isArrayOfString(val) && val.length === 1) {
@@ -90,7 +88,7 @@ export function TranscoderConfiguration(): ReactElement {
     event: React.FormEvent<HTMLDivElement>,
     option?: IDropdownOption,
   ): void => {
-    if (isDefined(option) && isTranscodeSource(option.key)) {
+    if (isDefined(option) && chkTranscodeSource(option.key)) {
       setSrcLocType(option.key);
     }
   };

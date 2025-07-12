@@ -3,6 +3,7 @@ import { Expandable } from '@freik/fluentui-tools';
 import { useAtomValue } from 'jotai';
 import { ReactElement } from 'react';
 
+import { TranscodeState } from 'www/Shared/CommonTypes';
 import { transcodeStatusState } from '../../../Jotai/Transcode';
 
 function completed(xcs: TranscodeState): number {
@@ -71,8 +72,7 @@ export function TranscodeStatus(): ReactElement {
   const errorList = curState.filesFailed ? (
     <Expandable
       label={`${curState.filesFailed.length} files failed`}
-      indent={15}
-    >
+      indent={15}>
       {curState.filesFailed.map(({ file, error }, idx) => (
         <div key={idx} style={{ margin: 10 }}>
           <span>

@@ -42,3 +42,5 @@ export type SongInfo = {
   moreArtists: string;
   album: Album;
 };
+
+export type Setter<T> = (arg: T) => void;
