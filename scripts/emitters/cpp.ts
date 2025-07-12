@@ -26,6 +26,7 @@ import {
   MapType,
   NEnum,
   ObjType,
+  OptType,
   SEnum,
   SetType,
   Str,
@@ -273,12 +274,10 @@ const objType: EmitItem<ObjType> = async (writer, name, item) => {
     await writer.write(`  ${typeName} ${key};\n`);
   }
   await writer.write('};\n');
-  const required = Object.entries(item.d)
-    .filter(([_, v]) => !isOptionalType(v))
-    .map(([k, _]) => k);
-  const optional = Object.entries(item.d)
-    .filter(([_, v]) => isOptionalType(v))
-    .map(([k, _]) => k);
+  const required = Object.entries(item.d).filter(
+    ([_, v]) => !isOptionalType(v),
+  );
+  const optional = Object.entries(item.d).filter(([_, v]) => isOptionalType(v));
   addNonShared(`
 #pragma region JSON serialization for object ${name}
 template <> 
@@ -287,12 +286,12 @@ struct impl_to_json<Shared::${name}> {
       const Shared::${name}& _value) {
     crow::json::wvalue _res;
     ${required
-      .map((key) => `_res["${key}"] = to_json(_value.${key});`)
+      .map(([key, _]) => `_res["${key}"] = to_json(_value.${key});`)
       .join('\n    ')}
     ${optional
       .map(
-        (key) => `if (_value.${key}.has_value()) {
-       _res["${key}"] = to_json(_value.${key}.value());
+        ([key, _]) => `if (_value.${key}) {
+       _res["${key}"] = to_json(*_value.${key});
       }`,
       )
       .join('\n    ')}
@@ -307,7 +306,7 @@ from_json<Shared::${name}>(
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::${name} _res;
-  ${Object.entries(item.d)
+  ${required
     .map(
       ([key, value]) => `
   if (!_value.has("${key}"))
@@ -318,7 +317,19 @@ from_json<Shared::${name}>(
   _res.${key} = std::move(*_${key}_opt_);`,
     )
     .join('\n  ')}
-
+  ${optional
+    .map(
+      ([key, value]) => `
+  if (_value.has("${key}")) {
+    auto _${key}_opt_ = from_json<${getTypeName((value as OptType).d, true)}>(_value["${key}"]);
+    if (!_${key}_opt_.has_value())
+      return std::nullopt;
+    _res.${key} = std::move(*_${key}_opt_);
+  } else {
+    _res.${key} = std::nullopt;
+  }`,
+    )
+    .join('\n  ')}
   return _res;
 }
 #pragma endregion JSON serialization for object ${name}
