@@ -22,6 +22,7 @@ export enum TypeId {
   Sub = 'C',
   Arr = 'A',
   Set = 'S',
+  Opt = '?', // Optional type
   FastSet = 'H', // Fast Set, used for std::unordered_set in C++
   Map = 'M',
   FastMap = 'F', // Fast Map, used for std::unordered_map in C++
@@ -61,7 +62,7 @@ export type MapType = { t: TypeId.Map; k: Anonymous; v: Anonymous };
 export type FastMapType = { t: TypeId.FastMap; k: Anonymous; v: Anonymous }; // Fast Map, used for std::unordered_map in C++
 export type TupType = { t: TypeId.Tup; l: Anonymous[] };
 export type RefType = { t: TypeId.Ref; r: string }; // Reference type, Points at a type by name
-
+export type OptType = { t: TypeId.Opt; d: Types }; // Optional type
 export type Enum = { t: TypeId.Enum; u: Int | I; v: string[] };
 export type NEnum = { t: TypeId.NEnum; u: Int | I; v: Of<number> };
 export type SEnum = { t: TypeId.SEnum; v: Of<string> };
@@ -76,7 +77,8 @@ export type Anonymous =
   | FastSetType
   | MapType
   | FastMapType
-  | TupType;
+  | TupType
+  | OptType;
 export type Types = Anonymous | ObjType | SubType | EnumType | I;
 export type NamedTypes = ObjType | SubType | EnumType;
 
@@ -109,6 +111,7 @@ export const fmap = (k: Anonymous, v: Anonymous): FastMapType => ({
 });
 export const tup = (...l: Anonymous[]): TupType => ({ t: TypeId.Tup, l });
 export const obj = (d: Of<Anonymous>): ObjType => ({ t: TypeId.Obj, d });
+export const opt = (d: Types): OptType => ({ t: TypeId.Opt, d });
 export const sub = (p: string, d: Of<Anonymous>): SubType => ({
   t: TypeId.Sub,
   p,
@@ -196,6 +199,9 @@ export function isTupleType(x: Types): x is TupType {
 }
 export function isObjectType(x: Types): x is ObjType {
   return isObjectNonNull(x) && x.t === TypeId.Obj;
+}
+export function isOptionalType(x: Types): x is OptType {
+  return isObjectNonNull(x) && x.t === TypeId.Opt;
 }
 export function isSubType(x: Types): x is SubType {
   return isObjectNonNull(x) && x.t === TypeId.Sub;

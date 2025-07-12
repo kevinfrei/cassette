@@ -11,8 +11,12 @@ import { useBoolState } from '@freik/react-tools';
 import { isArrayOfString, isDefined } from '@freik/typechk';
 import { useAtom, useAtomValue } from 'jotai';
 import { ReactElement, useState } from 'react';
-import { chkTranscodeSource, TranscodeSource } from 'www/Shared/CommonTypes';
-import { StringSpinButton } from 'www/Tools/Utilities';
+import {
+  chkTranscodeSource,
+  IpcCall,
+  TranscodeSource,
+} from 'www/Shared/CommonTypes';
+import { ShowOpenDialog, StringSpinButton } from 'www/Tools/Utilities';
 import { useJotaiCallback } from '../../../Jotai/Helpers';
 import {
   destLocationState,
@@ -32,6 +36,7 @@ import {
 } from './SourceSelectors';
 import { TranscodeStatus } from './TranscodeStatus';
 
+import { PostMain, SendMain } from 'www/Tools/Ipc';
 import { Setter } from 'www/Types';
 import '../styles/Tools.css';
 
@@ -51,9 +56,9 @@ const sourceOptions: IComboBoxOption[] = [
 ];
 
 function getDir(setter: Setter<string>, setError: Setter<string>) {
-  Util.ShowOpenDialog({ properties: ['openDirectory'] })
+  ShowOpenDialog({ folder: true, title: 'Select a directory' })
     .then((val) => {
-      if (isArrayOfString(val) && val.length === 1) {
+      if (isArrayOfString(val) && val.length >= 1) {
         setter(val[0]);
       }
     })
@@ -171,7 +176,7 @@ export function TranscoderConfiguration(): ReactElement {
           text="Transcode"
           disabled={!validSource || dstLoc.length === 0}
           onClick={() => {
-            void Ipc.PostMain(IpcId.TranscodingBegin.toString(), {
+            SendMain(IpcCall.TranscodingBegin, {
               source: srcLocDescr,
               dest: dstLoc,
               artwork: copyArtwork[0],

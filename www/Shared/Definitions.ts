@@ -1,3 +1,4 @@
+import { ShowOpenDialog } from 'www/Tools/Utilities';
 import {
   arr,
   bool,
@@ -13,6 +14,7 @@ import {
   num,
   obj,
   ObjType,
+  opt,
   ref,
   SEnum,
   str,
@@ -144,7 +146,7 @@ const IpcCall: NEnum = enum_num(u8(), {
   RemoveIgnoreItem: 40,
   PushIgnoreList: 41,
   IgnoreListId: 42,
-  FolderPicker: 43,
+  ShowOpenDialog: 43,
 });
 
 const SocketMsg: Enum = enum_lst(u8(), [
@@ -363,6 +365,17 @@ const MimeData = obj({
   data: str(),
 });
 
+const FileFilterItem = obj({ name: str(), extensions: arr(str()) });
+
+const OpenDialogOptions = obj({
+  folder: opt(bool()),
+  title: opt(str()),
+  defaultPath: opt(str()),
+  buttonLabel: opt(str()),
+  multiSelections: opt(bool()),
+  filters: opt(arr(ref('FileFilterItem'))),
+});
+
 export const TypesToGenerate: Record<string, Types> = {
   Keys,
   StrId,
@@ -399,6 +412,8 @@ export const TypesToGenerate: Record<string, Types> = {
   AudioFileRegexPattern,
   MimeData,
   MusicDatabase,
+  FileFilterItem,
+  OpenDialogOptions,
 };
 
 export const PicklersToGenerate: Record<string, Types> = {};

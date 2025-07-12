@@ -13,6 +13,7 @@ import {
   isI64Type,
   isI8Type,
   isMapType,
+  isOptionalType,
   isPlainIntEnumType,
   isRefType,
   isSetType,
@@ -125,6 +126,8 @@ function getTypeName(type: Types, scoped?: boolean): string {
     return `std::unordered_map<${getTypeName(type.k, !!scoped)}, ${getTypeName(type.v, !!scoped)}>`;
   } else if (isTupleType(type)) {
     return `std::tuple<${type.l.map((a) => getTypeName(a, !!scoped)).join(', ')}>`;
+  } else if (isOptionalType(type)) {
+    return `std::optional<${getTypeName(type.d)}>`;
   }
   throw new Error(`Unsupported unnamed type: ${JSON.stringify(type)}`);
 }
@@ -270,6 +273,12 @@ const objType: EmitItem<ObjType> = async (writer, name, item) => {
     await writer.write(`  ${typeName} ${key};\n`);
   }
   await writer.write('};\n');
+  const required = Object.entries(item.d)
+    .filter(([_, v]) => !isOptionalType(v))
+    .map(([k, _]) => k);
+  const optional = Object.entries(item.d)
+    .filter(([_, v]) => isOptionalType(v))
+    .map(([k, _]) => k);
   addNonShared(`
 #pragma region JSON serialization for object ${name}
 template <> 
@@ -277,8 +286,15 @@ struct impl_to_json<Shared::${name}> {
   static inline crow::json::wvalue process(
       const Shared::${name}& _value) {
     crow::json::wvalue _res;
-    ${Object.entries(item.d)
-      .map(([key]) => `_res["${key}"] = to_json(_value.${key});`)
+    ${required
+      .map((key) => `_res["${key}"] = to_json(_value.${key});`)
+      .join('\n    ')}
+    ${optional
+      .map(
+        (key) => `if (_value.${key}) {
+       _res["${key}"] = to_json(_value->${key});
+      }`,
+      )
       .join('\n    ')}
     return _res;
   }

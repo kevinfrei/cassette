@@ -25,6 +25,7 @@ import {
   isI8Type,
   isMapType,
   isObjectType,
+  isOptionalType,
   isRefType,
   isSetType,
   isStringType,
@@ -92,7 +93,9 @@ function chkIdlI64(v: unknown): v is number {
 }
 const chkIdlChar: TypeChk.typecheck<string> = (v: unknown): v is string =>
   TypeChk.isString(v) && v.length === 1;
-
+function chkOptional<T>(chk: TypeChk.typecheck<T>): TypeChk.typecheck<T | undefined> {
+  return (v: unknown): v is T | undefined => v === undefined || chk(v);
+}
 `);
 }
 
@@ -102,7 +105,7 @@ async function footer(writer: Bun.FileSink): Promise<void> {
 `);
 }
 
-function getTypeName(type: Types): string {
+function getTypeName(type: Types, optUndef?: boolean): string {
   if (
     isU8Type(type) ||
     isI8Type(type) ||
@@ -123,18 +126,22 @@ function getTypeName(type: Types): string {
   } else if (isRefType(type)) {
     return type.r; // Reference type, just return the name
   } else if (isArrayType(type)) {
-    return `${getTypeName(type.d)}[]`;
+    return `${getTypeName(type.d, true)}[]`;
   } else if (isSetType(type) || isFastSetType(type)) {
     return `Set<${getTypeName(type.d)}>`;
   } else if (isMapType(type) || isFastMapType(type)) {
     return `Map<${getTypeName(type.k)}, ${getTypeName(type.v)}>`;
   } else if (isTupleType(type)) {
-    return `[${type.l.map(getTypeName).join(', ')}]`;
+    return `[${type.l.map((t) => getTypeName(t, true)).join(', ')}]`;
+  } else if (isOptionalType(type)) {
+    return optUndef
+      ? `(${getTypeName(type.d)} | undefined)`
+      : getTypeName(type.d);
   }
   throw new Error(`Unsupported unnamed type: ${JSON.stringify(type)}`);
 }
 
-function getTypeCheckName(type: Anonymous): string {
+function getTypeCheckName(type: Types): string {
   if (isU8Type(type)) {
     return 'chkIdlU8';
   } else if (isI8Type(type)) {
@@ -175,6 +182,8 @@ function getTypeCheckName(type: Anonymous): string {
     return `TypeChk.chkMapOf(${getTypeCheckName(type.k)}, ${getTypeCheckName(type.v)})`;
   } else if (isTupleType(type)) {
     return `TypeChk.chkTuple(${type.l.map(getTypeCheckName).join(', ')})`;
+  } else if (isOptionalType(type)) {
+    return `chkOptional(${getTypeCheckName(type.d)})`;
   }
   throw new Error(
     `Unsupported unnamed type for checking: ${JSON.stringify(type)}\n(Probably use a reference)`,
@@ -221,11 +230,24 @@ export function chk${name}(val: unknown): val is ${name} {
 };
 
 const objType: EmitItem<ObjType> = async (writer, name, item) => {
+  const required = Object.entries(item.d)
+    .filter(([_, v]) => !isOptionalType(v))
+    .map(([k, _]) => k);
+  const optional = Object.entries(item.d)
+    .filter(([_, v]) => isOptionalType(v))
+    .map(([k, _]) => k);
+  if (required.length + optional.length !== Object.keys(item.d).length) {
+    throw new Error(
+      `Internal error: could not separate required/optional keys for ${name}`,
+    );
+  }
   await writer.write(`
 export type ${name} = {`);
   for (const [key, value] of Object.entries(item.d)) {
     const typeName = getTypeName(value);
-    await writer.write(`\n  ${key}: ${typeName};`);
+    await writer.write(
+      `\n  ${key}${isOptionalType(value) ? '?' : ''}: ${typeName};`,
+    );
   }
   await writer.write(`
 }
@@ -248,7 +270,7 @@ export type ${name} = ${item.p} & {`);
 };
 
 const simpleType: EmitItem<Types> = async (writer, name, item) => {
-  await writer.write(`\nexport type ${name} = ${getTypeName(item)};\n`);
+  await writer.write(`\nexport type ${name} = ${getTypeName(item, true)};\n`);
   if (isAnonymousType(item)) {
     await writer.write(`export const chk${name} = ${getTypeCheckName(item)}\n`);
   }

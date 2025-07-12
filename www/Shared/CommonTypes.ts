@@ -47,6 +47,11 @@ function chkIdlI64(v: unknown): v is number {
 }
 const chkIdlChar: TypeChk.typecheck<string> = (v: unknown): v is string =>
   TypeChk.isString(v) && v.length === 1;
+function chkOptional<T>(
+  chk: TypeChk.typecheck<T>,
+): TypeChk.typecheck<T | undefined> {
+  return (v: unknown): v is T | undefined => v === undefined || chk(v);
+}
 
 export const Keys = Object.freeze({
   AddFileLocation: 'O',
@@ -185,7 +190,7 @@ export const IpcCall = Object.freeze({
   RemoveIgnoreItem: 40,
   PushIgnoreList: 41,
   IgnoreListId: 42,
-  FolderPicker: 43,
+  ShowOpenDialog: 43,
 });
 export type IpcCall = (typeof IpcCall)[keyof typeof IpcCall];
 export function chkIpcCall(val: unknown): val is IpcCall {
@@ -530,6 +535,34 @@ export const chkMusicDatabase: TypeChk.typecheck<MusicDatabase> =
     albums: TypeChk.chkMapOf(chkAlbumKey, chkAlbum),
     songs: TypeChk.chkMapOf(chkSongKey, chkSong),
     playlists: TypeChk.chkMapOf(TypeChk.isString, chkPlaylist),
+  });
+
+export type FileFilterItem = {
+  name: string;
+  extensions: string[];
+};
+export const chkFileFilterItem: TypeChk.typecheck<FileFilterItem> =
+  TypeChk.chkObjectOfType({
+    name: TypeChk.isString,
+    extensions: TypeChk.chkArrayOf(TypeChk.isString),
+  });
+
+export type OpenDialogOptions = {
+  folder?: boolean;
+  title?: string;
+  defaultPath?: string;
+  buttonLabel?: string;
+  multiSelections?: boolean;
+  filters?: FileFilterItem[];
+};
+export const chkOpenDialogOptions: TypeChk.typecheck<OpenDialogOptions> =
+  TypeChk.chkObjectOfType({
+    folder: chkOptional(TypeChk.isBoolean),
+    title: chkOptional(TypeChk.isString),
+    defaultPath: chkOptional(TypeChk.isString),
+    buttonLabel: chkOptional(TypeChk.isString),
+    multiSelections: chkOptional(TypeChk.isBoolean),
+    filters: chkOptional(TypeChk.chkArrayOf(chkFileFilterItem)),
   });
 
 // End of generated code

@@ -515,7 +515,7 @@ enum class IpcCall : std::uint8_t {
   RemoveIgnoreItem = 40,
   PushIgnoreList = 41,
   IgnoreListId = 42,
-  FolderPicker = 43,
+  ShowOpenDialog = 43,
 };
 
 inline constexpr bool is_valid(IpcCall _value) {
@@ -563,7 +563,7 @@ inline constexpr bool is_valid(IpcCall _value) {
     case IpcCall::RemoveIgnoreItem:
     case IpcCall::PushIgnoreList:
     case IpcCall::IgnoreListId:
-    case IpcCall::FolderPicker:
+    case IpcCall::ShowOpenDialog:
       return true;
     default:
       return false;
@@ -1112,6 +1112,20 @@ struct MusicDatabase {
   std::map<std::string, Playlist> playlists;
 };
 
+struct FileFilterItem {
+  std::string name;
+  std::vector<std::string> extensions;
+};
+
+struct OpenDialogOptions {
+  std::optional<bool> folder;
+  std::optional<std::string> title;
+  std::optional<std::string> defaultPath;
+  std::optional<std::string> buttonLabel;
+  std::optional<bool> multiSelections;
+  std::optional<std::vector<FileFilterItem>> filters;
+};
+
 } // namespace Shared
 #pragma region JSON serialization for string enum Keys
 template <>
@@ -1232,6 +1246,7 @@ struct impl_to_json<Shared::TranscodeSourceLocation> {
     crow::json::wvalue _res;
     _res["type"] = to_json(_value.type);
     _res["loc"] = to_json(_value.loc);
+
     return _res;
   }
 };
@@ -1268,6 +1283,7 @@ struct impl_to_json<Shared::FileFailure> {
     crow::json::wvalue _res;
     _res["file"] = to_json(_value.file);
     _res["error"] = to_json(_value.error);
+
     return _res;
   }
 };
@@ -1310,6 +1326,7 @@ struct impl_to_json<Shared::TranscodeState> {
     _res["filesUntouched"] = to_json(_value.filesUntouched);
     _res["filesFailed"] = to_json(_value.filesFailed);
     _res["itemsRemoved"] = to_json(_value.itemsRemoved);
+
     return _res;
   }
 };
@@ -1389,6 +1406,7 @@ struct impl_to_json<Shared::TranscodeInfo> {
     _res["mirror"] = to_json(_value.mirror);
     _res["format"] = to_json(_value.format);
     _res["bitrate"] = to_json(_value.bitrate);
+
     return _res;
   }
 };
@@ -1460,6 +1478,7 @@ struct impl_to_json<Shared::Song> {
     _res["artistIds"] = to_json(_value.artistIds);
     _res["secondaryIds"] = to_json(_value.secondaryIds);
     _res["variations"] = to_json(_value.variations);
+
     return _res;
   }
 };
@@ -1567,6 +1586,7 @@ struct impl_to_json<Shared::Artist> {
     _res["name"] = to_json(_value.name);
     _res["albums"] = to_json(_value.albums);
     _res["songs"] = to_json(_value.songs);
+
     return _res;
   }
 };
@@ -1623,6 +1643,7 @@ struct impl_to_json<Shared::Album> {
     _res["primaryArtists"] = to_json(_value.primaryArtists);
     _res["songs"] = to_json(_value.songs);
     _res["diskNames"] = to_json(_value.diskNames);
+
     return _res;
   }
 };
@@ -1696,6 +1717,7 @@ struct impl_to_json<Shared::MediaInfo> {
     crow::json::wvalue _res;
     _res["general"] = to_json(_value.general);
     _res["audio"] = to_json(_value.audio);
+
     return _res;
   }
 };
@@ -1741,6 +1763,7 @@ struct impl_to_json<Shared::SimpleMetadata> {
     _res["discNum"] = to_json(_value.discNum);
     _res["discName"] = to_json(_value.discName);
     _res["compilation"] = to_json(_value.compilation);
+
     return _res;
   }
 };
@@ -1828,6 +1851,7 @@ struct impl_to_json<Shared::FullMetadata> {
     _res["variations"] = to_json(_value.variations);
     _res["disk"] = to_json(_value.disk);
     _res["diskName"] = to_json(_value.diskName);
+
     return _res;
   }
 };
@@ -1930,6 +1954,7 @@ struct impl_to_json<Shared::AudioFileRegexPattern> {
     crow::json::wvalue _res;
     _res["compilation"] = to_json(_value.compilation);
     _res["rgx"] = to_json(_value.rgx);
+
     return _res;
   }
 };
@@ -1966,6 +1991,7 @@ struct impl_to_json<Shared::MimeData> {
     crow::json::wvalue _res;
     _res["type"] = to_json(_value.type);
     _res["data"] = to_json(_value.data);
+
     return _res;
   }
 };
@@ -2005,6 +2031,7 @@ struct impl_to_json<Shared::MusicDatabase> {
     _res["albums"] = to_json(_value.albums);
     _res["songs"] = to_json(_value.songs);
     _res["playlists"] = to_json(_value.playlists);
+
     return _res;
   }
 };
@@ -2054,5 +2081,130 @@ inline std::optional<Shared::MusicDatabase> from_json<Shared::MusicDatabase>(
   return _res;
 }
 #pragma endregion JSON serialization for object MusicDatabase
+
+#pragma region JSON serialization for object FileFilterItem
+template <>
+struct impl_to_json<Shared::FileFilterItem> {
+  static inline crow::json::wvalue process(
+      const Shared::FileFilterItem& _value) {
+    crow::json::wvalue _res;
+    _res["name"] = to_json(_value.name);
+    _res["extensions"] = to_json(_value.extensions);
+
+    return _res;
+  }
+};
+
+template <>
+inline std::optional<Shared::FileFilterItem> from_json<Shared::FileFilterItem>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::FileFilterItem _res;
+
+  if (!_value.has("name"))
+    return std::nullopt;
+  auto _name_opt_ = from_json<std::string>(_value["name"]);
+  if (!_name_opt_.has_value())
+    return std::nullopt;
+  _res.name = std::move(*_name_opt_);
+
+  if (!_value.has("extensions"))
+    return std::nullopt;
+  auto _extensions_opt_ =
+      from_json<std::vector<std::string>>(_value["extensions"]);
+  if (!_extensions_opt_.has_value())
+    return std::nullopt;
+  _res.extensions = std::move(*_extensions_opt_);
+
+  return _res;
+}
+#pragma endregion JSON serialization for object FileFilterItem
+
+#pragma region JSON serialization for object OpenDialogOptions
+template <>
+struct impl_to_json<Shared::OpenDialogOptions> {
+  static inline crow::json::wvalue process(
+      const Shared::OpenDialogOptions& _value) {
+    crow::json::wvalue _res;
+
+    if (_value.folder) {
+      _res["folder"] = to_json(_value->folder);
+    }
+    if (_value.title) {
+      _res["title"] = to_json(_value->title);
+    }
+    if (_value.defaultPath) {
+      _res["defaultPath"] = to_json(_value->defaultPath);
+    }
+    if (_value.buttonLabel) {
+      _res["buttonLabel"] = to_json(_value->buttonLabel);
+    }
+    if (_value.multiSelections) {
+      _res["multiSelections"] = to_json(_value->multiSelections);
+    }
+    if (_value.filters) {
+      _res["filters"] = to_json(_value->filters);
+    }
+    return _res;
+  }
+};
+
+template <>
+inline std::optional<Shared::OpenDialogOptions>
+from_json<Shared::OpenDialogOptions>(const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::OpenDialogOptions _res;
+
+  if (!_value.has("folder"))
+    return std::nullopt;
+  auto _folder_opt_ = from_json<std::optional<bool>>(_value["folder"]);
+  if (!_folder_opt_.has_value())
+    return std::nullopt;
+  _res.folder = std::move(*_folder_opt_);
+
+  if (!_value.has("title"))
+    return std::nullopt;
+  auto _title_opt_ = from_json<std::optional<std::string>>(_value["title"]);
+  if (!_title_opt_.has_value())
+    return std::nullopt;
+  _res.title = std::move(*_title_opt_);
+
+  if (!_value.has("defaultPath"))
+    return std::nullopt;
+  auto _defaultPath_opt_ =
+      from_json<std::optional<std::string>>(_value["defaultPath"]);
+  if (!_defaultPath_opt_.has_value())
+    return std::nullopt;
+  _res.defaultPath = std::move(*_defaultPath_opt_);
+
+  if (!_value.has("buttonLabel"))
+    return std::nullopt;
+  auto _buttonLabel_opt_ =
+      from_json<std::optional<std::string>>(_value["buttonLabel"]);
+  if (!_buttonLabel_opt_.has_value())
+    return std::nullopt;
+  _res.buttonLabel = std::move(*_buttonLabel_opt_);
+
+  if (!_value.has("multiSelections"))
+    return std::nullopt;
+  auto _multiSelections_opt_ =
+      from_json<std::optional<bool>>(_value["multiSelections"]);
+  if (!_multiSelections_opt_.has_value())
+    return std::nullopt;
+  _res.multiSelections = std::move(*_multiSelections_opt_);
+
+  if (!_value.has("filters"))
+    return std::nullopt;
+  auto _filters_opt_ =
+      from_json<std::optional<std::vector<FileFilterItem>>>(_value["filters"]);
+  if (!_filters_opt_.has_value())
+    return std::nullopt;
+  _res.filters = std::move(*_filters_opt_);
+
+  return _res;
+}
+#pragma endregion JSON serialization for object OpenDialogOptions
 
 #endif // SHARED_CONSTANTS_HPP

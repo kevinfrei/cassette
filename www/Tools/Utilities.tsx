@@ -10,7 +10,7 @@ import {
 import { MakeLog } from '@freik/logger';
 import { BoolState, Catch } from '@freik/react-tools';
 import { DebouncedDelay } from '@freik/sync';
-import { isNumber, isUndefined } from '@freik/typechk';
+import { isArrayOfString, isNumber, isUndefined } from '@freik/typechk';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
   CSSProperties,
@@ -20,12 +20,17 @@ import {
   SyntheticEvent,
   useEffect,
 } from 'react';
-import { IpcCall } from 'www/Shared/CommonTypes';
+import {
+  FilePickerOptions,
+  FolderPickerOptions,
+  IpcCall,
+  OpenDialogOptions,
+} from 'www/Shared/CommonTypes';
 import { isSearchBox } from 'www/UI/Sidebar';
 import { keyBufferState } from '../Jotai/KeyBuffer';
 import { isMiniplayerState } from '../Jotai/Local';
 import { saveableState } from '../Jotai/PlaylistControl';
-import { SendMain } from './Ipc';
+import { CallMain, SendMain } from './Ipc';
 // import { MenuHandler } from './MenuHandler';
 import { Atom, WritableAtom } from 'jotai';
 import { useMediaEffect } from './MediaEffect';
@@ -252,4 +257,20 @@ export class ErrorBoundary extends Component<EBProps, EBState> {
 
     return this.props.children;
   }
+}
+
+/**
+ * @async
+ * Shows an Open dialog for the platform you're on. Use this instead of the
+ * long-deprecated `remote` electron module.
+ *
+ * @param options an
+ * [OpenDialogOptions](https://www.electronjs.org/docs/latest/api/dialog)
+ * instance describing what kind of Open dialog you want to show
+ * @returns A promise that resolves to the array of files/folders selected
+ */
+export async function ShowOpenDialog(
+  options: OpenDialogOptions,
+): Promise<string[] | void> {
+  return await CallMain(IpcCall.ShowOpenDialog, isArrayOfString, options);
 }
