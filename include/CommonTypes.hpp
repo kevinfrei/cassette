@@ -2128,23 +2128,23 @@ struct impl_to_json<Shared::OpenDialogOptions> {
       const Shared::OpenDialogOptions& _value) {
     crow::json::wvalue _res;
 
-    if (_value.folder) {
-      _res["folder"] = to_json(_value->folder);
+    if (_value.folder.has_value()) {
+      _res["folder"] = to_json(_value.folder.value());
     }
-    if (_value.title) {
-      _res["title"] = to_json(_value->title);
+    if (_value.title.has_value()) {
+      _res["title"] = to_json(_value.title.value());
     }
-    if (_value.defaultPath) {
-      _res["defaultPath"] = to_json(_value->defaultPath);
+    if (_value.defaultPath.has_value()) {
+      _res["defaultPath"] = to_json(_value.defaultPath.value());
     }
-    if (_value.buttonLabel) {
-      _res["buttonLabel"] = to_json(_value->buttonLabel);
+    if (_value.buttonLabel.has_value()) {
+      _res["buttonLabel"] = to_json(_value.buttonLabel.value());
     }
-    if (_value.multiSelections) {
-      _res["multiSelections"] = to_json(_value->multiSelections);
+    if (_value.multiSelections.has_value()) {
+      _res["multiSelections"] = to_json(_value.multiSelections.value());
     }
-    if (_value.filters) {
-      _res["filters"] = to_json(_value->filters);
+    if (_value.filters.has_value()) {
+      _res["filters"] = to_json(_value.filters.value());
     }
     return _res;
   }
@@ -2198,7 +2198,8 @@ from_json<Shared::OpenDialogOptions>(const crow::json::rvalue& _value) {
   if (!_value.has("filters"))
     return std::nullopt;
   auto _filters_opt_ =
-      from_json<std::optional<std::vector<FileFilterItem>>>(_value["filters"]);
+      from_json<std::optional<std::vector<Shared::FileFilterItem>>>(
+          _value["filters"]);
   if (!_filters_opt_.has_value())
     return std::nullopt;
   _res.filters = std::move(*_filters_opt_);
