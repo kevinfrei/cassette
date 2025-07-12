@@ -127,7 +127,7 @@ function getTypeName(type: Types, scoped?: boolean): string {
   } else if (isTupleType(type)) {
     return `std::tuple<${type.l.map((a) => getTypeName(a, !!scoped)).join(', ')}>`;
   } else if (isOptionalType(type)) {
-    return `std::optional<${getTypeName(type.d)}>`;
+    return `std::optional<${getTypeName(type.d, !!scoped)}>`;
   }
   throw new Error(`Unsupported unnamed type: ${JSON.stringify(type)}`);
 }
@@ -291,8 +291,8 @@ struct impl_to_json<Shared::${name}> {
       .join('\n    ')}
     ${optional
       .map(
-        (key) => `if (_value.${key}) {
-       _res["${key}"] = to_json(_value->${key});
+        (key) => `if (_value.${key}.has_value()) {
+       _res["${key}"] = to_json(_value.${key}.value());
       }`,
       )
       .join('\n    ')}

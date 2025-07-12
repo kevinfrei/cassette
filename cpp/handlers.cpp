@@ -117,7 +117,7 @@ crow::response api(const crow::request&, const std::string& path) {
     case Shared::IpcCall::DeleteFromStorage:
       ValidateAndCall(api::delete_from_storage);
       break;
-    case Shared::IpcCall::FolderPicker: {
+    case Shared::IpcCall::ShowOpenDialog: {
       files::folder_picker(resp,
                            std::string_view{path.c_str() + slashPos + 1,
                                             path.size() - slashPos - 1});
