@@ -55,8 +55,12 @@ import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
 // import { SongListMenu, SongListMenuData } from '../SongMenus';
 
 import { allAlbumsState } from 'www/Jotai/Albums';
-import { allArtistsState, artistByKey } from 'www/Jotai/Artists';
-import { allSongsState } from 'www/Jotai/Songs';
+import {
+  allArtistsState,
+  artistByKey,
+  filteredArtistsState,
+} from 'www/Jotai/Artists';
+import { allSongsState, songListFromKey } from 'www/Jotai/Songs';
 import {
   altRowRenderer,
   ProcessSongGroupData,
@@ -160,7 +164,7 @@ export function GroupedAristList(): ReactElement {
   const ignoreArticles = useAtomValue(ignoreArticlesState);
   const keyBuffer = useAtomValue(focusedKeysFuncFam(CurrentView.artists));
   const [artistContext, setArtistContext] = useAtom(artistContextState);
-  const filteredArtists = useAtomValue(filteredArtistsFunc);
+  const filteredArtists = useAtomValue(filteredArtistsState);
   const [curSort, setSort] = useAtom(sortOrderState);
   const curExpandedState = useAtom(artistExpandedState);
   const resetArtistContext = useResetAtom(artistContextState);
@@ -176,6 +180,10 @@ export function GroupedAristList(): ReactElement {
   };
   const onAddSongClick = useCallback(
     (item: ArtistSong) => AddSongs([item.key]),
+    [],
+  );
+  const onGetSongList = useJotaiCallback(
+    (get, set, data: string) => get(songListFromKey(data)),
     [],
   );
 
@@ -247,7 +255,7 @@ export function GroupedAristList(): ReactElement {
         <SongListMenu
           context={artistContext}
           onClearContext={resetArtistContext}
-          onGetSongList={(data: string) => SongListFromKey(data)}
+          onGetSongList={onGetSongList}
         />
       </ScrollablePane>
     </div>

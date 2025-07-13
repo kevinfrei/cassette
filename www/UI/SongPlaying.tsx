@@ -5,9 +5,9 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useAtomCallback } from 'jotai/utils';
 import {
   ForwardedRef,
+  forwardRef,
   ReactElement,
   SyntheticEvent,
-  forwardRef,
   useCallback,
   useEffect,
 } from 'react';
@@ -17,12 +17,10 @@ import { playOrderDisplayingState } from '../Jotai/Local';
 import { mySliderStyles } from './Utilities';
 */
 import {
-  MediaTime,
-  mediaTimePercentState,
-  mediaTimePositionState,
-  mediaTimeRemainingState,
-  mediaTimeState,
-} from 'www/State/TimeState';
+  mutedState,
+  shuffleState,
+  volumeState,
+} from 'www/State/SimpleSavedState';
 import {
   curSongKeyState,
   playOrderDisplayingState,
@@ -30,13 +28,16 @@ import {
   songDescriptionForSongState,
 } from 'www/State/SongState';
 import {
-  mutedState,
-  shuffleState,
-  volumeState,
-} from 'www/State/SimpleSavedState';
-import { onClickPlayPause } from './PlaybackControls';
+  MediaTime,
+  mediaTimePercentState,
+  mediaTimePositionState,
+  mediaTimeRemainingState,
+  mediaTimeState,
+} from 'www/State/TimeState';
 import { isMutableRefObject } from 'www/WebHelpers';
+import { onClickPlayPause } from './PlaybackControls';
 
+import { useJotaiCallback } from 'www/Jotai/Helpers';
 import '../styles/SongPlaying.css';
 
 const { log } = MakeLog('EMP:render:SongPlayback');
@@ -63,8 +64,7 @@ function MediaTimePosition(): ReactElement {
       id="now-playing-current-time"
       variant="tiny"
       block={true}
-      nowrap={true}
-    >
+      nowrap={true}>
       {mediaTimePosition}
     </Text>
   );
@@ -77,8 +77,7 @@ function MediaTimeRemaining(): ReactElement {
       id="now-playing-remaining-time"
       variant="tiny"
       block={true}
-      nowrap={true}
-    >
+      nowrap={true}>
       {mediaTimeRemaining}
     </Text>
   );
@@ -135,8 +134,7 @@ function ArtistAlbum(): ReactElement {
         id="artist-album"
         variant="tiny"
         block={true}
-        nowrap={true}
-      >{`${artist}${split}${album}`}</Text>
+        nowrap={true}>{`${artist}${split}${album}`}</Text>
     );
   } else {
     return <span id="artist-album" />;
@@ -252,11 +250,13 @@ export const SongPlaying = forwardRef(
         }
       },
     );*/
-    const flipDisplay = useAtomCallback(
-      useCallback(
-        (_get, set) => () => set(playOrderDisplayingState, (prv) => !prv),
-        [],
-      ),
+    const flipDisplay = useJotaiCallback(
+      async (get, set) =>
+        await set(
+          playOrderDisplayingState,
+          !(await get(playOrderDisplayingState)),
+        ),
+      [],
     );
     return (
       <span id="song-container" onAuxClick={showDetail}>
