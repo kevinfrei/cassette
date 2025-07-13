@@ -192,6 +192,19 @@ ${Object.entries(item.v)
   }
 }
 
+inline constexpr std::string_view to_string(${name} _value) {
+  switch (_value) {
+${Object.entries(item.v)
+  .map(
+    ([key, _]) => `    case ${name}::${key}:
+      return "${key}";`,
+  )
+  .join('\n')}
+    default:
+      return "<unknown>";
+  }
+}
+
 #pragma endregion linear enum ${name}
 `);
 };

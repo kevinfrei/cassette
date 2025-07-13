@@ -181,6 +181,19 @@ struct impl_to_json<std::set<T>> {
   }
 };
 
+/* Horsing around a little bit
+template <typename T>
+struct impl_to_json<std::optional<T>> {
+  static inline crow::json::wvalue process(const std::optional<T>& value) {
+    if (value.has_value()) {
+      return to_json(*value);
+    } else {
+      return crow::json::wvalue();
+    }
+  }
+};
+*/
+
 /****
 Conversion from JSON stuff
 ****/
@@ -497,5 +510,22 @@ struct impl_from_json<T, std::enable_if_t<is_enum_class_v<T>>> {
     return std::nullopt;
   }
 };
+
+/* Horsing around a little bit
+template <typename T>
+struct impl_from_json<std::optional<T>> {
+  static inline std::optional<std::optional<T>> process(
+      const crow::json::rvalue& json) {
+    if (json.t() == crow::json::type::Null) {
+      return std::nullopt;
+    }
+    auto val = from_json<T>(json);
+    if (!val.has_value()) {
+      return std::nullopt;
+    }
+    return val;
+  }
+};
+*/
 
 #endif

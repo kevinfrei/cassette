@@ -117,16 +117,27 @@ crow::response api(const crow::request&, const std::string& path) {
     case Shared::IpcCall::DeleteFromStorage:
       ValidateAndCall(api::delete_from_storage);
       break;
-    case Shared::IpcCall::ShowOpenDialog: {
+    case Shared::IpcCall::ShowOpenDialog:
       files::folder_picker(resp,
                            std::string_view{path.c_str() + slashPos + 1,
                                             path.size() - slashPos - 1});
       break;
-      default:
-        tools::e404(resp, "Unknown API call");
-        return resp;
-    }
+    default:
+      if (Shared::is_valid(call)) {
+        std::cerr << "Unimplemented API call received: "
+                  << Shared::to_string(call) << " ("
+                  << static_cast<std::underlying_type_t<Shared::IpcCall>>(call)
+                  << ") [" << path << "]" << std::endl;
+      } else {
+        std::cerr
+            << "Unknown API call received: " << static_cast<std::uint64_t>(call)
+            << " [" << path << "]" << std::endl;
+      }
+
+      tools::e404(resp, "Unknown/Unimplemented API call");
+      return resp;
   }
+
   return resp;
 }
 
