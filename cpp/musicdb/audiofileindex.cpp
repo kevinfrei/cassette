@@ -195,7 +195,7 @@ Shared::MusicDatabase* get_music_db() {
       .key = album_oneday,
       .year = 2008,
       .title = "One Day as a Lion",
-      .vatype = Shared::VAType::None,
+      .vatype = Shared::VAType::none,
       .primaryArtists = {arist_oneday},
       .songs = {oo1.key, oo2.key, oo3.key, oo4.key, oo5.key},
       .diskNames = {}};
@@ -203,14 +203,14 @@ Shared::MusicDatabase* get_music_db() {
       .key = album_bones,
       .year = 2013,
       .title = "The Bones of What You Believe",
-      .vatype = Shared::VAType::None,
+      .vatype = Shared::VAType::none,
       .primaryArtists = {artist_chv},
       .songs = {cb1.key, cb2.key, cb3.key, cb4.key, cb5.key},
       .diskNames = {}};
   Shared::Album l_eye = {.key = album_eye,
                          .year = 2015,
                          .title = "Every Open Eye",
-                         .vatype = Shared::VAType::None,
+                         .vatype = Shared::VAType::none,
                          .primaryArtists = {artist_chv},
                          .songs = {ce1.key, ce2.key, ce3.key, ce4.key},
                          .diskNames = {}};
