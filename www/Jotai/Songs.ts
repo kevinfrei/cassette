@@ -1,7 +1,7 @@
 import { Fail } from '@freik/react-tools';
-import { atom } from 'jotai';
+import { atom, Atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
-import { SongKey } from 'www/Shared/CommonTypes';
+import { AlbumKey, ArtistKey, MediaKey, SongKey } from 'www/Shared/CommonTypes';
 import { musicLibraryState } from './MusicLibrary';
 
 export const allSongsState = atom(
@@ -20,4 +20,14 @@ export const songByKey = atomFamily((sk: SongKey) =>
     }
     return song;
   }),
+);
+
+export const songListByKey = atomFamily<MediaKey, Atom<Promise<SongKey[]>>>(
+  (key: MediaKey) =>
+    atom(async (get) => {
+      if (key.length < 2) {
+        return [];
+      }
+      return [];
+    }),
 );

@@ -13,25 +13,24 @@ import { hasFieldType, isDefined, isNumber, isUndefined } from '@freik/typechk';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
 import { ReactElement, useCallback, useState } from 'react';
-import { useRecoilValue } from 'recoil';
 import { PlaylistName, Song, SongKey } from 'www/Shared/CommonTypes';
-import { useJotaiAsyncCallback, useJotaiCallback } from '../../Jotai/Helpers';
-import { MakeSetAtomFamily } from '../../Jotai/Hooks';
-import { allSongsFunc } from '../../Recoil/ReadOnly';
-import { MakeSortKey } from '../../Sorting';
 import {
   AlbumForSongRender,
   ArtistsForSongRender,
   YearForSongRender,
-} from '../SimpleTags';
+} from 'www/Tools/SimpleTags';
 import {
   altRowRenderer,
   ProcessSongGroupData,
   StickyRenderDetailsHeader,
-} from '../SongList';
-import { SongListMenu, SongListMenuData } from '../SongMenus';
+} from 'www/Tools/SongList';
+import { SongListMenu, SongListMenuData } from 'www/Tools/SongMenus';
+import { MakeSortKey } from 'www/Tools/Sorting';
+import { useJotaiAsyncCallback, useJotaiCallback } from '../../Jotai/Helpers';
+import { MakeSetAtomFamily } from '../../Jotai/Hooks';
 
 import { MakeLog } from '@freik/logger';
+import { allSongsState } from 'www/Jotai/Songs';
 import { AddSongs, PlaySongs } from '../../Jotai/API';
 import {
   allPlaylistsState,
@@ -123,7 +122,7 @@ export function PlaylistView(): ReactElement {
 
   const playlistNames = new Set(useAtomValue(playlistNamesState));
   const playlistContents = useAtomValue(allPlaylistsState);
-  const allSongs = useRecoilValue(allSongsFunc);
+  const allSongs = useAtomValue(allSongsState);
   const playlistContext = useAtomValue(playlistContextState);
   const resetPlaylistContext = useResetAtom(playlistContextState);
   const playlistExpanded = useAtom(playlistExpandedState);
@@ -215,8 +214,7 @@ export function PlaylistView(): ReactElement {
   );
 
   const onGetSongList = useJotaiAsyncCallback(
-    async (get, set, xact: MyTransactionInterface, data: string) =>
-      await get(playlistStateFamily(data)),
+    async (get, set, data: string) => await get(playlistStateFamily(data)),
     [],
   );
   const groups: IGroup[] = [];
@@ -349,7 +347,7 @@ export function PlaylistView(): ReactElement {
         <SongListMenu
           context={songContext}
           onClearContext={clearSongContext}
-          onGetSongList={(_xact, data) => [data]}
+          onGetSongList={(data) => [data]}
         />
       </ScrollablePane>
     </div>

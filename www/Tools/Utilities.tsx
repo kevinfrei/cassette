@@ -20,12 +20,7 @@ import {
   SyntheticEvent,
   useEffect,
 } from 'react';
-import {
-  FilePickerOptions,
-  FolderPickerOptions,
-  IpcCall,
-  OpenDialogOptions,
-} from 'www/Shared/CommonTypes';
+import { IpcCall, OpenDialogOptions } from 'www/Shared/CommonTypes';
 import { isSearchBox } from 'www/UI/Sidebar';
 import { keyBufferState } from '../Jotai/KeyBuffer';
 import { isMiniplayerState } from '../Jotai/Local';
