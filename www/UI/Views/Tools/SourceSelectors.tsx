@@ -2,12 +2,16 @@ import { ComboBox, IComboBox, IComboBoxOption } from '@fluentui/react';
 import { isDefined, isString } from '@freik/typechk';
 import { useAtom, useAtomValue } from 'jotai';
 import { ReactElement } from 'react';
+import { albumByKey, allAlbumsState } from 'www/Jotai/Albums';
+import { artistByKey, filteredArtistsState } from 'www/Jotai/Artists';
+import { allAlbumDescriptionsState } from 'www/Jotai/DisplayData';
 import {
   AlbumKey,
   Artist,
   ArtistKey,
   PlaylistName,
 } from 'www/Shared/CommonTypes';
+import { AlbumDescriptionWithKey } from 'www/State/SongState';
 import { useJotaiCallback } from '../../../Jotai/Helpers';
 import { WritableAtomType } from '../../../Jotai/Hooks';
 import { playlistNamesState } from '../../../Jotai/PlaylistControl';
@@ -54,30 +58,32 @@ export function ArtistSelector({
   value: WritableAtomType<ArtistKey>;
 }): ReactElement {
   const [selArtistKey, setSelArtistKey] = useAtom(value);
-  const artists = useAtomValue(filteredArtistsFunc);
+  const artists = useAtomValue(filteredArtistsState);
   const theList: IComboBoxOption[] = artists.map((r: Artist) => ({
     key: r.key,
     text: r.name,
   }));
-  const onChange = useMyTransaction(
-    ({ get }) =>
-      (
-        event: React.FormEvent<IComboBox>,
-        option?: IComboBoxOption,
-        index?: number,
-        newValue?: string,
-      ) => {
-        if (isDefined(option) && isString(option.key) && isString(newValue)) {
-          try {
-            const art = get(artistByKeyFuncFam(option.key));
-            if (art.key === option.key) {
-              setSelArtistKey(art.key);
-            }
-          } catch {
-            /* */
+  const onChange = useJotaiCallback(
+    async (
+      get,
+      _set,
+      event: React.FormEvent<IComboBox>,
+      option?: IComboBoxOption,
+      index?: number,
+      newValue?: string,
+    ) => {
+      if (isDefined(option) && isString(option.key) && isString(newValue)) {
+        try {
+          const art = await get(artistByKey(option.key));
+          if (art.key === option.key) {
+            setSelArtistKey(art.key);
           }
+        } catch {
+          /* */
         }
-      },
+      }
+    },
+    [],
   );
   return (
     <ComboBox
@@ -96,7 +102,7 @@ export function AlbumSelector({
   value: WritableAtomType<AlbumKey>;
 }): ReactElement {
   const [selAlbumKey, setSelArtistKey] = useAtom(value);
-  const albums = useRecoilValue(allAlbumsDataFunc);
+  const albums = useAtomValue(allAlbumDescriptionsState);
   const theList: IComboBoxOption[] = albums.map(
     (r: AlbumDescriptionWithKey) => ({
       key: r.key,
@@ -105,25 +111,27 @@ export function AlbumSelector({
       }`,
     }),
   );
-  const onChange = useMyTransaction(
-    ({ get }) =>
-      (
-        event: React.FormEvent<IComboBox>,
-        option?: IComboBoxOption,
-        index?: number,
-        newValue?: string,
-      ) => {
-        if (isDefined(option) && isString(option.key) && isString(newValue)) {
-          try {
-            const alb = get(albumByKeyFuncFam(option.key));
-            if (alb.key === option.key) {
-              setSelArtistKey(alb.key);
-            }
-          } catch {
-            /* */
+  const onChange = useJotaiCallback(
+    async (
+      get,
+      set,
+      event: React.FormEvent<IComboBox>,
+      option?: IComboBoxOption,
+      index?: number,
+      newValue?: string,
+    ) => {
+      if (isDefined(option) && isString(option.key) && isString(newValue)) {
+        try {
+          const alb = await get(albumByKey(option.key));
+          if (alb.key === option.key) {
+            setSelArtistKey(alb.key);
           }
+        } catch {
+          /* */
         }
-      },
+      }
+    },
+    [],
   );
   return (
     <ComboBox

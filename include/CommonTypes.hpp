@@ -1142,6 +1142,12 @@ struct OpenDialogOptions {
   std::optional<std::vector<FileFilterItem>> filters;
 };
 
+struct SearchResults {
+  std::vector<SongKey> songs;
+  std::vector<ArtistKey> artists;
+  std::vector<AlbumKey> albums;
+};
+
 } // namespace Shared
 #pragma region JSON serialization for string enum Keys
 template <>
@@ -2248,5 +2254,53 @@ from_json<Shared::OpenDialogOptions>(const crow::json::rvalue& _value) {
   return _res;
 }
 #pragma endregion JSON serialization for object OpenDialogOptions
+
+#pragma region JSON serialization for object SearchResults
+template <>
+struct impl_to_json<Shared::SearchResults> {
+  static inline crow::json::wvalue process(
+      const Shared::SearchResults& _value) {
+    crow::json::wvalue _res;
+    _res["songs"] = to_json(_value.songs);
+    _res["artists"] = to_json(_value.artists);
+    _res["albums"] = to_json(_value.albums);
+
+    return _res;
+  }
+};
+
+template <>
+inline std::optional<Shared::SearchResults> from_json<Shared::SearchResults>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::SearchResults _res;
+
+  if (!_value.has("songs"))
+    return std::nullopt;
+  auto _songs_opt_ = from_json<std::vector<Shared::SongKey>>(_value["songs"]);
+  if (!_songs_opt_.has_value())
+    return std::nullopt;
+  _res.songs = std::move(*_songs_opt_);
+
+  if (!_value.has("artists"))
+    return std::nullopt;
+  auto _artists_opt_ =
+      from_json<std::vector<Shared::ArtistKey>>(_value["artists"]);
+  if (!_artists_opt_.has_value())
+    return std::nullopt;
+  _res.artists = std::move(*_artists_opt_);
+
+  if (!_value.has("albums"))
+    return std::nullopt;
+  auto _albums_opt_ =
+      from_json<std::vector<Shared::AlbumKey>>(_value["albums"]);
+  if (!_albums_opt_.has_value())
+    return std::nullopt;
+  _res.albums = std::move(*_albums_opt_);
+
+  return _res;
+}
+#pragma endregion JSON serialization for object SearchResults
 
 #endif // SHARED_CONSTANTS_HPP

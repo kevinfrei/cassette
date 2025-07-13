@@ -565,4 +565,16 @@ export const chkOpenDialogOptions: TypeChk.typecheck<OpenDialogOptions> =
     filters: chkOptional(TypeChk.chkArrayOf(chkFileFilterItem)),
   });
 
+export type SearchResults = {
+  songs: SongKey[];
+  artists: ArtistKey[];
+  albums: AlbumKey[];
+};
+export const chkSearchResults: TypeChk.typecheck<SearchResults> =
+  TypeChk.chkObjectOfType({
+    songs: TypeChk.chkArrayOf(chkSongKey),
+    artists: TypeChk.chkArrayOf(chkArtistKey),
+    albums: TypeChk.chkArrayOf(chkAlbumKey),
+  });
+
 // End of generated code

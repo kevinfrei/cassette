@@ -10,36 +10,34 @@ import {
 } from '@fluentui/react';
 import { MakeLog } from '@freik/logger';
 import { hasFieldType, isBoolean } from '@freik/typechk';
+import { useAtomValue } from 'jotai';
 import { ReactElement, useCallback, useState } from 'react';
+import { allAlbumsState } from 'www/Jotai/Albums';
+import { allArtistsState } from 'www/Jotai/Artists';
+import { allSongsState } from 'www/Jotai/Songs';
 import {
   Album,
   AlbumKey,
   Artist,
   ArtistKey,
+  SearchResults,
   Song,
   SongKey,
 } from 'www/Shared/CommonTypes';
-import { GetDataForSong, SongData } from '../../DataSchema';
-import { SearchResults } from '../../Ipc';
-import { AddSongs } from '../../Jotai/API';
-import {
-  allAlbumsFunc,
-  allArtistsFunc,
-  allSongsFunc,
-  searchFuncFam,
-  searchTermState,
-} from '../../Recoil/ReadOnly';
-import { MakeSortKey } from '../../Sorting';
-import {
-  SongDetailClick,
-  SongListDetailContextMenuClick,
-} from '../DetailPanel/Clickers';
+import { searchTermState } from 'www/State/SimpleSavedState';
 import {
   altRowRenderer,
   HeaderExpanderClick,
   MakeColumns,
   StickyRenderDetailsHeader,
-} from '../SongList';
+} from 'www/Tools/SongList';
+import { MakeSortKey } from 'www/Tools/Sorting';
+import { GetDataForSong, SongData } from '../../DataSchema';
+import { AddSongs } from '../../Jotai/API';
+import {
+  SongDetailClick,
+  SongListDetailContextMenuClick,
+} from '../DetailPanel/Clickers';
 import './styles/SearchResults.css';
 
 const { wrn } = MakeLog('EMP:render:SearchResults');
@@ -216,11 +214,11 @@ function SearchResultsGroupHeader(props: {
 const noSort = MakeSortKey('rlnt');
 
 export function SearchResultsView(): ReactElement {
-  const searchTerm = useRecoilValue(searchTermState);
-  const searchResults = useRecoilValue(searchFuncFam(searchTerm));
-  const songs = useRecoilValue(allSongsFunc);
-  const artists = useRecoilValue(allArtistsFunc);
-  const albums = useRecoilValue(allAlbumsFunc);
+  const searchTerm = useAtomValue(searchTermState);
+  const searchResults = { songs: [], artists: [], albums: [] }; //useRecoilValue(searchRes(searchTerm));
+  const songs = useAtomValue(allSongsState);
+  const artists = useAtomValue(allArtistsState);
+  const albums = useAtomValue(allAlbumsState);
   const curExpandedState = useState(new Set<string>());
   const [curExpandedSet, setExpandedSet] = curExpandedState;
   const onSongDetailClick = (
