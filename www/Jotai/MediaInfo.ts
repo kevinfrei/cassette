@@ -118,3 +118,5 @@ export const commonMetadataFromSongKeys = atomFamily((keys: SongKey[]) =>
     return props;
   }),
 );
+
+export const metadataEditCountState = atom(0);

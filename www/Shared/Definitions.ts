@@ -247,7 +247,7 @@ const MediaKey = str();
 const PlaylistName = str();
 const Playlist = arr(ref('SongKey'));
 
-const VAType = enum_lst(u8(), ['None', 'VA', 'OST']);
+const VAType = enum_str({ none: 'None', va: 'VA', ost: 'OST' });
 
 const Song = obj({
   key: ref('SongKey'),

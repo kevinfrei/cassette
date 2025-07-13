@@ -401,13 +401,13 @@ export type SongWithPath = Song & {
 };
 
 export const VAType = Object.freeze({
-  None: 0,
-  VA: 1,
-  OST: 2,
+  none: 'None',
+  va: 'VA',
+  ost: 'OST',
 });
 export type VAType = (typeof VAType)[keyof typeof VAType];
 export function chkVAType(val: unknown): val is VAType {
-  return TypeChk.isNumber(val) && Object.values(VAType).includes(val as VAType);
+  return TypeChk.isString(val) && Object.values(VAType).includes(val as VAType);
 }
 
 export type Artist = {

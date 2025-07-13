@@ -7,7 +7,10 @@ import {
 import { SongKey } from '@freik/media-core';
 import { isArray, isString } from '@freik/typechk';
 import { useAtom, useAtomValue } from 'jotai';
-import { mediaInfoStateFamily } from '../../Jotai/MediaInfo';
+import {
+  commonMetadataFromSongKeys,
+  mediaInfoStateFamily,
+} from '../../Jotai/MediaInfo';
 import { SimpleSongsList } from './../Views/MixedSongs';
 import { MetadataEditor } from './MetadataEditor';
 
@@ -15,8 +18,11 @@ import { Expandable } from '@freik/fluentui-tools';
 import { albumByKey } from 'www/Jotai/Albums';
 import { artistStringStateFamily } from 'www/Jotai/Artists';
 import { songByKey } from 'www/Jotai/Songs';
+import { IpcCall } from 'www/Shared/CommonTypes';
+import { SendMain } from 'www/Tools/Ipc';
 import { altRowRenderer } from 'www/Tools/SongList';
 import { divGrand, fractionalSecondsStrToHMS } from 'www/Utils';
+
 import './styles/MediaInfo.css';
 
 const fileTypeMap = new Map([
@@ -69,7 +75,7 @@ function MediaFormatDetails({ forSong }: { forSong: SongKey }): JSX.Element {
         prefix="File Path"
         value={thePath}
         styles={{ field: { direction: 'rtl' } }}
-        onDoubleClick={() => void Ipc.InvokeMain(IpcId.ShowFile, thePath)}
+        onDoubleClick={() => SendMain(IpcCall.ShowFile, thePath)}
       />
       <br />
       <div className="metadata-specs">
@@ -152,7 +158,7 @@ function SingleFileEditor({ songKey }: { songKey: SongKey }): JSX.Element {
 }
 
 function MultiFileEditor({ songKeys }: { songKeys: SongKey[] }): JSX.Element {
-  const allTheInfos = useAtomValue(commonDataFuncFam(songKeys));
+  const allTheInfos = useAtomValue(commonMetadataFromSongKeys(songKeys));
   return <MetadataEditor forSongs={songKeys} {...allTheInfos} />;
 }
 

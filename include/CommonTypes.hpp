@@ -1020,14 +1020,15 @@ struct SongWithPath : Song {
   std::string path;
 };
 
-#pragma region numeric enum VAType
-enum class VAType : std::uint8_t { None, VA, OST };
+#pragma region string enum VAType
+
+enum class VAType { none, va, ost };
 
 inline constexpr bool is_valid(VAType _value) {
   switch (_value) {
-    case VAType::None:
-    case VAType::VA:
-    case VAType::OST:
+    case VAType::none:
+    case VAType::va:
+    case VAType::ost:
       return true;
     default:
       return false;
@@ -1036,17 +1037,32 @@ inline constexpr bool is_valid(VAType _value) {
 
 inline constexpr std::string_view to_string(VAType _value) {
   switch (_value) {
-    case VAType::None:
+    case VAType::none:
       return "None";
-    case VAType::VA:
+    case VAType::va:
       return "VA";
-    case VAType::OST:
+    case VAType::ost:
       return "OST";
     default:
       return "<unknown>";
   }
 }
-#pragma endregion numeric enum VAType
+
+// This is *super* simplistic, and should be optimized, cuz this is bad.
+// A deeply nested switch statement would be pretty fun to generate...
+template <>
+inline constexpr std::optional<VAType> from_string<VAType>(
+    const std::string_view& str) {
+  if (str == "None")
+    return VAType::none;
+  if (str == "VA")
+    return VAType::va;
+  if (str == "OST")
+    return VAType::ost;
+  return std::nullopt;
+}
+
+#pragma endregion string enum VAType
 
 struct Artist {
   ArtistKey key;
@@ -1576,6 +1592,24 @@ inline std::optional<Shared::SongWithPath> from_json<Shared::SongWithPath>(
   return _res;
 }
 #pragma endregion JSON serialization for object SongWithPath
+
+#pragma region JSON serialization for string enum VAType
+template <>
+inline crow::json::wvalue to_json<Shared::VAType>(Shared::VAType _value) {
+  return to_json(to_string(_value));
+}
+template <>
+struct impl_from_json<Shared::VAType> {
+  static inline std::optional<Shared::VAType> process(
+      const crow::json::rvalue& _value) {
+    if (_value.t() != crow::json::type::String)
+      return std::nullopt;
+    auto _str = _value.s();
+    return Shared::from_string<Shared::VAType>(
+        std::string_view{_str.begin(), _str.size()});
+  }
+};
+#pragma endregion JSON serialization for string enum VAType
 
 #pragma region JSON serialization for object Artist
 template <>
