@@ -42,7 +42,7 @@ import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
 
 import { albumByKey, allAlbumsState } from 'www/Jotai/Albums';
 import { allArtistsState } from 'www/Jotai/Artists';
-import { allSongsState } from 'www/Jotai/Songs';
+import { allSongsState, songListFromKey } from 'www/Jotai/Songs';
 import './styles/Albums.css';
 
 const { wrn } = MakeLog('EMP:render:Albums');
@@ -142,6 +142,10 @@ export function GroupedAlbumList(): ReactElement {
       setAlbumContext({ data, spot });
     }
   };
+  const onGetSongList = useJotaiCallback(
+    (get, set, data: string) => get(songListFromKey(data)),
+    [],
+  );
   // Get the sorted song & group lists
   const { songs: sortedSongs, groups } = SortSongsFromAlbums(
     albums.values(),
@@ -197,7 +201,7 @@ export function GroupedAlbumList(): ReactElement {
         <SongListMenu
           context={albumContext}
           onClearContext={resetAlbumContext}
-          onGetSongList={(data: string) => SongListFromKey(data)}
+          onGetSongList={onGetSongList}
         />
       </ScrollablePane>
     </div>

@@ -25,7 +25,7 @@ export const songByKey = atomFamily((sk: SongKey) =>
   }),
 );
 
-export const songListByKey = atomFamily<MediaKey, Atom<Promise<SongKey[]>>>(
+export const songListFromKey = atomFamily<MediaKey, Atom<Promise<SongKey[]>>>(
   (key: MediaKey) =>
     atom(async (get) => {
       if (key.length < 2) {
@@ -47,5 +47,6 @@ export const songListByKey = atomFamily<MediaKey, Atom<Promise<SongKey[]>>>(
           return [];
         }
       }
+      return [];
     }),
 );

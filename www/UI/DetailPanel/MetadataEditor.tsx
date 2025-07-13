@@ -12,10 +12,10 @@ import {
 import { MakeLog } from '@freik/logger';
 import { FullMetadata, Metadata } from '@freik/media-core';
 import { isArrayOfString, isDefined, isString } from '@freik/typechk';
-import { useAtomCallback } from 'jotai/utils';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { st } from 'www/Constants';
 import { albumKeyFromSongKey } from 'www/Jotai/Albums';
+import { useJotaiCallback } from 'www/Jotai/Helpers';
 import { metadataEditCountState } from 'www/Jotai/MediaInfo';
 import {
   AlbumKey,
@@ -92,103 +92,99 @@ export function MetadataEditor(props: MetadataProps): JSX.Element {
     return false;
   };
 
-  const onSubmit = useAtomCallback(
-    useCallback((get, set) => {
-      // This is necessary to invalidate things that may otherwise be confused
-      // once the metadata is different
-      set(metadataEditCountState, get(metadataEditCountState) + 1);
+  const onSubmit = useJotaiCallback((get, set) => {
+    // This is necessary to invalidate things that may otherwise be confused
+    // once the metadata is different
+    set(metadataEditCountState, get(metadataEditCountState) + 1);
 
-      // TODO: Save the changed values to the metadata override 'cache'
-      // and reflect those changes in the music DB
+    // TODO: Save the changed values to the metadata override 'cache'
+    // and reflect those changes in the music DB
 
-      // Worst case: trigger a rescan of the music on the back end, I guess :(
-      for (const songKey of isArrayOfString(props.forSongs)
-        ? props.forSongs
-        : [props.forSong]) {
-        log('Originally:');
-        log(props);
-        log('updated to:');
-        const md: Partial<FullMetadata> = { originalPath: '*' + songKey! };
-        if (artist) {
-          md.artist = Metadata.SplitArtistString(artist);
-        }
-        if (album) {
-          md.album = album;
-        }
-        if (year !== false) {
-          md.year = Number.parseInt(year.trim(), 10);
-        }
-        // Cowardly refuse to update track # and title for multi-edit
-        if (isSingle) {
-          if (track) {
-            md.track = Number.parseInt(track.trim(), 10);
-          }
-          if (title) {
-            md.title = title;
-          }
-        }
-        if (vaType !== false && vaType !== undefined && vaType !== '') {
-          md.vaType = vaType;
-        }
-        if (disk !== false) {
-          md.disk = disk.trim() ? Number.parseInt(disk.trim(), 10) : 0;
-          log('Disk Number:' + md.disk.toString());
-        }
-        if (diskName !== false) {
-          md.diskName = diskName.trim();
-        }
-        if (vars !== false) {
-          md.variations = vars.split(';').map((s) => s.trim());
-        }
-        if (moreArtists !== false) {
-          md.moreArtists = Metadata.SplitArtistString(moreArtists);
-        }
-        log(md);
-        SendMain(IpcCall.SetMediaInfo, songKey, md);
+    // Worst case: trigger a rescan of the music on the back end, I guess :(
+    for (const songKey of isArrayOfString(props.forSongs)
+      ? props.forSongs
+      : [props.forSong]) {
+      log('Originally:');
+      log(props);
+      log('updated to:');
+      const md: Partial<FullMetadata> = { originalPath: '*' + songKey! };
+      if (artist) {
+        md.artist = Metadata.SplitArtistString(artist);
       }
-    }, []),
-  );
+      if (album) {
+        md.album = album;
+      }
+      if (year !== false) {
+        md.year = Number.parseInt(year.trim(), 10);
+      }
+      // Cowardly refuse to update track # and title for multi-edit
+      if (isSingle) {
+        if (track) {
+          md.track = Number.parseInt(track.trim(), 10);
+        }
+        if (title) {
+          md.title = title;
+        }
+      }
+      if (vaType !== false && vaType !== undefined && vaType !== '') {
+        md.vaType = vaType;
+      }
+      if (disk !== false) {
+        md.disk = disk.trim() ? Number.parseInt(disk.trim(), 10) : 0;
+        log('Disk Number:' + md.disk.toString());
+      }
+      if (diskName !== false) {
+        md.diskName = diskName.trim();
+      }
+      if (vars !== false) {
+        md.variations = vars.split(';').map((s) => s.trim());
+      }
+      if (moreArtists !== false) {
+        md.moreArtists = Metadata.SplitArtistString(moreArtists);
+      }
+      log(md);
+      SendMain(IpcCall.SetMediaInfo, songKey, md);
+    }
+  }, []);
 
-  const uploadImage = useAtomCallback(
-    useCallback(
-      async (
-        get,
-        set,
-        uploadSong: (sk: SongKey) => Promise<void>,
-        uploadAlbum: (ak: AlbumKey) => Promise<void>,
-      ) => {
-        // Easy: one song:
-        if (props.forSong !== undefined) {
-          await uploadSong(props.forSong);
-          // const albumKey = await get(albumKeyFromSongKey(props.forSong));
+  const uploadImage = useJotaiCallback(
+    async (
+      get,
+      _set,
+      uploadSong: (sk: SongKey) => Promise<void>,
+      uploadAlbum: (ak: AlbumKey) => Promise<void>,
+    ) => {
+      // Easy: one song:
+      if (props.forSong !== undefined) {
+        await uploadSong(props.forSong);
+        // const albumKey = await get(albumKeyFromSongKey(props.forSong));
+        // setTimeout(
+        //   () => {}, //set(picCacheAvoiderStateFam(albumKey), (p) => p + 1),
+        //   250,
+        // );
+      } else {
+        // Messy: Multiple songs
+        const albumsSet: Set<AlbumKey> = new Set();
+        for (const song of props.forSongs!) {
+          const albumKey = await get(albumKeyFromSongKey(song));
+          if (albumsSet.has(albumKey)) {
+            continue;
+          }
+          albumsSet.add(albumKey);
+          await uploadAlbum(albumKey);
+          // This bonks the URL so it will be reloaded after we've uploaded the image
           // setTimeout(
-          //   () => {}, //set(picCacheAvoiderStateFam(albumKey), (p) => p + 1),
+          //   () => set(picCacheAvoiderStateFam(albumKey), (p) => p + 1),
           //   250,
           // );
-        } else {
-          // Messy: Multiple songs
-          const albumsSet: Set<AlbumKey> = new Set();
-          for (const song of props.forSongs!) {
-            const albumKey = await get(albumKeyFromSongKey(song));
-            if (albumsSet.has(albumKey)) {
-              continue;
-            }
-            albumsSet.add(albumKey);
-            await uploadAlbum(albumKey);
-            // This bonks the URL so it will be reloaded after we've uploaded the image
-            // setTimeout(
-            //   () => set(picCacheAvoiderStateFam(albumKey), (p) => p + 1),
-            //   250,
-            // );
-          }
         }
-      },
-      [],
-    ),
+      }
+    },
+    [],
   );
 
   /*
-  const onImageFromClipboard = useAtomCallback(useCallback((get set) => {
+  const onImageFromClipboard = useJotaiCallback((get set) => {
     const img = Util.ImageFromClipboard();
     if (img !== undefined) {
       uploadImage(
@@ -197,21 +193,20 @@ export function MetadataEditor(props: MetadataProps): JSX.Element {
         async (ak: AlbumKey) => await UploadImageForAlbum(ak, img),
       ).catch((e) => Catch(e));
     }
-  });
+  }, []);
   */
-  const onSelectFile = useAtomCallback(
-    useCallback(async (get, set) => {
-      const selected = await ShowOpenDialog(pickCoverArtDialogOptions);
-      if (isDefined(selected)) {
-        await uploadImage(
-          (sk: SongKey) =>
-            Promise.resolve() /*UploadFileForSong(sk, selected[0])*/,
-          (ak: AlbumKey) =>
-            Promise.resolve() /*UploadFileForAlbum(ak, selected[0])*/,
-        );
-      }
-    }, []),
-  );
+  const onSelectFile = useJotaiCallback(async (get, set) => {
+    const selected = await ShowOpenDialog(pickCoverArtDialogOptions);
+    if (isDefined(selected)) {
+      await uploadImage(
+        (sk: SongKey) =>
+          Promise.resolve() /*UploadFileForSong(sk, selected[0])*/,
+        (ak: AlbumKey) =>
+          Promise.resolve() /*UploadFileForAlbum(ak, selected[0])*/,
+      );
+    }
+  }, []);
+
   const coverUrl = getAlbumImageUrl(props.albumId || '___');
   // Nothing selected: EMPTY!
   if (!isSingle && !isMultiple) {
