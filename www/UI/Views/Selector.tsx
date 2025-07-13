@@ -14,6 +14,7 @@ import { SearchResultsView } from './SearchResults';
 import { ToolsView } from './Tools';
 */
 
+import { GroupedAlbumList } from './Albums';
 import './styles/Selector.css';
 
 function ignore(view: CurrentView): boolean {
@@ -33,10 +34,11 @@ export function ViewSelector(): ReactElement {
     setRendered(newrendered);
     // We still need to do a full render, because otherwise elements get
     // deleted and recreated, and that's probably bad, right?
-  } /*
+  }
   if (rendered.has(CurrentView.albums) || which === CurrentView.albums) {
     contents.push([CurrentView.albums, <GroupedAlbumList />]);
   }
+  /*
   if (rendered.has(CurrentView.artists) || which === CurrentView.artists) {
     contents.push([CurrentView.artists, <GroupedAristList />]);
   }

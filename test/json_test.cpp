@@ -307,13 +307,13 @@ TEST(JsonPickling, std_map_and_hash) {
 TEST(JsonPickling, enumClass) {
   // Test the conversion of basic types to and from JSON
   {
-    crow::json::wvalue json_value = to_json(Shared::VAType::OST);
+    crow::json::wvalue json_value = to_json(Shared::VAType::ost);
     EXPECT_EQ(json_value.t(), crow::json::type::Number);
     std::string s = json_value.dump();
     crow::json::rvalue json_value2 = crow::json::load(s);
     auto enum_value = from_json<Shared::VAType>(json_value2);
     EXPECT_TRUE(enum_value.has_value());
-    EXPECT_EQ(enum_value.value(), Shared::VAType::OST);
+    EXPECT_EQ(enum_value.value(), Shared::VAType::ost);
     auto str_value = from_json<std::string>(json_value2);
     EXPECT_FALSE(str_value.has_value());
   }
