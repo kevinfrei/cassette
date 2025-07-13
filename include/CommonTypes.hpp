@@ -468,6 +468,35 @@ inline constexpr bool is_valid(CurrentView _value) {
   }
 }
 
+inline constexpr std::string_view to_string(CurrentView _value) {
+  switch (_value) {
+    case CurrentView::disabled:
+      return "disabled";
+    case CurrentView::none:
+      return "none";
+    case CurrentView::recent:
+      return "recent";
+    case CurrentView::albums:
+      return "albums";
+    case CurrentView::artists:
+      return "artists";
+    case CurrentView::songs:
+      return "songs";
+    case CurrentView::playlists:
+      return "playlists";
+    case CurrentView::now_playing:
+      return "now_playing";
+    case CurrentView::settings:
+      return "settings";
+    case CurrentView::search:
+      return "search";
+    case CurrentView::tools:
+      return "tools";
+    default:
+      return "<unknown>";
+  }
+}
+
 #pragma endregion linear enum CurrentView
 
 #pragma region linear enum IpcCall
@@ -567,6 +596,101 @@ inline constexpr bool is_valid(IpcCall _value) {
       return true;
     default:
       return false;
+  }
+}
+
+inline constexpr std::string_view to_string(IpcCall _value) {
+  switch (_value) {
+    case IpcCall::Unknown:
+      return "Unknown";
+    case IpcCall::ReadFromStorage:
+      return "ReadFromStorage";
+    case IpcCall::WriteToStorage:
+      return "WriteToStorage";
+    case IpcCall::DeleteFromStorage:
+      return "DeleteFromStorage";
+    case IpcCall::AsyncData:
+      return "AsyncData";
+    case IpcCall::IsDev:
+      return "IsDev";
+    case IpcCall::ClearHates:
+      return "ClearHates";
+    case IpcCall::ClearLikes:
+      return "ClearLikes";
+    case IpcCall::ClearLocalOverrides:
+      return "ClearLocalOverrides";
+    case IpcCall::DeletePlaylist:
+      return "DeletePlaylist";
+    case IpcCall::FlushImageCache:
+      return "FlushImageCache";
+    case IpcCall::FlushMetadataCache:
+      return "FlushMetadataCache";
+    case IpcCall::GetHates:
+      return "GetHates";
+    case IpcCall::GetLikes:
+      return "GetLikes";
+    case IpcCall::GetMediaInfo:
+      return "GetMediaInfo";
+    case IpcCall::GetMusicDatabase:
+      return "GetMusicDatabase";
+    case IpcCall::GetPlaylists:
+      return "GetPlaylists";
+    case IpcCall::LoadPlaylist:
+      return "LoadPlaylist";
+    case IpcCall::MenuAction:
+      return "MenuAction";
+    case IpcCall::RenamePlaylist:
+      return "RenamePlaylist";
+    case IpcCall::SavePlaylist:
+      return "SavePlaylist";
+    case IpcCall::Search:
+      return "Search";
+    case IpcCall::SetHates:
+      return "SetHates";
+    case IpcCall::SetLikes:
+      return "SetLikes";
+    case IpcCall::SetMediaInfo:
+      return "SetMediaInfo";
+    case IpcCall::SetPlaylists:
+      return "SetPlaylists";
+    case IpcCall::SetSaveMenu:
+      return "SetSaveMenu";
+    case IpcCall::ShowFile:
+      return "ShowFile";
+    case IpcCall::ShowLocFromKey:
+      return "ShowLocFromKey";
+    case IpcCall::ShowMenu:
+      return "ShowMenu";
+    case IpcCall::SubstrSearch:
+      return "SubstrSearch";
+    case IpcCall::TranscodingBegin:
+      return "TranscodingBegin";
+    case IpcCall::UploadImage:
+      return "UploadImage";
+    case IpcCall::MinimizeWindow:
+      return "MinimizeWindow";
+    case IpcCall::MaximizeWindow:
+      return "MaximizeWindow";
+    case IpcCall::RestoreWindow:
+      return "RestoreWindow";
+    case IpcCall::CloseWindow:
+      return "CloseWindow";
+    case IpcCall::GetPicUri:
+      return "GetPicUri";
+    case IpcCall::GetIgnoreList:
+      return "GetIgnoreList";
+    case IpcCall::AddIgnoreItem:
+      return "AddIgnoreItem";
+    case IpcCall::RemoveIgnoreItem:
+      return "RemoveIgnoreItem";
+    case IpcCall::PushIgnoreList:
+      return "PushIgnoreList";
+    case IpcCall::IgnoreListId:
+      return "IgnoreListId";
+    case IpcCall::ShowOpenDialog:
+      return "ShowOpenDialog";
+    default:
+      return "<unknown>";
   }
 }
 

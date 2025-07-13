@@ -1,5 +1,5 @@
 import { useAtomValue } from 'jotai';
-import { CSSProperties, ReactElement, useState } from 'react';
+import { CSSProperties, ReactElement, Suspense, useState } from 'react';
 import { CurrentView } from 'www/Shared/CommonTypes';
 import { curViewState } from 'www/State/SimpleSavedState';
 import { NowPlayingView } from './NowPlaying';
@@ -15,7 +15,12 @@ import { ToolsView } from './Tools';
 */
 
 import { GroupedAlbumList } from './Albums';
+import { GroupedAristList } from './Artists';
+import { MixedSongsList } from './MixedSongs';
+import { PlaylistView } from './Playlists';
+import { SearchResultsView } from './SearchResults';
 import './styles/Selector.css';
+import { ToolsView } from './Tools';
 
 function ignore(view: CurrentView): boolean {
   return view === CurrentView.settings || view === CurrentView.tools;
@@ -38,7 +43,6 @@ export function ViewSelector(): ReactElement {
   if (rendered.has(CurrentView.albums) || which === CurrentView.albums) {
     contents.push([CurrentView.albums, <GroupedAlbumList />]);
   }
-  /*
   if (rendered.has(CurrentView.artists) || which === CurrentView.artists) {
     contents.push([CurrentView.artists, <GroupedAristList />]);
   }
@@ -47,7 +51,7 @@ export function ViewSelector(): ReactElement {
   }
   if (rendered.has(CurrentView.playlists) || which === CurrentView.playlists) {
     contents.push([CurrentView.playlists, <PlaylistView />]);
-  }*/
+  }
   if (
     rendered.has(CurrentView.now_playing) ||
     which === CurrentView.now_playing
@@ -67,20 +71,20 @@ export function ViewSelector(): ReactElement {
   if (which === CurrentView.settings) {
     contents.push([CurrentView.settings, <SettingsView />]);
   }
-  /*
   if (rendered.has(CurrentView.search) || which === CurrentView.search) {
     contents.push([CurrentView.search, <SearchResultsView />]);
   }
   if (which === CurrentView.tools) {
     contents.push([CurrentView.tools, <ToolsView />]);
   }
-    */
   return (
     <>
       {/* <PlaybackOrder /> */}
       {contents.map(([view, elem]) => (
         <div key={view} className="current-view" style={sl(view)}>
-          {elem}
+          <Suspense fallback={<div className="loading-view">Loading...</div>}>
+            {elem}
+          </Suspense>
         </div>
       ))}
     </>
