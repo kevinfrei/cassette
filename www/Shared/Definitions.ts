@@ -376,6 +376,12 @@ const OpenDialogOptions = obj({
   filters: opt(arr(ref('FileFilterItem'))),
 });
 
+const SearchResults = obj({
+  songs: arr(ref('SongKey')),
+  artists: arr(ref('ArtistKey')),
+  albums: arr(ref('AlbumKey')),
+});
+
 export const TypesToGenerate: Record<string, Types> = {
   Keys,
   StrId,
@@ -414,6 +420,7 @@ export const TypesToGenerate: Record<string, Types> = {
   MusicDatabase,
   FileFilterItem,
   OpenDialogOptions,
+  SearchResults,
 };
 
 export const PicklersToGenerate: Record<string, Types> = {};

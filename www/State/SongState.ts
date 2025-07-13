@@ -1,5 +1,6 @@
 import { Atom, atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
+import { SongKey } from 'www/Shared/CommonTypes';
 
 export type AlbumDescription = {
   artist: string;
@@ -31,3 +32,12 @@ export const songDescriptionForSongState = atomFamily((songKey: string) =>
 
 // Are we displaying the play order?
 export const playOrderDisplayingState = atom<boolean>(false);
+
+export const songDescriptionsForSongList = atomFamily((sks: SongKey[]) =>
+  atom(
+    async (get): Promise<SongDescription[]> =>
+      Promise.all(
+        sks.map((sk: SongKey) => get(songDescriptionForSongState(sk))),
+      ),
+  ),
+);

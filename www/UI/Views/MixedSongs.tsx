@@ -19,6 +19,7 @@ import {
 } from 'www/Jotai/LikesAndHates';
 import { allSongsState } from 'www/Jotai/Songs';
 import { Song, SongKey } from 'www/Shared/CommonTypes';
+import { songDescriptionsForSongList } from 'www/State/SongState';
 import {
   AlbumForSongRender,
   ArtistsForSongRender,
@@ -127,7 +128,7 @@ export function SimpleSongsList({
   keyprefix?: string;
 }): ReactElement {
   const pfx = keyprefix || 'ssl';
-  const songList = useAtomValue(dataForSongListFuncFam(forSongs));
+  const songList = useAtomValue(songDescriptionsForSongList(forSongs));
   if (!songList) {
     return <></>;
   }
