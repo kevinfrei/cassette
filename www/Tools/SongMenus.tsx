@@ -9,10 +9,7 @@ import { isString } from '@freik/typechk';
 import { useAtomValue } from 'jotai';
 import { ReactElement, useCallback } from 'react';
 import { SongKey } from 'www/Shared/CommonTypes';
-import { AddSongs, PlaySongs } from '../Jotai/API';
-import { AsyncHandler } from '../Jotai/Helpers';
 import { songListLikeNumberFromStringFam } from '../Jotai/LikesAndHates';
-import { SongListDetailClick } from './DetailPanel/Clickers';
 import { ErrorBoundary } from './Utilities';
 
 export type SongListMenuData = { data: string; spot?: Point };

@@ -5,11 +5,12 @@ import {
   List,
   mergeStyleSets,
 } from '@fluentui/react';
+import { useAtomValue } from 'jotai';
 import { ReactElement, useCallback, useRef } from 'react';
-import { useRecoilValue } from 'recoil';
+import { allAlbumsState } from 'www/Jotai/Albums';
+import { dataForAlbumByKey } from 'www/Jotai/API';
 import { Album } from 'www/Shared/CommonTypes';
-import { allAlbumsFunc, dataForAlbumFuncFam } from '../../Recoil/ReadOnly';
-import { getAlbumImageUrl } from '../../Tools';
+import { getAlbumImageUrl } from 'www/Utils';
 import './styles/Albums.css';
 
 const theme: ITheme = getTheme();
@@ -75,7 +76,7 @@ function AlbumCoverView({
   album: Album;
   cols: number;
 }): ReactElement {
-  const albumData = useRecoilValue(dataForAlbumFuncFam(album.key));
+  const albumData = useAtomValue(dataForAlbumByKey(album.key));
   const picurl = getAlbumImageUrl(album.key);
 
   // const onAddSongsClick = () => AddSongs(store, album.songs).catch(wrn);
@@ -130,7 +131,7 @@ export function NuAlbumView(): ReactElement {
       <></>
     );
   };
-  const albums = useRecoilValue(allAlbumsFunc);
+  const albums = useAtomValue(allAlbumsState);
   const getPageHeight = useCallback((): number => {
     const res = rowHeight.current * ROWS_PER_PAGE;
     return Number.isNaN(res) ? ROWS_PER_PAGE : res;

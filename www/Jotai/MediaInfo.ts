@@ -1,8 +1,14 @@
 import { MakeLog } from '@freik/logger';
 import { Fail } from '@freik/react-tools';
-import { atom } from 'jotai';
+import { atom, Atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
-import { SongKey, VAType } from 'www/Shared/CommonTypes';
+import {
+  chkMediaInfo,
+  IpcCall,
+  MediaInfo,
+  SongKey,
+  VAType,
+} from 'www/Shared/CommonTypes';
 import { MetadataProps, SongInfo } from 'www/Types';
 import { diskNumName } from 'www/Utils';
 import * as ipc from '../Tools/Ipc';
@@ -12,10 +18,18 @@ import { songByKey } from './Songs';
 
 const { log } = MakeLog('EMP:render:Jotai:MediaInfo');
 
-export const mediaInfoStateFamily = atomFamily((sk: SongKey) =>
+const emptyMedInfo: MediaInfo = {
+  general: new Map<string, string>(),
+  audio: new Map<string, string>(),
+};
+
+export const mediaInfoStateFamily = atomFamily<
+  SongKey,
+  Atom<Promise<MediaInfo>>
+>((sk: SongKey) =>
   atom(async () => {
-    if (!sk) return new Map<string, string>();
-    const result = await ipc.GetMediaInfo(sk);
+    if (!sk) return emptyMedInfo;
+    const result = await ipc.CallMain(IpcCall.GetMediaInfo, chkMediaInfo, sk);
     if (!result) {
       Fail(sk, 'Unfound song key');
     }

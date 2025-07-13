@@ -8,17 +8,9 @@ import {
   ArtistKey,
   PlaylistName,
 } from 'www/Shared/CommonTypes';
-
 import { useJotaiCallback } from '../../../Jotai/Helpers';
 import { WritableAtomType } from '../../../Jotai/Hooks';
 import { playlistNamesState } from '../../../Jotai/PlaylistControl';
-import { AlbumDescriptionWithKey } from '../../../MusicLibrarySchema';
-import {
-  albumByKeyFuncFam,
-  allAlbumsDataFunc,
-  artistByKeyFuncFam,
-  filteredArtistsFunc,
-} from '../../../Recoil/ReadOnly';
 
 export function PlaylistSelector({
   value,
@@ -62,7 +54,7 @@ export function ArtistSelector({
   value: WritableAtomType<ArtistKey>;
 }): ReactElement {
   const [selArtistKey, setSelArtistKey] = useAtom(value);
-  const artists = useRecoilValue(filteredArtistsFunc);
+  const artists = useAtomValue(filteredArtistsFunc);
   const theList: IComboBoxOption[] = artists.map((r: Artist) => ({
     key: r.key,
     text: r.name,

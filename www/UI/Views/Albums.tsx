@@ -34,7 +34,7 @@ import {
   SortSongsFromAlbums,
 } from 'www/Tools/Sorting';
 import { getAlbumImageUrl, GetIndexOf } from 'www/Utils';
-import { AddSongs } from '../../Jotai/API';
+import { AddSongs, dataForAlbumByKey } from '../../Jotai/API';
 import { useJotaiCallback } from '../../Jotai/Helpers';
 import { MakeSetAtomFamily } from '../../Jotai/Hooks';
 import { focusedKeysFuncFam } from '../../Jotai/KeyBuffer';
@@ -65,7 +65,7 @@ const albumSortState = jatom(MakeSortKey(['l', 'n'], ['lry', 'nrt']));
 type AHDProps = { group: IGroup };
 function AlbumHeaderDisplay({ group }: AHDProps): ReactElement {
   const album = useAtomValue(albumByKey(group.key));
-  const albumData = useAtomValue(dataForAlbumFuncFam(group.key));
+  const albumData = useAtomValue(dataForAlbumByKey(group.key));
   const picurl = getAlbumImageUrl(group.key);
   const onAddSongsClick = useCallback(() => {
     AddSongs(album.songs).catch(wrn);
