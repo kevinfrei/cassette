@@ -25,9 +25,9 @@ export const descriptionFromAlbumKey = atomFamily((ak: AlbumKey) =>
       if (maybeArtistName) {
         res.artist = maybeArtistName;
       }
-    } else if (album.vatype === VAType.OST) {
+    } else if (album.vatype === VAType.ost) {
       res.artist = 'Soundtrack';
-    } else if (album.vatype === VAType.VA) {
+    } else if (album.vatype === VAType.va) {
       res.artist = 'Compilation';
     } else {
       res.artist = '???';

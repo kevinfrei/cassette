@@ -9,34 +9,32 @@ import {
   TextField,
   TooltipHost,
 } from '@fluentui/react';
-import { Util } from '@freik/electron-render';
-import { StrId, st } from '@freik/emp-shared';
 import { MakeLog } from '@freik/logger';
-import { AlbumKey, FullMetadata, Metadata, SongKey } from '@freik/media-core';
-import { isArrayOfString, isString } from '@freik/typechk';
+import { FullMetadata, Metadata } from '@freik/media-core';
+import { isArrayOfString, isDefined, isString } from '@freik/typechk';
+import { useAtomCallback } from 'jotai/utils';
+import { useCallback, useEffect, useState } from 'react';
+import { st } from 'www/Constants';
+import { albumKeyFromSongKey } from 'www/Jotai/Albums';
+import { metadataEditCountState } from 'www/Jotai/MediaInfo';
 import {
-  Catch,
-  MyTransactionInterface,
-  onRejected,
-  useMyTransaction,
-} from '@freik/web-utils';
-import { useEffect, useState } from 'react';
-import {
-  UploadFileForAlbum,
-  UploadFileForSong,
-  UploadImageForAlbum,
-  UploadImageForSong,
-} from '../../MyWindow';
-import {
-  albumKeyForSongKeyFuncFam,
-  metadataEditCountState,
-} from '../../Recoil/ReadOnly';
-import { picCacheAvoiderStateFam } from '../../Recoil/cacheAvoider';
-import { getAlbumImageUrl } from '../../Tools';
-import { SetMediaInfo } from '../../ipc';
+  AlbumKey,
+  IpcCall,
+  OpenDialogOptions,
+  SongKey,
+  StrId,
+} from 'www/Shared/CommonTypes';
+import { PostMain, SendMain } from 'www/Tools/Ipc';
+import { ShowOpenDialog } from 'www/Tools/Utilities';
+import { getAlbumImageUrl } from 'www/Utils';
 import { MetadataProps } from './MetadataProps';
 
 const { log } = MakeLog('EMP:render:MetadataEditor');
+
+const pickCoverArtDialogOptions: OpenDialogOptions = {
+  title: st(StrId.ChooseCoverArt),
+  filters: [{ name: st(StrId.ImageName), extensions: ['jpg', 'jpeg', 'png'] }],
+};
 
 export function MetadataEditor(props: MetadataProps): JSX.Element {
   const [artist, setArtist] = useState<false | string>(false);
@@ -94,94 +92,103 @@ export function MetadataEditor(props: MetadataProps): JSX.Element {
     return false;
   };
 
-  const onSubmit = useMyTransaction((xact) => () => {
-    // This is necessary to invalidate things that may otherwise be confused
-    // once the metadata is different
-    xact.set(metadataEditCountState, (cur) => cur + 1);
+  const onSubmit = useAtomCallback(
+    useCallback((get, set) => {
+      // This is necessary to invalidate things that may otherwise be confused
+      // once the metadata is different
+      set(metadataEditCountState, get(metadataEditCountState) + 1);
 
-    // TODO: Save the changed values to the metadata override 'cache'
-    // and reflect those changes in the music DB
+      // TODO: Save the changed values to the metadata override 'cache'
+      // and reflect those changes in the music DB
 
-    // Worst case: trigger a rescan of the music on the back end, I guess :(
-    for (const songKey of isArrayOfString(props.forSongs)
-      ? props.forSongs
-      : [props.forSong]) {
-      log('Originally:');
-      log(props);
-      log('updated to:');
-      const md: Partial<FullMetadata> = { originalPath: '*' + songKey! };
-      if (artist) {
-        md.artist = Metadata.SplitArtistString(artist);
-      }
-      if (album) {
-        md.album = album;
-      }
-      if (year !== false) {
-        md.year = Number.parseInt(year.trim(), 10);
-      }
-      // Cowardly refuse to update track # and title for multi-edit
-      if (isSingle) {
-        if (track) {
-          md.track = Number.parseInt(track.trim(), 10);
+      // Worst case: trigger a rescan of the music on the back end, I guess :(
+      for (const songKey of isArrayOfString(props.forSongs)
+        ? props.forSongs
+        : [props.forSong]) {
+        log('Originally:');
+        log(props);
+        log('updated to:');
+        const md: Partial<FullMetadata> = { originalPath: '*' + songKey! };
+        if (artist) {
+          md.artist = Metadata.SplitArtistString(artist);
         }
-        if (title) {
-          md.title = title;
+        if (album) {
+          md.album = album;
         }
-      }
-      if (vaType !== false && vaType !== undefined && vaType !== '') {
-        md.vaType = vaType;
-      }
-      if (disk !== false) {
-        md.disk = disk.trim() ? Number.parseInt(disk.trim(), 10) : 0;
-        log('Disk Number:' + md.disk.toString());
-      }
-      if (diskName !== false) {
-        md.diskName = diskName.trim();
-      }
-      if (vars !== false) {
-        md.variations = vars.split(';').map((s) => s.trim());
-      }
-      if (moreArtists !== false) {
-        md.moreArtists = Metadata.SplitArtistString(moreArtists);
-      }
-      log(md);
-      SetMediaInfo(md).catch(onRejected('Saving Metadata failed'));
-    }
-  });
-
-  const uploadImage = async (
-    { get, set }: MyTransactionInterface,
-    uploadSong: (sk: SongKey) => Promise<void>,
-    uploadAlbum: (ak: AlbumKey) => Promise<void>,
-  ) => {
-    // Easy: one song:
-    if (props.forSong !== undefined) {
-      await uploadSong(props.forSong);
-      const albumKey = get(albumKeyForSongKeyFuncFam(props.forSong));
-      setTimeout(
-        () => set(picCacheAvoiderStateFam(albumKey), (p) => p + 1),
-        250,
-      );
-    } else {
-      // Messy: Multiple songs
-      const albumsSet: Set<AlbumKey> = new Set();
-      for (const song of props.forSongs!) {
-        const albumKey = get(albumKeyForSongKeyFuncFam(song));
-        if (albumsSet.has(albumKey)) {
-          continue;
+        if (year !== false) {
+          md.year = Number.parseInt(year.trim(), 10);
         }
-        albumsSet.add(albumKey);
-        await uploadAlbum(albumKey);
-        // This bonks the URL so it will be reloaded after we've uploaded the image
-        setTimeout(
-          () => set(picCacheAvoiderStateFam(albumKey), (p) => p + 1),
-          250,
-        );
+        // Cowardly refuse to update track # and title for multi-edit
+        if (isSingle) {
+          if (track) {
+            md.track = Number.parseInt(track.trim(), 10);
+          }
+          if (title) {
+            md.title = title;
+          }
+        }
+        if (vaType !== false && vaType !== undefined && vaType !== '') {
+          md.vaType = vaType;
+        }
+        if (disk !== false) {
+          md.disk = disk.trim() ? Number.parseInt(disk.trim(), 10) : 0;
+          log('Disk Number:' + md.disk.toString());
+        }
+        if (diskName !== false) {
+          md.diskName = diskName.trim();
+        }
+        if (vars !== false) {
+          md.variations = vars.split(';').map((s) => s.trim());
+        }
+        if (moreArtists !== false) {
+          md.moreArtists = Metadata.SplitArtistString(moreArtists);
+        }
+        log(md);
+        SendMain(IpcCall.SetMediaInfo, songKey, md);
       }
-    }
-  };
+    }, []),
+  );
 
-  const onImageFromClipboard = useMyTransaction((xact) => () => {
+  const uploadImage = useAtomCallback(
+    useCallback(
+      async (
+        get,
+        set,
+        uploadSong: (sk: SongKey) => Promise<void>,
+        uploadAlbum: (ak: AlbumKey) => Promise<void>,
+      ) => {
+        // Easy: one song:
+        if (props.forSong !== undefined) {
+          await uploadSong(props.forSong);
+          // const albumKey = await get(albumKeyFromSongKey(props.forSong));
+          // setTimeout(
+          //   () => {}, //set(picCacheAvoiderStateFam(albumKey), (p) => p + 1),
+          //   250,
+          // );
+        } else {
+          // Messy: Multiple songs
+          const albumsSet: Set<AlbumKey> = new Set();
+          for (const song of props.forSongs!) {
+            const albumKey = await get(albumKeyFromSongKey(song));
+            if (albumsSet.has(albumKey)) {
+              continue;
+            }
+            albumsSet.add(albumKey);
+            await uploadAlbum(albumKey);
+            // This bonks the URL so it will be reloaded after we've uploaded the image
+            // setTimeout(
+            //   () => set(picCacheAvoiderStateFam(albumKey), (p) => p + 1),
+            //   250,
+            // );
+          }
+        }
+      },
+      [],
+    ),
+  );
+
+  /*
+  const onImageFromClipboard = useAtomCallback(useCallback((get set) => {
     const img = Util.ImageFromClipboard();
     if (img !== undefined) {
       uploadImage(
@@ -191,27 +198,20 @@ export function MetadataEditor(props: MetadataProps): JSX.Element {
       ).catch((e) => Catch(e));
     }
   });
-  const onSelectFile = useMyTransaction((xact) => () => {
-    Util.ShowOpenDialog({
-      title: st(StrId.ChooseCoverArt),
-      properties: ['openFile'],
-      filters: [
-        { name: st(StrId.ImageName), extensions: ['jpg', 'jpeg', 'png'] },
-      ],
-    })
-      .then((selected) => {
-        return selected !== undefined
-          ? uploadImage(
-              xact,
-              async (sk: SongKey) => await UploadFileForSong(sk, selected[0]),
-              async (ak: AlbumKey) => await UploadFileForAlbum(ak, selected[0]),
-            )
-          : new Promise(() => {
-              return;
-            });
-      })
-      .catch((e) => Catch(e));
-  });
+  */
+  const onSelectFile = useAtomCallback(
+    useCallback(async (get, set) => {
+      const selected = await ShowOpenDialog(pickCoverArtDialogOptions);
+      if (isDefined(selected)) {
+        await uploadImage(
+          (sk: SongKey) =>
+            Promise.resolve() /*UploadFileForSong(sk, selected[0])*/,
+          (ak: AlbumKey) =>
+            Promise.resolve() /*UploadFileForAlbum(ak, selected[0])*/,
+        );
+      }
+    }, []),
+  );
   const coverUrl = getAlbumImageUrl(props.albumId || '___');
   // Nothing selected: EMPTY!
   if (!isSingle && !isMultiple) {
@@ -348,7 +348,7 @@ export function MetadataEditor(props: MetadataProps): JSX.Element {
         &nbsp;
         <DefaultButton
           text={st(StrId.FromClipboard)}
-          onClick={onImageFromClipboard}
+          onClick={() => {} /*onImageFromClipboard*/}
         />
       </div>
     </>
