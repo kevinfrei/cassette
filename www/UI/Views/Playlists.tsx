@@ -26,19 +26,19 @@ import {
 } from 'www/Tools/SongList';
 import { SongListMenu, SongListMenuData } from 'www/Tools/SongMenus';
 import { MakeSortKey } from 'www/Tools/Sorting';
-import { useJotaiAsyncCallback, useJotaiCallback } from '../../Jotai/Helpers';
-import { MakeSetAtomFamily } from '../../Jotai/Hooks';
+import { useJotaiAsyncCallback, useJotaiCallback } from '../../State/Helpers';
+import { MakeSetAtomFamily } from '../../State/Hooks';
 
 import { MakeLog } from '@freik/logger';
-import { allSongsState } from 'www/Jotai/Songs';
-import { AddSongs, PlaySongs } from '../../Jotai/API';
+import { allSongsState } from 'www/State/Songs';
+import { AddSongs, PlaySongs } from '../../State/API';
 import {
   allPlaylistsState,
   DeletePlaylist,
   playlistNamesState,
   playlistStateFamily,
   RenamePlaylist,
-} from '../../Jotai/PlaylistControl';
+} from '../../State/PlaylistControl';
 import './styles/Playlists.css';
 
 const { wrn } = MakeLog('EMP:render:Playlists');

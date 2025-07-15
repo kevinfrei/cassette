@@ -22,9 +22,9 @@ import {
 } from 'react';
 import { IpcCall, OpenDialogOptions } from 'www/Shared/CommonTypes';
 import { isSearchBox } from 'www/UI/Sidebar';
-import { keyBufferState } from '../Jotai/KeyBuffer';
-import { isMiniplayerState } from '../Jotai/Local';
-import { saveableState } from '../Jotai/PlaylistControl';
+import { keyBufferState } from '../State/KeyBuffer';
+import { isMiniplayerState } from '../State/Local';
+import { saveableState } from '../State/PlaylistControl';
 import { CallMain, SendMain } from './Ipc';
 // import { MenuHandler } from './MenuHandler';
 import { Atom, WritableAtom } from 'jotai';

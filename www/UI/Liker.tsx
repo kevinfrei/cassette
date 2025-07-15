@@ -1,12 +1,12 @@
 import { useAtomValue } from 'jotai';
 import { ReactElement } from 'react';
-import { useJotaiCallback } from 'www/Jotai/Helpers';
+import { Song, SongKey } from 'www/Shared/CommonTypes';
+import { useJotaiCallback } from 'www/State/Helpers';
 import {
   isSongHatedFam,
   isSongLikedFam,
   songListLikeNumberFromStringFam,
-} from 'www/Jotai/LikesAndHates';
-import { Song, SongKey } from 'www/Shared/CommonTypes';
+} from 'www/State/LikesAndHates';
 
 function Liker({ songId }: { songId: SongKey }): ReactElement {
   const likeNum = useAtomValue(songListLikeNumberFromStringFam(songId));

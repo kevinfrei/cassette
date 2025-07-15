@@ -9,16 +9,16 @@ import { MakeLog } from '@freik/logger';
 import { isNumber } from '@freik/typechk';
 import { atom, useAtom, useAtomValue } from 'jotai';
 import { ReactElement, useCallback } from 'react';
-import { allAlbumsState } from 'www/Jotai/Albums';
-import { allArtistsState } from 'www/Jotai/Artists';
-import { getAll } from 'www/Jotai/Helpers';
+import { Song, SongKey } from 'www/Shared/CommonTypes';
+import { allAlbumsState } from 'www/State/Albums';
+import { allArtistsState } from 'www/State/Artists';
+import { getAll } from 'www/State/Helpers';
 import {
   isSongHatedFam,
   isSongLikedFam,
   songListLikeNumberFromStringFam,
-} from 'www/Jotai/LikesAndHates';
-import { allSongsState } from 'www/Jotai/Songs';
-import { Song, SongKey } from 'www/Shared/CommonTypes';
+} from 'www/State/LikesAndHates';
+import { allSongsState } from 'www/State/Songs';
 import { songDescriptionsForSongList } from 'www/State/SongState';
 import {
   AlbumForSongRender,
@@ -32,8 +32,8 @@ import {
 } from 'www/Tools/SongList';
 import { SongListMenu, SongListMenuData } from 'www/Tools/SongMenus';
 import { MakeSortKey, SortSongList } from 'www/Tools/Sorting';
-import { AddSongs } from '../../Jotai/API';
-import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
+import { AddSongs } from '../../State/API';
+import { ignoreArticlesState } from '../../State/SimpleSettings';
 import { LikeOrHate } from '../Liker';
 
 import './styles/MixedSongs.css';

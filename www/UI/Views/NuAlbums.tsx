@@ -7,9 +7,9 @@ import {
 } from '@fluentui/react';
 import { useAtomValue } from 'jotai';
 import { ReactElement, useCallback, useRef } from 'react';
-import { allAlbumsState } from 'www/Jotai/Albums';
-import { dataForAlbumByKey } from 'www/Jotai/API';
 import { Album } from 'www/Shared/CommonTypes';
+import { allAlbumsState } from 'www/State/Albums';
+import { dataForAlbumByKey } from 'www/State/API';
 import { getAlbumImageUrl } from 'www/Utils';
 import './styles/Albums.css';
 

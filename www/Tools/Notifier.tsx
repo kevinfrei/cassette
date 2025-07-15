@@ -2,7 +2,7 @@ import { MessageBar, MessageBarType } from '@fluentui/react';
 import { useAtom } from 'jotai';
 import { ReactElement, useEffect } from 'react';
 
-import { displayMessageState, recentlyQueuedState } from '../Jotai/Local';
+import { displayMessageState, recentlyQueuedState } from '../State/Local';
 
 import './styles/Notifier.css';
 
@@ -26,8 +26,7 @@ export function Notifier(): ReactElement {
     <MessageBar
       className={displayed ? '' : 'fade-out'}
       messageBarType={MessageBarType.success}
-      isMultiline={true}
-    >
+      isMultiline={true}>
       Added {addedSongs} songs to the Now Playing queue
     </MessageBar>
   ) : (

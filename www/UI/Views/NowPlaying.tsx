@@ -21,8 +21,6 @@ import { isNumber } from '@freik/typechk';
 import { atom, useAtom, useAtomValue } from 'jotai';
 import { ReactElement, useCallback, useState } from 'react';
 
-import { allAlbumsState } from 'www/Jotai/Albums';
-import { allArtistsState } from 'www/Jotai/Artists';
 import {
   Album,
   AlbumKey,
@@ -32,6 +30,8 @@ import {
   Song,
   SongKey,
 } from 'www/Shared/CommonTypes';
+import { allAlbumsState } from 'www/State/Albums';
+import { allArtistsState } from 'www/State/Artists';
 import {
   AlbumForSongRender,
   ArtistsForSongRender,
@@ -42,22 +42,22 @@ import { SongListMenu, SongListMenuData } from 'www/Tools/SongMenus';
 import { SortKey, SortSongList } from 'www/Tools/Sorting';
 import { isPlaylistName } from 'www/Utils';
 import { GetHelperText } from 'www/WebHelpers';
-import { RemoveSongFromNowPlaying, StopAndClear } from '../../Jotai/API';
-import { useJotaiAsyncCallback, useJotaiCallback } from '../../Jotai/Helpers';
-import { isMiniplayerState, nowPlayingSortState } from '../../Jotai/Local';
+import { RemoveSongFromNowPlaying, StopAndClear } from '../../State/API';
+import { useJotaiAsyncCallback, useJotaiCallback } from '../../State/Helpers';
+import { isMiniplayerState, nowPlayingSortState } from '../../State/Local';
 import {
   playlistNamesState,
   playlistStateFamily,
   saveableState,
-} from '../../Jotai/PlaylistControl';
-import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
+} from '../../State/PlaylistControl';
+import { ignoreArticlesState } from '../../State/SimpleSettings';
 import {
   activePlaylistState,
   currentSongIndexState,
   curSongsState,
   songListState,
   songPlaybackOrderState,
-} from '../../Jotai/SongPlayback';
+} from '../../State/SongPlayback';
 
 import { LikeOrHate } from '../Liker';
 import './styles/NowPlaying.css';

@@ -34,15 +34,15 @@ import {
   SortSongsFromAlbums,
 } from 'www/Tools/Sorting';
 import { getAlbumImageUrl, GetIndexOf } from 'www/Utils';
-import { AddSongs, dataForAlbumByKey } from '../../Jotai/API';
-import { useJotaiCallback } from '../../Jotai/Helpers';
-import { MakeSetAtomFamily } from '../../Jotai/Hooks';
-import { focusedKeysFuncFam } from '../../Jotai/KeyBuffer';
-import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
+import { AddSongs, dataForAlbumByKey } from '../../State/API';
+import { useJotaiCallback } from '../../State/Helpers';
+import { MakeSetAtomFamily } from '../../State/Hooks';
+import { focusedKeysFuncFam } from '../../State/KeyBuffer';
+import { ignoreArticlesState } from '../../State/SimpleSettings';
 
-import { albumByKey, allAlbumsState } from 'www/Jotai/Albums';
-import { allArtistsState } from 'www/Jotai/Artists';
-import { allSongsState, songListFromKey } from 'www/Jotai/Songs';
+import { albumByKey, allAlbumsState } from 'www/State/Albums';
+import { allArtistsState } from 'www/State/Artists';
+import { allSongsState, songListFromKey } from 'www/State/Songs';
 import './styles/Albums.css';
 
 const { wrn } = MakeLog('EMP:render:Albums');

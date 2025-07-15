@@ -14,9 +14,6 @@ import { FullMetadata, Metadata } from '@freik/media-core';
 import { isArrayOfString, isDefined, isString } from '@freik/typechk';
 import { useEffect, useState } from 'react';
 import { st } from 'www/Constants';
-import { albumKeyFromSongKey } from 'www/Jotai/Albums';
-import { useJotaiCallback } from 'www/Jotai/Helpers';
-import { metadataEditCountState } from 'www/Jotai/MediaInfo';
 import {
   AlbumKey,
   IpcCall,
@@ -24,6 +21,9 @@ import {
   SongKey,
   StrId,
 } from 'www/Shared/CommonTypes';
+import { albumKeyFromSongKey } from 'www/State/Albums';
+import { useJotaiCallback } from 'www/State/Helpers';
+import { metadataEditCountState } from 'www/State/MediaInfo';
 import { PostMain, SendMain } from 'www/Tools/Ipc';
 import { ShowOpenDialog } from 'www/Tools/Utilities';
 import { getAlbumImageUrl } from 'www/Utils';

@@ -2,9 +2,9 @@ import { isBoolean, isNumber, typecheck } from '@freik/typechk';
 import { atom } from 'jotai';
 
 import { IgnoreItem } from 'www/Constants';
-import { atomWithMainStorage } from 'www/Jotai/Storage';
 import { CurrentView, StorageId } from 'www/Shared/CommonTypes';
 import { isCurrentView } from 'www/Shared/EnumTypeSupport';
+import { atomWithMainStorage } from 'www/State/Storage';
 
 export const mutedState = atomWithMainStorage(StorageId.Mute, false, isBoolean);
 export const volumeState = atomWithMainStorage(StorageId.Volume, 0.5, isNumber); // Volume as a percentage (0-100)

@@ -3,8 +3,8 @@ import { useAtomValue } from 'jotai';
 import { ReactElement } from 'react';
 import { AlbumKey, ArtistKey, Song } from 'www/Shared/CommonTypes';
 
-import { albumByKey } from '../Jotai/Albums';
-import { artistStringStateFamily } from '../Jotai/Artists';
+import { albumByKey } from '../State/Albums';
+import { artistStringStateFamily } from '../State/Artists';
 
 export function ArtistNameFromArtistIds({
   artistIds,

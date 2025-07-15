@@ -13,7 +13,7 @@ import {
 } from 'react';
 
 /*
-import { playOrderDisplayingState } from '../Jotai/Local';
+import { playOrderDisplayingState } from '../State/Local';
 import { mySliderStyles } from './Utilities';
 */
 import {
@@ -37,7 +37,7 @@ import {
 import { isMutableRefObject } from 'www/WebHelpers';
 import { onClickPlayPause } from './PlaybackControls';
 
-import { useJotaiCallback } from 'www/Jotai/Helpers';
+import { useJotaiCallback } from 'www/State/Helpers';
 import '../styles/SongPlaying.css';
 
 const { log } = MakeLog('EMP:render:SongPlayback');
