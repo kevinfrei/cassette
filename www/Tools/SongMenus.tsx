@@ -9,7 +9,7 @@ import { isString } from '@freik/typechk';
 import { useAtomValue } from 'jotai';
 import { ReactElement, useCallback } from 'react';
 import { SongKey } from 'www/Shared/CommonTypes';
-import { songListLikeNumberFromStringFam } from '../Jotai/LikesAndHates';
+import { songListLikeNumberFromStringFam } from '../State/LikesAndHates';
 import { ErrorBoundary } from './Utilities';
 
 export type SongListMenuData = { data: string; spot?: Point };

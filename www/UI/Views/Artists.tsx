@@ -14,13 +14,6 @@ import { MakeLog } from '@freik/logger';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
 import { ReactElement, useCallback, useState } from 'react';
-import { allAlbumsState } from 'www/Jotai/Albums';
-import {
-  allArtistsState,
-  artistByKey,
-  filteredArtistsState,
-} from 'www/Jotai/Artists';
-import { allSongsState, songListFromKey } from 'www/Jotai/Songs';
 import {
   Album,
   AlbumKey,
@@ -28,6 +21,13 @@ import {
   ArtistKey,
   CurrentView,
 } from 'www/Shared/CommonTypes';
+import { allAlbumsState } from 'www/State/Albums';
+import {
+  allArtistsState,
+  artistByKey,
+  filteredArtistsState,
+} from 'www/State/Artists';
+import { allSongsState, songListFromKey } from 'www/State/Songs';
 import {
   AlbumForSongRender,
   ArtistNameFromArtistIds,
@@ -47,11 +47,11 @@ import {
   SortSongsFromArtists,
 } from 'www/Tools/Sorting';
 import { getArtistImageUrl, GetIndexOf } from 'www/Utils';
-import { AddSongs } from '../../Jotai/API';
-import { useJotaiCallback } from '../../Jotai/Helpers';
-import { MakeSetAtomFamily } from '../../Jotai/Hooks';
-import { focusedKeysFuncFam } from '../../Jotai/KeyBuffer';
-import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
+import { AddSongs } from '../../State/API';
+import { useJotaiCallback } from '../../State/Helpers';
+import { MakeSetAtomFamily } from '../../State/Hooks';
+import { focusedKeysFuncFam } from '../../State/KeyBuffer';
+import { ignoreArticlesState } from '../../State/SimpleSettings';
 
 import './styles/Artists.css';
 

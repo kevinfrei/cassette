@@ -6,8 +6,8 @@ import {
   shuffleState,
   songListState,
   songPlaybackOrderState,
-} from 'www/Jotai/SongPlayback';
-import { isMiniplayerState, playOrderDisplayingState } from '../../Jotai/Local';
+} from 'www/State/SongPlayback';
+import { isMiniplayerState, playOrderDisplayingState } from '../../State/Local';
 import { SimpleSongsList } from './MixedSongs';
 
 export function PlaybackOrder(): ReactElement {

@@ -2,19 +2,19 @@ import { ComboBox, IComboBox, IComboBoxOption } from '@fluentui/react';
 import { isDefined, isString } from '@freik/typechk';
 import { useAtom, useAtomValue } from 'jotai';
 import { ReactElement } from 'react';
-import { albumByKey, allAlbumsState } from 'www/Jotai/Albums';
-import { artistByKey, filteredArtistsState } from 'www/Jotai/Artists';
-import { allAlbumDescriptionsState } from 'www/Jotai/DisplayData';
 import {
   AlbumKey,
   Artist,
   ArtistKey,
   PlaylistName,
 } from 'www/Shared/CommonTypes';
+import { albumByKey, allAlbumsState } from 'www/State/Albums';
+import { artistByKey, filteredArtistsState } from 'www/State/Artists';
+import { allAlbumDescriptionsState } from 'www/State/DisplayData';
 import { AlbumDescriptionWithKey } from 'www/State/SongState';
-import { useJotaiCallback } from '../../../Jotai/Helpers';
-import { WritableAtomType } from '../../../Jotai/Hooks';
-import { playlistNamesState } from '../../../Jotai/PlaylistControl';
+import { useJotaiCallback } from '../../../State/Helpers';
+import { WritableAtomType } from '../../../State/Hooks';
+import { playlistNamesState } from '../../../State/PlaylistControl';
 
 export function PlaylistSelector({
   value,

@@ -12,9 +12,6 @@ import { MakeLog } from '@freik/logger';
 import { hasFieldType, isBoolean } from '@freik/typechk';
 import { useAtomValue } from 'jotai';
 import { ReactElement, useCallback, useState } from 'react';
-import { allAlbumsState } from 'www/Jotai/Albums';
-import { allArtistsState } from 'www/Jotai/Artists';
-import { allSongsState } from 'www/Jotai/Songs';
 import {
   Album,
   AlbumKey,
@@ -24,7 +21,10 @@ import {
   Song,
   SongKey,
 } from 'www/Shared/CommonTypes';
+import { allAlbumsState } from 'www/State/Albums';
+import { allArtistsState } from 'www/State/Artists';
 import { searchTermState } from 'www/State/SimpleSavedState';
+import { allSongsState } from 'www/State/Songs';
 import {
   altRowRenderer,
   HeaderExpanderClick,
@@ -33,7 +33,7 @@ import {
 } from 'www/Tools/SongList';
 import { MakeSortKey } from 'www/Tools/Sorting';
 import { GetDataForSong, SongData } from '../../DataSchema';
-import { AddSongs } from '../../Jotai/API';
+import { AddSongs } from '../../State/API';
 import {
   SongDetailClick,
   SongListDetailContextMenuClick,

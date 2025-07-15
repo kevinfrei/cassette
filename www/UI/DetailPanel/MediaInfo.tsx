@@ -10,15 +10,15 @@ import { useAtom, useAtomValue } from 'jotai';
 import {
   commonMetadataFromSongKeys,
   mediaInfoStateFamily,
-} from '../../Jotai/MediaInfo';
+} from '../../State/MediaInfo';
 import { SimpleSongsList } from './../Views/MixedSongs';
 import { MetadataEditor } from './MetadataEditor';
 
 import { Expandable } from '@freik/fluentui-tools';
-import { albumByKey } from 'www/Jotai/Albums';
-import { artistStringStateFamily } from 'www/Jotai/Artists';
-import { songByKey } from 'www/Jotai/Songs';
 import { IpcCall } from 'www/Shared/CommonTypes';
+import { albumByKey } from 'www/State/Albums';
+import { artistStringStateFamily } from 'www/State/Artists';
+import { songByKey } from 'www/State/Songs';
 import { SendMain } from 'www/Tools/Ipc';
 import { altRowRenderer } from 'www/Tools/SongList';
 import { divGrand, fractionalSecondsStrToHMS } from 'www/Utils';

@@ -2,17 +2,18 @@ import { MakeLog } from '@freik/logger';
 import { hasStrField } from '@freik/typechk';
 import { ForwardedRef } from 'react';
 
-import { MaybePlayNext, MaybePlayPrev } from '../Jotai/API';
-import { curViewFunc } from '../Jotai/CurrentView';
-import { mediaTimePercentFunc, mediaTimeState } from '../Jotai/MediaPlaying';
-import { playlistStateFamily } from '../Jotai/PlaylistControl';
-import { mutedState, volumeState } from '../Jotai/SimpleSettings';
-import { repeatState, shuffleState } from '../Jotai/SongPlayback';
-import { getStore, MaybeStore } from '../Jotai/Storage';
-// import { onClickPlayPause } from './PlaybackControls';
-// imp ort { addLocation } from './Views/Settings';
 import { FocusSearch } from 'www/Globals';
 import { CurrentView } from 'www/Shared/CommonTypes';
+import { MaybePlayNext, MaybePlayPrev } from '../State/API';
+import { curViewFunc } from '../State/CurrentView';
+import { mediaTimePercentFunc, mediaTimeState } from '../State/MediaPlaying';
+import { playlistStateFamily } from '../State/PlaylistControl';
+import { mutedState, volumeState } from '../State/SimpleSavedState';
+import { repeatState, shuffleState } from '../State/SongPlayback';
+import { getStore, MaybeStore } from '../State/Storage';
+
+// import { onClickPlayPause } from './PlaybackControls';
+// import { addLocation } from './Views/Settings';
 
 const { wrn, log } = MakeLog('EMP:render:MenuHandler');
 // log.enabled = true;
