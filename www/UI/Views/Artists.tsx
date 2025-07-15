@@ -14,6 +14,13 @@ import { MakeLog } from '@freik/logger';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
 import { ReactElement, useCallback, useState } from 'react';
+import { allAlbumsState } from 'www/Jotai/Albums';
+import {
+  allArtistsState,
+  artistByKey,
+  filteredArtistsState,
+} from 'www/Jotai/Artists';
+import { allSongsState, songListFromKey } from 'www/Jotai/Songs';
 import {
   Album,
   AlbumKey,
@@ -27,47 +34,25 @@ import {
   YearForSongRender,
 } from 'www/Tools/SimpleTags';
 import {
+  altRowRenderer,
+  ProcessSongGroupData,
+  StickyRenderDetailsHeader,
+} from 'www/Tools/SongList';
+import { SongListMenu, SongListMenuData } from 'www/Tools/SongMenus';
+import {
   articlesCmp,
   ArtistSong,
   MakeSortKey,
   noArticlesCmp,
   SortSongsFromArtists,
 } from 'www/Tools/Sorting';
+import { getArtistImageUrl, GetIndexOf } from 'www/Utils';
 import { AddSongs } from '../../Jotai/API';
 import { useJotaiCallback } from '../../Jotai/Helpers';
 import { MakeSetAtomFamily } from '../../Jotai/Hooks';
 import { focusedKeysFuncFam } from '../../Jotai/KeyBuffer';
 import { ignoreArticlesState } from '../../Jotai/SimpleSettings';
-// import { SongListFromKey } from '../../Recoil/api';
-// import {
-//   allAlbumsFunc,
-//   allArtistsFunc,
-//   allSongsFunc,
-//   artistByKeyFuncFam,
-//   filteredArtistsFunc,
-// } from '../../Recoil/ReadOnly';
-// import { getArtistImageUrl, GetIndexOf } from '../../Tools';
-// import {
-//   altRowRenderer,
-//   ProcessSongGroupData,
-//   StickyRenderDetailsHeader,
-// } from '../SongList';
-// import { SongListMenu, SongListMenuData } from '../SongMenus';
 
-import { allAlbumsState } from 'www/Jotai/Albums';
-import {
-  allArtistsState,
-  artistByKey,
-  filteredArtistsState,
-} from 'www/Jotai/Artists';
-import { allSongsState, songListFromKey } from 'www/Jotai/Songs';
-import {
-  altRowRenderer,
-  ProcessSongGroupData,
-  StickyRenderDetailsHeader,
-} from 'www/Tools/SongList';
-import { SongListMenu, SongListMenuData } from 'www/Tools/SongMenus';
-import { getArtistImageUrl, GetIndexOf } from 'www/Utils';
 import './styles/Artists.css';
 
 const { wrn } = MakeLog('EMP:render:Artists');
