@@ -51,7 +51,7 @@ export type Dbl = TypeId.Dbl;
 
 export type Int = U8 | I8 | U16 | I16 | U32 | I32 | U64 | I64;
 export type Num = Int | Flt | Dbl;
-export type Simple = Str | Char | Int | Bool | Flt | Dbl;
+export type Simple = Str | Char | Num | Bool;
 
 export type ObjType = { t: TypeId.Obj; d: Of<Anonymous> };
 export type SubType = { t: TypeId.Sub; p: string; d: Of<Anonymous> };
