@@ -1,6 +1,6 @@
 import { Song, SongKey } from '@freik/media-core';
-import { songDetailState } from '../../State/Local';
-import { getStore } from '../../State/Storage';
+import { songDetailState } from 'www/State/Local';
+import { getStore } from 'www/State/Storage';
 
 export function SongDetailClick(song: Song, shift?: boolean): void {
   const store = getStore();

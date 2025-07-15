@@ -18,7 +18,6 @@ import {
   SongKey,
   VAType,
 } from 'www/Shared/CommonTypes';
-import { AlbumDescriptionWithKey, SongDescription } from 'www/State/SongState';
 import { isPlaylistName, ShuffleArray } from 'www/Utils';
 import { albumByKey, maybeAlbumByKey } from './Albums';
 import { artistStringStateFamily } from './Artists';
@@ -44,6 +43,7 @@ import {
   songPlaybackOrderState,
 } from './SongPlayback';
 import { maybeSongByKey } from './Songs';
+import { AlbumDescriptionWithKey, SongDescription } from './SongState';
 import { getStore, MaybeStore } from './Storage';
 
 /**

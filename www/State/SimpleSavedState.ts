@@ -4,7 +4,7 @@ import { atom } from 'jotai';
 import { IgnoreItem } from 'www/Constants';
 import { CurrentView, StorageId } from 'www/Shared/CommonTypes';
 import { isCurrentView } from 'www/Shared/EnumTypeSupport';
-import { atomWithMainStorage } from 'www/State/Storage';
+import { atomWithMainStorage } from './Storage';
 
 export const mutedState = atomWithMainStorage(StorageId.Mute, false, isBoolean);
 export const volumeState = atomWithMainStorage(StorageId.Volume, 0.5, isNumber); // Volume as a percentage (0-100)

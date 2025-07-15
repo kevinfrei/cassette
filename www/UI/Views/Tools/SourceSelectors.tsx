@@ -11,10 +11,10 @@ import {
 import { albumByKey, allAlbumsState } from 'www/State/Albums';
 import { artistByKey, filteredArtistsState } from 'www/State/Artists';
 import { allAlbumDescriptionsState } from 'www/State/DisplayData';
+import { useJotaiCallback } from 'www/State/Helpers';
+import { WritableAtomType } from 'www/State/Hooks';
+import { playlistNamesState } from 'www/State/PlaylistControl';
 import { AlbumDescriptionWithKey } from 'www/State/SongState';
-import { useJotaiCallback } from '../../../State/Helpers';
-import { WritableAtomType } from '../../../State/Hooks';
-import { playlistNamesState } from '../../../State/PlaylistControl';
 
 export function PlaylistSelector({
   value,

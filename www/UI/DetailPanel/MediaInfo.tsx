@@ -10,7 +10,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import {
   commonMetadataFromSongKeys,
   mediaInfoStateFamily,
-} from '../../State/MediaInfo';
+} from 'www/State/MediaInfo';
 import { SimpleSongsList } from './../Views/MixedSongs';
 import { MetadataEditor } from './MetadataEditor';
 
