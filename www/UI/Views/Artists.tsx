@@ -22,11 +22,16 @@ import {
   CurrentView,
 } from 'www/Shared/CommonTypes';
 import { allAlbumsState } from 'www/State/Albums';
+import { AddSongs } from 'www/State/API';
 import {
   allArtistsState,
   artistByKey,
   filteredArtistsState,
 } from 'www/State/Artists';
+import { useJotaiCallback } from 'www/State/Helpers';
+import { MakeSetAtomFamily } from 'www/State/Hooks';
+import { focusedKeysFuncFam } from 'www/State/KeyBuffer';
+import { ignoreArticlesState } from 'www/State/SimpleSettings';
 import { allSongsState, songListFromKey } from 'www/State/Songs';
 import {
   AlbumForSongRender,
@@ -47,11 +52,6 @@ import {
   SortSongsFromArtists,
 } from 'www/Tools/Sorting';
 import { getArtistImageUrl, GetIndexOf } from 'www/Utils';
-import { AddSongs } from '../../State/API';
-import { useJotaiCallback } from '../../State/Helpers';
-import { MakeSetAtomFamily } from '../../State/Hooks';
-import { focusedKeysFuncFam } from '../../State/KeyBuffer';
-import { ignoreArticlesState } from '../../State/SimpleSettings';
 
 import './styles/Artists.css';
 

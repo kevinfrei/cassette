@@ -16,8 +16,7 @@ import {
   IpcCall,
   TranscodeSource,
 } from 'www/Shared/CommonTypes';
-import { ShowOpenDialog, StringSpinButton } from 'www/Tools/Utilities';
-import { useJotaiCallback } from '../../../State/Helpers';
+import { useJotaiCallback } from 'www/State/Helpers';
 import {
   destLocationState,
   sourceLocationAlbumState,
@@ -28,7 +27,8 @@ import {
   sourceLocationTypeState,
   validSourceState,
   xcodeBitRateState,
-} from '../../../State/Transcode';
+} from 'www/State/Transcode';
+import { ShowOpenDialog, StringSpinButton } from 'www/Tools/Utilities';
 import {
   AlbumSelector,
   ArtistSelector,

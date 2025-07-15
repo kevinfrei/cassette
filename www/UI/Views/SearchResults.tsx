@@ -22,6 +22,7 @@ import {
   SongKey,
 } from 'www/Shared/CommonTypes';
 import { allAlbumsState } from 'www/State/Albums';
+import { AddSongs } from 'www/State/API';
 import { allArtistsState } from 'www/State/Artists';
 import { searchTermState } from 'www/State/SimpleSavedState';
 import { allSongsState } from 'www/State/Songs';
@@ -33,7 +34,6 @@ import {
 } from 'www/Tools/SongList';
 import { MakeSortKey } from 'www/Tools/Sorting';
 import { GetDataForSong, SongData } from '../../DataSchema';
-import { AddSongs } from '../../State/API';
 import {
   SongDetailClick,
   SongListDetailContextMenuClick,

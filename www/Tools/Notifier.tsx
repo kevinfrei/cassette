@@ -2,7 +2,7 @@ import { MessageBar, MessageBarType } from '@fluentui/react';
 import { useAtom } from 'jotai';
 import { ReactElement, useEffect } from 'react';
 
-import { displayMessageState, recentlyQueuedState } from '../State/Local';
+import { displayMessageState, recentlyQueuedState } from 'www/State/Local';
 
 import './styles/Notifier.css';
 

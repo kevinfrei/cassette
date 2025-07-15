@@ -31,7 +31,23 @@ import {
   SongKey,
 } from 'www/Shared/CommonTypes';
 import { allAlbumsState } from 'www/State/Albums';
+import { RemoveSongFromNowPlaying, StopAndClear } from 'www/State/API';
 import { allArtistsState } from 'www/State/Artists';
+import { useJotaiAsyncCallback, useJotaiCallback } from 'www/State/Helpers';
+import { isMiniplayerState, nowPlayingSortState } from 'www/State/Local';
+import {
+  playlistNamesState,
+  playlistStateFamily,
+  saveableState,
+} from 'www/State/PlaylistControl';
+import { ignoreArticlesState } from 'www/State/SimpleSettings';
+import {
+  activePlaylistState,
+  currentSongIndexState,
+  curSongsState,
+  songListState,
+  songPlaybackOrderState,
+} from 'www/State/SongPlayback';
 import {
   AlbumForSongRender,
   ArtistsForSongRender,
@@ -42,22 +58,6 @@ import { SongListMenu, SongListMenuData } from 'www/Tools/SongMenus';
 import { SortKey, SortSongList } from 'www/Tools/Sorting';
 import { isPlaylistName } from 'www/Utils';
 import { GetHelperText } from 'www/WebHelpers';
-import { RemoveSongFromNowPlaying, StopAndClear } from '../../State/API';
-import { useJotaiAsyncCallback, useJotaiCallback } from '../../State/Helpers';
-import { isMiniplayerState, nowPlayingSortState } from '../../State/Local';
-import {
-  playlistNamesState,
-  playlistStateFamily,
-  saveableState,
-} from '../../State/PlaylistControl';
-import { ignoreArticlesState } from '../../State/SimpleSettings';
-import {
-  activePlaylistState,
-  currentSongIndexState,
-  curSongsState,
-  songListState,
-  songPlaybackOrderState,
-} from '../../State/SongPlayback';
 
 import { LikeOrHate } from '../Liker';
 import './styles/NowPlaying.css';

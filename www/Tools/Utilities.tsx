@@ -21,10 +21,10 @@ import {
   useEffect,
 } from 'react';
 import { IpcCall, OpenDialogOptions } from 'www/Shared/CommonTypes';
+import { keyBufferState } from 'www/State/KeyBuffer';
+import { isMiniplayerState } from 'www/State/Local';
+import { saveableState } from 'www/State/PlaylistControl';
 import { isSearchBox } from 'www/UI/Sidebar';
-import { keyBufferState } from '../State/KeyBuffer';
-import { isMiniplayerState } from '../State/Local';
-import { saveableState } from '../State/PlaylistControl';
 import { CallMain, SendMain } from './Ipc';
 // import { MenuHandler } from './MenuHandler';
 import { Atom, WritableAtom } from 'jotai';

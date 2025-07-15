@@ -4,7 +4,7 @@ import { useAtomValue } from 'jotai';
 import { ReactElement } from 'react';
 
 import { TranscodeState } from 'www/Shared/CommonTypes';
-import { transcodeStatusState } from '../../../State/Transcode';
+import { transcodeStatusState } from 'www/State/Transcode';
 
 function completed(xcs: TranscodeState): number {
   return (

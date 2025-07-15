@@ -1,10 +1,10 @@
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import { Album, AlbumKey, SongKey, VAType } from 'www/Shared/CommonTypes';
-import { AlbumDescriptionWithKey, SongDescription } from 'www/State/SongState';
 import { albumByKey, allAlbumsState } from './Albums';
 import { artistStringStateFamily } from './Artists';
 import { maybeSongByKey } from './Songs';
+import { AlbumDescriptionWithKey, SongDescription } from './SongState';
 
 export const descriptionFromAlbumKey = atomFamily((ak: AlbumKey) =>
   atom(async (get): Promise<AlbumDescriptionWithKey> => {

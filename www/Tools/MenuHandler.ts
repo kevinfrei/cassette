@@ -4,13 +4,13 @@ import { ForwardedRef } from 'react';
 
 import { FocusSearch } from 'www/Globals';
 import { CurrentView } from 'www/Shared/CommonTypes';
-import { MaybePlayNext, MaybePlayPrev } from '../State/API';
-import { curViewFunc } from '../State/CurrentView';
-import { mediaTimePercentFunc, mediaTimeState } from '../State/MediaPlaying';
-import { playlistStateFamily } from '../State/PlaylistControl';
-import { mutedState, volumeState } from '../State/SimpleSavedState';
-import { repeatState, shuffleState } from '../State/SongPlayback';
-import { getStore, MaybeStore } from '../State/Storage';
+import { MaybePlayNext, MaybePlayPrev } from 'www/State/API';
+import { curViewFunc } from 'www/State/CurrentView';
+import { mediaTimePercentFunc, mediaTimeState } from 'www/State/MediaPlaying';
+import { playlistStateFamily } from 'www/State/PlaylistControl';
+import { mutedState, volumeState } from 'www/State/SimpleSavedState';
+import { repeatState, shuffleState } from 'www/State/SongPlayback';
+import { getStore, MaybeStore } from 'www/State/Storage';
 
 // import { onClickPlayPause } from './PlaybackControls';
 // import { addLocation } from './Views/Settings';

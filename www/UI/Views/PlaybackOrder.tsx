@@ -1,13 +1,13 @@
 import { IDetailsRowProps, Panel, PanelType } from '@fluentui/react';
 import { useAtom, useAtomValue } from 'jotai';
 import { ReactElement } from 'react';
+import { isMiniplayerState, playOrderDisplayingState } from 'www/State/Local';
 import {
   currentIndexState,
   shuffleState,
   songListState,
   songPlaybackOrderState,
 } from 'www/State/SongPlayback';
-import { isMiniplayerState, playOrderDisplayingState } from '../../State/Local';
 import { SimpleSongsList } from './MixedSongs';
 
 export function PlaybackOrder(): ReactElement {
