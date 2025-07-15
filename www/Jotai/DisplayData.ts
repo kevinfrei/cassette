@@ -69,7 +69,7 @@ export const songDescriptionFromSongKey = atomFamily((sk: SongKey) =>
   }),
 );
 
-export const songDescriptionFromSongList = atomFamily((sks: SongKey[]) =>
+export const songDescriptionsFromSongList = atomFamily((sks: SongKey[]) =>
   atom(
     async (get): Promise<SongDescription[]> =>
       Promise.all(
