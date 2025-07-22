@@ -1,5 +1,5 @@
 {
-  "name": "freik-local-app",
+  "name": "cassette",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -22,11 +22,11 @@
     "rbr": "bun run rbld && bun run rrun",
     "typecheck": "tsc --noEmit",
     "typechk": "tsc --noEmit",
-    "gen": "bun run scripts/gen.ts include/CommonTypes.hpp www/Shared/CommonTypes.ts"
+    "gen": "crow-idl www/Shared/Definitions.ts -c:include/CommonTypes.hpp -t:www/Shared/CommonTypes.ts"
   },
   "dependencies": {
     "@fluentui/react": "^8.123.1",
-    "@fluentui/react-components": "^9.66.6",
+    "@fluentui/react-components": "^9.67.0",
     "@fluentui/react-icons-mdl2": "^1.3.87",
     "@freik/containers": "^0.4.4",
     "@freik/fluentui-tools": "^1.2.4",
@@ -35,20 +35,21 @@
     "@freik/react-tools": "^0.3.4",
     "@freik/seqnum": "^1.3.4",
     "@freik/sync": "^0.4.4",
-    "@freik/typechk": "^0.8.4",
+    "@freik/typechk": "^0.9.0",
+    "crow-idl": "^0.1.0",
     "jotai": "^2.12.5",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
   "devDependencies": {
     "@freik/workspace": "^0.6.5",
-    "@types/bun": "^1.2.18",
+    "@types/bun": "^1.2.19",
     "@types/react": "18.3.23",
     "@types/react-dom": "18.3.7",
     "clang-format": "^1.8.0",
     "husky": "^9.1.7",
     "prettier": "^3.6.2",
-    "prettier-plugin-organize-imports": "^4.1.0",
+    "prettier-plugin-organize-imports": "^4.2.0",
     "typescript": "^5.8.3"
   }
 }
