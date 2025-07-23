@@ -23,6 +23,7 @@ import { SendMain } from 'www/Tools/Ipc';
 import { altRowRenderer } from 'www/Tools/SongList';
 import { divGrand, fractionalSecondsStrToHMS } from 'www/Utils';
 
+import { ReactElement } from 'react';
 import './styles/MediaInfo.css';
 
 const fileTypeMap = new Map([
@@ -55,7 +56,7 @@ function getSampleRate(sr: string | void): string {
 }
 
 // This is the header for single-file editing
-function MediaFormatDetails({ forSong }: { forSong: SongKey }): JSX.Element {
+function MediaFormatDetails({ forSong }: { forSong: SongKey }): ReactElement {
   const mediaInfo = useAtomValue(mediaInfoStateFamily(forSong));
 
   const fileType = getType(mediaInfo.audio.get('format.codec'));
@@ -95,7 +96,7 @@ function MediaFormatDetails({ forSong }: { forSong: SongKey }): JSX.Element {
     </>
   );
 }
-function RawMetadata({ songKey }: { songKey: SongKey }): JSX.Element {
+function RawMetadata({ songKey }: { songKey: SongKey }): ReactElement {
   const columns: IColumn[] = [
     {
       key: '0',
@@ -126,7 +127,7 @@ function RawMetadata({ songKey }: { songKey: SongKey }): JSX.Element {
   );
 }
 
-function SingleFileEditor({ songKey }: { songKey: SongKey }): JSX.Element {
+function SingleFileEditor({ songKey }: { songKey: SongKey }): ReactElement {
   const theSong = useAtomValue(songByKey(songKey));
   const theArtist = useAtomValue(artistStringStateFamily(theSong.artistIds));
   const moreArtists = useAtomValue(
@@ -157,16 +158,15 @@ function SingleFileEditor({ songKey }: { songKey: SongKey }): JSX.Element {
   );
 }
 
-function MultiFileEditor({ songKeys }: { songKeys: SongKey[] }): JSX.Element {
+function MultiFileEditor({ songKeys }: { songKeys: SongKey[] }): ReactElement {
   const allTheInfos = useAtomValue(commonMetadataFromSongKeys(songKeys));
   return <MetadataEditor forSongs={songKeys} {...allTheInfos} />;
 }
 
-export function MediaInfoTable({
-  keyOrKeys,
-}: {
+type MediaInfoProps = {
   keyOrKeys: SongKey | SongKey[];
-}): JSX.Element {
+};
+export function MediaInfoTable({ keyOrKeys }: MediaInfoProps): ReactElement {
   if (keyOrKeys.length === 0) {
     return <></>;
   }

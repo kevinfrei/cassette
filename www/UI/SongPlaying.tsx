@@ -2,7 +2,6 @@ import { Slider, Text } from '@fluentui/react';
 import { ListIcon } from '@fluentui/react-icons-mdl2';
 import { MakeLog } from '@freik/logger';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { useAtomCallback } from 'jotai/utils';
 import {
   ForwardedRef,
   forwardRef,
@@ -11,11 +10,7 @@ import {
   useCallback,
   useEffect,
 } from 'react';
-
-/*
-import { playOrderDisplayingState } from 'www/State/Local';
-import { mySliderStyles } from './Utilities';
-*/
+import { useJotaiCallback } from 'www/State/Helpers';
 import {
   mutedState,
   shuffleState,
@@ -34,10 +29,14 @@ import {
   mediaTimeRemainingState,
   mediaTimeState,
 } from 'www/State/TimeState';
-import { isMutableRefObject } from 'www/WebHelpers';
+import { isRefObject } from 'www/Utils';
 import { onClickPlayPause } from './PlaybackControls';
 
-import { useJotaiCallback } from 'www/State/Helpers';
+/*
+import { playOrderDisplayingState } from 'www/State/Local';
+import { mySliderStyles } from './Utilities';
+*/
+
 import '../styles/SongPlaying.css';
 
 const { log } = MakeLog('EMP:render:SongPlayback');
@@ -164,7 +163,7 @@ export const SongPlaying = forwardRef(
       if (rep && songList.length === 1) {
         // Because we rely on auto-play, if we just try to play the same song
         // again, it won't start playing
-        if (isMutableRefObject(audioRef)) {
+        if (isRefObject<HTMLAudioElement>(audioRef)) {
           void audioRef.current.play();
         }
       } else {
@@ -205,13 +204,13 @@ export const SongPlaying = forwardRef(
       });
     }, [songKey, metadata, picDataUri]);
     useEffect(() => {
-      if (isMutableRefObject(audioRef)) {
+      if (isRefObject<HTMLAudioElement>(audioRef)) {
         audioRef.current.volume = volumeLevel * volumeLevel;
       }
     }, [audioRef, volumeLevel]);
     // TODO: Make this effect only trigger due to user intervention
     useEffect(() => {
-      if (isMutableRefObject(audioRef)) {
+      if (isRefObject<HTMLAudioElement>(audioRef)) {
         const targetTime = audioRef.current.duration * playbackPercent;
         const currentTime = audioRef.current.currentTime;
 

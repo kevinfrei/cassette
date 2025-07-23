@@ -1,5 +1,3 @@
-import { hasFieldType, isObjectNonNull, typecheck } from '@freik/typechk';
-import { ForwardedRef, MutableRefObject } from 'react';
 import { Keys } from './Shared/CommonTypes';
 
 const HostOs: 'mac' | 'windows' | 'linux' = (() => {
@@ -26,10 +24,4 @@ export function GetHelperText(key: Keys) {
     return accPrefix + '-→';
   }
   return `${accPrefix}-${key}`;
-}
-
-export function isMutableRefObject<T>(
-  ref: ForwardedRef<T>,
-): ref is MutableRefObject<T> {
-  return isObjectNonNull(ref) && hasFieldType(ref, 'current', isObjectNonNull);
 }

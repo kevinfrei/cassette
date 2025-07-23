@@ -1,4 +1,5 @@
 // This is for getting at "global" stuff from the window object
+import { RefObject } from '@fluentui/react';
 import { MakeLog } from '@freik/logger';
 import {
   hasField,
@@ -7,7 +8,7 @@ import {
   isObjectNonNull,
   isString,
 } from '@freik/typechk';
-import { ForwardedRef, MutableRefObject } from 'react';
+import { ForwardedRef } from 'react';
 import { AlbumKey, ArtistKey, PlaylistName } from 'www/Shared/CommonTypes';
 import { SongInfo } from './Types';
 
@@ -113,14 +114,10 @@ export function divGrand(val: string): string {
   return flt;
 }
 
-export function isMutableRefObject<T>(
+export function isRefObject<T>(
   ref: ForwardedRef<T>,
-): ref is MutableRefObject<T> {
-  return (
-    isObjectNonNull(ref) &&
-    hasField(ref, 'current') &&
-    isObjectNonNull(ref.current)
-  );
+): ref is RefObject<T> & { current: T } {
+  return isObjectNonNull(ref) && hasFieldOf(ref, 'current', isObjectNonNull);
 }
 
 export function getAlbumImageUrl(albumKey: AlbumKey) {

@@ -12,7 +12,7 @@ import {
 import { MakeLog } from '@freik/logger';
 import { FullMetadata, Metadata } from '@freik/media-core';
 import { isArrayOfString, isDefined, isString } from '@freik/typechk';
-import { useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { st } from 'www/Constants';
 import {
   AlbumKey,
@@ -36,7 +36,7 @@ const pickCoverArtDialogOptions: OpenDialogOptions = {
   filters: [{ name: st(StrId.ImageName), extensions: ['jpg', 'jpeg', 'png'] }],
 };
 
-export function MetadataEditor(props: MetadataProps): JSX.Element {
+export function MetadataEditor(props: MetadataProps): ReactElement {
   const [artist, setArtist] = useState<false | string>(false);
   const [album, setAlbum] = useState<false | string>(false);
   const [track, setTrack] = useState<false | string>(false);

@@ -2,11 +2,12 @@ import { ContextualMenu, Dialog, DialogType } from '@fluentui/react';
 import { Spinner } from '@freik/fluentui-tools';
 import { useAtom, useAtomValue } from 'jotai';
 import { RESET } from 'jotai/utils';
+import { ReactElement } from 'react';
 import { maybeDataForSongFunc } from 'www/State/DisplayData';
 import { songDetailState } from 'www/State/Local';
 import { MediaInfoTable } from './MediaInfo';
 
-export function SongDetailPanel(): JSX.Element {
+export function SongDetailPanel(): ReactElement {
   const [detailSongs, setSongDetail] = useAtom(songDetailState);
   const songInfo = useAtomValue(maybeDataForSongFunc([...detailSongs]));
   const dismissClick = () => setSongDetail(RESET);
