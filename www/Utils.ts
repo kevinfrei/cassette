@@ -9,7 +9,12 @@ import {
   isString,
 } from '@freik/typechk';
 import { ForwardedRef } from 'react';
-import { AlbumKey, ArtistKey, PlaylistName } from 'www/Shared/CommonTypes';
+import {
+  AlbumKey,
+  ArtistKey,
+  Keys,
+  PlaylistName,
+} from 'www/Shared/CommonTypes';
 import { SongInfo } from './Types';
 
 const { log } = MakeLog('EMP:render:Tools');
@@ -140,4 +145,31 @@ export function diskNumName(
   } else {
     return [null, null];
   }
+}
+
+// Hurray for IIFE's :)
+const HostOs: 'mac' | 'windows' | 'linux' = (() => {
+  const ua = window.navigator.userAgent;
+  if (ua.indexOf('Mac') >= 0) {
+    return 'mac';
+  }
+  if (ua.indexOf('Windows') >= 0) {
+    return 'windows';
+  }
+  return 'linux';
+})();
+
+const accPrefix = HostOs === 'mac' ? '⌘' : 'Ctrl';
+
+export function GetHelperText(key: Keys) {
+  if (key.length === 1) {
+    return `${accPrefix}-${key}`;
+  }
+  if (key === Keys.PreviousTrack) {
+    return accPrefix + '-←';
+  }
+  if (key === Keys.NextTrack) {
+    return accPrefix + '-→';
+  }
+  return `${accPrefix}-${key}`;
 }

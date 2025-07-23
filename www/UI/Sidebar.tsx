@@ -1,15 +1,14 @@
 import { FontIcon, SearchBox, Text } from '@fluentui/react';
 import { hasStrField, isObjectNonNull } from '@freik/typechk';
 import { useAtom } from 'jotai';
-
-import { SetSearch } from 'www/Globals';
-import { GetHelperText } from 'www/WebHelpers';
-import { curViewState, searchTermState } from 'www/State/SimpleSavedState';
 import { ReactElement, useCallback } from 'react';
+import { st } from 'www/Constants';
+import { SetSearch } from 'www/Globals';
 import { CurrentView, Keys, StrId } from 'www/Shared/CommonTypes';
+import { curViewState, searchTermState } from 'www/State/SimpleSavedState';
+import { GetHelperText } from 'www/Utils';
 
 import '../styles/Sidebar.css';
-import { st } from 'www/Constants';
 
 type ViewEntry = {
   name: CurrentView;
@@ -51,8 +50,7 @@ function getEntry(
       key={index}
       className={`sidebar-container${extra}`}
       onClick={() => void setCurView(view.name)}
-      title={GetHelperText(view.accelerator)}
-    >
+      title={GetHelperText(view.accelerator)}>
       <span className="sidebar-icon" id={st(view.title).replace(/ /g, '-')}>
         &nbsp;
       </span>

@@ -20,7 +20,6 @@ import { useDialogState } from '@freik/react-tools';
 import { isNumber } from '@freik/typechk';
 import { atom, useAtom, useAtomValue } from 'jotai';
 import { ReactElement, useCallback, useState } from 'react';
-
 import {
   Album,
   AlbumKey,
@@ -56,10 +55,9 @@ import {
 import { altRowRenderer, MakeColumns } from 'www/Tools/SongList';
 import { SongListMenu, SongListMenuData } from 'www/Tools/SongMenus';
 import { SortKey, SortSongList } from 'www/Tools/Sorting';
-import { isPlaylistName } from 'www/Utils';
-import { GetHelperText } from 'www/WebHelpers';
-
+import { GetHelperText, isPlaylistName } from 'www/Utils';
 import { LikeOrHate } from '../Liker';
+
 import './styles/NowPlaying.css';
 
 const { wrn } = MakeLog('EMP:render:NowPlaying');

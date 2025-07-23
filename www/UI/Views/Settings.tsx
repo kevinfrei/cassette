@@ -14,13 +14,12 @@ import { useBoolState } from '@freik/react-tools';
 import { isDefined } from '@freik/typechk';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { ReactElement, useCallback, useState } from 'react';
-
 import { st } from 'www/Constants';
 import {
   ignoreItemsState,
   minSongCountForArtistListState,
 } from 'www/State/SimpleSavedState';
-import { GetHelperText } from 'www/WebHelpers';
+import { GetHelperText } from 'www/Utils';
 
 import {
   IgnoreItemType,
@@ -30,6 +29,7 @@ import {
   StrId,
 } from 'www/Shared/CommonTypes';
 import { PostMain, SendMessage } from 'www/Tools/Ipc';
+
 import './styles/Settings.css';
 
 const btnWidth: React.CSSProperties = { width: '155px', padding: 0 };

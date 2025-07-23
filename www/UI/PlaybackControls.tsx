@@ -15,8 +15,7 @@ import {
   shuffleState,
 } from 'www/State/SimpleSavedState';
 import { getStore, MyStore } from 'www/State/Storage';
-import { isRefObject } from 'www/Utils';
-import { GetHelperText } from 'www/WebHelpers';
+import { GetHelperText, isRefObject } from 'www/Utils';
 
 import '../styles/PlaybackControls.css';
 
