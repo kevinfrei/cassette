@@ -15,7 +15,7 @@
         "@freik/seqnum": "^1.3.4",
         "@freik/sync": "^0.4.4",
         "@freik/typechk": "^0.9.0",
-        "crow-idl": "^0.1.0",
+        "crow-idl": "^0.1.2",
         "jotai": "^2.12.5",
         "react": "18.3.1",
         "react-dom": "18.3.1",
@@ -320,7 +320,7 @@
 
     "concat-map": ["concat-map@0.0.1", "", {}, "sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg=="],
 
-    "crow-idl": ["crow-idl@0.1.0", "", { "dependencies": { "prettier-plugin-organize-imports": "^4.1.0" }, "peerDependencies": { "@freik/typechk": "^0.9.0", "prettier": "^3.6.2", "typescript": "^5" }, "bin": { "crow-idl": "build/src/gen.js" } }, "sha512-mG4b225olkPB/xeRtP5lmJYZoIYG9zqqQI/C8QlZhEO+jkI7geCS9B/VjNYe82rJvoDFKDwrDGcz+J2QFoOFPw=="],
+    "crow-idl": ["crow-idl@0.1.2", "", { "dependencies": { "prettier-plugin-organize-imports": "^4.1.0" }, "peerDependencies": { "@freik/typechk": "^0.9.0", "prettier": "^3.6.2", "typescript": "^5" }, "bin": { "crow-idl": "build/src/gen.js" } }, "sha512-DdxzMdW+mqPKmVRsCe0vdUE8Jl2j6hc/ExPqdCZdcLLeF9GZ/Zs99MGeyYcqrElWq4tlsEfbMe2bvEkxZm3/pg=="],
 
     "csstype": ["csstype@3.1.3", "", {}, "sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw=="],
 
