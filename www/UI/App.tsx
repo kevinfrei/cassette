@@ -23,7 +23,7 @@ function Tools(): ReactElement {
 }
 
 function TheActualApp(): ReactElement {
-  const audioRef = useRef<HTMLAudioElement>(null);
+  /*  const audioRef = useRef<HTMLAudioElement>(null);
   return (
     <div id="app">
       <span id="left-column" />
@@ -35,6 +35,17 @@ function TheActualApp(): ReactElement {
       <ViewSelector />
       <div className="SongDetailPanel" />
     </div>
+  );*/
+  return (
+    <audio
+      autoPlay={true}
+      src={'../tune/test.flac'}
+      onPlay={() => {}}
+      onPause={() => {}}
+      onEnded={() => {}}
+      onTimeUpdate={() => {}}
+      muted={false}
+    />
   );
 }
 

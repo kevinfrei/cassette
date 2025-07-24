@@ -227,7 +227,9 @@ export const SongPlaying = forwardRef(
       <audio
         ref={audioRef}
         autoPlay={true}
-        src={songKey !== '' ? 'trune://song/' + songKey : ''}
+        src={
+          '../tune/test.flac'
+        } /*{songKey !== '' ? 'trune://song/' + songKey : ''}*/
         onPlay={onPlayPause}
         onPause={onPlayPause}
         onEnded={onEnded}

@@ -34,21 +34,28 @@ std::filesystem::path home_env{getenv("HOME")};
 
 // This is fugly, most hopefully it's the only truly fugly thing here.
 #if defined(_WIN32)
-std::filesystem::path env_var{getenv("LOCALAPPDATA")};
+const std::filesystem::path cfg_var{getenv("LOCALAPPDATA")};
+const std::filesystem::path home_path{getenv("USERPROFILE")};
 std::filesystem::path relative_path = ".";
 #elif defined(__APPLE__)
-std::std::filesystem::path env_var{getenv("HOME")};
+const std::filesystem::path cfg_var{getenv("HOME")};
+const std::filesystem::path home_path{getenv("HOME")};
 std::filesystem::path relative_path = "Library/Application Support";
 #elif defined(__linux__)
-std::filesystem::path env_var{getenv("HOME")};
-std::filesystem::path relative_path = "Library/Application Support";
+const std::filesystem::path cfg_var{getenv("HOME")};
+const std::filesystem::path home_path{getenv("HOME")};
+std::filesystem::path relative_path = ".config";
 #else
 #error Unsupported platform
 #endif
 
+const std::filesystem::path& get_home_path() {
+  return home_path;
+}
+
 // Returns the path to the configuration directory for the application.
 std::filesystem::path get_path() {
-  return env_var / relative_path / files::get_app_name();
+  return cfg_var / relative_path / files::get_app_name();
 }
 
 std::filesystem::path get_persistence_path() {
