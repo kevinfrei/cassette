@@ -14,6 +14,9 @@
 
 namespace config {
 
+using read_lock = std::shared_lock<std::shared_mutex>;
+using write_lock = std::unique_lock<std::shared_mutex>;
+
 bool is_ready_storage = false;
 void set_ready() {
   is_ready_storage = true;
@@ -27,27 +30,25 @@ void not_ready() {
   is_ready_storage = false;
 }
 
+std::filesystem::path home_env{getenv("HOME")};
+
 // This is fugly, most hopefully it's the only truly fugly thing here.
 #if defined(_WIN32)
-const char* env_var = "LOCALAPPDATA";
+std::filesystem::path env_var{getenv("LOCALAPPDATA")};
 std::filesystem::path relative_path = ".";
 #elif defined(__APPLE__)
-const char* env_var = "HOME";
+std::std::filesystem::path env_var{getenv("HOME")};
 std::filesystem::path relative_path = "Library/Application Support";
 #elif defined(__linux__)
-const char* env_var = "HOME";
+std::filesystem::path env_var{getenv("HOME")};
 std::filesystem::path relative_path = "Library/Application Support";
 #else
 #error Unsupported platform
 #endif
 
-using read_lock = std::shared_lock<std::shared_mutex>;
-using write_lock = std::unique_lock<std::shared_mutex>;
-
 // Returns the path to the configuration directory for the application.
 std::filesystem::path get_path() {
-  return std::filesystem::path(getenv(env_var)) / relative_path /
-         files::get_app_name();
+  return env_var / relative_path / files::get_app_name();
 }
 
 std::filesystem::path get_persistence_path() {
