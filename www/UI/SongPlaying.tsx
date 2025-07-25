@@ -191,7 +191,7 @@ export const SongPlaying = forwardRef(
     };
     const metadata = useAtomValue(songDescriptionForSongState(songKey));
     const picDataUri = '/images/tune/key'; // useRecoilValue(picForKeyFam(songKey));
-    useEffect(() => {
+    /*useEffect(() => {
       navigator.mediaSession.metadata = new MediaMetadata({
         artist: metadata.artist,
         album: metadata.album,
@@ -202,7 +202,7 @@ export const SongPlaying = forwardRef(
           },
         ],
       });
-    }, [songKey, metadata, picDataUri]);
+    }, [songKey, metadata, picDataUri]);*/
     useEffect(() => {
       if (isRefObject<HTMLAudioElement>(audioRef)) {
         audioRef.current.volume = volumeLevel * volumeLevel;
@@ -228,7 +228,7 @@ export const SongPlaying = forwardRef(
         ref={audioRef}
         autoPlay={true}
         src={
-          '../tune/song.m4a'
+          '/tune/song.m4a'
         } /*{songKey !== '' ? 'trune://song/' + songKey : ''}*/
         onPlay={onPlayPause}
         onPause={onPlayPause}

@@ -6,6 +6,7 @@
 namespace handlers {
 
 crow::response file_path(const crow::request& req, const std::string& path);
+crow::response images(const crow::request&, const std::string& path);
 crow::response tune(const crow::request& req, const std::string& path);
 crow::response api(const crow::request& req, const std::string& path);
 crow::response keepalive();

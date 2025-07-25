@@ -25,6 +25,7 @@ void ConfigureRoutes(crow::SimpleApp& app, const std::string& /*url*/) {
   CROW_ROUTE(app, "/www/<path>")(handlers::file_path);
   CROW_ROUTE(app, "/api/<path>")(handlers::api);
   CROW_ROUTE(app, "/tune/<path>")(handlers::tune);
+  CROW_ROUTE(app, "/images/<path>")(handlers::images);
   CROW_ROUTE(app, "/keepalive")
       .methods(crow::HTTPMethod::GET,
                crow::HTTPMethod::POST,
