@@ -30,31 +30,46 @@ void not_ready() {
   is_ready_storage = false;
 }
 
-std::filesystem::path home_env{getenv("HOME")};
+bool inited = false;
+std::filesystem::path home_env;
+std::filesystem::path home_path;
+std::filesystem::path cfg_var;
+std::filesystem::path relative_path;
 
-// This is fugly, most hopefully it's the only truly fugly thing here.
+void init() {
+  if (!inited) {
 #if defined(_WIN32)
-const std::filesystem::path cfg_var{getenv("LOCALAPPDATA")};
-const std::filesystem::path home_path{getenv("USERPROFILE")};
-std::filesystem::path relative_path = ".";
+    home_env = getenv("USERPROFILE");
+    cfg_var = getenv("LOCALAPPDATA");
+    home_path = home_env;
+    relative_path = ".";
 #elif defined(__APPLE__)
-const std::filesystem::path cfg_var{getenv("HOME")};
-const std::filesystem::path home_path{getenv("HOME")};
-std::filesystem::path relative_path = "Library/Application Support";
+    home_env = getenv("HOME");
+    cfg_var = home_env;
+    home_path = home_env;
+    relative_path = std::filesystem::path{"Library"} / "Application Support";
 #elif defined(__linux__)
-const std::filesystem::path cfg_var{getenv("HOME")};
-const std::filesystem::path home_path{getenv("HOME")};
-std::filesystem::path relative_path = ".config";
+    home_env = getenv("HOME");
+    cfg_var = home_env;
+    home_path = home_env;
+    relative_path = ".config";
 #else
 #error Unsupported platform
 #endif
+    inited = true;
+  }
+}
+
+// This is fugly, most hopefully it's the only truly fugly thing here.
 
 const std::filesystem::path& get_home_path() {
+  init();
   return home_path;
 }
 
 // Returns the path to the configuration directory for the application.
 std::filesystem::path get_path() {
+  init();
   return cfg_var / relative_path / files::get_app_name();
 }
 
