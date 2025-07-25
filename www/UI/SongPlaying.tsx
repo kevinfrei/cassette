@@ -10,7 +10,7 @@ import {
   useCallback,
   useEffect,
 } from 'react';
-import { useJotaiCallback } from 'www/State/Helpers';
+import { useJotaiAsyncCallback, useJotaiCallback } from 'www/State/Helpers';
 import {
   mutedState,
   shuffleState,
@@ -29,7 +29,7 @@ import {
   mediaTimeRemainingState,
   mediaTimeState,
 } from 'www/State/TimeState';
-import { isRefObject } from 'www/Utils';
+import { isValidRefObject } from 'www/Utils';
 import { onClickPlayPause } from './PlaybackControls';
 
 /*
@@ -37,7 +37,11 @@ import { playOrderDisplayingState } from 'www/State/Local';
 import { mySliderStyles } from './Utilities';
 */
 
+import { MaybePlayNext } from 'www/State/API';
+import { repeatState, songListState } from 'www/State/SongPlayback';
+import { allSongsState } from 'www/State/Songs';
 import '../styles/SongPlaying.css';
+import { SongDetailClick } from './DetailPanel/Clickers';
 
 const { log } = MakeLog('EMP:render:SongPlayback');
 
@@ -96,14 +100,8 @@ function MediaTimeSlider(): ReactElement {
       disabled={songKey.length === 0}
       step={1e-7}
       // TODO: styles={mySliderStyles}
-      onChange={(value: number) => {
-        log('Change: ' + value);
-        setMediaTimePercent(value);
-      }}
-      onChanged={(_, value: number) => {
-        log('Changed:' + value);
-        log(_);
-      }}
+      onChange={(value: number) => setMediaTimePercent(value)}
+      // onChanged={(, value: number) => log('Changed:' + value)}
       showValue={false}
     />
   );
@@ -152,25 +150,21 @@ export const SongPlaying = forwardRef(
       () => onClickPlayPause(audioRef),
       [audioRef],
     );
-    const onEnded = () => {
+    const onEnded = useJotaiAsyncCallback(async (get, set) => {
       /* TODO: What happens when the song ends? */
-    };
-    /*
-      useMyTransaction((xact) => (): void => {
       log('Heading to the next song!!!');
-      const songList = xact.get(songListState);
-      const rep = xact.get(repeatState);
+      const songList = await get(songListState);
+      const rep = await get(repeatState);
       if (rep && songList.length === 1) {
         // Because we rely on auto-play, if we just try to play the same song
         // again, it won't start playing
-        if (isRefObject<HTMLAudioElement>(audioRef)) {
+        if (isValidRefObject<HTMLAudioElement>(audioRef)) {
           void audioRef.current.play();
         }
       } else {
-        setPlaying(MaybePlayNext(xact));
+        await MaybePlayNext();
       }
-    });
-    */
+    }, []);
     const onTimeUpdate = (ev: SyntheticEvent<HTMLMediaElement>) => {
       const ae = ev.currentTarget;
       log('time update');
@@ -190,8 +184,8 @@ export const SongPlaying = forwardRef(
       }
     };
     const metadata = useAtomValue(songDescriptionForSongState(songKey));
-    const picDataUri = '/images/tune/key'; // useRecoilValue(picForKeyFam(songKey));
-    /*useEffect(() => {
+    const picDataUri = '/images/tune/key'; // JODO: useRecoilValue(picForKeyFam(songKey));
+    useEffect(() => {
       navigator.mediaSession.metadata = new MediaMetadata({
         artist: metadata.artist,
         album: metadata.album,
@@ -202,15 +196,15 @@ export const SongPlaying = forwardRef(
           },
         ],
       });
-    }, [songKey, metadata, picDataUri]);*/
+    }, [songKey, metadata, picDataUri]);
     useEffect(() => {
-      if (isRefObject<HTMLAudioElement>(audioRef)) {
+      if (isValidRefObject<HTMLAudioElement>(audioRef)) {
         audioRef.current.volume = volumeLevel * volumeLevel;
       }
     }, [audioRef, volumeLevel]);
     // TODO: Make this effect only trigger due to user intervention
     useEffect(() => {
-      if (isRefObject<HTMLAudioElement>(audioRef)) {
+      if (isValidRefObject<HTMLAudioElement>(audioRef)) {
         const targetTime = audioRef.current.duration * playbackPercent;
         const currentTime = audioRef.current.currentTime;
 
@@ -225,33 +219,35 @@ export const SongPlaying = forwardRef(
     }, [audioRef, playbackPercent]);
     const audio = (
       <audio
+        // src={songKey !== '' ? '/tune/' + songKey : ''}
+        src={'/tune/song.m4a'}
         ref={audioRef}
         autoPlay={true}
-        src={
-          '/tune/song.m4a'
-        } /*{songKey !== '' ? 'trune://song/' + songKey : ''}*/
         onPlay={onPlayPause}
         onPause={onPlayPause}
         onEnded={onEnded}
         onTimeUpdate={onTimeUpdate}
         muted={isMuted}
+        controls={true}
       />
     );
-    const showDetail = () => {
-      /* TODO */
-    };
-    /*useMyTransaction(
-      (xact) => (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+    const showDetail = useJotaiAsyncCallback(
+      async (
+        get,
+        set,
+        event: React.MouseEvent<HTMLSpanElement, MouseEvent>,
+      ) => {
         if (songKey !== '') {
-          const songs = xact.get(allSongsFunc);
+          const songs = await get(allSongsState);
           const song = songs.get(songKey);
           if (song) {
             SongDetailClick(song, event.shiftKey);
           }
         }
       },
-    );*/
-    const flipDisplay = useJotaiCallback(
+      [songKey],
+    );
+    const flipDisplay = useJotaiAsyncCallback(
       async (get, set) =>
         await set(
           playOrderDisplayingState,

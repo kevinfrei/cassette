@@ -119,7 +119,7 @@ export function divGrand(val: string): string {
   return flt;
 }
 
-export function isRefObject<T>(
+export function isValidRefObject<T>(
   ref: ForwardedRef<T>,
 ): ref is RefObject<T> & { current: T } {
   return isObjectNonNull(ref) && hasFieldOf(ref, 'current', isObjectNonNull);
