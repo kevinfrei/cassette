@@ -15,7 +15,7 @@ import {
   shuffleState,
 } from 'www/State/SimpleSavedState';
 import { getStore, MyStore } from 'www/State/Storage';
-import { GetHelperText, isRefObject } from 'www/Utils';
+import { GetHelperText, isValidRefObject } from 'www/Utils';
 
 import '../styles/PlaybackControls.css';
 
@@ -25,7 +25,7 @@ export function onClickPlayPause(
   audioRef: ForwardedRef<HTMLAudioElement>,
   maybeStore?: MyStore,
 ): void {
-  if (!isRefObject<HTMLAudioElement>(audioRef)) {
+  if (!isValidRefObject<HTMLAudioElement>(audioRef)) {
     wrn('Clicking but no audio element');
     return;
   }
