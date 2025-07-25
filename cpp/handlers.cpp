@@ -63,6 +63,22 @@ crow::response file_path(const crow::request&, const std::string& path) {
   return resp;
 }
 
+crow::response images(const crow::request&, const std::string& /*path*/) {
+  quitting::keep_alive();
+  crow::response resp;
+  /*
+  std::filesystem::path p = files::get_web_dir() / "images" / path;
+  if (!std::filesystem::exists(p)) {
+    tools::e404(resp, "Image not found");
+    return resp;
+  }*/
+  std::filesystem::path p = config::get_home_path() / "src" / "cassette" /
+                            "www" / "img" / "album.svg";
+  resp.set_static_file_info_unsafe(p.generic_string());
+  resp.set_header("Content-type", files::path_to_mime_type(p));
+  return resp;
+}
+
 crow::response tune(const crow::request&, const std::string& path) {
   quitting::keep_alive();
   crow::response resp;
