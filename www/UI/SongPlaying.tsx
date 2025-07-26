@@ -142,47 +142,46 @@ export const SongPlaying = forwardRef(
   (_props, audioRef: ForwardedRef<HTMLAudioElement>): ReactElement => {
     const songKey = useAtomValue(curSongKeyState);
     const isShuffle = useAtomValue(shuffleState);
-    const isMuted = useAtomValue(mutedState);
     const volumeLevel = useAtomValue(volumeState);
     const playbackPercent = useAtomValue(mediaTimePercentState);
-    const setMediaTime = useSetAtom(mediaTimeState);
-    const onPlayPause = useCallback(
-      () => onClickPlayPause(audioRef),
-      [audioRef],
-    );
-    const onEnded = useJotaiAsyncCallback(async (get, set) => {
-      /* TODO: What happens when the song ends? */
-      log('Heading to the next song!!!');
-      const songList = await get(songListState);
-      const rep = await get(repeatState);
-      if (rep && songList.length === 1) {
-        // Because we rely on auto-play, if we just try to play the same song
-        // again, it won't start playing
-        if (isValidRefObject<HTMLAudioElement>(audioRef)) {
-          void audioRef.current.play();
-        }
-      } else {
-        await MaybePlayNext();
-      }
-    }, []);
-    const onTimeUpdate = (ev: SyntheticEvent<HTMLMediaElement>) => {
-      const ae = ev.currentTarget;
-      log('time update');
-      log(ev);
+    // const setMediaTime = useSetAtom(mediaTimeState);
+    // const onPlayPause = useCallback(
+    //   () => onClickPlayPause(audioRef),
+    //   [audioRef],
+    // );
+    // const onEnded = useJotaiAsyncCallback(async (get, set) => {
+    //   /* TODO: What happens when the song ends? */
+    //   log('Heading to the next song!!!');
+    //   const songList = await get(songListState);
+    //   const rep = await get(repeatState);
+    //   if (rep && songList.length === 1) {
+    //     // Because we rely on auto-play, if we just try to play the same song
+    //     // again, it won't start playing
+    //     if (isValidRefObject<HTMLAudioElement>(audioRef)) {
+    //       void audioRef.current.play();
+    //     }
+    //   } else {
+    //     await MaybePlayNext();
+    //   }
+    // }, []);
+    // const onTimeUpdate = (ev: SyntheticEvent<HTMLMediaElement>) => {
+    //   const ae = ev.currentTarget;
+    //   log('time update');
+    //   log(ev);
 
-      if (!Number.isNaN(ae.duration)) {
-        setMediaTime((prevTime: MediaTime) => {
-          if (
-            Math.trunc(ae.duration) !== Math.trunc(prevTime.duration) ||
-            Math.trunc(ae.currentTime) !== Math.trunc(prevTime.position)
-          ) {
-            return { position: ae.currentTime, duration: ae.duration };
-          } else {
-            return prevTime;
-          }
-        });
-      }
-    };
+    //   if (!Number.isNaN(ae.duration)) {
+    //     setMediaTime((prevTime: MediaTime) => {
+    //       if (
+    //         Math.trunc(ae.duration) !== Math.trunc(prevTime.duration) ||
+    //         Math.trunc(ae.currentTime) !== Math.trunc(prevTime.position)
+    //       ) {
+    //         return { position: ae.currentTime, duration: ae.duration };
+    //       } else {
+    //         return prevTime;
+    //       }
+    //     });
+    //   }
+    // };
     const metadata = useAtomValue(songDescriptionForSongState(songKey));
     const picDataUri = '/images/tune/key'; // JODO: useRecoilValue(picForKeyFam(songKey));
     useEffect(() => {
@@ -202,6 +201,7 @@ export const SongPlaying = forwardRef(
         audioRef.current.volume = volumeLevel * volumeLevel;
       }
     }, [audioRef, volumeLevel]);
+
     // TODO: Make this effect only trigger due to user intervention
     useEffect(() => {
       if (isValidRefObject<HTMLAudioElement>(audioRef)) {
@@ -217,20 +217,20 @@ export const SongPlaying = forwardRef(
         }
       }
     }, [audioRef, playbackPercent]);
-    const audio = (
-      <audio
-        // src={songKey !== '' ? '/tune/' + songKey : ''}
-        src={'/tune/song.m4a'}
-        ref={audioRef}
-        autoPlay={true}
-        onPlay={onPlayPause}
-        onPause={onPlayPause}
-        onEnded={onEnded}
-        onTimeUpdate={onTimeUpdate}
-        muted={isMuted}
-        controls={true}
-      />
-    );
+    // const audio = (
+    //   <audio
+    //     // src={songKey !== '' ? '/tune/' + songKey : ''}
+    //     src={'/tune/song.m4a'}
+    //     ref={audioRef}
+    //     autoPlay={true}
+    //     onPlay={onPlayPause}
+    //     onPause={onPlayPause}
+    //     onEnded={onEnded}
+    //     onTimeUpdate={onTimeUpdate}
+    //     muted={isMuted}
+    //     controls={true}
+    //   />
+    // );
     const showDetail = useJotaiAsyncCallback(
       async (
         get,
@@ -263,7 +263,6 @@ export const SongPlaying = forwardRef(
         <MediaTimePosition />
         <MediaTimeSlider />
         <MediaTimeRemaining />
-        {audio}
         <ListIcon
           id="showPlayOrder"
           onClick={flipDisplay}
