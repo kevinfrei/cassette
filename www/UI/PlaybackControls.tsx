@@ -8,13 +8,13 @@ import {
   useCallback,
 } from 'react';
 import { Keys } from 'www/Shared/CommonTypes';
-import { playingState } from 'www/State/MediaPlaying';
 import {
   NextRepeat,
   repeatState,
   shuffleState,
 } from 'www/State/SimpleSavedState';
 import { getStore, MyStore } from 'www/State/Storage';
+import { playingState } from 'www/State/TimeState';
 import { GetHelperText, isValidRefObject } from 'www/Utils';
 
 import '../styles/PlaybackControls.css';

@@ -32,7 +32,6 @@ import {
   nowPlayingSortState,
   recentlyQueuedState,
 } from './Local';
-import { mediaTimeState, playingState } from './MediaPlaying';
 import {
   activePlaylistState,
   currentIndexState,
@@ -45,6 +44,7 @@ import {
 import { maybeSongByKey } from './Songs';
 import { AlbumDescriptionWithKey, SongDescription } from './SongState';
 import { getStore, MaybeStore } from './Storage';
+import { mediaTimeState, playingState } from './TimeState';
 
 /**
  * Try to play the next song in the playlist
