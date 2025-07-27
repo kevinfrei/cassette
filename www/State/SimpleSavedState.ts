@@ -2,8 +2,7 @@ import { isBoolean, isNumber, typecheck } from '@freik/typechk';
 import { atom } from 'jotai';
 
 import { IgnoreItem } from 'www/Constants';
-import { CurrentView, StorageId } from 'www/Shared/CommonTypes';
-import { isCurrentView } from 'www/Shared/EnumTypeSupport';
+import { StorageId } from 'www/Shared/CommonTypes';
 import { atomWithMainStorage } from './Storage';
 
 export const mutedState = atomWithMainStorage(StorageId.Mute, false, isBoolean);
@@ -13,11 +12,7 @@ export type RepeatType = 'off' | 'one' | 'all';
 export const isRepeatType: typecheck<RepeatType> = (
   val: unknown,
 ): val is RepeatType => val === 'off' || val === 'one' || val === 'all';
-export const curViewState = atomWithMainStorage(
-  StorageId.CurrentView,
-  CurrentView.albums,
-  isCurrentView,
-);
+
 export const shuffleState = atomWithMainStorage(
   StorageId.Shuffle,
   false,

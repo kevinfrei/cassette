@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
 import { CSSProperties, ReactElement, Suspense, useState } from 'react';
 import { CurrentView } from 'www/Shared/CommonTypes';
-import { curViewState } from 'www/State/SimpleSavedState';
+import { curViewState } from 'www/State/CurrentView';
 import { NowPlayingView } from './NowPlaying';
 import { SettingsView } from './Settings';
 /*

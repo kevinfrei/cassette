@@ -5,7 +5,7 @@ import { ForwardedRef } from 'react';
 import { FocusSearch } from 'www/Globals';
 import { CurrentView } from 'www/Shared/CommonTypes';
 import { MaybePlayNext, MaybePlayPrev } from 'www/State/API';
-import { curViewFunc } from 'www/State/CurrentView';
+import { curViewState } from 'www/State/CurrentView';
 import { playlistStateFamily } from 'www/State/PlaylistControl';
 import { mutedState, volumeState } from 'www/State/SimpleSavedState';
 import { repeatState, shuffleState } from 'www/State/SongPlayback';
@@ -127,7 +127,7 @@ export function MenuHandler(
               break;
           }
           if (theView !== CurrentView.none) {
-            store.set(curViewFunc, theView).catch(wrn);
+            store.set(curViewState, theView).catch(wrn);
           }
         } else {
           wrn('Invalid view menu message:');
