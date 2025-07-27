@@ -33,7 +33,6 @@ import { allAlbumsState } from 'www/State/Albums';
 import { RemoveSongFromNowPlaying, StopAndClear } from 'www/State/API';
 import { allArtistsState } from 'www/State/Artists';
 import { useJotaiAsyncCallback, useJotaiCallback } from 'www/State/Helpers';
-import { isMiniplayerState, nowPlayingSortState } from 'www/State/Local';
 import {
   playlistNamesState,
   playlistStateFamily,
@@ -44,6 +43,8 @@ import {
   activePlaylistState,
   currentSongIndexState,
   curSongsState,
+  isMiniplayerState,
+  nowPlayingSortState,
   songListState,
   songPlaybackOrderState,
 } from 'www/State/SongPlayback';

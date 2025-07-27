@@ -22,8 +22,8 @@ import {
 } from 'react';
 import { IpcCall, OpenDialogOptions } from 'www/Shared/CommonTypes';
 import { keyBufferState } from 'www/State/KeyBuffer';
-import { isMiniplayerState } from 'www/State/Local';
 import { saveableState } from 'www/State/PlaylistControl';
+import { isMiniplayerState } from 'www/State/SongPlayback';
 import { isSearchBox } from 'www/UI/Sidebar';
 import { CallMain, SendMain } from './Ipc';
 // import { MenuHandler } from './MenuHandler';

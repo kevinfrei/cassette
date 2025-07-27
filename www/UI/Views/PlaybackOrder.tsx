@@ -1,17 +1,17 @@
 import { IDetailsRowProps, Panel, PanelType } from '@fluentui/react';
 import { useAtom, useAtomValue } from 'jotai';
-import { ReactElement } from 'react';
-import { isMiniplayerState, playOrderDisplayingState } from 'www/State/Local';
 import {
-  currentIndexState,
+  currentSongIndexState,
+  isMiniplayerState,
+  playOrderDisplayingState,
   shuffleState,
   songListState,
   songPlaybackOrderState,
 } from 'www/State/SongPlayback';
 import { SimpleSongsList } from './MixedSongs';
 
-export function PlaybackOrder(): ReactElement {
-  const curIndex = useAtomValue(currentIndexState);
+export function PlaybackOrder(): JSX.Element {
+  const curIndex = useAtomValue(currentSongIndexState);
   const isShuffle = useAtomValue(shuffleState);
   const isMiniplayer = useAtomValue(isMiniplayerState);
   const pbOrder = useAtomValue(songPlaybackOrderState);

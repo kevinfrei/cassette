@@ -7,6 +7,7 @@ import { MaybePlayNext } from 'www/State/API';
 import { useJotaiAsyncCallback } from 'www/State/Helpers';
 import {
   mutedState,
+  playOrderDisplayingState,
   repeatState,
   shuffleState,
   songListState,
@@ -15,7 +16,6 @@ import {
 import { allSongsState } from 'www/State/Songs';
 import {
   curSongKeyState,
-  playOrderDisplayingState,
   SongDescription,
   songDescriptionForSongState,
 } from 'www/State/SongState';
@@ -29,9 +29,7 @@ import {
 import { isValidRefObject } from 'www/Utils';
 import { SongDetailClick } from './DetailPanel/Clickers';
 import { onClickPlayPause } from './PlaybackControls';
-
 /*
-import { playOrderDisplayingState } from 'www/State/Local';
 import { mySliderStyles } from './Utilities';
 */
 

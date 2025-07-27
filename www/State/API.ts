@@ -28,14 +28,12 @@ import {
   onlyPlayLikesState,
 } from './LikesAndHates';
 import {
-  displayMessageState,
-  nowPlayingSortState,
-  recentlyQueuedState,
-} from './Local';
-import {
   activePlaylistState,
   currentIndexState,
   currentSongKeyState,
+  displayMessageState,
+  nowPlayingSortState,
+  recentlyQueuedState,
   repeatState,
   shuffleState,
   songListState,

@@ -2,17 +2,14 @@ import { useAtomValue } from 'jotai';
 import { CSSProperties, ReactElement, Suspense, useState } from 'react';
 import { CurrentView } from 'www/Shared/CommonTypes';
 import { curViewState } from 'www/State/CurrentView';
-import { NowPlayingView } from './NowPlaying';
-import { SettingsView } from './Settings';
-/*
-import { PlaybackOrder } from './PlaybackOrder';
-import { ToolsView } from './Tools';
-*/
 import { GroupedAlbumList } from './Albums';
 import { GroupedAristList } from './Artists';
 import { MixedSongsList } from './MixedSongs';
+import { NowPlayingView } from './NowPlaying';
+import { PlaybackOrder } from './PlaybackOrder';
 import { PlaylistView } from './Playlists';
 import { SearchResultsView } from './SearchResults';
+import { SettingsView } from './Settings';
 import { ToolsView } from './Tools';
 
 import './styles/Selector.css';
@@ -74,7 +71,7 @@ export function ViewSelector(): ReactElement {
   }
   return (
     <>
-      {/* <PlaybackOrder /> */}
+      <PlaybackOrder />
       {contents.map(([view, elem]) => (
         <div key={view} className="current-view" style={sl(view)}>
           <Suspense fallback={<div className="loading-view">Loading...</div>}>

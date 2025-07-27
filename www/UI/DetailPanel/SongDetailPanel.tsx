@@ -4,7 +4,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import { RESET } from 'jotai/utils';
 import { ReactElement } from 'react';
 import { maybeDataForSongFunc } from 'www/State/DisplayData';
-import { songDetailState } from 'www/State/Local';
+import { songDetailState } from 'www/State/SongPlayback';
 import { MediaInfoTable } from './MediaInfo';
 
 export function SongDetailPanel(): ReactElement {
