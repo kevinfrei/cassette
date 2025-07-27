@@ -5,9 +5,10 @@ import { ReactElement, useCallback } from 'react';
 import { st } from 'www/Constants';
 import { SetSearch } from 'www/Globals';
 import { CurrentView, Keys, StrId } from 'www/Shared/CommonTypes';
-import { curViewState, searchTermState } from 'www/State/SimpleSavedState';
+import { searchTermState } from 'www/State/SimpleSavedState';
 import { GetHelperText } from 'www/Utils';
 
+import { curViewState } from 'www/State/CurrentView';
 import '../styles/Sidebar.css';
 
 type ViewEntry = {

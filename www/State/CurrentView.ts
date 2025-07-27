@@ -14,7 +14,7 @@ const curViewBackerState = atomWithMainStorage<CurrentView>(
 );
 
 // This makes the miniplayer view always select the current view
-export const curViewFunc = atom(
+export const curViewState = atom(
   (get) =>
     get(isMiniplayerState) ? CurrentView.now_playing : get(curViewBackerState),
   (_get, set, newVal: CurrentView) => set(curViewBackerState, newVal),
