@@ -2,7 +2,7 @@
 
 import { atom } from 'jotai';
 import { chkCurrentView, CurrentView, StorageId } from 'www/Shared/CommonTypes';
-import { isMiniplayerState } from './Local';
+import { isMiniplayerState } from './SongPlayback';
 import { atomWithMainStorage } from './Storage';
 
 // The currently selected item from the left bar

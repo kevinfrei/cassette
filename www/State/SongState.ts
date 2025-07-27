@@ -1,4 +1,4 @@
-import { Atom, atom } from 'jotai';
+import { atom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import { SongKey } from 'www/Shared/CommonTypes';
 
@@ -29,9 +29,6 @@ export const curSongKeyState = atom<string>('');
 export const songDescriptionForSongState = atomFamily((songKey: string) =>
   atom<SongDescription>(defSongDescr),
 );
-
-// Are we displaying the play order?
-export const playOrderDisplayingState = atom<boolean>(false);
 
 export const songDescriptionsForSongList = atomFamily((sks: SongKey[]) =>
   atom(
