@@ -5,22 +5,17 @@ import { curViewState } from 'www/State/CurrentView';
 import { NowPlayingView } from './NowPlaying';
 import { SettingsView } from './Settings';
 /*
-import { GroupedAlbumList } from './Albums';
-import { GroupedAristList } from './Artists';
-import { MixedSongsList } from './MixedSongs';
 import { PlaybackOrder } from './PlaybackOrder';
-import { PlaylistView } from './Playlists';
-import { SearchResultsView } from './SearchResults';
 import { ToolsView } from './Tools';
 */
-
 import { GroupedAlbumList } from './Albums';
 import { GroupedAristList } from './Artists';
 import { MixedSongsList } from './MixedSongs';
 import { PlaylistView } from './Playlists';
 import { SearchResultsView } from './SearchResults';
-import './styles/Selector.css';
 import { ToolsView } from './Tools';
+
+import './styles/Selector.css';
 
 function ignore(view: CurrentView): boolean {
   return view === CurrentView.settings || view === CurrentView.tools;

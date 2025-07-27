@@ -1,15 +1,8 @@
 import { Provider, useAtomValue, useSetAtom } from 'jotai';
-import {
-  ReactElement,
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-  useRef,
-} from 'react';
+import { ReactElement, SyntheticEvent, useCallback, useRef } from 'react';
 import { KeepAlive } from 'www/KeepAlive';
 import { useJotaiAsyncCallback } from 'www/State/Helpers';
-import { mutedState } from 'www/State/SimpleSavedState';
-import { repeatState, songListState } from 'www/State/SongPlayback';
+import { mutedState, repeatState, songListState } from 'www/State/SongPlayback';
 import { getStore } from 'www/State/Storage';
 import { MediaTime, mediaTimeState } from 'www/State/TimeState';
 import { MusicDbListener } from 'www/Tools/MusicDbListener';

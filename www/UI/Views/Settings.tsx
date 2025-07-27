@@ -16,19 +16,18 @@ import { useAtom, useAtomValue } from 'jotai';
 import React, { ReactElement, useCallback, useState } from 'react';
 import { st } from 'www/Constants';
 import {
-  ignoreItemsState,
-  minSongCountForArtistListState,
-} from 'www/State/SimpleSavedState';
-import { GetHelperText } from 'www/Utils';
-
-import {
   IgnoreItemType,
   IpcCall,
   Keys,
   SocketMsg,
   StrId,
 } from 'www/Shared/CommonTypes';
+import {
+  ignoreItemsState,
+  minSongCountForArtistListState,
+} from 'www/State/SongPlayback';
 import { PostMain, SendMessage } from 'www/Tools/Ipc';
+import { GetHelperText } from 'www/Utils';
 
 import './styles/Settings.css';
 

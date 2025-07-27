@@ -1,21 +1,18 @@
 import { Slider, Text } from '@fluentui/react';
 import { ListIcon } from '@fluentui/react-icons-mdl2';
 import { MakeLog } from '@freik/logger';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import {
-  ForwardedRef,
-  forwardRef,
-  ReactElement,
-  SyntheticEvent,
-  useCallback,
-  useEffect,
-} from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+import { ForwardedRef, forwardRef, ReactElement, useEffect } from 'react';
+import { MaybePlayNext } from 'www/State/API';
 import { useJotaiAsyncCallback } from 'www/State/Helpers';
 import {
   mutedState,
+  repeatState,
   shuffleState,
+  songListState,
   volumeState,
-} from 'www/State/SimpleSavedState';
+} from 'www/State/SongPlayback';
+import { allSongsState } from 'www/State/Songs';
 import {
   curSongKeyState,
   playOrderDisplayingState,
@@ -30,6 +27,7 @@ import {
   mediaTimeState,
 } from 'www/State/TimeState';
 import { isValidRefObject } from 'www/Utils';
+import { SongDetailClick } from './DetailPanel/Clickers';
 import { onClickPlayPause } from './PlaybackControls';
 
 /*
@@ -37,11 +35,7 @@ import { playOrderDisplayingState } from 'www/State/Local';
 import { mySliderStyles } from './Utilities';
 */
 
-import { MaybePlayNext } from 'www/State/API';
-import { repeatState, songListState } from 'www/State/SongPlayback';
-import { allSongsState } from 'www/State/Songs';
 import '../styles/SongPlaying.css';
-import { SongDetailClick } from './DetailPanel/Clickers';
 
 const { log } = MakeLog('EMP:render:SongPlayback');
 

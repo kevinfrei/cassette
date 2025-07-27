@@ -1,9 +1,8 @@
 import { FontIcon, ISliderStyles, Slider } from '@fluentui/react';
 import { useAtom } from 'jotai';
-
-import { mutedState, volumeState } from 'www/State/SimpleSavedState';
-
 import { ReactElement } from 'react';
+import { mutedState, volumeState } from 'www/State/SongPlayback';
+
 import '../styles/VolumeControl.css';
 
 export const mySliderStyles: Partial<ISliderStyles> = {
