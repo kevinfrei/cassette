@@ -6,11 +6,11 @@ import { FocusSearch } from 'www/Globals';
 import { CurrentView } from 'www/Shared/CommonTypes';
 import { MaybePlayNext, MaybePlayPrev } from 'www/State/API';
 import { curViewFunc } from 'www/State/CurrentView';
-import { mediaTimePercentFunc, mediaTimeState } from 'www/State/MediaPlaying';
 import { playlistStateFamily } from 'www/State/PlaylistControl';
 import { mutedState, volumeState } from 'www/State/SimpleSavedState';
 import { repeatState, shuffleState } from 'www/State/SongPlayback';
 import { getStore, MaybeStore } from 'www/State/Storage';
+import { mediaTimePercentState, mediaTimeState } from 'www/State/TimeState';
 
 // import { onClickPlayPause } from './PlaybackControls';
 // import { addLocation } from './Views/Settings';
@@ -28,7 +28,7 @@ function updateTime(offset: number, mstore?: MaybeStore) {
 
   if (position < Number.MAX_SAFE_INTEGER && position >= 0) {
     store.set(mediaTimeState, { position, duration: curTime.duration });
-    store.set(mediaTimePercentFunc, position / curTime.duration);
+    store.set(mediaTimePercentState, position / curTime.duration);
   }
 }
 /*
