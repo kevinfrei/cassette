@@ -1,14 +1,17 @@
 import { MakeLog } from '@freik/logger';
 import { hasStrField } from '@freik/typechk';
 import { ForwardedRef } from 'react';
-
 import { FocusSearch } from 'www/Globals';
 import { CurrentView } from 'www/Shared/CommonTypes';
 import { MaybePlayNext, MaybePlayPrev } from 'www/State/API';
 import { curViewState } from 'www/State/CurrentView';
 import { playlistStateFamily } from 'www/State/PlaylistControl';
-import { mutedState, volumeState } from 'www/State/SimpleSavedState';
-import { repeatState, shuffleState } from 'www/State/SongPlayback';
+import {
+  mutedState,
+  repeatState,
+  shuffleState,
+  volumeState,
+} from 'www/State/SongPlayback';
 import { getStore, MaybeStore } from 'www/State/Storage';
 import { mediaTimePercentState, mediaTimeState } from 'www/State/TimeState';
 

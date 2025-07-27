@@ -24,7 +24,7 @@ import {
 import { allAlbumsState } from 'www/State/Albums';
 import { AddSongs } from 'www/State/API';
 import { allArtistsState } from 'www/State/Artists';
-import { searchTermState } from 'www/State/SimpleSavedState';
+import { searchTermState } from 'www/State/SongPlayback';
 import { allSongsState } from 'www/State/Songs';
 import {
   altRowRenderer,
@@ -38,6 +38,7 @@ import {
   SongDetailClick,
   SongListDetailContextMenuClick,
 } from '../DetailPanel/Clickers';
+
 import './styles/SearchResults.css';
 
 const { wrn } = MakeLog('EMP:render:SearchResults');

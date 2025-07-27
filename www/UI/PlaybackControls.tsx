@@ -1,18 +1,9 @@
 import { MakeLog } from '@freik/logger';
 import { onRejected } from '@freik/react-tools';
 import { useAtom } from 'jotai';
-import {
-  ForwardedRef,
-  MouseEventHandler,
-  ReactElement,
-  useCallback,
-} from 'react';
+import { ForwardedRef, ReactElement, useCallback } from 'react';
 import { Keys } from 'www/Shared/CommonTypes';
-import {
-  NextRepeat,
-  repeatState,
-  shuffleState,
-} from 'www/State/SimpleSavedState';
+import { NextRepeat, repeatState, shuffleState } from 'www/State/SongPlayback';
 import { getStore, MyStore } from 'www/State/Storage';
 import { playingState } from 'www/State/TimeState';
 import { GetHelperText, isValidRefObject } from 'www/Utils';

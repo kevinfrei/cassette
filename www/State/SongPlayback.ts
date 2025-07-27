@@ -1,29 +1,52 @@
-// import { StorageId } from '@freik/emp-shared';
 import { isSongKey } from '@freik/media-core';
 import { Catch } from '@freik/react-tools';
 import {
+  chkAnyOf,
   chkArrayOf,
-  chkOneOf,
   isBoolean,
   isNumber,
   isString,
+  typecheck,
 } from '@freik/typechk';
 import { atom } from 'jotai';
+import { IgnoreItem } from 'www/Constants';
 import { Song, SongKey, StorageId } from 'www/Shared/CommonTypes';
 import { songByKey } from './Songs';
 import { atomWithMainStorage } from './Storage';
+
+export const mutedState = atomWithMainStorage(StorageId.Mute, false, isBoolean);
+export const volumeState = atomWithMainStorage(StorageId.Volume, 0.5, isNumber); // Volume as a percentage (0-100)
+
+export type RepeatType = 'off' | 'one' | 'all';
+export const isRepeatType: typecheck<RepeatType> = (
+  val: unknown,
+): val is RepeatType => val === 'off' || val === 'one' || val === 'all';
 
 export const shuffleState = atomWithMainStorage(
   StorageId.Shuffle,
   false,
   isBoolean,
 );
-
 export const repeatState = atomWithMainStorage(
   StorageId.Repeat,
-  false,
-  isBoolean,
+  'off',
+  isRepeatType,
 );
+export function NextRepeat(current: RepeatType): RepeatType {
+  switch (current) {
+    case 'off':
+      return 'one';
+    case 'one':
+      return 'all';
+    case 'all':
+    default:
+      return 'off'; // Fallback to 'off' if something goes wrong
+  }
+}
+
+export const searchTermState = atom<string>('');
+export const ignoreItemsState = atom<IgnoreItem[]>([]);
+export const minSongCountForArtistListState = atom<number>(5);
 
 // The position in the active playlist of the current song
 // For 'ordered' playback, it's the index in the songList
@@ -38,7 +61,7 @@ export const currentIndexState = atomWithMainStorage(
 export const songPlaybackOrderState = atomWithMainStorage<'ordered' | number[]>(
   StorageId.PlaybackOrder,
   'ordered',
-  chkOneOf((a): a is 'ordered' => a === 'ordered', chkArrayOf(isNumber)),
+  chkAnyOf((a): a is 'ordered' => a === 'ordered', chkArrayOf(isNumber)),
 );
 
 // The name of the active playlist
