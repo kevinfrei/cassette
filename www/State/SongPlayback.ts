@@ -65,7 +65,6 @@ export function NextRepeat(current: RepeatType): RepeatType {
 
 export const searchTermState = atom<string>('');
 export const ignoreItemsState = atom<IgnoreItem[]>([]);
-export const minSongCountForArtistListState = atom<number>(5);
 
 // The position in the active playlist of the current song
 // For 'ordered' playback, it's the index in the songList

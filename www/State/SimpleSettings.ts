@@ -2,8 +2,6 @@ import { isArrayOfString, isBoolean, isNumber, isString } from '@freik/typechk';
 import { StorageId } from 'www/Shared/CommonTypes';
 import { atomWithMainStorage } from './Storage';
 
-// export const repeatState = atomWithMainStorage('repeat', false, isBoolean);
-
 // This is the 'locations' for searching for tunes
 export const locationsState = atomWithMainStorage(
   StorageId.Locations,

@@ -10,7 +10,6 @@ import {
   TooltipHost,
 } from '@fluentui/react';
 import { Expandable, StateToggle } from '@freik/fluentui-tools';
-import { useBoolState } from '@freik/react-tools';
 import { isDefined } from '@freik/typechk';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { ReactElement, useCallback, useState } from 'react';
@@ -22,10 +21,21 @@ import {
   SocketMsg,
   StrId,
 } from 'www/Shared/CommonTypes';
+import { useJotaiBoolState } from 'www/State/Hooks';
 import {
-  ignoreItemsState,
+  neverPlayHatesState,
+  onlyPlayLikesState,
+} from 'www/State/LikesAndHates';
+import {
+  albumCoverNameState,
+  downloadAlbumArtworkState,
+  downloadArtistArtworkState,
+  ignoreArticlesState,
   minSongCountForArtistListState,
-} from 'www/State/SongPlayback';
+  saveAlbumArtworkWithMusicState,
+  showArtistsWithFullAlbumsState,
+} from 'www/State/SimpleSettings';
+import { ignoreItemsState } from 'www/State/SongPlayback';
 import { PostMain, SendMessage } from 'www/Tools/Ipc';
 import { GetHelperText } from 'www/Utils';
 
@@ -212,21 +222,19 @@ function IgnoreList(): ReactElement {
 }
 
 function ArticleSorting(): ReactElement {
-  const articles = useBoolState(true);
+  const articles = useJotaiBoolState(ignoreArticlesState);
   return <StateToggle label="Ignore articles when sorting" state={articles} />;
 }
 
 function ArtistFiltering(): ReactElement {
-  const onlyAlbumArtists = useBoolState(
-    /*showArtistsWithFullAlbumsState*/ true,
-  );
+  const onlyAlbumArtists = useJotaiBoolState(showArtistsWithFullAlbumsState);
   const [songCount, setSongCount] = useAtom(minSongCountForArtistListState);
   const onIncrement = useCallback(
-    () => setSongCount(Math.min(100, songCount + 1)),
+    () => void setSongCount(Math.min(100, songCount + 1)),
     [minSongCountForArtistListState],
   );
   const onDecrement = useCallback(
-    () => setSongCount(Math.max(1, songCount - 1)),
+    () => void setSongCount(Math.max(1, songCount - 1)),
     [minSongCountForArtistListState],
   );
   return (
@@ -248,8 +256,8 @@ function ArtistFiltering(): ReactElement {
 }
 
 function LikeFiltering(): ReactElement {
-  const neverPlayHates = useBoolState(/*neverPlayHatesState*/ true);
-  const onlyPlayLikes = useBoolState(/*onlyPlayLikesState*/ false);
+  const neverPlayHates = useJotaiBoolState(neverPlayHatesState);
+  const onlyPlayLikes = useJotaiBoolState(onlyPlayLikesState);
   return (
     <>
       <StateToggle
@@ -262,14 +270,10 @@ function LikeFiltering(): ReactElement {
 }
 
 function ArtworkSettings(): ReactElement {
-  const dlAlbumArtwork = useBoolState(/*downloadAlbumArtworkState*/ true);
-  const dlArtistArtwork = useBoolState(/*downloadArtistArtworkState*/ true);
-  const saveAlbumArtwork = useBoolState(
-    /*saveAlbumArtworkWithMusicState*/ true,
-  );
-  const [coverArtName, setCoverArtName] = useState(
-    /*albumCoverNameState*/ 'cover.jpg',
-  );
+  const dlAlbumArtwork = useJotaiBoolState(downloadAlbumArtworkState);
+  const dlArtistArtwork = useJotaiBoolState(downloadArtistArtworkState);
+  const saveAlbumArtwork = useJotaiBoolState(saveAlbumArtworkWithMusicState);
+  const [coverArtName, setCoverArtName] = useAtom(albumCoverNameState);
   return (
     <>
       <StateToggle label="Download Album Artwork" state={dlAlbumArtwork} />

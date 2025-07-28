@@ -21,7 +21,7 @@ export type WriteOnlyAtomType<T> = WritableAtom<
   Promise<void>
 >;
 
-export function useBoolAtom(atm: WritableAtomType<boolean>): BoolState {
+export function useJotaiBoolState(atm: WritableAtomType<boolean>): BoolState {
   const [val, setter] = useAtom(atm);
   return [val, () => setter(false), () => setter(true)];
 }

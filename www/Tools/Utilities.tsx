@@ -28,6 +28,7 @@ import { isSearchBox } from 'www/UI/Sidebar';
 import { CallMain, SendMain } from './Ipc';
 // import { MenuHandler } from './MenuHandler';
 import { Atom, WritableAtom } from 'jotai';
+import { WritableAtomType } from 'www/State/Hooks';
 import { useMediaEffect } from './MediaEffect';
 
 const { wrn } = MakeLog('EMP:render:Utilities');
@@ -144,13 +145,6 @@ export const mySliderStyles: Partial<ISliderStyles> = {
     zIndex: 100,
   },
 };
-
-export function useJotaiBoolState(
-  st: WritableAtom<boolean, [boolean], boolean>,
-): BoolState {
-  const [value, setter] = useAtom(st);
-  return [value, () => setter(true), () => setter(false)];
-}
 
 export type StringSpinButtonProps = {
   id?: string;
