@@ -21,22 +21,27 @@ import {
   SocketMsg,
   StrId,
 } from 'www/Shared/CommonTypes';
+import { useJotaiAsyncCallback } from 'www/State/Helpers';
 import { useJotaiBoolState } from 'www/State/Hooks';
 import {
   neverPlayHatesState,
   onlyPlayLikesState,
 } from 'www/State/LikesAndHates';
+import { rescanInProgressState } from 'www/State/Miscellany';
 import {
   albumCoverNameState,
+  defaultLocationState,
   downloadAlbumArtworkState,
   downloadArtistArtworkState,
   ignoreArticlesState,
+  locationsState,
   minSongCountForArtistListState,
   saveAlbumArtworkWithMusicState,
   showArtistsWithFullAlbumsState,
 } from 'www/State/SimpleSettings';
 import { ignoreItemsState } from 'www/State/SongPlayback';
 import { PostMain, SendMessage } from 'www/Tools/Ipc';
+import { ShowOpenDialog } from 'www/Tools/Utilities';
 import { GetHelperText } from 'www/Utils';
 
 import './styles/Settings.css';
@@ -49,36 +54,27 @@ const removeFromSet = (set: string[], val: string): string[] => {
 };
 
 async function GetDirs(): Promise<string[] | void> {
-  return Promise.resolve();
-  /* TODO await Util.ShowOpenDialog({ properties: ['openDirectory'] }); */
+  return await ShowOpenDialog({
+    title: 'Select Music Directory',
+    folder: true,
+    multiSelections: true,
+  });
 }
-/*
-export async function addLocation({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  set,
-}: MyTransactionInterface): Promise<boolean> {
-  const locs = await GetDirs();
-  if (locs) {
-    // set(locationsState, (curLocs) => [...locs, ...curLocs]);
-    return true;
-  }
-  return false;
-}*/
 
 function MusicLocations(): ReactElement {
-  /*
-
-  TODO
-
   const [newLoc, setNewLoc] = useAtom(locationsState);
   const [defLoc, setDefLoc] = useAtom(defaultLocationState);
   const rescanInProgress = useAtomValue(rescanInProgressState);
-  const onAddLocation = useMyTransaction((xact) => () => {
-    addLocation(xact).catch(Catch);
-  });
+  const onAddLocation = useJotaiAsyncCallback(async (get, set) => {
+    const locs = await GetDirs();
+    if (locs) {
+      await set(locationsState, [...(await get(locationsState)), ...locs]);
+    }
+  }, []);
+  /*
   const songs = useRecoilValue(allSongsFunc);
   const albums = useRecoilValue(allAlbumsFunc);
-  const artists = useRecoilValue(allArtistsFunc);
+  const artists = useRecoilValue(allArtistsFunc);  
   */
   const setSaveStyle = {
     textContainer: { fontSize: 11 },
@@ -91,7 +87,7 @@ function MusicLocations(): ReactElement {
   };
   return (
     <>
-      {/*(newLoc || []).map((elem) => (
+      {(newLoc || []).map((elem) => (
         <span key={elem} className="music-loc">
           <IconButton
             onClick={() => void setNewLoc(removeFromSet(newLoc, elem))}
@@ -109,11 +105,11 @@ function MusicLocations(): ReactElement {
             />
           )}
         </span>
-      ))*/}
+      ))}
       <div>
         <DefaultButton
           text="Add Location"
-          onClick={() => {} /*onAddLocation*/}
+          onClick={onAddLocation}
           iconProps={{ iconName: 'Add' }}
           title={GetHelperText(Keys.AddFileLocation)}
           style={btnWidth}
@@ -125,7 +121,7 @@ function MusicLocations(): ReactElement {
           <DefaultButton
             text="Rescan Locations"
             iconProps={{ iconName: 'SearchData' }}
-            disabled={false /*rescanInProgress*/}
+            disabled={rescanInProgress}
             onClick={() => SendMessage(SocketMsg.ManualRescan)}
             style={btnWidth}
           />
