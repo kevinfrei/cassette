@@ -37,7 +37,7 @@
     "gen": "crow-idl www/Shared/Definitions.ts -c:include/CommonTypes.hpp -t:www/Shared/CommonTypes.ts"
   },
   "dependencies": {
-    "@fluentui/react": "^8.123.1",
+    "@fluentui/react": "^8.123.2",
     "@fluentui/react-components": "^9.67.0",
     "@fluentui/react-icons-mdl2": "^1.3.87",
     "@freik/containers": "^0.4.4",

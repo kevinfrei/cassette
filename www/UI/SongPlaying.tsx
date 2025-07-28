@@ -6,6 +6,7 @@ import { ForwardedRef, forwardRef, ReactElement, useEffect } from 'react';
 import { MaybePlayNext } from 'www/State/API';
 import { useJotaiAsyncCallback } from 'www/State/Helpers';
 import {
+  curSongKeyState,
   mutedState,
   playOrderDisplayingState,
   repeatState,
@@ -15,7 +16,6 @@ import {
 } from 'www/State/SongPlayback';
 import { allSongsState } from 'www/State/Songs';
 import {
-  curSongKeyState,
   SongDescription,
   songDescriptionForSongState,
 } from 'www/State/SongState';
@@ -33,6 +33,7 @@ import { onClickPlayPause } from './PlaybackControls';
 import { mySliderStyles } from './Utilities';
 */
 
+import { mySliderStyles } from 'www/Tools/Utilities';
 import '../styles/SongPlaying.css';
 
 const { log } = MakeLog('EMP:render:SongPlayback');
@@ -91,7 +92,7 @@ function MediaTimeSlider(): ReactElement {
       max={1}
       disabled={songKey.length === 0}
       step={1e-7}
-      // TODO: styles={mySliderStyles}
+      styles={mySliderStyles}
       onChange={(value: number) => setMediaTimePercent(value)}
       // onChanged={(, value: number) => log('Changed:' + value)}
       showValue={false}

@@ -25,7 +25,6 @@ const defSongDescr: SongDescription = {
   year: '2023',
 };
 
-export const curSongKeyState = atom<string>('');
 export const songDescriptionForSongState = atomFamily((songKey: string) =>
   atom<SongDescription>(defSongDescr),
 );

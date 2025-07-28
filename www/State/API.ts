@@ -30,7 +30,7 @@ import {
 import {
   activePlaylistState,
   currentIndexState,
-  currentSongKeyState,
+  curSongKeyState,
   displayMessageState,
   nowPlayingSortState,
   recentlyQueuedState,
@@ -58,7 +58,7 @@ export async function MaybePlayNext(
   const store = getStore(mstore);
   const curIndex = await store.get(currentIndexState);
   const songList = await store.get(songListState);
-  const curSong = await store.get(currentSongKeyState);
+  const curSong = await store.get(curSongKeyState);
   if (dislike) {
     await store.set(isSongHatedFam(curSong), true);
     if (await store.get(neverPlayHatesState)) {

@@ -2,21 +2,9 @@ import { FontIcon, ISliderStyles, Slider } from '@fluentui/react';
 import { useAtom } from 'jotai';
 import { ReactElement } from 'react';
 import { mutedState, volumeState } from 'www/State/SongPlayback';
+import { mySliderStyles } from 'www/Tools/Utilities';
 
 import '../styles/VolumeControl.css';
-
-export const mySliderStyles: Partial<ISliderStyles> = {
-  thumb: {
-    borderWidth: 1,
-    width: 6,
-    height: 10,
-    top: -3,
-    zIndex: 100,
-  },
-  line: {
-    zIndex: 100,
-  },
-};
 
 export function VolumeControl(): ReactElement {
   const [muted, setMuted] = useAtom(mutedState);

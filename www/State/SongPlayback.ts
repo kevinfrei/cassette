@@ -124,7 +124,7 @@ export const currentSongIndexState = atom(
 );
 
 // Selector to get the current song key based on the rest of this nonsense
-export const currentSongKeyState = atom(async (get) => {
+export const curSongKeyState = atom(async (get) => {
   const curIndex = await get(currentIndexState);
   if (curIndex >= 0) {
     const songList = await get(songListState);
