@@ -1,4 +1,10 @@
-import { isDefined, typecheck } from '@freik/typechk';
+import {
+  isDefined,
+  isString,
+  SafelyUnpickle,
+  typecheck,
+  Unpickle,
+} from '@freik/typechk';
 import { createStore } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 import { AsyncStorage } from 'jotai/vanilla/utils/atomWithStorage';
@@ -34,8 +40,11 @@ function makeGetItem<T>(
   chk: typecheck<T>,
 ): (key: string, initialValue: T) => PromiseLike<T> {
   return async (key: string, initialValue: T): Promise<T> => {
-    const maybeValue = await ReadFromStorage(key, chk);
-    return isDefined(maybeValue) ? maybeValue : initialValue;
+    const maybeValue = await ReadFromStorage(key, isString);
+    if (!isDefined(maybeValue)) {
+      return initialValue;
+    }
+    return SafelyUnpickle(maybeValue, chk) || initialValue;
   };
 }
 

@@ -2,7 +2,7 @@ import { isString } from '@freik/typechk';
 import { ReactElement } from 'react';
 
 import { useInterval } from './hooks';
-import { RawGet } from './Tools/Ipc';
+import { RawGetAsText } from './Tools/Ipc';
 
 // This is a 'two-way' keep-alive mechanism.
 // It sends a request to the server every 5 seconds to keep the connection alive.
@@ -16,7 +16,7 @@ function closeWindow() {
 }
 export function KeepAlive(): ReactElement {
   useInterval(() => {
-    RawGet('/keepalive')
+    RawGetAsText('/keepalive')
       .then((res) => {
         if (!isString(res) || res !== 'OK') {
           closeWindow();

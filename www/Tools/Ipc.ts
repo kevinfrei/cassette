@@ -3,6 +3,7 @@ import MakeSeqNum from '@freik/seqnum';
 import {
   isDefined,
   isFunction,
+  isNumberOrString,
   isObjectNonNull,
   isString,
   Pickle,
@@ -273,7 +274,9 @@ export async function SendMessage<T>(
   return result;
 }
 
-export async function RawGet(endpoint: string): Promise<string | undefined> {
+export async function RawGetAsText(
+  endpoint: string,
+): Promise<string | undefined> {
   try {
     const response = await fetch(endpoint, {
       method: 'GET',
@@ -287,34 +290,82 @@ export async function RawGet(endpoint: string): Promise<string | undefined> {
   return undefined;
 }
 
+export async function RawGetAsJSON(
+  endpoint: string,
+): Promise<string | undefined> {
+  try {
+    const response = await fetch(endpoint, {
+      method: 'GET',
+    });
+    if (response.ok) {
+      return await response.json();
+    }
+  } catch (err) {
+    console.error(`Failed to fetch ${endpoint}:`, err);
+  }
+  return undefined;
+}
+
+function encodeForCall(arg: unknown): string {
+  if (isNumberOrString(arg)) {
+    return encodeURIComponent(arg);
+  } else if (isObjectNonNull(arg) || Array.isArray(arg)) {
+    return encodeURIComponent(Pickle(arg));
+  } else if (isDefined(arg)) {
+    return encodeURIComponent(String(arg));
+  } else {
+    return '';
+  }
+}
+
 async function Get(endpoint: IpcCall, ...args: unknown[]): Promise<unknown> {
   try {
     const response = await fetch(
-      [
-        '/api',
-        endpoint.toString(10),
-        ...args.map(Pickle).map(encodeURIComponent),
-      ].join('/'),
+      ['/api', endpoint.toString(10), ...args.map(encodeForCall)].join('/'),
       {
         method: 'GET',
       },
     );
     if (response.ok) {
-      const txt = await response.text();
-      if (txt.length === 0) {
-        return undefined;
-      }
-      try {
-        const res = Unpickle(txt);
-        if (isDefined(res)) {
-          return res;
-        } else {
-          console.error(`Failed to unpickle response from ${endpoint}:`, txt);
+      const contentType = response.headers.get('Content-Type');
+      const isJson = contentType && contentType.includes('json');
+      const isText = contentType && contentType.includes('text');
+      if (isJson || isText) {
+        console.log(
+          `isJson: ${isJson}, isText: ${isText}, contentType: ${contentType}`,
+        );
+        const txt = await response.text();
+        if (txt.length === 0) {
+          console.warn(`Received empty response from ${endpoint}`);
+          return undefined;
         }
-      } catch (e) {
-        console.error(`Failed to unpickle response from ${endpoint}:`, e);
-        console.error('Response text was:', txt);
-        return undefined;
+        try {
+          if (isJson) {
+            console.log(`Unpickling JSON response from ${endpoint}:`, txt);
+            const res = Unpickle(txt);
+            if (isDefined(res)) {
+              console.log(
+                `Successfully unpickled response from ${endpoint}:`,
+                res,
+              );
+              return res;
+            } else {
+              console.error(
+                `Failed to unpickle response from ${endpoint}:`,
+                txt,
+              );
+            }
+          }
+        } catch (e) {
+          console.error(`Failed to unpickle response from ${endpoint}:`, e);
+          console.error('Response text was:', txt);
+        }
+        return txt;
+      } else {
+        console.log(
+          `Received non-JSON/text response from ${endpoint}, contentType: ${contentType}`,
+        );
+        return await response.blob();
       }
     }
   } catch (err) {

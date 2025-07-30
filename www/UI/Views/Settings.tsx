@@ -93,6 +93,7 @@ function MusicLocations(): ReactElement {
   };
   return (
     <>
+      <Text>Location Count #{allLocs.length}</Text>
       {(allLocs || []).map((elem) => (
         <span key={elem} className="music-loc">
           <IconButton
