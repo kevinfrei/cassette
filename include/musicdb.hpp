@@ -1,16 +1,16 @@
-#if !defined(AUDIOFILEINDEX_HPP)
-#define AUDIOFILEINDEX_HPP
+#if !defined(MUSICDB_HPP)
+#define MUSICDB_HPP
 #pragma once
 
 #include <crow.h>
 
 #include "CommonTypes.hpp"
 
-namespace afi {
+namespace musicdb {
 
 Shared::MusicDatabase* get_music_db();
 void send_music_db(crow::websocket::connection& conn);
 
-} // namespace afi
+} // namespace musicdb
 
-#endif // AUDIOFILEINDEX_HPP
+#endif // MUSICDB_HPP

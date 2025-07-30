@@ -10,16 +10,26 @@ set(LIB_SOURCE_FILES
     tools.cpp
     tunes.cpp
     websocket.cpp
-    window.cpp
-    musicdb/audiofileindex.cpp)
+    window.cpp)
 
 # Compile main.cpp
 add_library(cassette_lib ${LIB_SOURCE_FILES})
+
+add_subdirectory(tools)
+add_subdirectory(musicdb)
+
 add_executable(cassette main.cpp)
 
 target_include_directories(cassette_lib PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 # Link the dependencies with our binary
-target_link_libraries(cassette_lib PUBLIC ${BOOST_LIB} ${CROW_LIB}
-                                          ${MEDIAINFO_LIB} ${PFD_LIB})
+target_link_libraries(
+  cassette_lib 
+  PUBLIC 
+    tools_lib
+    musicdb_lib
+    ${BOOST_LIB}
+    ${CROW_LIB}
+    ${MEDIAINFO_LIB}
+    ${PFD_LIB})
 target_link_libraries(cassette PRIVATE cassette_lib)

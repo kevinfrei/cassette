@@ -8,9 +8,9 @@
 // and produce the music-db map.
 
 #include "CommonTypes.hpp"
-#include "audiofileindex.hpp"
+#include "musicdb.hpp"
 
-namespace afi {
+namespace musicdb {
 
 #if defined(_WIN32)
 const char* user_root = "USERPROFILE";
@@ -21,9 +21,11 @@ const char* user_root = "HOME";
 #endif
 
 namespace {
+
 std::shared_mutex music_db_mutex;
 std::unordered_set<std::string> extensions = {
     ".mp3", ".flac", ".m4a", ".jpg", ".png"};
+
 } // namespace
 
 Shared::MusicDatabase* get_music_db() {
@@ -267,4 +269,4 @@ void send_music_db(crow::websocket::connection& conn) {
   conn.send_text(oss.str());
 }
 
-} // namespace afi
+} // namespace musicdb
