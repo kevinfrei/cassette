@@ -1,7 +1,7 @@
-import { WebBuild } from './webbuild';
 import { CppBuild } from './cppbuild';
+import { WebBuild } from './webbuild';
 
-import { GetBuildType, BuildType } from './buildtype';
+import { BuildType, GetBuildType } from './buildtype';
 
 // Logically:
 // bun wdbld && bun dbuild && ( cd build/Debug && ./cassette )

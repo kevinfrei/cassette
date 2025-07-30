@@ -34,6 +34,6 @@ else()
 endif()
 
 # Find Conan2 generated libraries
-include(cmake/ConanLibImports.cmake)
+include(build/ConanLibImports.cmake)
 
 add_subdirectory(cpp)

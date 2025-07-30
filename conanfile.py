@@ -53,7 +53,7 @@ class CassetteRecipe(ConanFile):
               var_name = library.info.var if library.info.var else f'{library.info.package.upper()}_LIB'
               imports.append(f'set({var_name} {library.info.target})\n')
               imports.append('\n')
-        file_location = os.path.join(self.recipe_folder, "cmake/ConanLibImports.cmake")
+        file_location = os.path.join(self.recipe_folder, "build/ConanLibImports.cmake")
         if os.path.exists(file_location):
             # Check to see if the file is the same as what we're about to write, so we don't
             # unnecessarily trigger a camke reconfig
@@ -66,7 +66,7 @@ class CassetteRecipe(ConanFile):
                 else:
                     # File is the same, so don't write it out
                     return
-        with open(os.path.join(self.recipe_folder, "cmake/ConanLibImports.cmake"), "w", newline='\n') as f:
+        with open(os.path.join(self.recipe_folder, "build/ConanLibImports.cmake"), "w", newline='\n') as f:
             f.writelines(imports)
                 
     def requirements(self):
