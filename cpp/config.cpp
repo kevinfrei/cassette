@@ -12,6 +12,8 @@
 #include "config.h"
 #include "files.h"
 
+namespace fs = std::filesystem;
+
 namespace config {
 
 using read_lock = std::shared_lock<std::shared_mutex>;
@@ -31,10 +33,10 @@ void not_ready() {
 }
 
 bool inited = false;
-std::filesystem::path home_env;
-std::filesystem::path home_path;
-std::filesystem::path cfg_var;
-std::filesystem::path relative_path;
+fs::path home_env;
+fs::path home_path;
+fs::path cfg_var;
+fs::path relative_path;
 
 void init() {
   if (!inited) {
@@ -47,7 +49,7 @@ void init() {
     home_env = getenv("HOME");
     cfg_var = home_env;
     home_path = home_env;
-    relative_path = std::filesystem::path{"Library"} / "Application Support";
+    relative_path = fs::path{"Library"} / "Application Support";
 #elif defined(__linux__)
     home_env = getenv("HOME");
     cfg_var = home_env;
@@ -62,23 +64,23 @@ void init() {
 
 // This is fugly, most hopefully it's the only truly fugly thing here.
 
-const std::filesystem::path& get_home_path() {
+const fs::path& get_home_path() {
   init();
   return home_path;
 }
 
 // Returns the path to the configuration directory for the application.
-std::filesystem::path get_path() {
+fs::path get_path() {
   init();
-  return cfg_var / relative_path / files::get_app_name();
+  return fs::weakly_canonical(cfg_var / relative_path / files::get_app_name());
 }
 
-std::filesystem::path get_persistence_path() {
-  std::filesystem::path res = get_path() / "persistence";
-  if (std::filesystem::exists(res)) {
+fs::path get_persistence_path() {
+  fs::path res = get_path() / "persistence";
+  if (fs::exists(res)) {
     return res;
   }
-  if (!std::filesystem::create_directories(res)) {
+  if (!fs::create_directories(res)) {
     std::cerr << "Failed to create persistence directory: " << res.string()
               << std::endl;
   }
@@ -139,8 +141,8 @@ bool write_to_storage(std::string_view key, std::string_view value) {
   {
     auto path_to_data = get_persistence_path() / files::file_name_encode(key);
     write_lock lock(the_mutex);
-    if (std::filesystem::exists(path_to_data)) {
-      if (!std::filesystem::remove(path_to_data)) {
+    if (fs::exists(path_to_data)) {
+      if (!fs::remove(path_to_data)) {
         std::cerr << "Failed to remove existing file: " << path_to_data.string()
                   << std::endl;
         return false;
@@ -176,7 +178,7 @@ std::optional<std::string> read_from_storage(std::string_view key) {
   // deal with races from the write_to_storage function.
   auto path_to_data = get_persistence_path() / files::file_name_encode(key);
   write_lock write_lock(the_mutex);
-  if (!std::filesystem::exists(path_to_data)) {
+  if (!fs::exists(path_to_data)) {
     return std::nullopt; // Key does not exist
   }
   auto maybe_value = files::read_file(path_to_data);
@@ -204,10 +206,10 @@ bool delete_from_storage(std::string_view key) {
     write_lock lock(the_mutex);
     cache.erase(std::string{key});
     auto path_to_data = get_persistence_path() / files::file_name_encode(key);
-    if (!std::filesystem::exists(path_to_data)) {
+    if (!fs::exists(path_to_data)) {
       return false; // Key does not exist
     }
-    if (!std::filesystem::remove(path_to_data)) {
+    if (!fs::remove(path_to_data)) {
       std::cerr << "Failed to remove file: " << path_to_data.string()
                 << std::endl;
       return false; // Failed to delete the file
@@ -228,9 +230,9 @@ void flush_storage_cache() {
 void clear_storage() {
   flush_storage_cache();
   auto path_to_data = get_persistence_path();
-  if (std::filesystem::exists(path_to_data)) {
+  if (fs::exists(path_to_data)) {
     write_lock lock(the_mutex);
-    if (!std::filesystem::remove_all(path_to_data)) {
+    if (!fs::remove_all(path_to_data)) {
       std::cerr << "Failed to clear storage directory: "
                 << path_to_data.string() << std::endl;
       return;

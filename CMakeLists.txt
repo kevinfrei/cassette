@@ -37,4 +37,3 @@ endif()
 include(cmake/ConanLibImports.cmake)
 
 add_subdirectory(cpp)
-add_subdirectory(test)

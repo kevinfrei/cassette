@@ -8,9 +8,11 @@
 // and produce the music-db map.
 
 #include "CommonTypes.hpp"
-#include "audiofileindex.hpp"
+#include "musicdb.hpp"
 
-namespace afi {
+namespace fs = std::filesystem;
+
+namespace musicdb {
 
 #if defined(_WIN32)
 const char* user_root = "USERPROFILE";
@@ -21,9 +23,11 @@ const char* user_root = "HOME";
 #endif
 
 namespace {
+
 std::shared_mutex music_db_mutex;
 std::unordered_set<std::string> extensions = {
     ".mp3", ".flac", ".m4a", ".jpg", ".png"};
+
 } // namespace
 
 Shared::MusicDatabase* get_music_db() {
@@ -38,16 +42,16 @@ Shared::MusicDatabase* get_music_db() {
   }
   // TODO: Get the location from the config.
   std::string home = getenv(user_root);
-  std::filesystem::path root = std::filesystem::path(home) / "Music";
-  if (!std::filesystem::exists(root)) {
+  fs::path root = fs::path(home) / "Music";
+  if (!fs::exists(root)) {
     std::cerr << "Music directory does not exist: " << root.string()
               << std::endl;
     return nullptr;
   }
   auto db = new Shared::MusicDatabase();
   /*
-  std::filesystem::recursive_directory_iterator it(root);
-  std::filesystem::recursive_directory_iterator end;
+  fs::recursive_directory_iterator it(root);
+  fs::recursive_directory_iterator end;
   for (; it != end; ++it) {
     if (it->is_regular_file()) {
       auto path = it->path();
@@ -267,4 +271,4 @@ void send_music_db(crow::websocket::connection& conn) {
   conn.send_text(oss.str());
 }
 
-} // namespace afi
+} // namespace musicdb

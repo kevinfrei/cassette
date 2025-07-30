@@ -6,10 +6,10 @@
 
 #include "CommonTypes.hpp"
 #include "api.h"
-#include "audiofileindex.hpp"
 #include "config.h"
 #include "files.h"
 #include "handlers.h"
+#include "musicdb.hpp"
 #include "quitting.h"
 #include "setup.h"
 #include "tools.h"
@@ -199,7 +199,7 @@ void socket_message(crow::websocket::connection& conn,
       break;
     case Shared::SocketMsg::ContentLoaded:
       config::set_ready();
-      afi::send_music_db(conn);
+      musicdb::send_music_db(conn);
       break;
     default: // Unsupported message
       std::cerr << "Unsupported message received: " << Shared::to_string(msg)
