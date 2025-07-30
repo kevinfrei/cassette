@@ -14,7 +14,7 @@ TEST(Config, TheBasics) {
   std::filesystem::path res = config::get_path();
   EXPECT_FALSE(res.empty());
   EXPECT_EQ(res.stem(), files::get_app_name());
-  std::cout << "Config path: " << res.generic_string() << std::endl;
+  // std::cout << "Config path: " << res.generic_string() << std::endl;
 }
 
 TEST(Config, Storage) {

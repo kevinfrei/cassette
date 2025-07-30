@@ -9,28 +9,30 @@
 #include "CommonTypes.hpp"
 #include "files.h"
 
+namespace fs = std::filesystem;
+
 namespace files {
 
-std::filesystem::path program_location;
-std::filesystem::path web_dir;
+fs::path program_location;
+fs::path web_dir;
 
 void set_program_location() {
   program_location = boost::dll::program_location().string();
 }
 
-std::filesystem::path get_web_dir() {
+fs::path get_web_dir() {
   if (web_dir.empty()) {
-    std::filesystem::path cur = program_location.parent_path().parent_path();
+    fs::path cur = program_location.parent_path().parent_path();
     web_dir = cur / "www";
   }
   return web_dir;
 }
 
-std::filesystem::path get_app_name() {
+fs::path get_app_name() {
   return program_location.stem();
 }
 
-std::string path_to_mime_type(const std::filesystem::path& file_path) {
+std::string path_to_mime_type(const fs::path& file_path) {
   const std::string extension = file_path.extension().generic_string();
   if (extension == ".txt") {
     return "text/plain";
@@ -64,11 +66,11 @@ std::string path_to_mime_type(const std::filesystem::path& file_path) {
   return "text/html";
 }
 
-std::filesystem::path file_name_encode(std::string_view filename);
+fs::path file_name_encode(std::string_view filename);
 std::optional<std::string> file_name_decode(std::string_view filename);
 
 #if 0
-std::string LoadFileWithMimeType(const std::filesystem::path& path,
+std::string LoadFileWithMimeType(const fs::path& path,
                                  std::string& mime_type) {
   std::ifstream input_file(path, std::ifstream::binary);
 
@@ -96,7 +98,7 @@ std::string LoadFileWithMimeType(const std::filesystem::path& path,
 // In addition, Windows, Mac, and Linux all *may* have case-insensitive
 // filesystems, so we need to encode filenames in a way that keeps all
 // that in mind.
-std::filesystem::path file_name_encode(std::string_view filename) {
+fs::path file_name_encode(std::string_view filename) {
   // Encode the string provided as a valid, unique filename, which can
   // be re-translated back to it's original value.
   std::ostringstream oss;
@@ -279,7 +281,7 @@ std::optional<std::string> file_name_decode(std::string_view filename) {
   }
 }
 
-std::optional<std::string> read_file(std::filesystem::path file_path) {
+std::optional<std::string> read_file(fs::path file_path) {
   constexpr size_t read_size = 4096;
   std::ifstream stream(file_path);
   stream.exceptions(std::ios_base::badbit);

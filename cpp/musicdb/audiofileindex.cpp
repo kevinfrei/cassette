@@ -10,6 +10,8 @@
 #include "CommonTypes.hpp"
 #include "musicdb.hpp"
 
+namespace fs = std::filesystem;
+
 namespace musicdb {
 
 #if defined(_WIN32)
@@ -40,16 +42,16 @@ Shared::MusicDatabase* get_music_db() {
   }
   // TODO: Get the location from the config.
   std::string home = getenv(user_root);
-  std::filesystem::path root = std::filesystem::path(home) / "Music";
-  if (!std::filesystem::exists(root)) {
+  fs::path root = fs::path(home) / "Music";
+  if (!fs::exists(root)) {
     std::cerr << "Music directory does not exist: " << root.string()
               << std::endl;
     return nullptr;
   }
   auto db = new Shared::MusicDatabase();
   /*
-  std::filesystem::recursive_directory_iterator it(root);
-  std::filesystem::recursive_directory_iterator end;
+  fs::recursive_directory_iterator it(root);
+  fs::recursive_directory_iterator end;
   for (; it != end; ++it) {
     if (it->is_regular_file()) {
       auto path = it->path();
