@@ -1,6 +1,6 @@
 import { BuildOutput } from 'bun';
 
-import { GetBuildType, BuildType } from './buildtype';
+import { BuildType, GetBuildType } from './buildtype';
 
 export function WebBuild(buildType: BuildType): Promise<BuildOutput> {
   return Bun.build({

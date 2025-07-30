@@ -1,6 +1,6 @@
 import { $ } from 'bun';
 
-import { GetBuildType, BuildType } from './buildtype';
+import { BuildType, GetBuildType } from './buildtype';
 
 export function CppBuild(buildType: BuildType): $.ShellPromise {
   return $`cmake --build build/${buildType}`;
