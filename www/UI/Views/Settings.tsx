@@ -1,6 +1,7 @@
 import {
   DefaultButton,
   Dropdown,
+  Icon,
   IconButton,
   IDropdownOption,
   Label,
@@ -47,6 +48,7 @@ import { GetHelperText } from 'www/Utils';
 import './styles/Settings.css';
 
 const btnWidth: React.CSSProperties = { width: '155px', padding: 0 };
+
 const removeFromSet = (set: string[], val: string): string[] => {
   const newSet = new Set(set);
   newSet.delete(val);
@@ -54,15 +56,19 @@ const removeFromSet = (set: string[], val: string): string[] => {
 };
 
 async function GetDirs(): Promise<string[] | void> {
-  return await ShowOpenDialog({
+  const vals = await ShowOpenDialog({
     title: 'Select Music Directory',
     folder: true,
     multiSelections: true,
   });
+  if (vals) {
+    console.log('Selected directories:', vals);
+  }
+  return vals;
 }
 
 function MusicLocations(): ReactElement {
-  const [newLoc, setNewLoc] = useAtom(locationsState);
+  const [allLocs, setAllLocs] = useAtom(locationsState);
   const [defLoc, setDefLoc] = useAtom(defaultLocationState);
   const rescanInProgress = useAtomValue(rescanInProgressState);
   const onAddLocation = useJotaiAsyncCallback(async (get, set) => {
@@ -87,21 +93,21 @@ function MusicLocations(): ReactElement {
   };
   return (
     <>
-      {(newLoc || []).map((elem) => (
+      {(allLocs || []).map((elem) => (
         <span key={elem} className="music-loc">
           <IconButton
-            onClick={() => void setNewLoc(removeFromSet(newLoc, elem))}
+            onClick={() => void setAllLocs(removeFromSet(allLocs, elem))}
             iconProps={{ iconName: 'Delete' }}
           />
           <Label>{elem}</Label>&nbsp;
           {defLoc === elem ? (
-            <Text variant="small">[Default "Save" Location (NYI)]</Text>
+            <Text variant="small">Default "Save" Location (NYI)</Text>
           ) : (
             <DefaultButton
               styles={setSaveStyle}
               iconProps={{ iconName: 'Save' }}
               onClick={() => void setDefLoc(elem)}
-              text="NYI: Set as"
+              text="NYI: Set as Default Save Location"
             />
           )}
         </span>

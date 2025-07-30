@@ -261,5 +261,11 @@ export class ErrorBoundary extends Component<EBProps, EBState> {
 export async function ShowOpenDialog(
   options: OpenDialogOptions,
 ): Promise<string[] | void> {
-  return await CallMain(IpcCall.ShowOpenDialog, isArrayOfString, options);
+  const res = await CallMain(IpcCall.ShowOpenDialog, isArrayOfString, options);
+  if (res) {
+    console.log('ShowOpenDialog result:', res);
+  } else {
+    console.log('ShowOpenDialog cancelled or failed');
+  }
+  return res;
 }

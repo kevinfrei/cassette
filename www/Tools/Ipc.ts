@@ -39,7 +39,7 @@ export async function ReadFromStorage<T>(
  * @param data The value to be written
  */
 export function WriteToStorage<T>(key: string, data: T): void {
-  PostMain(IpcCall.WriteToStorage, key, Pickle(data)).catch((err) => {
+  PostMain(IpcCall.WriteToStorage, key, data).catch((err) => {
     err(`Failed to write to storage for key "${key}":`, err);
   });
 }
@@ -287,16 +287,35 @@ export async function RawGet(endpoint: string): Promise<string | undefined> {
   return undefined;
 }
 
-async function Get(endpoint: IpcCall, ...args: string[]): Promise<unknown> {
+async function Get(endpoint: IpcCall, ...args: unknown[]): Promise<unknown> {
   try {
     const response = await fetch(
-      ['/api', endpoint.toString(10), ...args].join('/'),
+      [
+        '/api',
+        endpoint.toString(10),
+        ...args.map(Pickle).map(encodeURIComponent),
+      ].join('/'),
       {
         method: 'GET',
       },
     );
     if (response.ok) {
-      return await response.json();
+      const txt = await response.text();
+      if (txt.length === 0) {
+        return undefined;
+      }
+      try {
+        const res = Unpickle(txt);
+        if (isDefined(res)) {
+          return res;
+        } else {
+          console.error(`Failed to unpickle response from ${endpoint}:`, txt);
+        }
+      } catch (e) {
+        console.error(`Failed to unpickle response from ${endpoint}:`, e);
+        console.error('Response text was:', txt);
+        return undefined;
+      }
     }
   } catch (err) {
     return err;
@@ -307,10 +326,24 @@ async function Get(endpoint: IpcCall, ...args: string[]): Promise<unknown> {
 async function GetAs<T>(
   validator: typecheck<T>,
   endpoint: IpcCall,
-  ...args: string[]
+  ...args: unknown[]
 ): Promise<T | undefined> {
   const res = await Get(endpoint, ...args);
-  return validator(res) ? res : undefined;
+  if (validator(res)) {
+    console.log('Validator for endpoint passed:', endpoint);
+    console.log(validator);
+    console.log('GetAs validated result');
+    try {
+      console.log(res);
+    } catch {
+      /* */
+    }
+    return res;
+  } else {
+    console.log('GetAs failed to validate result');
+    console.log(res);
+    return undefined;
+  }
 }
 
 /**
@@ -328,7 +361,7 @@ export async function CallMain<T>(
   typecheck: typecheck<T>,
   ...args: unknown[]
 ): Promise<T | undefined> {
-  return await GetAs(typecheck, channel, ...args.map((a) => String(a)));
+  return await GetAs(typecheck, channel, ...args);
 }
 
 export async function PostMain(
