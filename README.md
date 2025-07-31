@@ -3,13 +3,13 @@
 ## A local music player from inside the browser
 
 I've gotten frustrated with just how bloated and slow Electron was, and a friend
-pointed me at the [CrowCPP](https://crowcpp.oerg) C++ web server. SO I decided
-to take a swipe at porting my
+pointed me at the [CrowCPP](https://crowcpp.org) C++ web server. I decided to
+take a swipe at porting my
 [Electron Music Player](https://github.com/kevinfrei/EMP) over to a strictly
 browser-hosted solution with a crow-based back end.
 
-Currently, it's not working, but I'm active pushing it toward completion. I had
-to migrate off of [Recoil](https://recoiljs.org) because Meta's definitely
+Currently, it's not working, but I'm actively pushing it toward completion. I
+had to migrate off of [Recoil](https://recoiljs.org) because Meta's definitely
 abandoned it, so I'm moving to [Jotai](https://jotai.org) as part of this
 migration. I'd say things are about 50% done.
 
