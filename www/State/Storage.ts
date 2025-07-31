@@ -40,11 +40,8 @@ function makeGetItem<T>(
   chk: typecheck<T>,
 ): (key: string, initialValue: T) => PromiseLike<T> {
   return async (key: string, initialValue: T): Promise<T> => {
-    const maybeValue = await ReadFromStorage(key, isString);
-    if (!isDefined(maybeValue)) {
-      return initialValue;
-    }
-    return SafelyUnpickle(maybeValue, chk) || initialValue;
+    const maybeValue = await ReadFromStorage(key, chk);
+    return isDefined(maybeValue) ? maybeValue : initialValue;
   };
 }
 

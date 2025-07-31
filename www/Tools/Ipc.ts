@@ -331,40 +331,15 @@ async function Get(endpoint: IpcCall, ...args: unknown[]): Promise<unknown> {
       const isJson = contentType && contentType.includes('json');
       const isText = contentType && contentType.includes('text');
       if (isJson || isText) {
-        console.log(
-          `isJson: ${isJson}, isText: ${isText}, contentType: ${contentType}`,
-        );
         const txt = await response.text();
         if (txt.length === 0) {
-          console.warn(`Received empty response from ${endpoint}`);
           return undefined;
-        }
-        try {
-          if (isJson) {
-            console.log(`Unpickling JSON response from ${endpoint}:`, txt);
-            const res = Unpickle(txt);
-            if (isDefined(res)) {
-              console.log(
-                `Successfully unpickled response from ${endpoint}:`,
-                res,
-              );
-              return res;
-            } else {
-              console.error(
-                `Failed to unpickle response from ${endpoint}:`,
-                txt,
-              );
-            }
-          }
-        } catch (e) {
-          console.error(`Failed to unpickle response from ${endpoint}:`, e);
-          console.error('Response text was:', txt);
         }
         return txt;
       } else {
-        console.log(
-          `Received non-JSON/text response from ${endpoint}, contentType: ${contentType}`,
-        );
+        // console.log(
+        //   `Received non-JSON/text response from ${endpoint}, contentType: ${contentType}`,
+        // );
         return await response.blob();
       }
     }
@@ -380,21 +355,12 @@ async function GetAs<T>(
   ...args: unknown[]
 ): Promise<T | undefined> {
   const res = await Get(endpoint, ...args);
-  if (validator(res)) {
-    console.log('Validator for endpoint passed:', endpoint);
-    console.log(validator);
-    console.log('GetAs validated result');
-    try {
-      console.log(res);
-    } catch {
-      /* */
-    }
-    return res;
-  } else {
-    console.log('GetAs failed to validate result');
-    console.log(res);
-    return undefined;
+  if (isString(res)) {
+    return SafelyUnpickle(res, validator);
   }
+  // console.log('GetAs failed to validate result');
+  // console.log(res);
+  return undefined;
 }
 
 /**
