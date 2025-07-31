@@ -1,11 +1,13 @@
-set(MUSICDB_SRC_FILES audiofileindex.cpp)
-set(MUSICDB_HEADER_FILES audiofileindex.h)
+set(
+  MUSICDB_SRC_FILES
+  audiofileindex.cpp
+  musicdb.cpp
+)
 
 add_library(
   musicdb_lib
   OBJECT
   ${MUSICDB_SRC_FILES}
-  ${MUSICDB_HEADER_FILES}
 )
 
 target_link_libraries(
