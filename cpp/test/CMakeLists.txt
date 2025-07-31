@@ -4,9 +4,9 @@ set(
   TEST_SOURCE_FILES
 	json_test.cpp
 	config_test.cpp
-)
+	audiofileindex_test.cpp)
 
-add_executable(cassette_cpptst ${TEST_SOURCE_FILES})
+add_executable(cassette_cpptst ${TEST_SOURCE_FILES} "audiofileindex_test.cpp")
 target_link_libraries(
   cassette_cpptst
   PUBLIC
