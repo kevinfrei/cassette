@@ -21,7 +21,7 @@ std::string_view get_key(std::string_view data) {
 
 void read_from_storage(crow::response& resp, std::string_view data) {
   auto key = get_key(data);
-  std::cout << "Reading " << key << " from storage: [" << data << "]"
+  std::cout << "Reading " << key << " from storage: <" << data << ">"
             << std::endl;
   auto result = config::read_from_storage(key);
   if (!result) {
@@ -30,6 +30,8 @@ void read_from_storage(crow::response& resp, std::string_view data) {
     resp.code = 200; // OK
     resp.set_header("Content-Type", "text/plain");
     resp.body = *result;
+    std::cout << "Read data for <" << key << "> from storage: <" << *result
+              << ">" << std::endl;
   }
 }
 
@@ -38,13 +40,13 @@ void write_to_storage(crow::response& resp, std::string_view data) {
   if (key.length() == data.length()) {
     // If the key is the same as the data, it means no slash was found
     std::cerr << "Invalid (missing) data for key " << key
-              << " in storage request: [" << data << "]" << std::endl;
+              << " in storage request: <" << data << ">" << std::endl;
     return;
   }
   auto maybe_value = tools::url_decode(data.substr(key.length() + 1));
   if (!maybe_value) {
     std::cerr << "Invalid (malformed) value for key " << key
-              << " in storage request: [" << data << "]" << std::endl;
+              << " in storage request: <" << data << ">" << std::endl;
     return;
   }
   auto json = crow::json::load(*maybe_value);
@@ -61,7 +63,7 @@ void write_to_storage(crow::response& resp, std::string_view data) {
 
 void delete_from_storage(crow::response& resp, std::string_view data) {
   auto key = get_key(data);
-  std::cout << "Deleting " << key << " from storage: [" << data << "]"
+  std::cout << "Deleting " << key << " from storage: <" << data << ">"
             << std::endl;
   if (!config::delete_from_storage(key)) {
     resp.code = 500; // Internal Server Error

@@ -1,11 +1,9 @@
 import {
   isDefined,
-  isNumber,
   isString,
-  isUndefined,
-  Pickle,
   SafelyUnpickle,
   typecheck,
+  Unpickle,
 } from '@freik/typechk';
 import { createStore } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';

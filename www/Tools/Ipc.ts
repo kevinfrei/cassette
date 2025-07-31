@@ -3,6 +3,7 @@ import MakeSeqNum from '@freik/seqnum';
 import {
   isDefined,
   isFunction,
+  isNumberOrString,
   isObjectNonNull,
   isString,
   Pickle,
@@ -39,7 +40,7 @@ export async function ReadFromStorage<T>(
  * @param data The value to be written
  */
 export function WriteToStorage<T>(key: string, data: T): void {
-  PostMain(IpcCall.WriteToStorage, key, Pickle(data)).catch((err) => {
+  PostMain(IpcCall.WriteToStorage, key, data).catch((err) => {
     err(`Failed to write to storage for key "${key}":`, err);
   });
 }
@@ -273,7 +274,9 @@ export async function SendMessage<T>(
   return result;
 }
 
-export async function RawGet(endpoint: string): Promise<string | undefined> {
+export async function RawGetAsText(
+  endpoint: string,
+): Promise<string | undefined> {
   try {
     const response = await fetch(endpoint, {
       method: 'GET',
@@ -287,16 +290,58 @@ export async function RawGet(endpoint: string): Promise<string | undefined> {
   return undefined;
 }
 
-async function Get(endpoint: IpcCall, ...args: string[]): Promise<unknown> {
+export async function RawGetAsJSON(
+  endpoint: string,
+): Promise<string | undefined> {
+  try {
+    const response = await fetch(endpoint, {
+      method: 'GET',
+    });
+    if (response.ok) {
+      return await response.json();
+    }
+  } catch (err) {
+    console.error(`Failed to fetch ${endpoint}:`, err);
+  }
+  return undefined;
+}
+
+function encodeForCall(arg: unknown): string {
+  if (isNumberOrString(arg)) {
+    return encodeURIComponent(arg);
+  } else if (isObjectNonNull(arg) || Array.isArray(arg)) {
+    return encodeURIComponent(Pickle(arg));
+  } else if (isDefined(arg)) {
+    return encodeURIComponent(String(arg));
+  } else {
+    return '';
+  }
+}
+
+async function Get(endpoint: IpcCall, ...args: unknown[]): Promise<unknown> {
   try {
     const response = await fetch(
-      ['/api', endpoint.toString(10), ...args].join('/'),
+      ['/api', endpoint.toString(10), ...args.map(encodeForCall)].join('/'),
       {
         method: 'GET',
       },
     );
     if (response.ok) {
-      return await response.json();
+      const contentType = response.headers.get('Content-Type');
+      const isJson = contentType && contentType.includes('json');
+      const isText = contentType && contentType.includes('text');
+      if (isJson || isText) {
+        const txt = await response.text();
+        if (txt.length === 0) {
+          return undefined;
+        }
+        return txt;
+      } else {
+        // console.log(
+        //   `Received non-JSON/text response from ${endpoint}, contentType: ${contentType}`,
+        // );
+        return await response.blob();
+      }
     }
   } catch (err) {
     return err;
@@ -307,10 +352,15 @@ async function Get(endpoint: IpcCall, ...args: string[]): Promise<unknown> {
 async function GetAs<T>(
   validator: typecheck<T>,
   endpoint: IpcCall,
-  ...args: string[]
+  ...args: unknown[]
 ): Promise<T | undefined> {
   const res = await Get(endpoint, ...args);
-  return validator(res) ? res : undefined;
+  if (isString(res)) {
+    return SafelyUnpickle(res, validator);
+  }
+  // console.log('GetAs failed to validate result');
+  // console.log(res);
+  return undefined;
 }
 
 /**
@@ -328,7 +378,7 @@ export async function CallMain<T>(
   typecheck: typecheck<T>,
   ...args: unknown[]
 ): Promise<T | undefined> {
-  return await GetAs(typecheck, channel, ...args.map((a) => String(a)));
+  return await GetAs(typecheck, channel, ...args);
 }
 
 export async function PostMain(

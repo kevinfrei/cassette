@@ -9,7 +9,7 @@ take a swipe at porting my
 browser-hosted solution with a crow-based back end.
 
 Currently, it's not working, but I'm actively pushing it toward completion. I
-had to migrate off of [Recoil](https://recoiljs.org) because Meta's definitely
+had to migrate off of [Recoil](https://recoiljs.org) because Meta has fully
 abandoned it, so I'm moving to [Jotai](https://jotai.org) as part of this
 migration. I'd say things are about 50% done.
 

@@ -8,6 +8,7 @@
 
 #include "CommonTypes.hpp"
 #include "files.h"
+#include "tools.h"
 
 namespace fs = std::filesystem;
 
@@ -299,22 +300,69 @@ std::optional<std::string> read_file(fs::path file_path) {
   return out;
 }
 
-void folder_picker(crow::response& /*resp*/, std::string_view /*data*/) {
+template <typename T>
+void show_opt(std::string_view name, const std::optional<T>& opt) {
+  if (opt) {
+    std::cout << "  " << name << ": " << *opt << std::endl;
+  } else {
+    std::cout << "  " << name << ": <none>" << std::endl;
+  }
+}
+
+void folder_picker(crow::response& resp, std::string_view data) {
   // TODO: Allow data to specify a title, default path or a platform path.
   // For now, I'm waiting on platform folders to get updated (see the
   // conan file)
-  auto result = pfd::select_folder("Select a folder", "", pfd::opt::none);
-  /*  auto json = crow::json::load(*maybe_value);
-    std::cout << "Writing data " << json << " for " << key << " to storage"
-              << std::endl;
-    std::ostringstream os;
-    os << json;
-    if (!config::write_to_storage(key, os.str())) {
-      resp.code = 500; // Internal Server Error
-    } else {
-      resp.code = 200; // OK
+  auto res = tools::url_decode(data);
+  if (res) {
+    std::cout << "Folder picker called with data: " << *res << std::endl;
+    auto options = from_json<Shared::OpenDialogOptions>(crow::json::load(*res));
+    if (options) {
+      std::cout << "Options: " << std::endl;
+      show_opt("folder", options->folder);
+      show_opt("title", options->title);
+      show_opt("defaultPath", options->defaultPath);
+      show_opt("buttonLabel", options->buttonLabel);
+      show_opt("multiSelections", options->multiSelections);
+      if (options->filters) {
+        std::cout << "  filters: " << std::endl;
+        for (const auto& filter : *options->filters) {
+          std::cout << "    name: " << filter.name << std::endl;
+          std::cout << "    extensions: ";
+          for (const auto& ext : filter.extensions) {
+            std::cout << ext << " ";
+          }
+          std::cout << std::endl;
+        }
+      }
     }
-      */
+  } else {
+    std::cout << "Folder picker called with bad data: " << data << std::endl;
+  }
+  auto result =
+      pfd::select_folder("Select a folder", "", pfd::opt::none).result();
+  if (result.empty()) {
+    std::cout << "Folder picker cancelled." << std::endl;
+    resp.code = 204; // No Content
+    resp.body = "";
+  } else {
+    std::cout << "Folder picker selected: " << result << std::endl;
+    resp.code = 200; // OK
+    resp.set_header("Content-Type", "text/json");
+    resp.body = to_json(std::vector<std::string>{result}).dump();
+  }
+  /*
+  auto json = crow::json::load(*maybe_value);
+  std::cout << "Writing data " << json << " for " << key << " to storage"
+            << std::endl;
+  std::ostringstream os;
+  os << json;
+  if (!config::write_to_storage(key, os.str())) {
+    resp.code = 500; // Internal Server Error
+  } else {
+    resp.code = 200; // OK
+  }
+  */
 }
 
 } // namespace files

@@ -1,6 +1,7 @@
 import {
   DefaultButton,
   Dropdown,
+  Icon,
   IconButton,
   IDropdownOption,
   Label,
@@ -21,27 +22,36 @@ import {
   SocketMsg,
   StrId,
 } from 'www/Shared/CommonTypes';
+import { useJotaiAsyncCallback } from 'www/State/Helpers';
 import { useJotaiBoolState } from 'www/State/Hooks';
 import {
   neverPlayHatesState,
   onlyPlayLikesState,
 } from 'www/State/LikesAndHates';
+import { rescanInProgressState } from 'www/State/Miscellany';
 import {
   albumCoverNameState,
+  defaultLocationState,
   downloadAlbumArtworkState,
   downloadArtistArtworkState,
   ignoreArticlesState,
+  locationsState,
   minSongCountForArtistListState,
   saveAlbumArtworkWithMusicState,
   showArtistsWithFullAlbumsState,
 } from 'www/State/SimpleSettings';
 import { ignoreItemsState } from 'www/State/SongPlayback';
 import { PostMain, SendMessage } from 'www/Tools/Ipc';
+import { ShowOpenDialog } from 'www/Tools/Utilities';
 import { GetHelperText } from 'www/Utils';
 
+import { allAlbumsState } from 'www/State/Albums';
+import { allArtistsState } from 'www/State/Artists';
+import { allSongsState } from 'www/State/Songs';
 import './styles/Settings.css';
 
 const btnWidth: React.CSSProperties = { width: '155px', padding: 0 };
+
 const removeFromSet = (set: string[], val: string): string[] => {
   const newSet = new Set(set);
   newSet.delete(val);
@@ -49,37 +59,30 @@ const removeFromSet = (set: string[], val: string): string[] => {
 };
 
 async function GetDirs(): Promise<string[] | void> {
-  return Promise.resolve();
-  /* TODO await Util.ShowOpenDialog({ properties: ['openDirectory'] }); */
-}
-/*
-export async function addLocation({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  set,
-}: MyTransactionInterface): Promise<boolean> {
-  const locs = await GetDirs();
-  if (locs) {
-    // set(locationsState, (curLocs) => [...locs, ...curLocs]);
-    return true;
+  const vals = await ShowOpenDialog({
+    title: 'Select Music Directory',
+    folder: true,
+    multiSelections: true,
+  });
+  if (vals) {
+    console.log('Selected directories:', vals);
   }
-  return false;
-}*/
+  return vals;
+}
 
 function MusicLocations(): ReactElement {
-  /*
-
-  TODO
-
-  const [newLoc, setNewLoc] = useAtom(locationsState);
+  const [allLocs, setAllLocs] = useAtom(locationsState);
   const [defLoc, setDefLoc] = useAtom(defaultLocationState);
   const rescanInProgress = useAtomValue(rescanInProgressState);
-  const onAddLocation = useMyTransaction((xact) => () => {
-    addLocation(xact).catch(Catch);
-  });
-  const songs = useRecoilValue(allSongsFunc);
-  const albums = useRecoilValue(allAlbumsFunc);
-  const artists = useRecoilValue(allArtistsFunc);
-  */
+  const onAddLocation = useJotaiAsyncCallback(async (get, set) => {
+    const locs = await GetDirs();
+    if (locs) {
+      await set(locationsState, [...(await get(locationsState)), ...locs]);
+    }
+  }, []);
+  const songs = useAtomValue(allSongsState);
+  const albums = useAtomValue(allAlbumsState);
+  const artists = useAtomValue(allArtistsState);
   const setSaveStyle = {
     textContainer: { fontSize: 11 },
     root: { height: 22, padding: 5, minWidth: 45 },
@@ -91,29 +94,29 @@ function MusicLocations(): ReactElement {
   };
   return (
     <>
-      {/*(newLoc || []).map((elem) => (
+      {(allLocs || []).map((elem) => (
         <span key={elem} className="music-loc">
           <IconButton
-            onClick={() => void setNewLoc(removeFromSet(newLoc, elem))}
+            onClick={() => void setAllLocs(removeFromSet(allLocs, elem))}
             iconProps={{ iconName: 'Delete' }}
           />
           <Label>{elem}</Label>&nbsp;
           {defLoc === elem ? (
-            <Text variant="small">[Default "Save" Location (NYI)]</Text>
+            <Text variant="small">Default "Save" (NYI)</Text>
           ) : (
             <DefaultButton
               styles={setSaveStyle}
               iconProps={{ iconName: 'Save' }}
               onClick={() => void setDefLoc(elem)}
-              text="NYI: Set as"
+              text="NYI: Set as Default"
             />
           )}
         </span>
-      ))*/}
+      ))}
       <div>
         <DefaultButton
           text="Add Location"
-          onClick={() => {} /*onAddLocation*/}
+          onClick={onAddLocation}
           iconProps={{ iconName: 'Add' }}
           title={GetHelperText(Keys.AddFileLocation)}
           style={btnWidth}
@@ -125,7 +128,7 @@ function MusicLocations(): ReactElement {
           <DefaultButton
             text="Rescan Locations"
             iconProps={{ iconName: 'SearchData' }}
-            disabled={false /*rescanInProgress*/}
+            disabled={rescanInProgress}
             onClick={() => SendMessage(SocketMsg.ManualRescan)}
             style={btnWidth}
           />
@@ -139,7 +142,7 @@ function MusicLocations(): ReactElement {
           style={btnWidth}
         />
       </div>
-      <Text>{`1 Artists, 2 Albums, 3 Songs`}</Text>
+      <Text>{`${artists.size} Artists, ${albums.size} Albums, ${songs.size} Songs`}</Text>
     </>
   );
 }
