@@ -45,6 +45,9 @@ import { PostMain, SendMessage } from 'www/Tools/Ipc';
 import { ShowOpenDialog } from 'www/Tools/Utilities';
 import { GetHelperText } from 'www/Utils';
 
+import { allAlbumsState } from 'www/State/Albums';
+import { allArtistsState } from 'www/State/Artists';
+import { allSongsState } from 'www/State/Songs';
 import './styles/Settings.css';
 
 const btnWidth: React.CSSProperties = { width: '155px', padding: 0 };
@@ -77,11 +80,9 @@ function MusicLocations(): ReactElement {
       await set(locationsState, [...(await get(locationsState)), ...locs]);
     }
   }, []);
-  /*
-  const songs = useRecoilValue(allSongsFunc);
-  const albums = useRecoilValue(allAlbumsFunc);
-  const artists = useRecoilValue(allArtistsFunc);  
-  */
+  const songs = useAtomValue(allSongsState);
+  const albums = useAtomValue(allAlbumsState);
+  const artists = useAtomValue(allArtistsState);
   const setSaveStyle = {
     textContainer: { fontSize: 11 },
     root: { height: 22, padding: 5, minWidth: 45 },
@@ -93,7 +94,6 @@ function MusicLocations(): ReactElement {
   };
   return (
     <>
-      <Text>Location Count #{allLocs.length}</Text>
       {(allLocs || []).map((elem) => (
         <span key={elem} className="music-loc">
           <IconButton
@@ -102,13 +102,13 @@ function MusicLocations(): ReactElement {
           />
           <Label>{elem}</Label>&nbsp;
           {defLoc === elem ? (
-            <Text variant="small">Default "Save" Location (NYI)</Text>
+            <Text variant="small">Default "Save" (NYI)</Text>
           ) : (
             <DefaultButton
               styles={setSaveStyle}
               iconProps={{ iconName: 'Save' }}
               onClick={() => void setDefLoc(elem)}
-              text="NYI: Set as Default Save Location"
+              text="NYI: Set as Default"
             />
           )}
         </span>
@@ -142,7 +142,7 @@ function MusicLocations(): ReactElement {
           style={btnWidth}
         />
       </div>
-      <Text>{`1 Artists, 2 Albums, 3 Songs`}</Text>
+      <Text>{`${artists.size} Artists, ${albums.size} Albums, ${songs.size} Songs`}</Text>
     </>
   );
 }
