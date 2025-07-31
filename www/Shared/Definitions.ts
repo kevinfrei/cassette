@@ -166,6 +166,11 @@ const IgnoreItemType: SEnum = enum_str({
   DirName: 'dir-name',
 });
 
+const IgnoreItemPair: ObjType = obj({
+  type: ref('IgnoreItemType'),
+  value: str(),
+});
+
 const StorageId: SEnum = enum_str({
   CurrentView: 'currentView',
   Shuffle: 'shuffle',
@@ -389,6 +394,7 @@ export const TypesToGenerate: Record<string, Types> = {
   IpcCall,
   SocketMsg,
   IgnoreItemType,
+  IgnoreItemPair,
   StorageId,
   TranscodeFormatTargetName,
   TranscodeSource,

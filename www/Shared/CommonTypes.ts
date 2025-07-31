@@ -197,6 +197,19 @@ export function chkIgnoreItemType(val: unknown): val is IgnoreItemType {
   );
 }
 
+export type IgnoreItemPair = {
+  type: IgnoreItemType;
+  value: string;
+};
+export const chkIgnoreItemPair: TC.typecheck<IgnoreItemPair> =
+  TC.chkObjectOfType(
+    {
+      type: chkIgnoreItemType,
+      value: TC.isString,
+    },
+    {},
+  );
+
 export const StorageId = Object.freeze({
   CurrentView: 'currentView',
   Shuffle: 'shuffle',
