@@ -4,6 +4,11 @@
 #include <functional>
 #include <optional>
 #include <set>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 #include "CommonTypes.hpp"
 
@@ -12,28 +17,46 @@
 namespace afi {
 
 class audio_file_index {
+  using path_handler = std::function<void(const std::filesystem::path&)>;
+
   std::size_t hash;
   std::filesystem::path loc;
+
+  std::unordered_map<std::string, Shared::SongKey> file_to_key;
+  std::unordered_map<Shared::SongKey, std::string> key_to_file;
+
   std::chrono::time_point<std::chrono::system_clock> last_scan;
   std::set<Shared::IgnoreItemPair> ignore_items;
 
- public:
-  using fspath = std::filesystem::path;
-  using path_handler = std::function<void(const fspath&)>;
+  // Adds a new file to the index (if it doesn't already exist). Don't save
+  // anything, just update the in-memory structures.
+  bool add_new_file(const std::filesystem::path& path);
+  // Removes an existing file from the index (if it exists). Don't save
+  // anything, just update the in-memory structures.
+  bool remove_file(const std::filesystem::path& path);
+  // Get a normalized relative path from the root of the index.
+  std::string get_relative_path(const std::filesystem::path& path) const;
+  // Create a song key for a given relative path.
+  Shared::SongKey make_song_key(const std::string& relPath) const;
 
-  audio_file_index(const fspath& loc, std::size_t hash = 0);
+  void read_index_file();
+  void write_index_file() const;
+
+ public:
+  audio_file_index(const std::filesystem::path& loc, std::size_t hash = 0);
 
   std::size_t getHash() const {
     return hash;
   }
 
-  const fspath& getLocation() const {
+  const std::filesystem::path& getLocation() const {
     return loc;
   }
 
   // The simple stuff:
   std::chrono::time_point<std::chrono::system_clock> getLastScanTime() const;
-  std::optional<Shared::SongKey> makeSongKey(const fspath& songPath) const;
+  std::optional<Shared::SongKey> makeSongKey(
+      const std::filesystem::path& songPath) const;
   void forEachAudioFile(path_handler fn) const;
   void rescanFiles(path_handler addAudioFile, path_handler delAudioFile);
 
@@ -41,7 +64,7 @@ class audio_file_index {
   void updateMetadata(const Shared::SimpleMetadata& newMetadata);
   void updateMetadata(const Shared::FullMetadata& newMetadata);
   std::optional<Shared::FullMetadata> getMetadataForSong(
-      const fspath& filePath) const;
+      const std::filesystem::path& filePath) const;
   void clearMetadataCache();
   void clearLocalMetadataOverrides();
 
