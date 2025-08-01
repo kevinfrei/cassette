@@ -102,7 +102,7 @@ bool audio_file_index::remove_file(const fs::path& path) {
 
 // Get a normalized relative path from the root of the index.
 std::string audio_file_index::get_relative_path(const fs::path& path) const {
-  return fs::proximate(path, loc).generic_string();
+  return fs::weakly_canonical(fs::proximate(path, loc)).generic_string();
 }
 
 void audio_file_index::read_index_file() {
@@ -138,6 +138,14 @@ void audio_file_index::read_index_file() {
   });
 }
 
+std::unordered_set<std::string> suffixes = {
+    ".mp3", ".flac", ".wav", ".m4a", ".aac", ".wma", ".png", ".jpg"};
+
+bool audio_file_index::belongs_here(const fs::path& path) const {
+  // Check if the path is within the index location.
+  return suffixes.contains(fs::proximate(path, loc).extension());
+}
+
 void audio_file_index::rescan_files(path_handler add_audio_file,
                                     path_handler del_audio_file) {
   // For simplicity, we will just scan the directory and call addAudioFile
@@ -155,7 +163,7 @@ void audio_file_index::rescan_files(path_handler add_audio_file,
     existingFiles.insert(relPath);
   }
   for (const auto& entry : fs::recursive_directory_iterator(loc)) {
-    if (entry.is_regular_file()) {
+    if (belongs_here(entry.path())) {
       const auto relativePath = get_relative_path(entry.path());
       existingFiles.erase(relativePath);
       if (file_to_key.contains(relativePath)) {

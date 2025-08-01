@@ -29,6 +29,8 @@ class audio_file_index {
   std::chrono::time_point<std::chrono::system_clock> last_scan;
   std::set<Shared::IgnoreItemPair> ignore_items;
 
+  bool belongs_here(const std::filesystem::path& path) const;
+
   // Adds a new file to the index (if it doesn't already exist). Don't save
   // anything, just update the in-memory structures.
   bool add_new_file(const std::filesystem::path& path);
