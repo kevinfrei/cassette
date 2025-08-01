@@ -50,12 +50,11 @@ audio_file_index::audio_file_index(const fs::path& _loc, std::size_t _hash)
   // If there's already an index, read it first, then run a rescan.
   // Maybe rescan on a background thread?
   read_index_file();
-  /*
   std::vector<fs::path> newFiles;
   std::vector<fs::path> removedFiles;
 
   // Read the entire contents of the location into an internal map:
-  rescanFiles(
+  rescan_files(
       [&](const fs::path& path) {
         newFiles.push_back(path);
         // std::cout << "Found audio file: " << path << "\n";
@@ -64,7 +63,15 @@ audio_file_index::audio_file_index(const fs::path& _loc, std::size_t _hash)
         removedFiles.push_back(path);
         // std::cout << "Removed audio file: " << path << "\n";
       });
-  */
+  // Now we can update the index with the new files.
+  for (const auto& path : newFiles) {
+    add_new_file(path);
+  }
+  // And remove the files that were not found.
+  for (const auto& path : removedFiles) {
+    remove_file(path);
+  }
+  // TODO: Write the index file to disk.
 }
 
 // Adds a new file to the index (if it doesn't already exist). Don't save
@@ -118,12 +125,15 @@ void audio_file_index::read_index_file() {
   // Each line is expected to be a file path relative to loc.
   foreach_line_in_file(indexFile, [&](const std::string& line) {
     if (!line.empty()) {
-      fs::path filePath = loc / line;
+      /* fs::path filePath = loc / line;
       if (fs::exists(filePath) && fs::is_regular_file(filePath)) {
-        add_new_file(filePath);
+       */
+      add_new_file(line);
+      /*
       } else {
         std::cerr << "Indexed file does not exist: " << filePath << "\n";
       }
+      */
     }
   });
 }
@@ -138,17 +148,28 @@ void audio_file_index::rescan_files(path_handler add_audio_file,
               << "\n";
     return;
   }
-
+  std::unordered_set<std::string> existingFiles;
+  existingFiles.reserve(file_to_key.size());
+  // Populate existingFiles with the currently indexed files.
+  for (const auto& [relPath, songKey] : file_to_key) {
+    existingFiles.insert(relPath);
+  }
   for (const auto& entry : fs::recursive_directory_iterator(loc)) {
     if (entry.is_regular_file()) {
-      const auto& path = entry.path();
+      const auto relativePath = get_relative_path(entry.path());
+      existingFiles.erase(relativePath);
+      if (file_to_key.contains(relativePath)) {
+        // File already indexed, skip it.
+        continue;
+      }
       // Here we would check if the file is an audio file based on extension
       // or content. For simplicity, we assume all files are audio files.
-      add_audio_file(path);
+      add_audio_file(relativePath);
     }
   }
-  if (false) {
-    del_audio_file(fs::path("example_removed_file.mp3"));
+  for (const auto& relPath : existingFiles) {
+    // These files were not found in the current scan, so they are removed.
+    del_audio_file(relPath);
   }
 }
 
@@ -156,10 +177,17 @@ Shared::SongKey audio_file_index::make_song_key(
     const std::string& relPath) const {
   // Create a song key based on the relative path.
   // This is a placeholder implementation; actual implementation may vary.
+  // TODO: Check for collisions
   std::ostringstream oss;
   oss << key_prefix << std::hex
       << (std::hash<std::string>{}(relPath) % 0x7fffffff);
   return Shared::SongKey{oss.str()};
+}
+
+void audio_file_index::foreach_audio_file(path_handler fn) const {
+  for (const auto& [relPath, songKey] : file_to_key) {
+    fn(loc / relPath);
+  }
 }
 
 } // namespace afi

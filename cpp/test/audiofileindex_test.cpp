@@ -17,4 +17,14 @@ TEST(AFI, Basics) {
   auto p = afi.get_location();
   // std::cout << p.generic_string() << std::endl;
   EXPECT_FALSE(p.generic_string().ends_with("."));
+  int i = 0;
+  afi.foreach_audio_file([&](const std::filesystem::path& path) {
+    std::cout << "Audio file: " << path.generic_string() << std::endl;
+    EXPECT_TRUE(path.is_absolute());
+    EXPECT_TRUE(path.has_filename());
+    EXPECT_TRUE(path.has_extension());
+    EXPECT_TRUE(path.extension().generic_string().starts_with("."));
+    i++;
+  });
+  EXPECT_EQ(i, 0);
 }
