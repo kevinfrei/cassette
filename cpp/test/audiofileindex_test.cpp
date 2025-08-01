@@ -26,5 +26,5 @@ TEST(AFI, Basics) {
     EXPECT_TRUE(path.extension().generic_string().starts_with("."));
     i++;
   });
-  EXPECT_EQ(i, 0);
+  EXPECT_EQ(i, 6);
 }
