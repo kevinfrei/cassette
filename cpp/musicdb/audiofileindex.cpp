@@ -3,10 +3,12 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <iomanip>
 #include <iostream>
 #include <optional>
 #include <set>
 #include <string>
+#include <strstream>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -31,7 +33,7 @@ void foreach_line_in_file(const fs::path& filePath,
     fn(line);
   }
 }
-}
+} // namespace
 namespace afi {
 
 audio_file_index::audio_file_index(const fs::path& _loc, std::size_t _hash)
@@ -41,6 +43,9 @@ audio_file_index::audio_file_index(const fs::path& _loc, std::size_t _hash)
     std::hash<std::string> hasher;
     hash = hasher(loc.generic_string());
   }
+  std::ostringstream oss;
+  oss << "S" << std::hex << (hash % 0x7fffffff) << ":";
+  key_prefix = oss.str();
 
   // If there's already an index, read it first, then run a rescan.
   // Maybe rescan on a background thread?
@@ -142,5 +147,19 @@ void audio_file_index::rescan_files(path_handler add_audio_file,
       add_audio_file(path);
     }
   }
+  if (false) {
+    del_audio_file(fs::path("example_removed_file.mp3"));
+  }
+}
+
+Shared::SongKey audio_file_index::make_song_key(
+    const std::string& relPath) const {
+  // Create a song key based on the relative path.
+  // This is a placeholder implementation; actual implementation may vary.
+  std::ostringstream oss;
+  oss << key_prefix << std::hex
+      << (std::hash<std::string>{}(relPath) % 0x7fffffff);
+  return Shared::SongKey{oss.str()};
+}
 
 } // namespace afi
