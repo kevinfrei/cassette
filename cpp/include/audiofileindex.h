@@ -21,6 +21,7 @@ class audio_file_index {
 
   std::size_t hash;
   std::filesystem::path loc;
+  std::string key_prefix;
 
   std::unordered_map<std::string, Shared::SongKey> file_to_key;
   std::unordered_map<Shared::SongKey, std::string> key_to_file;
@@ -45,39 +46,40 @@ class audio_file_index {
  public:
   audio_file_index(const std::filesystem::path& loc, std::size_t hash = 0);
 
-  std::size_t getHash() const {
+  std::size_t get_hash() const {
     return hash;
   }
 
-  const std::filesystem::path& getLocation() const {
+  const std::filesystem::path& get_location() const {
     return loc;
   }
 
   // The simple stuff:
-  std::chrono::time_point<std::chrono::system_clock> getLastScanTime() const;
-  std::optional<Shared::SongKey> makeSongKey(
+  std::chrono::time_point<std::chrono::system_clock> get_last_scan_time() const;
+  std::optional<Shared::SongKey> get_song_key(
       const std::filesystem::path& songPath) const;
-  void forEachAudioFile(path_handler fn) const;
-  void rescanFiles(path_handler addAudioFile, path_handler delAudioFile);
+  void foreach_audio_file(path_handler fn) const;
+  void rescan_files(path_handler addAudioFile, path_handler delAudioFile);
 
   // Metadata stuff:
-  void updateMetadata(const Shared::SimpleMetadata& newMetadata);
-  void updateMetadata(const Shared::FullMetadata& newMetadata);
-  std::optional<Shared::FullMetadata> getMetadataForSong(
+  void update_metadata(const Shared::SimpleMetadata& newMetadata);
+  void update_metadata(const Shared::FullMetadata& newMetadata);
+  std::optional<Shared::FullMetadata> get_metadata_for_song(
       const std::filesystem::path& filePath) const;
-  void clearMetadataCache();
-  void clearLocalMetadataOverrides();
+  void clear_metadata_cache();
+  void clear_local_metadata_overrides();
 
-  void setImageForSong(const Shared::SongKey& songKey,
-                       const std::vector<std::uint8_t>& buf);
-  bool clearImageForSong(const Shared::SongKey& songKey);
-  std::optional<std::vector<std::uint8_t>> getImageForSong(
+  void set_image_for_song(const Shared::SongKey& songKey,
+                          const std::vector<std::uint8_t>& buf);
+  bool clear_image_for_song(const Shared::SongKey& songKey);
+  std::optional<std::vector<std::uint8_t>> get_image_for_song(
       const Shared::SongKey& songKey, bool preferInternal = false) const;
-  void clearLocalImageCache();
+  void clear_local_image_cache();
 
-  void addIgnoreItem(Shared::IgnoreItemType which, const std::string& value);
-  bool removeIgnoreItem(Shared::IgnoreItemType which, const std::string& value);
-  std::set<Shared::IgnoreItemPair> getIgnoreItems() const;
+  void add_ignore_item(Shared::IgnoreItemType which, const std::string& value);
+  bool remove_ignore_item(Shared::IgnoreItemType which,
+                          const std::string& value);
+  std::set<Shared::IgnoreItemPair> get_ignore_items() const;
 };
 
 } // namespace afi

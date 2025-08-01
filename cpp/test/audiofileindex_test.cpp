@@ -13,8 +13,8 @@ std::filesystem::path self{__FILE__};
 TEST(AFI, Basics) {
   auto afi = afi::audio_file_index{self.parent_path() / "__tests__" /
                                    "audiofileindex"};
-  EXPECT_NE(afi.getHash(), 0);
-  auto p = afi.getLocation();
+  EXPECT_NE(afi.get_hash(), 0);
+  auto p = afi.get_location();
   // std::cout << p.generic_string() << std::endl;
   EXPECT_FALSE(p.generic_string().ends_with("."));
 }
