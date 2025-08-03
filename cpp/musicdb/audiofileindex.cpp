@@ -143,7 +143,8 @@ std::unordered_set<std::string> suffixes = {
 
 bool audio_file_index::belongs_here(const fs::path& path) const {
   // Check if the path is within the index location.
-  return suffixes.contains(fs::proximate(path, loc).extension());
+  return suffixes.contains(
+      fs::proximate(path, loc).extension().generic_string());
 }
 
 void audio_file_index::rescan_files(path_handler add_audio_file,

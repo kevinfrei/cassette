@@ -19,16 +19,24 @@ namespace afi {
 class audio_file_index {
   using path_handler = std::function<void(const std::filesystem::path&)>;
 
+  // The hash of the index, used to identify it.
   std::size_t hash;
+  // The location of the index, where the audio files are stored.
   std::filesystem::path loc;
+  // The prefix for the song keys, based on the index hash.
   std::string key_prefix;
 
+  // Lookup from canonical, proximate paths to song keys.
   std::unordered_map<std::string, Shared::SongKey> file_to_key;
+  // Lookup from song keys to canonical, proximate paths.
   std::unordered_map<Shared::SongKey, std::string> key_to_file;
 
+  // The last time the storage was scanned for files.
   std::chrono::time_point<std::chrono::system_clock> last_scan;
+  // Items to ignore in the index (that would otherwise be included).
   std::set<Shared::IgnoreItemPair> ignore_items;
 
+  // This indicates if the file extension of the path is to be tracked.
   bool belongs_here(const std::filesystem::path& path) const;
 
   // Adds a new file to the index (if it doesn't already exist). Don't save
@@ -42,21 +50,37 @@ class audio_file_index {
   // Create a song key for a given relative path.
   Shared::SongKey make_song_key(const std::string& relPath) const;
 
+  // Read the index file from disk and populate the in-memory structures.
   void read_index_file();
   void write_index_file() const;
 
  public:
+  // Constructs an audio file index at the given location.
+  // If the hash is not provided, it will be computed based on the location.
   audio_file_index(const std::filesystem::path& loc, std::size_t hash = 0);
+  // Constructs an audio file index at the given location.
+  // Update the index, even if it already exists.
+  audio_file_index(const std::filesystem::path& loc,
+                   bool update_index,
+                   std::size_t hash = 0);
 
+  // No AFI copying!
+  audio_file_index(const audio_file_index&) = delete;
+  audio_file_index& operator=(const audio_file_index&) = delete;
+  audio_file_index(audio_file_index&&) = default;
+  audio_file_index& operator=(audio_file_index&&) = default;
+
+  // Get the hash of the index.
   std::size_t get_hash() const {
     return hash;
   }
 
+  // Get the location of the index.
   const std::filesystem::path& get_location() const {
     return loc;
   }
 
-  // The simple stuff:
+  //
   std::chrono::time_point<std::chrono::system_clock> get_last_scan_time() const;
   std::optional<Shared::SongKey> get_song_key(
       const std::filesystem::path& songPath) const;
