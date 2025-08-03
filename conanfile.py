@@ -25,7 +25,7 @@ libraries = [
     Library("boost", "1.87.0", CMakeInfo("Boost", "boost::boost")),
     Library("crowcpp-crow", "1.2.0", CMakeInfo("Crow", "Crow::Crow")),
     Library("gtest", "1.16.0", CMakeInfo("GTest", "gtest::gtest")),   
-    Library("libjpeg", "9e"),
+    Library("libjpeg", "9f"),
     Library("libpng", "1.6.48", CMakeInfo("PNG", "PNG::PNG")),
     Library("libtiff", "4.7.0", CMakeInfo("TIFF", "TIFF::TIFF")),
     Library("portable-file-dialogs", "0.1.0", CMakeInfo("portable-file-dialogs", "portable-file-dialogs::portable-file-dialogs", "PFD_LIB")),
@@ -36,6 +36,9 @@ libraries = [
     Library("libmediainfo", "22.03", CMakeInfo("MediaInfoLib", "mediainfo", "MEDIAINFO_LIB")),
     Library("taglib", "2.0", CMakeInfo("taglib", "taglib::taglib")),
 ]
+
+# I don't think I want anything other than just the pair for these
+tools = [] # [Library("doxygen", "1.14.0")]
 
 class CassetteRecipe(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
@@ -71,7 +74,11 @@ class CassetteRecipe(ConanFile):
                 
     def requirements(self):
         for requirement in libraries:
-            self.requires(requirement.name+"/"+requirement.version)
+            self.requires(requirement.name + "/" + requirement.version)
 
+    def build_requirements(self):
+        # Add the cmake toolchain as a build requirement
+        for requirement in tools:
+          self.tool_requires(requirement.name + "/" + requirement.version)
     def layout(self):
         vs_layout(self)
