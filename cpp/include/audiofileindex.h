@@ -25,6 +25,8 @@ class audio_file_index {
   std::filesystem::path loc;
   // The prefix for the song keys, based on the index hash.
   std::string key_prefix;
+  // The index file path, if it exists.
+  std::optional<std::filesystem::path> index_file_path;
 
   // Lookup from canonical, proximate paths to song keys.
   std::unordered_map<std::string, Shared::SongKey> file_to_key;
@@ -52,6 +54,7 @@ class audio_file_index {
 
   // Read the index file from disk and populate the in-memory structures.
   void read_index_file();
+  // Write the in-memory structures to the index file on disk.
   void write_index_file() const;
 
  public:
@@ -80,8 +83,11 @@ class audio_file_index {
     return loc;
   }
 
-  //
-  std::chrono::time_point<std::chrono::system_clock> get_last_scan_time() const;
+  // The last timue the index was scanned for files.
+  std::chrono::time_point<std::chrono::system_clock> get_last_scan_time()
+      const {
+    return last_scan;
+  }
   std::optional<Shared::SongKey> get_song_key(
       const std::filesystem::path& songPath) const;
   void foreach_audio_file(path_handler fn) const;
