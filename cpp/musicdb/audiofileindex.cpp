@@ -21,6 +21,30 @@
 namespace fs = std::filesystem;
 
 namespace {
+// Base 64: A-Za-z0-9+/
+std::uint64_t base64_string_as_int(std::uint32_t val) {
+  char buffer[sizeof(std::uint64_t)];
+  int i = 0;
+  for (; i < 6 && val; i++) {
+    buffer[i] =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+            [val & 0x3f];
+    val >>= 6;
+  }
+  // Reverse the buffer:
+  for (int j = 0; j < i / 2; j++) {
+    std::swap(buffer[j], buffer[i - j - 1]);
+  }
+  if (!i) {
+    // Special case for zero:
+    buffer[i++] = 'A';
+  }
+  // Null-terminate the string:
+  buffer[i] = '\0';
+  std::uint64_t result = *reinterpret_cast<std::uint64_t*>(&buffer);
+  return result;
+}
+
 void foreach_line_in_file(const fs::path& filePath,
                           const std::function<void(const std::string&)>& fn) {
   std::ifstream file(filePath);
@@ -44,7 +68,8 @@ audio_file_index::audio_file_index(const fs::path& _loc, std::size_t _hash)
     hash = hasher(loc.generic_string());
   }
   std::ostringstream oss;
-  oss << "S" << std::hex << (hash % 0x7fffffff) << ":";
+  std::uint64_t b64 = base64_string_as_int(hash % 0x7fffffff);
+  oss << "S" << reinterpret_cast<const char*>(&b64) << ".";
   key_prefix = oss.str();
 
   // If there's already an index, read it first, then run a rescan.
@@ -188,8 +213,9 @@ Shared::SongKey audio_file_index::make_song_key(
   // This is a placeholder implementation; actual implementation may vary.
   // TODO: Check for collisions
   std::ostringstream oss;
-  oss << key_prefix << std::hex
-      << (std::hash<std::string>{}(relPath) % 0x7fffffff);
+  std::uint64_t b64 =
+      base64_string_as_int(std::hash<std::string>{}(relPath) % 0x7fffffff);
+  oss << key_prefix << reinterpret_cast<const char*>(&b64);
   return Shared::SongKey{oss.str()};
 }
 
