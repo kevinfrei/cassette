@@ -57,6 +57,8 @@ class AFI : public ::testing::Test {
 };
 
 TEST_F(AFI, SmallFileIndex) {
+  std::chrono::time_point<std::chrono::system_clock> start =
+      std::chrono::system_clock::now();
   auto afi = afi::audio_file_index{self.parent_path() / "audiofileindex"};
   EXPECT_NE(afi.get_hash(), 0);
   auto p = afi.get_location();
@@ -76,6 +78,9 @@ TEST_F(AFI, SmallFileIndex) {
   });
   // There should be a total of 6 files in the test directory.
   EXPECT_EQ(i, 6);
+  // Check the timestamp of the last scan.
+  auto lastScan = afi.get_last_scan_time();
+  EXPECT_GT(lastScan, start);
 }
 
 TEST_F(AFI, LargeFileIndex) {

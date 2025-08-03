@@ -7,8 +7,8 @@
 #include <iostream>
 #include <optional>
 #include <set>
+#include <sstream>
 #include <string>
-#include <strstream>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -61,7 +61,9 @@ void foreach_line_in_file(const fs::path& filePath,
 namespace afi {
 
 audio_file_index::audio_file_index(const fs::path& _loc, std::size_t _hash)
-    : hash(_hash), loc(std::filesystem::canonical(_loc)) {
+    : hash(_hash),
+      loc(std::filesystem::canonical(_loc)),
+      last_scan(std::chrono::system_clock::time_point::min()) {
   if (hash == 0) {
     // Compute hash based on the location, if not provided.
     std::hash<std::string> hasher;
@@ -182,6 +184,7 @@ void audio_file_index::rescan_files(path_handler add_audio_file,
               << "\n";
     return;
   }
+  last_scan = std::chrono::system_clock::now();
   std::unordered_set<std::string> existingFiles;
   existingFiles.reserve(file_to_key.size());
   // Populate existingFiles with the currently indexed files.
