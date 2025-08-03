@@ -53,16 +53,20 @@ class audio_file_index {
   Shared::SongKey make_song_key(const std::string& relPath) const;
 
   // Read the index file from disk and populate the in-memory structures.
-  void read_index_file();
+  // Returns true if the index file was successfully read, false otherwise.
+  bool read_index_file();
   // Write the in-memory structures to the index file on disk.
   void write_index_file() const;
 
  public:
   // Constructs an audio file index at the given location.
   // If the hash is not provided, it will be computed based on the location.
-  audio_file_index(const std::filesystem::path& loc, std::size_t hash = 0);
+  // If an index already exists, it will be read from disk, and the source will
+  // *NOT* be rescanned.
+  audio_file_index(const std::filesystem::path& loc, std::size_t hash = 0)
+      : audio_file_index(loc, false, hash) {}
   // Constructs an audio file index at the given location.
-  // Update the index, even if it already exists.
+  // Update the index, even if it already exists, if update_index is true.
   audio_file_index(const std::filesystem::path& loc,
                    bool update_index,
                    std::size_t hash = 0);

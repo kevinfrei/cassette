@@ -60,7 +60,9 @@ void foreach_line_in_file(const fs::path& filePath,
 } // namespace
 namespace afi {
 
-audio_file_index::audio_file_index(const fs::path& _loc, std::size_t _hash)
+audio_file_index::audio_file_index(const fs::path& _loc,
+                                   bool update_index,
+                                   std::size_t _hash)
     : hash(_hash),
       loc(std::filesystem::canonical(_loc)),
       last_scan(std::chrono::system_clock::time_point::min()) {
@@ -76,7 +78,9 @@ audio_file_index::audio_file_index(const fs::path& _loc, std::size_t _hash)
 
   // If there's already an index, read it first, then run a rescan.
   // Maybe rescan on a background thread?
-  read_index_file();
+  if (read_index_file() && !update_index) {
+    return;
+  }
   std::vector<fs::path> newFiles;
   std::vector<fs::path> removedFiles;
 
@@ -132,20 +136,20 @@ std::string audio_file_index::get_relative_path(const fs::path& path) const {
   return fs::weakly_canonical(fs::proximate(path, loc)).generic_string();
 }
 
-void audio_file_index::read_index_file() {
+bool audio_file_index::read_index_file() {
   if (!fs::exists(loc)) {
-    std::cerr << "Index location does not exist: " << loc << "\n";
-    return;
+    // std::cerr << "Index location does not exist: " << loc << "\n";
+    return false;
   }
   fs::path indexDir = loc / ".afi";
   if (!fs::exists(indexDir) || !fs::is_directory(indexDir)) {
-    std::cerr << "Index directory does not exist: " << indexDir << "\n";
-    return;
+    // std::cerr << "Index directory does not exist: " << indexDir << "\n";
+    return false;
   }
   fs::path indexFile = indexDir / "index.txt";
   if (!fs::exists(indexFile) || !fs::is_regular_file(indexFile)) {
-    std::cerr << "Index file does not exist: " << indexFile << "\n";
-    return;
+    // std::cerr << "Index file does not exist: " << indexFile << "\n";
+    return false;
   }
 
   // For simplicity, we will just read the index file line by line.
@@ -163,6 +167,7 @@ void audio_file_index::read_index_file() {
       */
     }
   });
+  return true;
 }
 
 std::unordered_set<std::string> suffixes = {
