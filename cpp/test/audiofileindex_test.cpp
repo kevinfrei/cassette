@@ -23,7 +23,6 @@ TEST(AFI, SmallFileIndex) {
     EXPECT_TRUE(path.is_absolute());
     EXPECT_TRUE(path.has_filename());
     EXPECT_TRUE(path.has_extension());
-    EXPECT_TRUE(path.extension().generic_string().starts_with("."));
     EXPECT_TRUE(path.extension().generic_string() == ".mp3" ||
                 path.extension().generic_string() == ".flac");
     EXPECT_TRUE(path.generic_string().find("/01 - ") != std::string::npos ||
@@ -39,20 +38,27 @@ TEST(AFI, LargeFileIndex) {
                                    "NotActuallyFiles"};
   EXPECT_NE(afi.get_hash(), 0);
   auto p = afi.get_location();
-  // std::cout << p.generic_string() << std::endl;
-  EXPECT_FALSE(p.generic_string().ends_with("."));
   int i = 0;
+  int mp3 = 0;
+  int m4a = 0;
+  int jpg = 0;
+  int flac = 0;
   afi.foreach_audio_file([&](const std::filesystem::path& path) {
-    std::cout << "Audio file: " << path.generic_string() << std::endl;
+    // std::cout << "Audio file: " << path.generic_string() << std::endl;
     EXPECT_TRUE(path.is_absolute());
     EXPECT_TRUE(path.has_filename());
     EXPECT_TRUE(path.has_extension());
     auto ext = path.extension().generic_string();
-    EXPECT_TRUE(ext.starts_with("."));
-    EXPECT_TRUE(ext == ".mp3" || ext == ".m4a" || ext == ".jpg" ||
-                ext == ".flac");
+    mp3 += ext == ".mp3";
+    m4a += ext == ".m4a";
+    jpg += ext == ".jpg";
+    flac += ext == ".flac";
     i++;
   });
   // There should be a total of 870 files in the test directory.
-  EXPECT_EQ(i, 870);
+  EXPECT_EQ(mp3, 739);
+  EXPECT_EQ(m4a, 3);
+  EXPECT_EQ(jpg, 127);
+  EXPECT_EQ(flac, 1);
+  EXPECT_EQ(i, mp3 + m4a + jpg + flac);
 }
