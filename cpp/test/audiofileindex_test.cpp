@@ -8,17 +8,62 @@
 #include "CommonTypes.hpp"
 #include "audiofileindex.h"
 
-std::filesystem::path self{__FILE__};
+namespace fs = std::filesystem;
 
-TEST(AFI, SmallFileIndex) {
-  auto afi = afi::audio_file_index{self.parent_path() / "__tests__" /
-                                   "audiofileindex"};
+fs::path self{__FILE__};
+
+class AFI : public ::testing::Test {
+  // delete the .afi subdirectory before and after running the tests.
+  void rd(const fs::path& dir) {
+    if (fs::exists(dir)) {
+      fs::remove_all(dir);
+    }
+  }
+  void rm(const fs::path& file) {
+    if (fs::exists(file)) {
+      fs::remove(file);
+    }
+  }
+  void remove_stuff() {
+    auto testDir = self.parent_path();
+    rd(testDir / ".afi");
+    rm(testDir / "audiofileindex" /
+       "Test Artist - 2010 - Test Album/04 - New File Not There.mp3");
+  }
+
+ protected:
+  AFI() {
+    remove_stuff();
+  }
+
+  ~AFI() override {
+    remove_stuff();
+  }
+  /*
+  // SetUp() method for per-test setup
+  void SetUp() override {
+    std::cout << "AFI Fixture SetUp called." << std::endl;
+    // Per-test setup code here
+  }
+
+  // TearDown() method for per-test cleanup
+  void TearDown() override {
+    std::cout << "AFI Fixture TearDown called." << std::endl;
+    // This code will run after each test using this fixture,
+    // regardless of whether the test passed or failed.
+    // For example, close files, release resources, etc.
+  }
+  */
+};
+
+TEST_F(AFI, SmallFileIndex) {
+  auto afi = afi::audio_file_index{self.parent_path() / "audiofileindex"};
   EXPECT_NE(afi.get_hash(), 0);
   auto p = afi.get_location();
   // std::cout << p.generic_string() << std::endl;
   EXPECT_FALSE(p.generic_string().ends_with("."));
   int i = 0;
-  afi.foreach_audio_file([&](const std::filesystem::path& path) {
+  afi.foreach_audio_file([&](const fs::path& path) {
     // std::cout << "Audio file: " << path.generic_string() << std::endl;
     EXPECT_TRUE(path.is_absolute());
     EXPECT_TRUE(path.has_filename());
@@ -33,9 +78,8 @@ TEST(AFI, SmallFileIndex) {
   EXPECT_EQ(i, 6);
 }
 
-TEST(AFI, LargeFileIndex) {
-  auto afi = afi::audio_file_index{self.parent_path() / "__tests__" /
-                                   "NotActuallyFiles"};
+TEST_F(AFI, LargeFileIndex) {
+  auto afi = afi::audio_file_index{self.parent_path() / "NotActuallyFiles"};
   EXPECT_NE(afi.get_hash(), 0);
   auto p = afi.get_location();
   int i = 0;
@@ -43,7 +87,7 @@ TEST(AFI, LargeFileIndex) {
   int m4a = 0;
   int jpg = 0;
   int flac = 0;
-  afi.foreach_audio_file([&](const std::filesystem::path& path) {
+  afi.foreach_audio_file([&](const fs::path& path) {
     // std::cout << "Audio file: " << path.generic_string() << std::endl;
     EXPECT_TRUE(path.is_absolute());
     EXPECT_TRUE(path.has_filename());
