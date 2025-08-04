@@ -18,12 +18,12 @@ Belly - 1993 - Star/.CoverArt.jpg
 Belly - 1993 - Star/09 - Feed The Tree.mp3
 Belly - 1995 - King/.CoverArt.jpg
 Belly - 1995 - King/05 - Superconnected.mp3
-Bj�rk - 2003 - Greatest Hits/12 - It's In Our Hands.mp3
-Bj�rk - 2003 - Greatest Hits/14 - Play Dead.mp3
-Bj�rk - 2003 - Greatest Hits/15 - It's In Our Hands [soft pink truth mix].mp3
-Bj�rk - 2003 - Greatest Hits/16 - Our Hands [Grayarea Remix].mp3
-Bj�rk - 2003 - Greatest Hits/17 - It's In Our Hands [Arcade mix].mp3
-Bj�rk - 2003 - Greatest Hits/18 - Our Hands [Winterman's Drum&Bass Remix].mp3
+Björk - 2003 - Greatest Hits/12 - It's In Our Hands.mp3
+Björk - 2003 - Greatest Hits/14 - Play Dead.mp3
+Björk - 2003 - Greatest Hits/15 - It's In Our Hands [soft pink truth mix].mp3
+Björk - 2003 - Greatest Hits/16 - Our Hands [Grayarea Remix].mp3
+Björk - 2003 - Greatest Hits/17 - It's In Our Hands [Arcade mix].mp3
+Björk - 2003 - Greatest Hits/18 - Our Hands [Winterman's Drum&Bass Remix].mp3
 Blind Melon - 1995 - Soup/.CoverArt.jpg
 Blind Melon - 1995 - Soup/01 - Galaxie.mp3
 Blind Melon - 1995 - Soup/04 - Skinned.mp3
@@ -446,24 +446,24 @@ Sesame Street - Various/08 - Time in a Bottle.mp3
 Sesame Street - Various/09 - We Wish You A Merry Christmas.mp3
 Simple Minds - 1992 - Glittering Prize/01 - Alive And Kicking.mp3
 Simple Minds - 1992 - Glittering Prize/03 - Don't You (Forget About Me).mp3
-Sin�ad O'Connor - 1992 - Am I Not Your Girl-/.CoverArt.jpg
-Sin�ad O'Connor - 1992 - Am I Not Your Girl-/02 - Bewitched, Bothered And Bewildered.mp3
-Sin�ad O'Connor - 1992 - Am I Not Your Girl-/04 - Black Coffee.mp3
-Sin�ad O'Connor - 1992 - Am I Not Your Girl-/05 - Success Has Made A Failure Of Our Home.mp3
-Sin�ad O'Connor - 1992 - Am I Not Your Girl-/06 - Don't Cry For Me Argentina.mp3
-Sin�ad O'Connor - 1992 - Am I Not Your Girl-/07 - I Want To Be Loved By You.mp3
-Sin�ad O'Connor - 1994 - Universal Mother/.CoverArt.jpg
-Sin�ad O'Connor - 1994 - Universal Mother/02 - Fire On Babylon.mp3
-Sin�ad O'Connor - 1994 - Universal Mother/03 - John, I Love You.mp3
-Sin�ad O'Connor - 1994 - Universal Mother/04 - My Darling Child.mp3
-Sin�ad O'Connor - 1997 - So Far/.CoverArt.jpg
-Sin�ad O'Connor - 1997 - So Far/12 - Heroine (Theme From 'captive').mp3
-Sin�ad O'Connor - 1997 - So Far/14 - You Made Me The Thief Of Your Heart.mp3
-Sin�ad O'Connor - 2000 - Faith & Courage/.CoverArt.jpg
-Sin�ad O'Connor - 2000 - Faith & Courage/05 - Daddy I'm Fine.mp3
-Sin�ad O'Connor - 2000 - Faith & Courage/06 - 'til I Whisper You Something.mp3
-Sin�ad O'Connor - 2000 - Faith & Courage/09 - The State I'm In.mp3
-Sin�ad O'Connor - 2000 - Faith & Courage/11 - If You Ever.mp3
+Sinéad O'Connor - 1992 - Am I Not Your Girl-/.CoverArt.jpg
+Sinéad O'Connor - 1992 - Am I Not Your Girl-/02 - Bewitched, Bothered And Bewildered.mp3
+Sinéad O'Connor - 1992 - Am I Not Your Girl-/04 - Black Coffee.mp3
+Sinéad O'Connor - 1992 - Am I Not Your Girl-/05 - Success Has Made A Failure Of Our Home.mp3
+Sinéad O'Connor - 1992 - Am I Not Your Girl-/06 - Don't Cry For Me Argentina.mp3
+Sinéad O'Connor - 1992 - Am I Not Your Girl-/07 - I Want To Be Loved By You.mp3
+Sinéad O'Connor - 1994 - Universal Mother/.CoverArt.jpg
+Sinéad O'Connor - 1994 - Universal Mother/02 - Fire On Babylon.mp3
+Sinéad O'Connor - 1994 - Universal Mother/03 - John, I Love You.mp3
+Sinéad O'Connor - 1994 - Universal Mother/04 - My Darling Child.mp3
+Sinéad O'Connor - 1997 - So Far/.CoverArt.jpg
+Sinéad O'Connor - 1997 - So Far/12 - Heroine (Theme From 'captive').mp3
+Sinéad O'Connor - 1997 - So Far/14 - You Made Me The Thief Of Your Heart.mp3
+Sinéad O'Connor - 2000 - Faith & Courage/.CoverArt.jpg
+Sinéad O'Connor - 2000 - Faith & Courage/05 - Daddy I'm Fine.mp3
+Sinéad O'Connor - 2000 - Faith & Courage/06 - 'til I Whisper You Something.mp3
+Sinéad O'Connor - 2000 - Faith & Courage/09 - The State I'm In.mp3
+Sinéad O'Connor - 2000 - Faith & Courage/11 - If You Ever.mp3
 Sister Machine Gun - 1995 - Burn/.CoverArt.jpg
 Sister Machine Gun - 1995 - Burn/05 - Burn.mp3
 Smashing Pumpkins - 1991 - Lull/.CoverArt.jpg
@@ -669,7 +669,7 @@ VA - 2005 - Singles/01 - Kelis - Milkshake.mp3
 VA - 2005 - Singles/02 - Sean Paul - Temperature.mp3
 VA - 2005 - Singles/03 - Shakira - My Hips Don't Lie [w- Wyclef Jean].mp3
 VA - 2005 - Singles/04 - Shakira - Whenever, Wherever.mp3
-VA - 2009 - Singles/01 - Beyonc� - Single Ladies (Put a Ring on it).mp3
+VA - 2009 - Singles/01 - Beyoncé - Single Ladies (Put a Ring on it).mp3
 VA - 2009 - Singles/02 - Whitetown - Not an actual song qwerty [w- Yello].mp3
 VA - 2009 - Singles/03 - Yello - Another Not Song qwerty [live from silly place].mp3
 VA - 2009 - Singles/04 - ZZ Top - Both qwerty [live yup, it is] [w- Whitetown].mp3
@@ -725,7 +725,6 @@ VA - Sesame Street Duets/03 - John Denver & Sesame Street - The Christmas Wish.m
 VA - Sesame Street Duets/04 - Ozzy Osbourne & Sesame Street - Born To Be Wild.mp3
 VA - Singles/01 - Lenny Kravitz - American Woman.mp3
 VA - Unsorted/BustedSong.flac
-VA - Unsorted/TrackA-WontParse.m4a
 VA - Unsorted/CD 1- Some Stuff/04 - Bone Thugs-n-Harmony - Tha Crossroads.mp3
 VA - Unsorted/CD 1- Some Stuff/05 - Bush - Come Down (Acoustic).mp3
 VA - Unsorted/CD 1- Some Stuff/06 - Bush - Machinehead (acoustic).mp3
@@ -830,6 +829,7 @@ VA - Unsorted/CD 2- Other Stuff/22 - Black Velvet Flag - Institutionalized.mp3
 VA - Unsorted/CD 2- Other Stuff/23 - Fiona Apple - Pure Imagination.m4a
 VA - Unsorted/CD 2- Other Stuff/24 - Aaron O'Keefe & Kids - Forty-six & 2.mp3
 VA - Unsorted/CD 2- Other Stuff/25 - El-P - Lab Rat Bravely Escapes on Hovercraft Only to Crash Directly Outside of Gates.mp3
+VA - Unsorted/TrackA-WontParse.m4a
 Wall Of Voodoo - 1982 - Call Of The West/.CoverArt.jpg
 Wall Of Voodoo - 1982 - Call Of The West/06 - Mexican Radio.mp3
 Weird Al Yankovic - 1983 - Weird Al Yankovic/.CoverArt.jpg
