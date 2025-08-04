@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(USE_COMMON_PCH ON)
 
 if(MSVC)
   # For windows/VC++, run normal exception handling & windows 10 APIs
@@ -35,5 +36,38 @@ endif()
 
 # Find Conan2 generated libraries
 include(build/ConanLibImports.cmake)
+
+
+if (${USE_COMMON_PCH})
+add_library(pch_target OBJECT cpp/pch.cpp)
+target_precompile_headers(
+  pch_target
+  PRIVATE
+  <atomic>
+  <cctype>
+  <chrono>
+  <cstdint>
+  <cstdlib>
+  <filesystem>
+  <fstream>
+  <functional>
+  <iomanip>
+  <iostream>
+  <map>
+  <optional>
+  <random>
+  <set>
+  <shared_mutex>
+  <sstream>
+  <string_view>
+  <string>
+  <tuple>
+  <type_traits>
+  <unordered_map>
+  <unordered_set>
+  <utility>
+  <vector>
+)
+endif()
 
 add_subdirectory(cpp)

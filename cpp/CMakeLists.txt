@@ -27,6 +27,10 @@ target_include_directories(
   ${PROJECT_SOURCE_DIR}/cpp/include
 )
 
+if (${USE_COMMON_PCH})
+target_precompile_headers(cassette_lib REUSE_FROM pch_target)
+endif()
+
 # Link the dependencies with our binary
 target_link_libraries(
   cassette_lib

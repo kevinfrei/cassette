@@ -7,6 +7,9 @@ set(
 	audiofileindex_test.cpp)
 
 add_executable(cassette_cpptst ${TEST_SOURCE_FILES} "audiofileindex_test.cpp")
+if (${USE_COMMON_PCH})
+target_precompile_headers(cassette_cpptst REUSE_FROM pch_target)
+endif()
 target_link_libraries(
   cassette_cpptst
   PUBLIC
