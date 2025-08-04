@@ -97,6 +97,12 @@ class audio_file_index {
   void foreach_audio_file(path_handler fn) const;
   void rescan_files(path_handler addAudioFile, path_handler delAudioFile);
 
+  // Ignore items 'stuff':
+  void add_ignore_item(Shared::IgnoreItemType which, const std::string& value);
+  bool remove_ignore_item(Shared::IgnoreItemType which,
+                          const std::string& value);
+  std::set<Shared::IgnoreItemPair> get_ignore_items() const;
+
   // Metadata stuff:
   void update_metadata(const Shared::SimpleMetadata& newMetadata);
   void update_metadata(const Shared::FullMetadata& newMetadata);
@@ -105,17 +111,13 @@ class audio_file_index {
   void clear_metadata_cache();
   void clear_local_metadata_overrides();
 
+  // Images for songs & the like:
   void set_image_for_song(const Shared::SongKey& songKey,
                           const std::vector<std::uint8_t>& buf);
   bool clear_image_for_song(const Shared::SongKey& songKey);
   std::optional<std::vector<std::uint8_t>> get_image_for_song(
       const Shared::SongKey& songKey, bool preferInternal = false) const;
   void clear_local_image_cache();
-
-  void add_ignore_item(Shared::IgnoreItemType which, const std::string& value);
-  bool remove_ignore_item(Shared::IgnoreItemType which,
-                          const std::string& value);
-  std::set<Shared::IgnoreItemPair> get_ignore_items() const;
 };
 
 } // namespace afi
