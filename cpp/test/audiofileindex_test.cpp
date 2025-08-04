@@ -121,18 +121,38 @@ TEST_F(AFI, LargeFileIndex) {
   // TODO: Update the AFI to have some changes, and check the scan times.
   int added = 0;
   int removed = 0;
+  int mp3delta = 0;
+  int jpgdelta = 0;
+  int otherdelta = 0;
   afi.rescan_files(
-      [&](const fs::path& /*path*/) {
+      [&](const fs::path& path) {
         // std::cout << "Added file: " << path.generic_string() << std::endl;
         added++;
+        if (path.extension() == ".mp3") {
+          mp3delta++;
+        } else if (path.extension() == ".jpg") {
+          jpgdelta++;
+        } else {
+          otherdelta++;
+        }
       },
-      [&](const fs::path& /*path*/) {
+      [&](const fs::path& path) {
         // std::cout << "Removed file: " << path.generic_string() << std::endl;
         removed++;
+        if (path.extension() == ".mp3") {
+          mp3delta--;
+        } else if (path.extension() == ".jpg") {
+          jpgdelta--;
+        } else {
+          otherdelta--;
+        }
       });
   EXPECT_GT(afi.get_last_scan_time(),
             std::chrono::system_clock::time_point::min());
   EXPECT_LE(afi.get_last_scan_time(), std::chrono::system_clock::now());
   EXPECT_EQ(added, 2);
   EXPECT_EQ(removed, 2);
+  EXPECT_EQ(mp3delta, 0);
+  EXPECT_EQ(jpgdelta, 0);
+  EXPECT_EQ(otherdelta, 0);
 }
