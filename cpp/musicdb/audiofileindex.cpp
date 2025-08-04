@@ -133,7 +133,9 @@ bool audio_file_index::remove_file(const fs::path& path) {
 
 // Get a normalized relative path from the root of the index.
 std::string audio_file_index::get_relative_path(const fs::path& path) const {
-  return fs::weakly_canonical(fs::proximate(path, loc)).generic_string();
+  auto prox = fs::proximate(path, loc);
+  auto pstr = prox.generic_string();
+  return pstr;
 }
 
 bool audio_file_index::read_index_file() {
@@ -159,7 +161,7 @@ bool audio_file_index::read_index_file() {
       /* fs::path filePath = loc / line;
       if (fs::exists(filePath) && fs::is_regular_file(filePath)) {
        */
-      add_new_file(line);
+      add_new_file(loc / line);
       /*
       } else {
         std::cerr << "Indexed file does not exist: " << filePath << "\n";

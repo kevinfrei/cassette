@@ -84,7 +84,8 @@ TEST_F(AFI, SmallFileIndex) {
 }
 
 TEST_F(AFI, LargeFileIndex) {
-  auto afi = afi::audio_file_index{self.parent_path() / "NotActuallyFiles"};
+  auto afi =
+      afi::audio_file_index{self.parent_path() / "NotActuallyFiles", true};
   EXPECT_NE(afi.get_hash(), 0);
   auto p = afi.get_location();
   int i = 0;
@@ -98,10 +99,17 @@ TEST_F(AFI, LargeFileIndex) {
     EXPECT_TRUE(path.has_filename());
     EXPECT_TRUE(path.has_extension());
     auto ext = path.extension().generic_string();
-    mp3 += ext == ".mp3";
-    m4a += ext == ".m4a";
-    jpg += ext == ".jpg";
-    flac += ext == ".flac";
+    bool isMp3 = ext == ".mp3";
+    bool isM4a = ext == ".m4a";
+    bool isJpg = ext == ".jpg";
+    bool isFlac = ext == ".flac";
+    mp3 += isMp3;
+    m4a += isM4a;
+    jpg += isJpg;
+    flac += isFlac;
+    if (!isMp3 && !isM4a && !isJpg && !isFlac) {
+      std::cerr << "Unexpected file: " << path.generic_string() << std::endl;
+    }
     i++;
   });
   // There should be a total of 870 files in the test directory.
