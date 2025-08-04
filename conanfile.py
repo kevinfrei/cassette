@@ -25,7 +25,7 @@ libraries = [
     Library("boost", "1.87.0", CMakeInfo("Boost", "boost::boost")),
     Library("crowcpp-crow", "1.2.0", CMakeInfo("Crow", "Crow::Crow")),
     Library("gtest", "1.16.0", CMakeInfo("GTest", "gtest::gtest")),   
-    Library("libjpeg", "9f"),
+    Library("libjpeg", "9e"),
     Library("libpng", "1.6.48", CMakeInfo("PNG", "PNG::PNG")),
     Library("libtiff", "4.7.0", CMakeInfo("TIFF", "TIFF::TIFF")),
     Library("portable-file-dialogs", "0.1.0", CMakeInfo("portable-file-dialogs", "portable-file-dialogs::portable-file-dialogs", "PFD_LIB")),

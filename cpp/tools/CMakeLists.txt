@@ -7,6 +7,9 @@ add_library(
   ${TOOLS_SRC_FILES}
   ${TOOLS_HEADER_FILES}
 )
+if (${USE_COMMON_PCH})
+target_precompile_headers(tools_lib REUSE_FROM pch_target)
+endif()
 
 # Specify the include directories for consumers of this library
 target_include_directories(

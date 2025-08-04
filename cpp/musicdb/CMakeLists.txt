@@ -9,7 +9,9 @@ add_library(
   OBJECT
   ${MUSICDB_SRC_FILES}
 )
-
+if (${USE_COMMON_PCH})
+target_precompile_headers(musicdb_lib REUSE_FROM pch_target)
+endif()
 target_link_libraries(
   musicdb_lib
   PUBLIC
