@@ -1,11 +1,9 @@
 #include <filesystem>
-#include <gtest/gtest.h>
 #include <iostream>
-#include <optional>
 #include <string>
-#include <string_view>
 
-#include "CommonTypes.hpp"
+#include <gtest/gtest.h>
+
 #include "audiofileindex.h"
 
 namespace fs = std::filesystem;
@@ -85,8 +83,10 @@ TEST_F(AFI, SmallFileIndex) {
 
 TEST_F(AFI, LargeFileIndex) {
   auto afi =
-      afi::audio_file_index{self.parent_path() / "NotActuallyFiles", true};
+      afi::audio_file_index{self.parent_path() / "NotActuallyFiles", false};
   EXPECT_NE(afi.get_hash(), 0);
+  EXPECT_EQ(afi.get_last_scan_time(),
+            std::chrono::system_clock::time_point::min());
   auto p = afi.get_location();
   int i = 0;
   int mp3 = 0;
@@ -118,4 +118,21 @@ TEST_F(AFI, LargeFileIndex) {
   EXPECT_EQ(jpg, 127);
   EXPECT_EQ(flac, 1);
   EXPECT_EQ(i, mp3 + m4a + jpg + flac);
+  // TODO: Update the AFI to have some changes, and check the scan times.
+  int added = 0;
+  int removed = 0;
+  afi.rescan_files(
+      [&](const fs::path& /*path*/) {
+        // std::cout << "Added file: " << path.generic_string() << std::endl;
+        added++;
+      },
+      [&](const fs::path& /*path*/) {
+        // std::cout << "Removed file: " << path.generic_string() << std::endl;
+        removed++;
+      });
+  EXPECT_GT(afi.get_last_scan_time(),
+            std::chrono::system_clock::time_point::min());
+  EXPECT_LE(afi.get_last_scan_time(), std::chrono::system_clock::now());
+  EXPECT_EQ(added, 2);
+  EXPECT_EQ(removed, 2);
 }
