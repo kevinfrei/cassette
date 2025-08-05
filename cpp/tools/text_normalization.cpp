@@ -336,7 +336,7 @@ std::string normalize_latin_to_utf8(std::string_view input) {
 // diacritics as combining characters.
 std::string normalize_utf8_or_latin(std::string_view input) {
   std::string result;
-  for (int i = 0; i < input.size(); i++) {
+  for (size_t i = 0; i < input.size(); i++) {
     unsigned char c = static_cast<unsigned char>(input[i]);
     char32_t codepoint = 0;
     if (is_onebyte(c)) {

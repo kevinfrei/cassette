@@ -35,22 +35,7 @@ else()
 endif()
 
 # Find Conan2 generated libraries
-# include(build/ConanLibImports.cmake)
-
-find_package(Boost REQUIRED COMPONENTS locale)
-set(BOOST_LIB boost::boost)
-
-find_package(Crow REQUIRED)
-set(CROW_LIB Crow::Crow)
-
-find_package(GTest REQUIRED)
-set(GTEST_LIB gtest::gtest)
-
-find_package(ICU REQUIRED)
-set(ICU_LIB icu::icu)
-
-find_package(portable-file-dialogs REQUIRED)
-set(PFD_LIB portable-file-dialogs::portable-file-dialogs)
+include(build/ConanLibImports.cmake)
 
 if (${USE_COMMON_PCH})
 add_library(pch_target OBJECT cpp/pch.cpp)

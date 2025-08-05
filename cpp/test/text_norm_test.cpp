@@ -33,7 +33,7 @@ TEST(unicode, BasicNormalization) {
       u8"U\u0300U\u0301U\u0302U\u0308u\u0300u\u0301u\u0302u\u0308"
       u8"C\u0327c\u0327N\u0303n\u0303"); // Y\u0301y\u0301 ");
   std::string normalized = txtnorm::normalize_latin_to_utf8(input);
-  for (int i = 0; i < normalized.size(); i++) {
+  for (size_t i = 0; i < normalized.size(); i++) {
     if (normalized[i] != expected[i]) {
       std::cout << "Mismatch at " << i << ": expected '" << expected[i]
                 << "' (0x" << std::hex << static_cast<int>(expected[i])

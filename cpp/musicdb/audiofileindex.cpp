@@ -61,28 +61,6 @@ void foreach_line_in_file(const fs::path& filePath,
   }
 }
 
-void push_combo(std::string& result, char base, char32_t combo) {
-  result.push_back(base);
-  // Now push the combining character:
-  // For simplicity, we will just append the UTF-8 encoding of the combining
-  // character.
-  if (combo <= 0x7f) {
-    result.push_back(static_cast<char>(combo));
-  } else if (combo <= 0x7ff) {
-    result.push_back(static_cast<char>(0xc0 | ((combo >> 6) & 0x1f)));
-    result.push_back(static_cast<char>(0x80 | (combo & 0x3f)));
-  } else if (combo <= 0xffff) {
-    result.push_back(static_cast<char>(0xe0 | ((combo >> 12) & 0x0f)));
-    result.push_back(static_cast<char>(0x80 | ((combo >> 6) & 0x3f)));
-    result.push_back(static_cast<char>(0x80 | (combo & 0x3f)));
-  } else {
-    result.push_back(static_cast<char>(0xf0 | ((combo >> 18) & 0x07)));
-    result.push_back(static_cast<char>(0x80 | ((combo >> 12) & 0x3f)));
-    result.push_back(static_cast<char>(0x80 | ((combo >> 6) & 0x3f)));
-    result.push_back(static_cast<char>(0x80 | (combo & 0x3f)));
-  }
-}
-
 } // namespace
 namespace afi {
 
