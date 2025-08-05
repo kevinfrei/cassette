@@ -37,7 +37,6 @@ endif()
 # Find Conan2 generated libraries
 include(build/ConanLibImports.cmake)
 
-
 if (${USE_COMMON_PCH})
 add_library(pch_target OBJECT cpp/pch.cpp)
 target_precompile_headers(

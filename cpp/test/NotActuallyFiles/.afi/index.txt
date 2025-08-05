@@ -18,12 +18,12 @@ Belly - 1993 - Star/.CoverArt.jpg
 Belly - 1993 - Star/09 - Feed The Tree.mp3
 Belly - 1995 - King/.CoverArt.jpg
 Belly - 1995 - King/05 - Superconnected.mp3
-Björk - 2003 - Greatest Hits/12 - It's In Our Hands.mp3
-Björk - 2003 - Greatest Hits/14 - Play Dead.mp3
-Björk - 2003 - Greatest Hits/15 - It's In Our Hands [soft pink truth mix].mp3
-Björk - 2003 - Greatest Hits/16 - Our Hands [Grayarea Remix].mp3
-Björk - 2003 - Greatest Hits/17 - It's In Our Hands [Arcade mix].mp3
-Björk - 2003 - Greatest Hits/18 - Our Hands [Winterman's Drum&Bass Remix].mp3
+Björk - 2003 - Greatest Hits/12 - It's In Our Hands.mp3
+Björk - 2003 - Greatest Hits/14 - Play Dead.mp3
+Björk - 2003 - Greatest Hits/15 - It's In Our Hands [soft pink truth mix].mp3
+Björk - 2003 - Greatest Hits/16 - Our Hands [Grayarea Remix].mp3
+Björk - 2003 - Greatest Hits/17 - It's In Our Hands [Arcade mix].mp3
+Björk - 2003 - Greatest Hits/18 - Our Hands [Winterman's Drum&Bass Remix].mp3
 Blind Melon - 1995 - Soup/.CoverArt.jpg
 Blind Melon - 1995 - Soup/01 - Galaxie.mp3
 Blind Melon - 1995 - Soup/04 - Skinned.mp3
@@ -446,24 +446,24 @@ Sesame Street - Various/08 - Time in a Bottle.mp3
 Sesame Street - Various/09 - We Wish You A Merry Christmas.mp3
 Simple Minds - 1992 - Glittering Prize/01 - Alive And Kicking.mp3
 Simple Minds - 1992 - Glittering Prize/03 - Don't You (Forget About Me).mp3
-Sinéad O'Connor - 1992 - Am I Not Your Girl-/.CoverArt.jpg
-Sinéad O'Connor - 1992 - Am I Not Your Girl-/02 - Bewitched, Bothered And Bewildered.mp3
-Sinéad O'Connor - 1992 - Am I Not Your Girl-/04 - Black Coffee.mp3
-Sinéad O'Connor - 1992 - Am I Not Your Girl-/05 - Success Has Made A Failure Of Our Home.mp3
-Sinéad O'Connor - 1992 - Am I Not Your Girl-/06 - Don't Cry For Me Argentina.mp3
-Sinéad O'Connor - 1992 - Am I Not Your Girl-/07 - I Want To Be Loved By You.mp3
-Sinéad O'Connor - 1994 - Universal Mother/.CoverArt.jpg
-Sinéad O'Connor - 1994 - Universal Mother/02 - Fire On Babylon.mp3
-Sinéad O'Connor - 1994 - Universal Mother/03 - John, I Love You.mp3
-Sinéad O'Connor - 1994 - Universal Mother/04 - My Darling Child.mp3
-Sinéad O'Connor - 1997 - So Far/.CoverArt.jpg
-Sinéad O'Connor - 1997 - So Far/12 - Heroine (Theme From 'captive').mp3
-Sinéad O'Connor - 1997 - So Far/14 - You Made Me The Thief Of Your Heart.mp3
-Sinéad O'Connor - 2000 - Faith & Courage/.CoverArt.jpg
-Sinéad O'Connor - 2000 - Faith & Courage/05 - Daddy I'm Fine.mp3
-Sinéad O'Connor - 2000 - Faith & Courage/06 - 'til I Whisper You Something.mp3
-Sinéad O'Connor - 2000 - Faith & Courage/09 - The State I'm In.mp3
-Sinéad O'Connor - 2000 - Faith & Courage/11 - If You Ever.mp3
+Sinéad O'Connor - 1992 - Am I Not Your Girl-/.CoverArt.jpg
+Sinéad O'Connor - 1992 - Am I Not Your Girl-/02 - Bewitched, Bothered And Bewildered.mp3
+Sinéad O'Connor - 1992 - Am I Not Your Girl-/04 - Black Coffee.mp3
+Sinéad O'Connor - 1992 - Am I Not Your Girl-/05 - Success Has Made A Failure Of Our Home.mp3
+Sinéad O'Connor - 1992 - Am I Not Your Girl-/06 - Don't Cry For Me Argentina.mp3
+Sinéad O'Connor - 1992 - Am I Not Your Girl-/07 - I Want To Be Loved By You.mp3
+Sinéad O'Connor - 1994 - Universal Mother/.CoverArt.jpg
+Sinéad O'Connor - 1994 - Universal Mother/02 - Fire On Babylon.mp3
+Sinéad O'Connor - 1994 - Universal Mother/03 - John, I Love You.mp3
+Sinéad O'Connor - 1994 - Universal Mother/04 - My Darling Child.mp3
+Sinéad O'Connor - 1997 - So Far/.CoverArt.jpg
+Sinéad O'Connor - 1997 - So Far/12 - Heroine (Theme From 'captive').mp3
+Sinéad O'Connor - 1997 - So Far/14 - You Made Me The Thief Of Your Heart.mp3
+Sinéad O'Connor - 2000 - Faith & Courage/.CoverArt.jpg
+Sinéad O'Connor - 2000 - Faith & Courage/05 - Daddy I'm Fine.mp3
+Sinéad O'Connor - 2000 - Faith & Courage/06 - 'til I Whisper You Something.mp3
+Sinéad O'Connor - 2000 - Faith & Courage/09 - The State I'm In.mp3
+Sinéad O'Connor - 2000 - Faith & Courage/11 - If You Ever.mp3
 Sister Machine Gun - 1995 - Burn/.CoverArt.jpg
 Sister Machine Gun - 1995 - Burn/05 - Burn.mp3
 Smashing Pumpkins - 1991 - Lull/.CoverArt.jpg
@@ -626,12 +626,6 @@ Utah Saints - 1992 - Utah Saints/01 - Something Good.mp3
 Utah Saints - 1992 - Utah Saints/02 - I Want You.mp3
 Utah Saints - 1992 - Utah Saints/03 - What Can You Do For Me-.mp3
 Utah Saints - 1992 - Utah Saints/06 - New Gold Dream (81-82-83-84).mp3
-Va - 1993 - Sweet Relief/03 - Pearl Jam - Crazy Mary.mp3
-Va - 1994 - You Got Lucky- A Tribute To Tom Petty/01 - Everclear - American Girl.mp3
-Va - 1996 - Home Alive/13 - Pearl Jam - Leaving Here.mp3
-Va - 1996 - Music For Our Mother Ocean/08 - Silverchair - Surfin Bird.mp3
-Va - 1996 - Wipeout Xl/10 - Daft Punk - Musique.mp3
-Va - 1997 - Coca Cola's Christmas Music/01 - Everclear - Santa Baby.mp3
 VA - 1997 - Merry Axemas/Disk 1/01 - Kenny Wayne Sheppard - Rudolph The Red-Nosed Reindeer.mp3
 VA - 1997 - Merry Axemas/Disk 1/02 - Eric Johnson - The First Noel.mp3
 VA - 1997 - Merry Axemas/Disk 1/04 - Brian Setzer Orchestra - Jingle Bells.mp3
@@ -645,31 +639,11 @@ VA - 1997 - Merry Axemas/Disk 2/05 - Trevor Rabin - O Come All Ye Faithful.mp3
 VA - 1997 - Merry Axemas/Disk 2/06 - Zakk Wylde - White Christmas.mp3
 VA - 1997 - Merry Axemas/Disk 2/08 - Robin Trower - O Little Town of Bethlehem.mp3
 VA - 1997 - Merry Axemas/Disk 2/10 - Ted Nugent - Deck The Halls.mp3
-Va - 1997 - Mtv Buzz Bin Volume 2/03 - Nada Surf - Popular.mp3
-Va - 1997 - Mtv Buzz Bin Volume 2/04 - Folk Implosion - Natural One.mp3
-Va - 1997 - Mtv Buzz Bin Volume 2/10 - The Flaming Lips - She Don't Use Jelly.mp3
-Va - 1997 - Retro Lunchbox- Squeeze The Cheese/13 - Murray Head - One Night In Bankok.mp3
-Va - 1998 - Gershwin Groove/15 - Sinead O'connor - Someone To Watch Over Me.mp3
-Va - 1998 - Plastic Compilation Volume 2/01 - The Crystal Method - Comin' Back (The Light's Southern Grit Mix).mp3
-Va - 1998 - Plastic Compilation Volume 2/03 - Wiliam Orbit - Water From A Vine Leaf (Xylem Flow Mix).mp3
-Va - 1998 - Plastic Compilation Volume 2/05 - Sarah Mclachlan - Sweet Surrender (Roni Size Mix).mp3
-Va - 1998 - Plastic Compilation Volume 2/11 - Spiritualized - I Think I'm In Love (The Chemical Brothers Remix).mp3
-Va - 1998 - Roots Of Rock- 80's New Wave/02 - Level 42 - Something About You.mp3
-Va - 1998 - Roots Of Rock- 80's New Wave/07 - Nena - 99 Luftballoons.mp3
-Va - 1998 - Roots Of Rock- 80's New Wave/10 - Men Without Hats - Pop Goes The World.mp3
-Va - 1999 - Millenium Hip-Hop Party/05 - Young Mc - Bust A Move.mp3
-Va - 1999 - Millenium Hip-Hop Party/07 - Wreckx-N-Effect - Rump Shaker.mp3
-Va - 1999 - Millenium Hip-Hop Party/14 - Sir Mix-A-Lot - Baby Got Back.mp3
-Va - 1999 - Millenium Party- 80's New Wave/02 - Devo - Whip It.mp3
-Va - 1999 - Millenium Party- 80's New Wave/05 - Eurythmics - Sweet Dreams.mp3
-Va - 1999 - Millenium Party- 80's New Wave/09 - Men Without Hats - Safety Dance.mp3
-Va - 1999 - Millenium Party- 80's New Wave/11 - The Thompson Twins - In The Name Of Love.mp3
-Va - 1999 - Millenium Party- 80's New Wave/16 - Modern English - I Melt With You.mp3
 VA - 2005 - Singles/01 - Kelis - Milkshake.mp3
 VA - 2005 - Singles/02 - Sean Paul - Temperature.mp3
 VA - 2005 - Singles/03 - Shakira - My Hips Don't Lie [w- Wyclef Jean].mp3
 VA - 2005 - Singles/04 - Shakira - Whenever, Wherever.mp3
-VA - 2009 - Singles/01 - Beyoncé - Single Ladies (Put a Ring on it).mp3
+VA - 2009 - Singles/01 - Beyoncé - Single Ladies (Put a Ring on it).mp3
 VA - 2009 - Singles/02 - Whitetown - Not an actual song qwerty [w- Yello].mp3
 VA - 2009 - Singles/03 - Yello - Another Not Song qwerty [live from silly place].mp3
 VA - 2009 - Singles/04 - ZZ Top - Both qwerty [live yup, it is] [w- Whitetown].mp3
@@ -830,6 +804,32 @@ VA - Unsorted/CD 2- Other Stuff/23 - Fiona Apple - Pure Imagination.m4a
 VA - Unsorted/CD 2- Other Stuff/24 - Aaron O'Keefe & Kids - Forty-six & 2.mp3
 VA - Unsorted/CD 2- Other Stuff/25 - El-P - Lab Rat Bravely Escapes on Hovercraft Only to Crash Directly Outside of Gates.mp3
 VA - Unsorted/TrackA-WontParse.m4a
+Va - 1993 - Sweet Relief/03 - Pearl Jam - Crazy Mary.mp3
+Va - 1994 - You Got Lucky- A Tribute To Tom Petty/01 - Everclear - American Girl.mp3
+Va - 1996 - Home Alive/13 - Pearl Jam - Leaving Here.mp3
+Va - 1996 - Music For Our Mother Ocean/08 - Silverchair - Surfin Bird.mp3
+Va - 1996 - Wipeout Xl/10 - Daft Punk - Musique.mp3
+Va - 1997 - Coca Cola's Christmas Music/01 - Everclear - Santa Baby.mp3
+Va - 1997 - Mtv Buzz Bin Volume 2/03 - Nada Surf - Popular.mp3
+Va - 1997 - Mtv Buzz Bin Volume 2/04 - Folk Implosion - Natural One.mp3
+Va - 1997 - Mtv Buzz Bin Volume 2/10 - The Flaming Lips - She Don't Use Jelly.mp3
+Va - 1997 - Retro Lunchbox- Squeeze The Cheese/13 - Murray Head - One Night In Bankok.mp3
+Va - 1998 - Gershwin Groove/15 - Sinead O'connor - Someone To Watch Over Me.mp3
+Va - 1998 - Plastic Compilation Volume 2/01 - The Crystal Method - Comin' Back (The Light's Southern Grit Mix).mp3
+Va - 1998 - Plastic Compilation Volume 2/03 - Wiliam Orbit - Water From A Vine Leaf (Xylem Flow Mix).mp3
+Va - 1998 - Plastic Compilation Volume 2/05 - Sarah Mclachlan - Sweet Surrender (Roni Size Mix).mp3
+Va - 1998 - Plastic Compilation Volume 2/11 - Spiritualized - I Think I'm In Love (The Chemical Brothers Remix).mp3
+Va - 1998 - Roots Of Rock- 80's New Wave/02 - Level 42 - Something About You.mp3
+Va - 1998 - Roots Of Rock- 80's New Wave/07 - Nena - 99 Luftballoons.mp3
+Va - 1998 - Roots Of Rock- 80's New Wave/10 - Men Without Hats - Pop Goes The World.mp3
+Va - 1999 - Millenium Hip-Hop Party/05 - Young Mc - Bust A Move.mp3
+Va - 1999 - Millenium Hip-Hop Party/07 - Wreckx-N-Effect - Rump Shaker.mp3
+Va - 1999 - Millenium Hip-Hop Party/14 - Sir Mix-A-Lot - Baby Got Back.mp3
+Va - 1999 - Millenium Party- 80's New Wave/02 - Devo - Whip It.mp3
+Va - 1999 - Millenium Party- 80's New Wave/05 - Eurythmics - Sweet Dreams.mp3
+Va - 1999 - Millenium Party- 80's New Wave/09 - Men Without Hats - Safety Dance.mp3
+Va - 1999 - Millenium Party- 80's New Wave/11 - The Thompson Twins - In The Name Of Love.mp3
+Va - 1999 - Millenium Party- 80's New Wave/16 - Modern English - I Melt With You.mp3
 Wall Of Voodoo - 1982 - Call Of The West/.CoverArt.jpg
 Wall Of Voodoo - 1982 - Call Of The West/06 - Mexican Radio.mp3
 Weird Al Yankovic - 1983 - Weird Al Yankovic/.CoverArt.jpg

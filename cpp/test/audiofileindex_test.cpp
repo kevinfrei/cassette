@@ -24,17 +24,37 @@ class AFI : public ::testing::Test {
   }
   void remove_stuff() {
     auto testDir = self.parent_path();
-    rd(testDir / ".afi");
+    rd(testDir / "audiofileindex" / ".afi");
     rm(testDir / "audiofileindex" /
        "Test Artist - 2010 - Test Album/04 - New File Not There.mp3");
+  }
+  void backup_index() {
+    auto testDir = self.parent_path();
+    auto indexFile = testDir / "NotActuallyFiles" / ".afi" / "index.txt";
+    if (fs::exists(indexFile)) {
+      fs::copy(indexFile,
+               indexFile.string() + ".bak",
+               fs::copy_options::overwrite_existing);
+    }
+  }
+  void restore_index() {
+    auto testDir = self.parent_path();
+    auto indexFile = testDir / "NotActuallyFiles" / ".afi" / "index.txt";
+    auto backupFile = indexFile.string() + ".bak";
+    if (fs::exists(backupFile)) {
+      fs::copy(backupFile, indexFile, fs::copy_options::overwrite_existing);
+      fs::remove(backupFile);
+    }
   }
 
  protected:
   AFI() {
+    backup_index();
     remove_stuff();
   }
 
   ~AFI() override {
+    restore_index();
     remove_stuff();
   }
   /*

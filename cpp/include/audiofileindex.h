@@ -19,6 +19,9 @@ namespace afi {
 class audio_file_index {
   using path_handler = std::function<void(const std::filesystem::path&)>;
 
+  // Locale and cross-platform file name stuff is completely infuriating:
+  std::locale fs_locale;
+
   // The hash of the index, used to identify it.
   std::size_t hash;
   // The location of the index, where the audio files are stored.
