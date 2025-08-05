@@ -156,11 +156,11 @@ std::string audio_file_index::get_relative_path(const fs::path& path) const {
   auto prox = fs::proximate(path, loc);
   // Normalize to UTF-8 NFC:
   auto str = prox.generic_string();
-  if (str.find("onnor") != std::string::npos) {
-    std::cout << "This one's weird: " << str << "\n";
-    std::cout << "Normalized: " << txtnorm::normalize_utf8_or_latin(str)
-              << "\n";
-  }
+  // if (str.find("onnor") != std::string::npos) {
+  //   std::cout << "This one's weird: " << str << "\n";
+  //   std::cout << "Normalized: " << txtnorm::normalize_utf8_or_latin(str)
+  //             << "\n";
+  // }
   return txtnorm::normalize_utf8_or_latin(str);
 }
 
