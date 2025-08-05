@@ -1,5 +1,8 @@
 set(TOOLS_HEADER_FILES toolbox.h)
-set(TOOLS_SRC_FILES hiddenfile.cpp)
+set(TOOLS_SRC_FILES
+  hiddenfile.cpp
+  text_normalization.cpp
+)
 
 add_library(
   tools_lib

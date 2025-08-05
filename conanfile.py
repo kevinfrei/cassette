@@ -24,17 +24,17 @@ class Library(NamedTuple):
 libraries = [
     Library("boost", "1.87.0", CMakeInfo("Boost", "boost::boost")),
     Library("crowcpp-crow", "1.2.0", CMakeInfo("Crow", "Crow::Crow")),
-    Library("gtest", "1.16.0", CMakeInfo("GTest", "gtest::gtest")),   
-    Library("libjpeg", "9e"),
-    Library("libpng", "1.6.48", CMakeInfo("PNG", "PNG::PNG")),
-    Library("libtiff", "4.7.0", CMakeInfo("TIFF", "TIFF::TIFF")),
+    Library("gtest", "1.16.0", CMakeInfo("GTest", "gtest::gtest")),
     Library("portable-file-dialogs", "0.1.0", CMakeInfo("portable-file-dialogs", "portable-file-dialogs::portable-file-dialogs", "PFD_LIB")),
+    # Library("libjpeg", "9f"),
+    # Library("libpng", "1.6.48", CMakeInfo("PNG", "PNG::PNG")),
+    # Library("libtiff", "4.7.0", CMakeInfo("TIFF", "TIFF::TIFF")),
     # 4.2.0 doesn't work with the latest cmake, so I'll postpone this for now
     # Library("platformfolders", "4.2.0", CMakeInfo("platform_folders", "sago::platform_folders", "PLATFORMFOLDERS_LIB")),
-    Library("zlib", "1.3.1", CMakeInfo("ZLIB", "ZLIB::ZLIB")),
-    # Probably only need one of these two:
-    Library("libmediainfo", "22.03", CMakeInfo("MediaInfoLib", "mediainfo", "MEDIAINFO_LIB")),
-    Library("taglib", "2.0", CMakeInfo("taglib", "taglib::taglib")),
+    # Library("zlib", "1.3.1", CMakeInfo("ZLIB", "ZLIB::ZLIB")),
+    # Probiably only need one of these two:
+    # Library("libmediainfo", "22.03", CMakeInfo("MediaInfoLib", "mediainfo", "MEDIAINFO_LIB")),
+    # Library("taglib", "2.0", CMakeInfo("taglib", "taglib::taglib")),
 ]
 
 # I don't think I want anything other than just the pair for these
