@@ -8,6 +8,7 @@
 #include <optional>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -16,6 +17,8 @@
 // and produce the music-db map.
 
 #include "CommonTypes.hpp"
+#include "text_normalization.hpp"
+
 #include "audiofileindex.h"
 
 namespace fs = std::filesystem;
@@ -57,6 +60,29 @@ void foreach_line_in_file(const fs::path& filePath,
     fn(line);
   }
 }
+
+void push_combo(std::string& result, char base, char32_t combo) {
+  result.push_back(base);
+  // Now push the combining character:
+  // For simplicity, we will just append the UTF-8 encoding of the combining
+  // character.
+  if (combo <= 0x7f) {
+    result.push_back(static_cast<char>(combo));
+  } else if (combo <= 0x7ff) {
+    result.push_back(static_cast<char>(0xc0 | ((combo >> 6) & 0x1f)));
+    result.push_back(static_cast<char>(0x80 | (combo & 0x3f)));
+  } else if (combo <= 0xffff) {
+    result.push_back(static_cast<char>(0xe0 | ((combo >> 12) & 0x0f)));
+    result.push_back(static_cast<char>(0x80 | ((combo >> 6) & 0x3f)));
+    result.push_back(static_cast<char>(0x80 | (combo & 0x3f)));
+  } else {
+    result.push_back(static_cast<char>(0xf0 | ((combo >> 18) & 0x07)));
+    result.push_back(static_cast<char>(0x80 | ((combo >> 12) & 0x3f)));
+    result.push_back(static_cast<char>(0x80 | ((combo >> 6) & 0x3f)));
+    result.push_back(static_cast<char>(0x80 | (combo & 0x3f)));
+  }
+}
+
 } // namespace
 namespace afi {
 
@@ -66,6 +92,7 @@ audio_file_index::audio_file_index(const fs::path& _loc,
     : hash(_hash),
       loc(std::filesystem::canonical(_loc)),
       last_scan(std::chrono::system_clock::time_point::min()) {
+
   if (hash == 0) {
     // Compute hash based on the location, if not provided.
     std::hash<std::string> hasher;
@@ -85,24 +112,17 @@ audio_file_index::audio_file_index(const fs::path& _loc,
   std::vector<fs::path> removedFiles;
 
   // Read the entire contents of the location into an internal map:
-  rescan_files(
-      [&](const fs::path& path) {
-        newFiles.push_back(path);
-        // std::cout << "Found audio file: " << path << "\n";
-      },
-      [&](const fs::path& path) {
-        removedFiles.push_back(path);
-        // std::cout << "Removed audio file: " << path << "\n";
-      });
-  // Now we can update the index with the new files.
-  for (const auto& path : newFiles) {
-    add_new_file(path);
-  }
-  // And remove the files that were not found.
-  for (const auto& path : removedFiles) {
-    remove_file(path);
-  }
-  // TODO: Write the index file to disk.
+  auto empty = [](const fs::path&) {};
+  rescan_files(empty, empty);
+}
+
+std::unordered_set<std::string> suffixes = {
+    ".mp3", ".flac", ".wav", ".m4a", ".aac", ".wma", ".png", ".jpg"};
+
+bool audio_file_index::belongs_here(const fs::path& path) const {
+  // Check if the path is within the index location.
+  return suffixes.contains(
+      fs::proximate(path, loc).extension().generic_string());
 }
 
 // Adds a new file to the index (if it doesn't already exist). Don't save
@@ -134,8 +154,14 @@ bool audio_file_index::remove_file(const fs::path& path) {
 // Get a normalized relative path from the root of the index.
 std::string audio_file_index::get_relative_path(const fs::path& path) const {
   auto prox = fs::proximate(path, loc);
-  auto pstr = prox.generic_string();
-  return pstr;
+  // Normalize to UTF-8 NFC:
+  auto str = prox.generic_string();
+  if (str.find("onnor") != std::string::npos) {
+    std::cout << "This one's weird: " << str << "\n";
+    std::cout << "Normalized: " << txtnorm::normalize_utf8_or_latin(str)
+              << "\n";
+  }
+  return txtnorm::normalize_utf8_or_latin(str);
 }
 
 bool audio_file_index::read_index_file() {
@@ -172,13 +198,30 @@ bool audio_file_index::read_index_file() {
   return true;
 }
 
-std::unordered_set<std::string> suffixes = {
-    ".mp3", ".flac", ".wav", ".m4a", ".aac", ".wma", ".png", ".jpg"};
-
-bool audio_file_index::belongs_here(const fs::path& path) const {
-  // Check if the path is within the index location.
-  return suffixes.contains(
-      fs::proximate(path, loc).extension().generic_string());
+void audio_file_index::write_index_file() const {
+  if (!fs::exists(loc)) {
+    std::cerr << "Index location does not exist: " << loc << "\n";
+    return;
+  }
+  fs::path indexDir = loc / ".afi";
+  if (!fs::exists(indexDir)) {
+    fs::create_directory(indexDir);
+  }
+  fs::path indexFile = indexDir / "index.txt";
+  std::ofstream ofs(indexFile, std::ios::out | std::ios::binary);
+  if (!ofs.is_open()) {
+    std::cerr << "Failed to open index file for writing: " << indexFile << "\n";
+    return;
+  }
+  std::set<std::string> sortedFiles;
+  // Sort the keys to ensure consistent order in the index file.
+  for (const auto& [relPath, songKey] : file_to_key) {
+    sortedFiles.insert(relPath);
+  }
+  for (const auto& relPath : sortedFiles) {
+    ofs << relPath << "\n";
+  }
+  ofs.close();
 }
 
 void audio_file_index::rescan_files(path_handler add_audio_file,
@@ -198,6 +241,8 @@ void audio_file_index::rescan_files(path_handler add_audio_file,
   for (const auto& [relPath, songKey] : file_to_key) {
     existingFiles.insert(relPath);
   }
+  std::set<std::string> newAdds;
+  std::set<std::string> newDels;
   for (const auto& entry : fs::recursive_directory_iterator(loc)) {
     if (belongs_here(entry.path())) {
       const auto relativePath = get_relative_path(entry.path());
@@ -209,12 +254,23 @@ void audio_file_index::rescan_files(path_handler add_audio_file,
       // Here we would check if the file is an audio file based on extension
       // or content. For simplicity, we assume all files are audio files.
       add_audio_file(relativePath);
+      newAdds.insert(relativePath);
     }
   }
   for (const auto& relPath : existingFiles) {
     // These files were not found in the current scan, so they are removed.
     del_audio_file(relPath);
+    newDels.insert(relPath);
   }
+  // Add/Remove files to/from the index.
+  for (const auto& relPath : newAdds) {
+    add_new_file(loc / relPath);
+  }
+  for (const auto& relPath : newDels) {
+    remove_file(loc / relPath);
+  }
+  // Write the index file to disk after the scan is complete.
+  write_index_file();
 }
 
 Shared::SongKey audio_file_index::make_song_key(

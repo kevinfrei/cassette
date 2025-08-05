@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 
+#include <boost/locale.hpp>
+
 #include <gtest/gtest.h>
 
 #include "audiofileindex.h"
