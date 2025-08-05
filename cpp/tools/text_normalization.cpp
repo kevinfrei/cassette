@@ -13,6 +13,7 @@ constexpr char32_t COMBINING_TILDE = 0x0303;
 constexpr char32_t COMBINING_DIAERESIS = 0x0308;
 constexpr char32_t COMBINING_RING_ABOVE = 0x030a;
 constexpr char32_t COMBINING_CEDILLA = 0x0327;
+constexpr char32_t COMBINING_SLASH = 0x0337;
 
 namespace {
 // This puts the codepoint, as UTF8, into result. It will split diacritics into
@@ -174,6 +175,10 @@ bool uncombine_latin(std::string& result, char32_t codepoint) {
       handle_codepoint(result, 'a');
       handle_codepoint(result, COMBINING_DIAERESIS);
       break;
+    case 0xe5:
+      handle_codepoint(result, 'a');
+      handle_codepoint(result, COMBINING_RING_ABOVE);
+      break;
     case 0xe8:
       handle_codepoint(result, 'e');
       handle_codepoint(result, COMBINING_GRAVE);
@@ -226,6 +231,10 @@ bool uncombine_latin(std::string& result, char32_t codepoint) {
       handle_codepoint(result, 'O');
       handle_codepoint(result, COMBINING_DIAERESIS);
       break;
+    case 0xd8:
+      handle_codepoint(result, 'O');
+      handle_codepoint(result, COMBINING_SLASH);
+      break;
     case 0xf2:
       handle_codepoint(result, 'o');
       handle_codepoint(result, COMBINING_GRAVE);
@@ -245,6 +254,10 @@ bool uncombine_latin(std::string& result, char32_t codepoint) {
     case 0xf6:
       handle_codepoint(result, 'o');
       handle_codepoint(result, COMBINING_DIAERESIS);
+      break;
+    case 0xf8:
+      handle_codepoint(result, 'o');
+      handle_codepoint(result, COMBINING_SLASH);
       break;
     case 0xd9:
       handle_codepoint(result, 'U');
