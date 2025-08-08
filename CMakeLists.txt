@@ -10,7 +10,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(USE_COMMON_PCH ON)
 
 if(MSVC)
   # For windows/VC++, run normal exception handling & windows 10 APIs
@@ -22,6 +21,7 @@ if(MSVC)
   else()
     add_compile_options(/W4 /O2 /D_CRT_SECURE_NO_WARNINGS)
   endif()
+  set(USE_COMMON_PCH OFF)
 else()
   # For non-windows compilers, enable sanitizers and stuff
   add_compile_options(-Wpedantic -Wall -Wextra -Werror -pedantic)
@@ -32,6 +32,7 @@ else()
     add_compile_options(-flto -O2)
     add_link_options(-flto)
   endif()
+  set(USE_COMMON_PCH ON)
 endif()
 
 # Find Conan2 generated libraries
