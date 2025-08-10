@@ -19,50 +19,38 @@ namespace config {
 using read_lock = std::shared_lock<std::shared_mutex>;
 using write_lock = std::unique_lock<std::shared_mutex>;
 
-bool is_ready_storage = false;
-void set_ready() {
-  is_ready_storage = true;
-}
-
-bool is_ready() {
-  return is_ready_storage;
-}
-
-void not_ready() {
-  is_ready_storage = false;
-}
-
+namespace {
+// This is a singleton pattern to ensure we only initialize the paths once.
 bool inited = false;
-fs::path home_env;
+std::shared_mutex init_mutex;
 fs::path home_path;
-fs::path cfg_var;
-fs::path relative_path;
+fs::path cfg_path;
 
 void init() {
+  read_lock lock(init_mutex);
   if (!inited) {
+    lock.unlock(); // Release the lock before doing any I/O
+    write_lock write_lock(init_mutex);
+    if (inited) {
+      return; // Another thread initialized it while we were waiting
+    }
 #if defined(_WIN32)
-    home_env = getenv("USERPROFILE");
-    cfg_var = getenv("LOCALAPPDATA");
-    home_path = home_env;
-    relative_path = ".";
+    home_path = fs::canonical(getenv("USERPROFILE"));
+    cfg_path = fs::canonical(getenv("LOCALAPPDATA"));
 #elif defined(__APPLE__)
-    home_env = getenv("HOME");
-    cfg_var = home_env;
-    home_path = home_env;
-    relative_path = fs::path{"Library"} / "Application Support";
+    home_path = fs::canonical(getenv("HOME"));
+    cfg_path = fs::canonical(home_path / "Library" / "Application Support");
 #elif defined(__linux__)
-    home_env = getenv("HOME");
-    cfg_var = home_env;
-    home_path = home_env;
-    relative_path = ".config";
+    home_path = fs::canonical(getenv("HOME"));
+    cfg_path = fs::canonical(home_path / ".config");
 #else
-#error Unsupported platform
+#error Unsupported platform: I only grok Windows, macOS, and Linux.
 #endif
     inited = true;
   }
 }
 
-// This is fugly, most hopefully it's the only truly fugly thing here.
+} // namespace
 
 const fs::path& get_home_path() {
   init();
@@ -72,7 +60,7 @@ const fs::path& get_home_path() {
 // Returns the path to the configuration directory for the application.
 fs::path get_path() {
   init();
-  return fs::weakly_canonical(cfg_var / relative_path / files::get_app_name());
+  return fs::weakly_canonical(cfg_path / files::get_app_name());
 }
 
 fs::path get_persistence_path() {
