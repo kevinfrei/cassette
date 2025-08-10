@@ -72,6 +72,7 @@ crow::response images(const crow::request&, const std::string& /*path*/) {
     tools::e404(resp, "Image not found");
     return resp;
   }*/
+  // TODO: This is clearly bad & wrong, but I don't care right now.
   std::filesystem::path p = config::get_home_path() / "src" / "cassette" /
                             "www" / "img" / "album.svg";
   resp.set_static_file_info_unsafe(p.generic_string());
