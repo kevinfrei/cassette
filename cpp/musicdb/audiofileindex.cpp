@@ -189,6 +189,7 @@ void audio_file_index::write_index_file() const {
     fs::create_directory(indexDir);
   }
   fs::path indexFile = indexDir / "index.txt";
+  // Binary so we don't get any line-ending issues on different platforms.
   std::ofstream ofs(indexFile, std::ios::out | std::ios::binary);
   if (!ofs.is_open()) {
     std::cerr << "Failed to open index file for writing: " << indexFile << "\n";
@@ -196,6 +197,7 @@ void audio_file_index::write_index_file() const {
   }
   std::set<std::string> sortedFiles;
   // Sort the keys to ensure consistent order in the index file.
+  // TODO: Maybe in the future, this is time-ordered?
   for (const auto& [relPath, songKey] : file_to_key) {
     sortedFiles.insert(relPath);
   }
