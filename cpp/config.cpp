@@ -25,7 +25,9 @@ bool inited = false;
 std::shared_mutex init_mutex;
 fs::path home_path;
 fs::path cfg_path;
+bool config_ready = false;
 
+// This is the path to the configuration directory for the applicatio
 void init() {
   read_lock lock(init_mutex);
   if (!inited) {
@@ -51,6 +53,21 @@ void init() {
 }
 
 } // namespace
+
+void set_ready() {
+  write_lock lock(init_mutex);
+  config_ready = true;
+}
+
+void not_ready() {
+  write_lock lock(init_mutex);
+  config_ready = false;
+}
+
+bool is_ready() {
+  read_lock lock(init_mutex);
+  return config_ready;
+}
 
 const fs::path& get_home_path() {
   init();
