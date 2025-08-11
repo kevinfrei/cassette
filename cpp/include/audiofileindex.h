@@ -18,29 +18,6 @@
 
 namespace afi {
 
-using MkMatch =
-    std::make_tuple<std::uint8_t, std::vector<Shared::MetadataElement>>;
-
-std::vector<Shared::AudioFileRegexPattern> patterns {
-  // va - (year - )albumTitle/(disc #- disc name/)## - artist - track title.flac
-  {
-    Shared::VAType::va, Shared::MetadataType::Simple,
-        {
-            MkMatch(4,
-                    {Shared::MetadataElement::year,
-                     Shared::MetadataElement::album,
-                     Shared::MetadataElement::track,
-                     Shared::MetadataElement::artist,
-                     Shared::MetadataElement::title}),
-        },
-        "/^(?:.*\/)?(?:(?:va(?:rious artists)?)|(?:compilation)) -"
-        //   year       album                      diskNum
-        "(?:(\d{4}) - )?([^/]+)(?:\/(?:cd|dis[ck]) *(\d+)"
-        //       diskName          trk       artist     title
-        "(?:-? +([^ /][^/]+))?)?\/(\d+)[-. ]+([^/]+) - ([^/]+)$"
-  }
-} // namespace afi
-
 class audio_file_index {
   using path_handler = std::function<void(const std::filesystem::path&)>;
 

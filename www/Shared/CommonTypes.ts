@@ -478,8 +478,8 @@ export const MetadataElement = Object.freeze({
   year: 2,
   track: 3,
   title: 4,
-  discNum: 5,
-  discName: 6,
+  diskNum: 5,
+  diskName: 6,
   compilation: 7,
   moreArtists: 8,
   variations: 9,
@@ -551,7 +551,7 @@ export const chkFullMetadata: TC.typecheck<FullMetadata> = TC.chkObjectOfType(
 export type AudioFileRegexPattern = {
   compilation: VAType;
   matchType: MetadataType;
-  matches: [number, MetadataElement][];
+  matches: [number, MetadataElement[]][];
   rgx: string;
 };
 export const chkAudioFileRegexPattern: TC.typecheck<AudioFileRegexPattern> =
@@ -559,7 +559,9 @@ export const chkAudioFileRegexPattern: TC.typecheck<AudioFileRegexPattern> =
     {
       compilation: chkVAType,
       matchType: chkMetadataType,
-      matches: TC.chkArrayOf(TC.chkTupleOf(chkIdlU8, chkMetadataElement)),
+      matches: TC.chkArrayOf(
+        TC.chkTupleOf(chkIdlU8, TC.chkArrayOf(chkMetadataElement)),
+      ),
       rgx: TC.isString,
     },
     {},
