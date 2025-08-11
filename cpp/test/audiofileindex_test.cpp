@@ -74,7 +74,7 @@ class AFI : public ::testing::Test {
   */
 };
 
-TEST_F(AFI, SmallFileIndex) {
+TEST_F(AFI, SmallFileIndex_basics) {
   std::chrono::time_point<std::chrono::system_clock> start =
       std::chrono::system_clock::now();
   auto afi = afi::audio_file_index{self.parent_path() / "audiofileindex"};
@@ -101,6 +101,42 @@ TEST_F(AFI, SmallFileIndex) {
   EXPECT_GT(lastScan, start);
 }
 
+TEST_F(AFI, SmallFileIndex_metadata) {
+  auto afi = afi::audio_file_index{self.parent_path() / "audiofileindex"};
+  EXPECT_NE(afi.get_hash(), 0);
+  auto p = afi.get_location();
+  // std::cout << p.generic_string() << std::endl;
+  EXPECT_FALSE(p.generic_string().ends_with("."));
+  int i = 0;
+  afi.foreach_audio_file([&](const fs::path& path) {
+    // std::cout << "Audio file: " << path.generic_string() << std::endl;
+    EXPECT_TRUE(path.is_absolute());
+    EXPECT_TRUE(path.has_filename());
+    EXPECT_TRUE(path.has_extension());
+    EXPECT_TRUE(path.extension().generic_string() == ".mp3" ||
+                path.extension().generic_string() == ".flac");
+    i++;
+    auto metadata = afi.get_metadata_for_song_from_path(path);
+    EXPECT_TRUE(metadata.has_value());
+    if (metadata.has_value()) {
+      // std::cout << "Metadata: " << metadata->title << std::endl;
+      EXPECT_EQ(path, metadata->originalPath);
+      EXPECT_FALSE(metadata->title.empty());
+      EXPECT_EQ(metadata->artist.size(), 1);
+      EXPECT_FALSE(metadata->album.empty());
+      EXPECT_GT(metadata->year, 1990);
+      EXPECT_GT(metadata->track, 0);
+      EXPECT_LT(metadata->track, 3);
+      EXPECT_EQ(metadata->vaType, Shared::VAType::none);
+      EXPECT_TRUE(metadata->diskName.empty());
+      EXPECT_EQ(metadata->disk, 0);
+      EXPECT_TRUE(metadata->moreArtists.empty());
+      EXPECT_TRUE(metadata->variations.empty());
+    }
+  });
+  // There should be a total of 6 files in the test directory.
+  EXPECT_EQ(i, 6);
+}
 TEST_F(AFI, LargeFileIndex) {
   auto afi =
       afi::audio_file_index{self.parent_path() / "NotActuallyFiles", false};
