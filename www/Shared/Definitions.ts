@@ -9,6 +9,7 @@ import {
   fmap,
   i16,
   i32,
+  i8,
   map,
   NEnum,
   num,
@@ -19,6 +20,7 @@ import {
   SEnum,
   str,
   sub,
+  tup,
   Types,
   u16,
   u8,
@@ -326,6 +328,20 @@ const MediaInfo = obj({
   audio: map(str(), str()),
 });
 
+const MetadataType = enum_lst(u8(), ['Simple', 'Full']);
+const MetadataElement = enum_lst(u8(), [
+  'artist',
+  'album',
+  'year',
+  'track',
+  'title',
+  'discNum',
+  'discName',
+  'compilation',
+  'moreArtists',
+  'variations',
+]);
+
 // This is the most simplistic strongly typed metadata you'll find
 const SimpleMetadata = obj({
   artist: str(),
@@ -361,6 +377,12 @@ const AudioFileRegexPattern = obj({
   // or "true/false" to simply indicate that it's
   // a compilation of works by various artists
   compilation: ref('VAType'),
+  // Kind of the type of metadata to extract (Simple or Full)
+  matchType: ref('MetadataType'),
+  // A list of tuples where the first element is the index of the
+  // capturing group in the regular expression and the second
+  // element is the metadata element to extract.
+  matches: arr(tup(u8(), ref('MetadataElement'))),
   // This is the regular expression to match
   rgx: str(),
 });
@@ -419,6 +441,8 @@ export const TypesToGenerate: Record<string, Types> = {
   Artist,
   Album,
   MediaInfo,
+  MetadataType,
+  MetadataElement,
   SimpleMetadata,
   FullMetadata,
   AudioFileRegexPattern,

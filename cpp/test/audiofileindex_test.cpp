@@ -116,7 +116,7 @@ TEST_F(AFI, SmallFileIndex_metadata) {
     EXPECT_TRUE(path.extension().generic_string() == ".mp3" ||
                 path.extension().generic_string() == ".flac");
     i++;
-    auto metadata = afi.get_metadata_for_song_from_path(path);
+    auto metadata = afi.get_metadata_from_path(path);
     EXPECT_TRUE(metadata.has_value());
     if (metadata.has_value()) {
       // std::cout << "Metadata: " << metadata->title << std::endl;

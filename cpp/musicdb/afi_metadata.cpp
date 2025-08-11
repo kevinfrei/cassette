@@ -20,7 +20,7 @@ namespace afi {
 
 // Get the metadata for a song from the relative path. (underlying
 // implementation for the public interface of "fs::path" or SongKey).
-std::optional<Shared::FullMetadata> audio_file_index::get_metadata_for_song_rel(
+std::optional<Shared::FullMetadata> audio_file_index::get_metadata_rel(
     const std::string& relPath) const {
   if (relPath.length() == 0) {
     return std::nullopt; // NYI
@@ -31,8 +31,7 @@ std::optional<Shared::FullMetadata> audio_file_index::get_metadata_for_song_rel(
 
 // Get the metadata for a song from the file path only.i
 std::optional<Shared::FullMetadata>
-audio_file_index::get_metadata_for_song_from_path_rel(
-    const std::string& relPath) const {
+audio_file_index::get_metadata_from_path_rel(const std::string& relPath) const {
   if (relPath.length() == 0) {
     return std::nullopt; // NYI
   } else {
@@ -42,8 +41,7 @@ audio_file_index::get_metadata_for_song_from_path_rel(
 
 // Get the metadata for a song from the file's metadata only.
 std::optional<Shared::FullMetadata>
-audio_file_index::get_metadata_for_song_from_file_rel(
-    const std::string& relPath) const {
+audio_file_index::get_metadata_from_file_rel(const std::string& relPath) const {
   if (relPath.length() == 0) {
     return std::nullopt; // NYI
   } else {
@@ -105,7 +103,7 @@ void audio_file_index::reset_all_metadata() {
 
 // Get the metadata for a song, either from the index, from the file path, or
 // from the file metadata itself (in that order of preference).
-std::optional<Shared::FullMetadata> audio_file_index::get_metadata_for_song(
+std::optional<Shared::FullMetadata> audio_file_index::get_metadata(
     const fs::path& filePath) const {
   if (filePath.empty()) {
     return std::nullopt; // NYI
@@ -115,7 +113,7 @@ std::optional<Shared::FullMetadata> audio_file_index::get_metadata_for_song(
 
 // Get the metadata for a song, either from the index, from the file path, or
 // from the file metadata itself (in that order of preference).
-std::optional<Shared::FullMetadata> audio_file_index::get_metadata_for_song(
+std::optional<Shared::FullMetadata> audio_file_index::get_metadata(
     const Shared::SongKey& sk) const {
   if (sk.empty()) {
     return std::nullopt; // NYI
@@ -124,8 +122,7 @@ std::optional<Shared::FullMetadata> audio_file_index::get_metadata_for_song(
 }
 
 // Get the metadata for a song from the file path only.
-std::optional<Shared::FullMetadata>
-audio_file_index::get_metadata_for_song_from_path(
+std::optional<Shared::FullMetadata> audio_file_index::get_metadata_from_path(
     const fs::path& filePath) const {
   if (filePath.empty()) {
     return std::nullopt; // NYI
@@ -134,8 +131,7 @@ audio_file_index::get_metadata_for_song_from_path(
 }
 
 // Get the metadata for a song from the file path only.
-std::optional<Shared::FullMetadata>
-audio_file_index::get_metadata_for_song_from_path(
+std::optional<Shared::FullMetadata> audio_file_index::get_metadata_from_path(
     const Shared::SongKey& sk) const {
   if (sk.empty()) {
     return std::nullopt; // NYI
@@ -144,8 +140,7 @@ audio_file_index::get_metadata_for_song_from_path(
 }
 
 // Get the metadata for a song from the file's metadata only.
-std::optional<Shared::FullMetadata>
-audio_file_index::get_metadata_for_song_from_file(
+std::optional<Shared::FullMetadata> audio_file_index::get_metadata_from_file(
     const fs::path& filePath) const {
   if (filePath.empty()) {
     return std::nullopt; // NYI
@@ -154,8 +149,7 @@ audio_file_index::get_metadata_for_song_from_file(
 }
 
 // Get the metadata for a song from the file's metadata only.
-std::optional<Shared::FullMetadata>
-audio_file_index::get_metadata_for_song_from_file(
+std::optional<Shared::FullMetadata> audio_file_index::get_metadata_from_file(
     const Shared::SongKey& sk) const {
   if (sk.empty()) {
     return std::nullopt; // NYI
