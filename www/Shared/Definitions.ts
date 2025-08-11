@@ -379,10 +379,9 @@ const AudioFileRegexPattern = obj({
   compilation: ref('VAType'),
   // Kind of the type of metadata to extract (Simple or Full)
   matchType: ref('MetadataType'),
-  // A list of tuples where the first element is the index of the
-  // capturing group in the regular expression and the second
-  // element is the metadata element to extract.
-  matches: arr(tup(u8(), ref('MetadataElement'))),
+  // A list of tuples where the first element is the # of groups captures,
+  // and the second is the order of the metadata elements in the match.
+  matches: arr(tup(u8(), arr(ref('MetadataElement')))),
   // This is the regular expression to match
   rgx: str(),
 });
