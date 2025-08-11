@@ -14,6 +14,106 @@ namespace fs = std::filesystem;
 
 namespace afi {
 
+namespace {
+std::tuple<std::uint8_t, std::vector<Shared::MetadataElement>> MkMatch(
+    std::uint8_t numElements, std::vector<Shared::MetadataElement>&& elements) {
+  return std::make_tuple(numElements, std::move(elements));
+}
+} // namespace
+std::vector<Shared::AudioFileRegexPattern> patterns{
+    // va - (year - )album/(disc #- disc name/)## - artist - title.flac
+    {Shared::VAType::va,
+     Shared::MetadataType::Simple,
+     {MkMatch(4,
+              {Shared::MetadataElement::album,
+               Shared::MetadataElement::track,
+               Shared::MetadataElement::artist,
+               Shared::MetadataElement::title}),
+      MkMatch(5,
+              {Shared::MetadataElement::year,
+               Shared::MetadataElement::album,
+               Shared::MetadataElement::track,
+               Shared::MetadataElement::artist,
+               Shared::MetadataElement::title}),
+      MkMatch(6,
+              {Shared::MetadataElement::album,
+               Shared::MetadataElement::diskNum,
+               Shared::MetadataElement::diskName,
+               Shared::MetadataElement::track,
+               Shared::MetadataElement::artist,
+               Shared::MetadataElement::title}),
+      MkMatch(7,
+              {Shared::MetadataElement::year,
+               Shared::MetadataElement::album,
+               Shared::MetadataElement::diskNum,
+               Shared::MetadataElement::diskName,
+               Shared::MetadataElement::track,
+               Shared::MetadataElement::artist,
+               Shared::MetadataElement::title})},
+     "/^(?:.*\\/)?(?:(?:va(?:rious artists)?)|(?:compilation)) - "
+     //   year       album                      diskNum
+     "(?:(\\d{4}) - )?([^/]+)(?:\\/(?:cd|dis[ck]) *(\\d+)"
+     //       diskName          trk       artist     title
+     "(?:-? +([^ /][^/]+))?)?\\/(\\d+)[-. ]+([^/]+) - ([^/]+)$"},
+
+    // ost - (year - )album/(disc #- disc name/)## - artist - title.flac
+    {Shared::VAType::ost,
+     Shared::MetadataType::Simple,
+     {MkMatch(4,
+              {Shared::MetadataElement::album,
+               Shared::MetadataElement::track,
+               Shared::MetadataElement::artist,
+               Shared::MetadataElement::title}),
+      MkMatch(5,
+              {Shared::MetadataElement::year,
+               Shared::MetadataElement::album,
+               Shared::MetadataElement::track,
+               Shared::MetadataElement::artist,
+               Shared::MetadataElement::title}),
+      MkMatch(6,
+              {Shared::MetadataElement::album,
+               Shared::MetadataElement::diskNum,
+               Shared::MetadataElement::diskName,
+               Shared::MetadataElement::track,
+               Shared::MetadataElement::artist,
+               Shared::MetadataElement::title}),
+      MkMatch(7,
+              {Shared::MetadataElement::year,
+               Shared::MetadataElement::album,
+               Shared::MetadataElement::diskNum,
+               Shared::MetadataElement::diskName,
+               Shared::MetadataElement::track,
+               Shared::MetadataElement::artist,
+               Shared::MetadataElement::title})},
+     "^(?:.*\\/)?(?:(?:ost)|(?:soundtrack)) - "
+     //   year         album                   diskNum
+     "(?:(\\d{4}) - )?([^/]+)(?:\\/(cd|dis[ck]) *(\\d+)"
+     //       diskName           trk         artist    title
+     "(?:-? +([^ /][^/]+))?)?\\/(\\d+)[-. ]+([^/]+) - ([^/]+)$"},
+    // artist - year - album/(disc #- disc name/)## - track title.flac
+    {Shared::VAType::none,
+     Shared::MetadataType::Simple,
+     {MkMatch(5,
+              {Shared::MetadataElement::artist,
+               Shared::MetadataElement::year,
+               Shared::MetadataElement::album,
+               Shared::MetadataElement::track,
+               Shared::MetadataElement::title}),
+      MkMatch(7,
+              {Shared::MetadataElement::artist,
+               Shared::MetadataElement::year,
+               Shared::MetadataElement::album,
+               Shared::MetadataElement::diskNum,
+               Shared::MetadataElement::diskName,
+               Shared::MetadataElement::track,
+               Shared::MetadataElement::title})},
+     //            artist    year       album
+     "/^(?:.*\\/)?([^/]+) - (\\d{4}) - ([^/]+)"
+     //                  diskNum    diskName
+     "(\\/(cd|dis[ck]) *(\\d+)(-? +([^ /][^/]+))?)?"
+     //  track        title
+     "\\/(\\d+)[-. ]+([^/]+)$"}};
+
 // Metadata stuff:
 
 #pragma region Private interfaces

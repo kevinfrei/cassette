@@ -1242,8 +1242,8 @@ enum class MetadataElement : std::uint8_t {
   year,
   track,
   title,
-  discNum,
-  discName,
+  diskNum,
+  diskName,
   compilation,
   moreArtists,
   variations
@@ -1256,8 +1256,8 @@ inline constexpr bool is_valid(MetadataElement _value) {
     case MetadataElement::year:
     case MetadataElement::track:
     case MetadataElement::title:
-    case MetadataElement::discNum:
-    case MetadataElement::discName:
+    case MetadataElement::diskNum:
+    case MetadataElement::diskName:
     case MetadataElement::compilation:
     case MetadataElement::moreArtists:
     case MetadataElement::variations:
@@ -1279,10 +1279,10 @@ inline constexpr std::string_view to_string(MetadataElement _value) {
       return "track";
     case MetadataElement::title:
       return "title";
-    case MetadataElement::discNum:
-      return "discNum";
-    case MetadataElement::discName:
-      return "discName";
+    case MetadataElement::diskNum:
+      return "diskNum";
+    case MetadataElement::diskName:
+      return "diskName";
     case MetadataElement::compilation:
       return "compilation";
     case MetadataElement::moreArtists:
@@ -1323,7 +1323,7 @@ struct FullMetadata {
 struct AudioFileRegexPattern {
   VAType compilation;
   MetadataType matchType;
-  std::vector<std::tuple<std::uint8_t, MetadataElement>> matches;
+  std::vector<std::tuple<std::uint8_t, std::vector<MetadataElement>>> matches;
   std::string rgx;
 };
 
@@ -2273,9 +2273,9 @@ from_json<Shared::AudioFileRegexPattern>(const crow::json::rvalue& _value) {
 
   if (!_value.has("matches"))
     return std::nullopt;
-  auto _matches_opt_ =
-      from_json<std::vector<std::tuple<std::uint8_t, Shared::MetadataElement>>>(
-          _value["matches"]);
+  auto _matches_opt_ = from_json<std::vector<
+      std::tuple<std::uint8_t, std::vector<Shared::MetadataElement>>>>(
+      _value["matches"]);
   if (!_matches_opt_.has_value())
     return std::nullopt;
   _res.matches = std::move(*_matches_opt_);
