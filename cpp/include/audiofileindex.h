@@ -145,11 +145,18 @@ class audio_file_index {
       const Shared::SongKey& sk) const;
 
   // Replace the local metadata cache with the new metadata.
-  void update_metadata(const Shared::SimpleMetadata& newMetadata);
+  void update_metadata(const Shared::SongKey& songKey,
+                       const Shared::SimpleMetadata& newMetadata);
   // Replace the local metadata cache with the new metadata.
-  void update_metadata(const Shared::FullMetadata& newMetadata);
-  // Clear the local metadata *cache* (but maintain any overrides).
+  void update_metadata(const Shared::SongKey& songKey,
+                       const Shared::FullMetadata& newMetadata);
+  // Clear the local metadata *cache* for a single song (but maintain any
+  // overrides).
+  void clear_metadata_cache(const Shared::SongKey& songKey);
+  // Clear the local metadata cache for all songs.
   void clear_metadata_cache();
+  // Clear the local metadata cache AND overrides for a single song.
+  void reset_all_metadata(const Shared::SongKey& songKey);
   // Clear the local metadata cache AND overrides.
   void reset_all_metadata();
 
