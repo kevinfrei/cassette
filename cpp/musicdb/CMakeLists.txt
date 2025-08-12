@@ -18,6 +18,7 @@ endif()
 target_link_libraries(
   musicdb_lib
   PUBLIC
+  ${BOOST_LIB}
   ${CROW_LIB}
   ${MEDIAINFO_LIB}
 )

@@ -15,7 +15,6 @@
 #include <map>
 #include <optional>
 #include <string_view>
-#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -1210,91 +1209,6 @@ struct MediaInfo {
   std::map<std::string, std::string> audio;
 };
 
-#pragma region numeric enum MetadataType
-enum class MetadataType : std::uint8_t { Simple, Full };
-
-inline constexpr bool is_valid(MetadataType _value) {
-  switch (_value) {
-    case MetadataType::Simple:
-    case MetadataType::Full:
-      return true;
-    default:
-      return false;
-  }
-}
-
-inline constexpr std::string_view to_string(MetadataType _value) {
-  switch (_value) {
-    case MetadataType::Simple:
-      return "Simple";
-    case MetadataType::Full:
-      return "Full";
-    default:
-      return "<unknown>";
-  }
-}
-#pragma endregion numeric enum MetadataType
-
-#pragma region numeric enum MetadataElement
-enum class MetadataElement : std::uint8_t {
-  artist,
-  album,
-  year,
-  track,
-  title,
-  diskNum,
-  diskName,
-  compilation,
-  moreArtists,
-  variations
-};
-
-inline constexpr bool is_valid(MetadataElement _value) {
-  switch (_value) {
-    case MetadataElement::artist:
-    case MetadataElement::album:
-    case MetadataElement::year:
-    case MetadataElement::track:
-    case MetadataElement::title:
-    case MetadataElement::diskNum:
-    case MetadataElement::diskName:
-    case MetadataElement::compilation:
-    case MetadataElement::moreArtists:
-    case MetadataElement::variations:
-      return true;
-    default:
-      return false;
-  }
-}
-
-inline constexpr std::string_view to_string(MetadataElement _value) {
-  switch (_value) {
-    case MetadataElement::artist:
-      return "artist";
-    case MetadataElement::album:
-      return "album";
-    case MetadataElement::year:
-      return "year";
-    case MetadataElement::track:
-      return "track";
-    case MetadataElement::title:
-      return "title";
-    case MetadataElement::diskNum:
-      return "diskNum";
-    case MetadataElement::diskName:
-      return "diskName";
-    case MetadataElement::compilation:
-      return "compilation";
-    case MetadataElement::moreArtists:
-      return "moreArtists";
-    case MetadataElement::variations:
-      return "variations";
-    default:
-      return "<unknown>";
-  }
-}
-#pragma endregion numeric enum MetadataElement
-
 struct SimpleMetadata {
   std::string artist;
   std::string album;
@@ -1322,8 +1236,6 @@ struct FullMetadata {
 
 struct AudioFileRegexPattern {
   VAType compilation;
-  MetadataType matchType;
-  std::vector<std::tuple<std::uint8_t, std::vector<MetadataElement>>> matches;
   std::string rgx;
 };
 
@@ -2242,8 +2154,6 @@ struct impl_to_json<Shared::AudioFileRegexPattern> {
       const Shared::AudioFileRegexPattern& _value) {
     crow::json::wvalue _res;
     _res["compilation"] = to_json(_value.compilation);
-    _res["matchType"] = to_json(_value.matchType);
-    _res["matches"] = to_json(_value.matches);
     _res["rgx"] = to_json(_value.rgx);
 
     return _res;
@@ -2263,22 +2173,6 @@ from_json<Shared::AudioFileRegexPattern>(const crow::json::rvalue& _value) {
   if (!_compilation_opt_.has_value())
     return std::nullopt;
   _res.compilation = std::move(*_compilation_opt_);
-
-  if (!_value.has("matchType"))
-    return std::nullopt;
-  auto _matchType_opt_ = from_json<Shared::MetadataType>(_value["matchType"]);
-  if (!_matchType_opt_.has_value())
-    return std::nullopt;
-  _res.matchType = std::move(*_matchType_opt_);
-
-  if (!_value.has("matches"))
-    return std::nullopt;
-  auto _matches_opt_ = from_json<std::vector<
-      std::tuple<std::uint8_t, std::vector<Shared::MetadataElement>>>>(
-      _value["matches"]);
-  if (!_matches_opt_.has_value())
-    return std::nullopt;
-  _res.matches = std::move(*_matches_opt_);
 
   if (!_value.has("rgx"))
     return std::nullopt;

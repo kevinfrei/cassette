@@ -2,6 +2,8 @@
 #include <optional>
 #include <string>
 
+#include <boost/regex.hpp>
+
 // Initial implementation: Just read all the files in the directory
 // and produce the music-db map.
 
@@ -15,104 +17,102 @@ namespace fs = std::filesystem;
 namespace afi {
 
 namespace {
-std::tuple<std::uint8_t, std::vector<Shared::MetadataElement>> MkMatch(
-    std::uint8_t numElements, std::vector<Shared::MetadataElement>&& elements) {
-  return std::make_tuple(numElements, std::move(elements));
-}
-} // namespace
-std::vector<Shared::AudioFileRegexPattern> patterns{
-    // va - (year - )album/(disc #- disc name/)## - artist - title.flac
-    {Shared::VAType::va,
-     Shared::MetadataType::Simple,
-     {MkMatch(4,
-              {Shared::MetadataElement::album,
-               Shared::MetadataElement::track,
-               Shared::MetadataElement::artist,
-               Shared::MetadataElement::title}),
-      MkMatch(5,
-              {Shared::MetadataElement::year,
-               Shared::MetadataElement::album,
-               Shared::MetadataElement::track,
-               Shared::MetadataElement::artist,
-               Shared::MetadataElement::title}),
-      MkMatch(6,
-              {Shared::MetadataElement::album,
-               Shared::MetadataElement::diskNum,
-               Shared::MetadataElement::diskName,
-               Shared::MetadataElement::track,
-               Shared::MetadataElement::artist,
-               Shared::MetadataElement::title}),
-      MkMatch(7,
-              {Shared::MetadataElement::year,
-               Shared::MetadataElement::album,
-               Shared::MetadataElement::diskNum,
-               Shared::MetadataElement::diskName,
-               Shared::MetadataElement::track,
-               Shared::MetadataElement::artist,
-               Shared::MetadataElement::title})},
-     "/^(?:.*\\/)?(?:(?:va(?:rious artists)?)|(?:compilation)) - "
-     //   year       album                      diskNum
-     "(?:(\\d{4}) - )?([^/]+)(?:\\/(?:cd|dis[ck]) *(\\d+)"
-     //       diskName          trk       artist     title
-     "(?:-? +([^ /][^/]+))?)?\\/(\\d+)[-. ]+([^/]+) - ([^/]+)$"},
 
-    // ost - (year - )album/(disc #- disc name/)## - artist - title.flac
-    {Shared::VAType::ost,
-     Shared::MetadataType::Simple,
-     {MkMatch(4,
-              {Shared::MetadataElement::album,
-               Shared::MetadataElement::track,
-               Shared::MetadataElement::artist,
-               Shared::MetadataElement::title}),
-      MkMatch(5,
-              {Shared::MetadataElement::year,
-               Shared::MetadataElement::album,
-               Shared::MetadataElement::track,
-               Shared::MetadataElement::artist,
-               Shared::MetadataElement::title}),
-      MkMatch(6,
-              {Shared::MetadataElement::album,
-               Shared::MetadataElement::diskNum,
-               Shared::MetadataElement::diskName,
-               Shared::MetadataElement::track,
-               Shared::MetadataElement::artist,
-               Shared::MetadataElement::title}),
-      MkMatch(7,
-              {Shared::MetadataElement::year,
-               Shared::MetadataElement::album,
-               Shared::MetadataElement::diskNum,
-               Shared::MetadataElement::diskName,
-               Shared::MetadataElement::track,
-               Shared::MetadataElement::artist,
-               Shared::MetadataElement::title})},
-     "^(?:.*\\/)?(?:(?:ost)|(?:soundtrack)) - "
-     //   year         album                   diskNum
-     "(?:(\\d{4}) - )?([^/]+)(?:\\/(cd|dis[ck]) *(\\d+)"
-     //       diskName           trk         artist    title
-     "(?:-? +([^ /][^/]+))?)?\\/(\\d+)[-. ]+([^/]+) - ([^/]+)$"},
-    // artist - year - album/(disc #- disc name/)## - track title.flac
-    {Shared::VAType::none,
-     Shared::MetadataType::Simple,
-     {MkMatch(5,
-              {Shared::MetadataElement::artist,
-               Shared::MetadataElement::year,
-               Shared::MetadataElement::album,
-               Shared::MetadataElement::track,
-               Shared::MetadataElement::title}),
-      MkMatch(7,
-              {Shared::MetadataElement::artist,
-               Shared::MetadataElement::year,
-               Shared::MetadataElement::album,
-               Shared::MetadataElement::diskNum,
-               Shared::MetadataElement::diskName,
-               Shared::MetadataElement::track,
-               Shared::MetadataElement::title})},
-     //            artist    year       album
-     "/^(?:.*\\/)?([^/]+) - (\\d{4}) - ([^/]+)"
-     //                  diskNum    diskName
-     "(\\/(cd|dis[ck]) *(\\d+)(-? +([^ /][^/]+))?)?"
-     //  track        title
-     "\\/(\\d+)[-. ]+([^/]+)$"}};
+struct RegexPattern {
+  Shared::VAType va;
+  boost::regex rgx;
+};
+
+RegexPattern make(Shared::VAType va, const char* pattern) {
+  return {va,
+          boost::regex(pattern, boost::regex::icase | boost::regex::optimize)};
+}
+
+// Remove the suffix from a string(_view).
+std::string_view get_no_suffix(const std::string_view& s) {
+  auto pos = s.find_last_of('.');
+  if (pos == std::string_view::npos) {
+    return s;
+  }
+  return s.substr(0, pos);
+}
+std::string_view get_no_suffix(const std::string& s) {
+  return get_no_suffix(std::string_view(s));
+}
+
+} // namespace
+
+/* clang-format off */
+std::vector<RegexPattern> patterns{
+  make( // va - (year - )albumTitle/(disc #- disc name/)## - artist - trackTitle[.flac/.mp3/.m4a]
+    Shared::VAType::va,
+    "^(.*\\/)?((va(rious artists)?)|(compilation)) - "
+    "((?<year>\\d{4}) - )?(?<album>[^/]+)"
+    "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
+    "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"
+  ),
+  make( // soundtrack - (year - )albumTitle/(disc #- disc name/)## - artist - trackTitle
+    Shared::VAType::ost,
+    "^(.*\\/)?((ost)|(soundtrack)) - "
+    "((?<year>\\d{4}) - )?(?<album>[^/]+)"
+    "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
+    "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"
+  ),
+  make( // artist - year - album/(disc #- disc name/)## - trackTitle
+    Shared::VAType::none,
+    "^(.*\\/)?(?<artist>[^/]+) - (?<year>\\d{4}) - (?<album>[^/]+)"
+    "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
+    "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"
+  ),
+  make( // va/(year - )albumTitle/(CD # name/)## - artist - trackTitle
+    Shared::VAType::va,
+    "^(.*\\/)?((va(rious artists)?)|(compilation))"
+    "\\/((?<year>\\d{4}) - )?(?<album>[^/]+)"
+    "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
+    "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"
+  ),
+  make( // ost/(year - )albumTitle/(CD # name/)## - artist - trackTitle
+    Shared::VAType::ost,
+    "^(.*\\/)?((ost)|(soundtrack))"
+    "\\/((?<year>\\d{4}) - )?(?<album>[^/]+)"
+    "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
+    "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"
+  ),
+  make( // artist/year - albumTitle/CD # name/## - trackTitle
+    Shared::VAType::none,
+    "^(.*\\/)?(?<artist>[^/]+)\\/(?<year>\\d{4}) - (?<album>[^/]+)"
+    "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
+    "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$"
+  ),
+  make( // artist/year - albumTitle/## - trackTitle
+    Shared::VAType::none,
+    "^(.*\\/)?(?<artist>[^/]+)\\/(?<year>\\d{4}) - (?<album>[^/]+)"
+    "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$"
+  ),
+  make( // artist - album/CD # name/## - trackTitle
+    Shared::VAType::none,
+    "^(.*\\/)?(?<artist>[^/]+) - (?<album>[^/]+)"
+    "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
+    "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"
+  ),
+  make( // artist/albumTitle/CD # name/## - trackTitle
+    Shared::VAType::none,
+    "^(.*\\/)?(?<artist>[^/]+)\\/(?<album>[^/]+)"
+    "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
+    "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$"
+  ),
+  make( // artist - album/## - trackTitle
+    Shared::VAType::none,
+    "^(.*\\/)?(?<artist>[^/]+) - (?<album>[^/]+)"
+    "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"
+  ),
+  make( // artist/albumTitle/## - trackTitle
+    Shared::VAType::none,
+    "^(.*\\/)?(?<artist>[^/]+)\\/(?<album>[^/]+)"
+    "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$"
+  )
+};
+/* clang-format on */
 
 // Metadata stuff:
 
@@ -132,11 +132,22 @@ std::optional<Shared::FullMetadata> audio_file_index::get_metadata_rel(
 // Get the metadata for a song from the file path only.i
 std::optional<Shared::FullMetadata>
 audio_file_index::get_metadata_from_path_rel(const std::string& relPath) const {
-  if (relPath.length() == 0) {
-    return std::nullopt; // NYI
-  } else {
-    return std::nullopt; // NYI
+  std::string noSuffix{get_no_suffix(relPath)};
+  for (const RegexPattern& pattern : patterns) {
+    // Match the pattern against the relPath.
+    // If it matches, extract the metadata and return it.
+    boost::smatch match;
+    if (!boost::regex_match(noSuffix, match, pattern.rgx)) {
+      continue;
+    }
+    // Find
+    Shared::FullMetadata metadata;
+    metadata.originalPath = relPath;
+    // Extract the metadata based on the pattern.
+    // NYI!
+    return metadata; // Return the extracted metadata.
   }
+  return std::nullopt; // No match found.
 }
 
 // Get the metadata for a song from the file's metadata only.

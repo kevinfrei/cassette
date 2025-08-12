@@ -328,20 +328,6 @@ const MediaInfo = obj({
   audio: map(str(), str()),
 });
 
-const MetadataType = enum_lst(u8(), ['Simple', 'Full']);
-const MetadataElement = enum_lst(u8(), [
-  'artist',
-  'album',
-  'year',
-  'track',
-  'title',
-  'diskNum',
-  'diskName',
-  'compilation',
-  'moreArtists',
-  'variations',
-]);
-
 // This is the most simplistic strongly typed metadata you'll find
 const SimpleMetadata = obj({
   artist: str(),
@@ -373,16 +359,9 @@ const FullMetadata = obj({
 // This is a general mechanism for describing how to extract
 // various metadata components out of a file path
 const AudioFileRegexPattern = obj({
-  // This can be something like "soundtrack"
-  // or "true/false" to simply indicate that it's
-  // a compilation of works by various artists
+  // Is this fo a song from a VA album, soundtrack, or single artist
   compilation: ref('VAType'),
-  // Kind of the type of metadata to extract (Simple or Full)
-  matchType: ref('MetadataType'),
-  // A list of tuples where the first element is the # of groups captures,
-  // and the second is the order of the metadata elements in the match.
-  matches: arr(tup(u8(), arr(ref('MetadataElement')))),
-  // This is the regular expression to match
+  // The regular expression to match, with named groups (ecma syntax)
   rgx: str(),
 });
 
@@ -440,8 +419,6 @@ export const TypesToGenerate: Record<string, Types> = {
   Artist,
   Album,
   MediaInfo,
-  MetadataType,
-  MetadataElement,
   SimpleMetadata,
   FullMetadata,
   AudioFileRegexPattern,
