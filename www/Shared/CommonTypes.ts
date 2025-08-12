@@ -10,9 +10,6 @@ import * as TC from '@freik/typechk';
 
 // TODO: Only emit the type checks that are needed
 
-const chkIdlU8 = (v: unknown): v is number =>
-  TC.isNumber(v) && v >= 0 && v <= 255 && Number.isInteger(v);
-
 const chkIdlU16 = (v: unknown): v is number =>
   TC.isNumber(v) && v >= 0 && v <= 65535 && Number.isInteger(v);
 
@@ -460,39 +457,6 @@ export const chkMediaInfo: TC.typecheck<MediaInfo> = TC.chkObjectOfType(
   {},
 );
 
-export const MetadataType = Object.freeze({
-  Simple: 0,
-  Full: 1,
-});
-export type MetadataType = (typeof MetadataType)[keyof typeof MetadataType];
-export function chkMetadataType(val: unknown): val is MetadataType {
-  return (
-    TC.isNumber(val) &&
-    Object.values(MetadataType).includes(val as MetadataType)
-  );
-}
-
-export const MetadataElement = Object.freeze({
-  artist: 0,
-  album: 1,
-  year: 2,
-  track: 3,
-  title: 4,
-  diskNum: 5,
-  diskName: 6,
-  compilation: 7,
-  moreArtists: 8,
-  variations: 9,
-});
-export type MetadataElement =
-  (typeof MetadataElement)[keyof typeof MetadataElement];
-export function chkMetadataElement(val: unknown): val is MetadataElement {
-  return (
-    TC.isNumber(val) &&
-    Object.values(MetadataElement).includes(val as MetadataElement)
-  );
-}
-
 export type SimpleMetadata = {
   artist: string;
   album: string;
@@ -550,18 +514,12 @@ export const chkFullMetadata: TC.typecheck<FullMetadata> = TC.chkObjectOfType(
 
 export type AudioFileRegexPattern = {
   compilation: VAType;
-  matchType: MetadataType;
-  matches: [number, MetadataElement[]][];
   rgx: string;
 };
 export const chkAudioFileRegexPattern: TC.typecheck<AudioFileRegexPattern> =
   TC.chkObjectOfType(
     {
       compilation: chkVAType,
-      matchType: chkMetadataType,
-      matches: TC.chkArrayOf(
-        TC.chkTupleOf(chkIdlU8, TC.chkArrayOf(chkMetadataElement)),
-      ),
       rgx: TC.isString,
     },
     {},
