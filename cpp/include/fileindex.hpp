@@ -10,11 +10,7 @@
 
 #include "CommonTypes.hpp"
 
-// Stuff for the afi implemention only?
-
-namespace afi {
-
-class audio_file_index {
+class file_index {
   using path_handler = std::function<void(const std::filesystem::path&)>;
 
   // The hash of the index, used to identify it.
@@ -71,19 +67,19 @@ class audio_file_index {
   // If the hash is not provided, it will be computed based on the location.
   // If an index already exists, it will be read from disk, and the source will
   // *NOT* be rescanned.
-  audio_file_index(const std::filesystem::path& loc, std::size_t hash = 0)
-      : audio_file_index(loc, false, hash) {}
+  file_index(const std::filesystem::path& loc, std::size_t hash = 0)
+      : file_index(loc, false, hash) {}
   // Constructs an audio file index at the given location.
   // Update the index, even if it already exists, if update_index is true.
-  audio_file_index(const std::filesystem::path& loc,
-                   bool update_index,
-                   std::size_t hash = 0);
+  file_index(const std::filesystem::path& loc,
+             bool update_index,
+             std::size_t hash = 0);
 
-  // No AFI copying!
-  audio_file_index(const audio_file_index&) = delete;
-  audio_file_index& operator=(const audio_file_index&) = delete;
-  audio_file_index(audio_file_index&&) = default;
-  audio_file_index& operator=(audio_file_index&&) = default;
+  // No copying!
+  file_index(const file_index&) = delete;
+  file_index& operator=(const file_index&) = delete;
+  file_index(file_index&&) = default;
+  file_index& operator=(file_index&&) = default;
 
   // Get the hash of the index.
   std::size_t get_hash() const {
@@ -163,5 +159,3 @@ class audio_file_index {
       const Shared::SongKey& songKey, bool preferInternal = false) const;
   void clear_local_image_cache();
 };
-
-} // namespace afi

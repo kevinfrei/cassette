@@ -8,10 +8,11 @@
 
 namespace fs = std::filesystem;
 const char* dir_name = "fileindex";
+const char* idx_dir = ".afi";
 
 fs::path self{__FILE__};
 
-class AFI : public ::testing::Test {
+class FileIndex : public ::testing::Test {
   // delete the .afi subdirectory before and after running the tests.
   void rd(const fs::path& dir) {
     if (fs::exists(dir)) {
@@ -25,13 +26,13 @@ class AFI : public ::testing::Test {
   }
   void remove_stuff() {
     auto testDir = self.parent_path();
-    rd(testDir / dir_name / ".afi");
+    rd(testDir / dir_name / idx_dir);
     rm(testDir / dir_name /
        "Test Artist - 2010 - Test Album/04 - New File Not There.mp3");
   }
   void backup_index() {
     auto testDir = self.parent_path();
-    auto indexFile = testDir / "NotActuallyFiles" / ".afi" / "index.txt";
+    auto indexFile = testDir / "NotActuallyFiles" / idx_dir / "index.txt";
     if (fs::exists(indexFile)) {
       fs::copy(indexFile,
                indexFile.string() + ".bak",
@@ -40,7 +41,7 @@ class AFI : public ::testing::Test {
   }
   void restore_index() {
     auto testDir = self.parent_path();
-    auto indexFile = testDir / "NotActuallyFiles" / ".afi" / "index.txt";
+    auto indexFile = testDir / "NotActuallyFiles" / idx_dir / "index.txt";
     auto backupFile = indexFile.string() + ".bak";
     if (fs::exists(backupFile)) {
       fs::copy(backupFile, indexFile, fs::copy_options::overwrite_existing);
@@ -49,25 +50,25 @@ class AFI : public ::testing::Test {
   }
 
  protected:
-  AFI() {
+  FileIndex() {
     backup_index();
     remove_stuff();
   }
 
-  ~AFI() override {
+  ~FileIndex() override {
     restore_index();
     remove_stuff();
   }
   /*
   // SetUp() method for per-test setup
   void SetUp() override {
-    std::cout << "AFI Fixture SetUp called." << std::endl;
+    std::cout << "FileIndex Fixture SetUp called." << std::endl;
     // Per-test setup code here
   }
 
   // TearDown() method for per-test cleanup
   void TearDown() override {
-    std::cout << "AFI Fixture TearDown called." << std::endl;
+    std::cout << "FileIndex Fixture TearDown called." << std::endl;
     // This code will run after each test using this fixture,
     // regardless of whether the test passed or failed.
     // For example, close files, release resources, etc.
@@ -75,10 +76,10 @@ class AFI : public ::testing::Test {
   */
 };
 
-TEST_F(AFI, SmallFileIndex_basics) {
+TEST_F(FileIndex, SmallFileIndex_basics) {
   std::chrono::time_point<std::chrono::system_clock> start =
       std::chrono::system_clock::now();
-  auto afi = afi::audio_file_index{self.parent_path() / dir_name};
+  auto afi = file_index{self.parent_path() / dir_name};
   EXPECT_NE(afi.get_hash(), 0);
   auto p = afi.get_location();
   // std::cout << p.generic_string() << std::endl;
@@ -102,8 +103,8 @@ TEST_F(AFI, SmallFileIndex_basics) {
   EXPECT_GT(lastScan, start);
 }
 
-TEST_F(AFI, SmallFileIndex_metadata) {
-  auto afi = afi::audio_file_index{self.parent_path() / dir_name};
+TEST_F(FileIndex, SmallFileIndex_metadata) {
+  auto afi = file_index{self.parent_path() / dir_name};
   EXPECT_NE(afi.get_hash(), 0);
   auto p = afi.get_location();
   // std::cout << p.generic_string() << std::endl;
@@ -141,9 +142,8 @@ TEST_F(AFI, SmallFileIndex_metadata) {
   // There should be a total of 6 files in the test directory.
   EXPECT_EQ(i, 6);
 }
-TEST_F(AFI, LargeFileIndex) {
-  auto afi =
-      afi::audio_file_index{self.parent_path() / "NotActuallyFiles", false};
+TEST_F(FileIndex, LargeFileIndex) {
+  auto afi = file_index{self.parent_path() / "NotActuallyFiles", false};
   EXPECT_NE(afi.get_hash(), 0);
   EXPECT_EQ(afi.get_last_scan_time(),
             std::chrono::system_clock::time_point::min());
@@ -178,7 +178,7 @@ TEST_F(AFI, LargeFileIndex) {
   EXPECT_EQ(jpg, 127);
   EXPECT_EQ(flac, 1);
   EXPECT_EQ(i, mp3 + m4a + jpg + flac);
-  // TODO: Update the AFI to have some changes, and check the scan times.
+  // TODO: Update the FileIndex to have some changes, and check the scan times.
   int added = 0;
   int removed = 0;
   int mp3delta = 0;

@@ -13,8 +13,6 @@
 
 namespace fs = std::filesystem;
 
-namespace afi {
-
 namespace {
 
 struct RegexPattern {
@@ -105,15 +103,15 @@ std::vector<RegexPattern> patterns{
 
 // Get the metadata for a song from the relative path. (underlying
 // implementation for the public interface of "fs::path" or SongKey).
-std::optional<Shared::FullMetadata> audio_file_index::get_metadata_rel(
+std::optional<Shared::FullMetadata> file_index::get_metadata_rel(
     const std::string& relPath) const {
   // TODO: use a cache, overrides, the file path, then the file metadata.
   return get_metadata_from_path_rel(relPath);
 }
 
 // Get the metadata for a song from the file path only.i
-std::optional<Shared::FullMetadata>
-audio_file_index::get_metadata_from_path_rel(const std::string& relPath) const {
+std::optional<Shared::FullMetadata> file_index::get_metadata_from_path_rel(
+    const std::string& relPath) const {
   std::string noSuffix{get_no_suffix(relPath)};
   for (const RegexPattern& pattern : patterns) {
     // Match the pattern against the relPath.
@@ -164,8 +162,8 @@ audio_file_index::get_metadata_from_path_rel(const std::string& relPath) const {
 }
 
 // Get the metadata for a song from the file's metadata only.
-std::optional<Shared::FullMetadata>
-audio_file_index::get_metadata_from_file_rel(const std::string& relPath) const {
+std::optional<Shared::FullMetadata> file_index::get_metadata_from_file_rel(
+    const std::string& relPath) const {
   if (relPath.length() == 0) {
     return std::nullopt; // NYI
   } else {
@@ -179,8 +177,8 @@ audio_file_index::get_metadata_from_file_rel(const std::string& relPath) const {
 
 #pragma region Metadata Overrides& caching:
 // Replace the local metadata cache with the new metadata.
-void audio_file_index::update_metadata(
-    const Shared::SongKey& songKey, const Shared::SimpleMetadata& newMetadata) {
+void file_index::update_metadata(const Shared::SongKey& songKey,
+                                 const Shared::SimpleMetadata& newMetadata) {
   if (songKey.empty() || newMetadata.title.empty()) {
     return; // NYI
   }
@@ -188,8 +186,8 @@ void audio_file_index::update_metadata(
 }
 
 // Replace the local metadata cache with the new metadata.
-void audio_file_index::update_metadata(
-    const Shared::SongKey& songKey, const Shared::FullMetadata& newMetadata) {
+void file_index::update_metadata(const Shared::SongKey& songKey,
+                                 const Shared::FullMetadata& newMetadata) {
   if (songKey.empty() || newMetadata.title.empty()) {
     return; // NYI
   }
@@ -197,7 +195,7 @@ void audio_file_index::update_metadata(
 }
 
 // Clear the local metadata *cache* (but maintain any overrides).
-void audio_file_index::clear_metadata_cache(const Shared::SongKey& songKey) {
+void file_index::clear_metadata_cache(const Shared::SongKey& songKey) {
   // NYI
   if (songKey.empty()) {
     return;
@@ -205,12 +203,12 @@ void audio_file_index::clear_metadata_cache(const Shared::SongKey& songKey) {
 }
 
 // Clear the local metadata *cache* (but maintain any overrides).
-void audio_file_index::clear_metadata_cache() {
+void file_index::clear_metadata_cache() {
   // NYI
 }
 
 // Clear the local metadata cache AND overrides.
-void audio_file_index::reset_all_metadata(const Shared::SongKey& songKey) {
+void file_index::reset_all_metadata(const Shared::SongKey& songKey) {
   // NYI
   if (songKey.empty()) {
     return;
@@ -218,7 +216,7 @@ void audio_file_index::reset_all_metadata(const Shared::SongKey& songKey) {
 }
 
 // Clear the local metadata cache AND overrides.
-void audio_file_index::reset_all_metadata() {
+void file_index::reset_all_metadata() {
   // NYI
 }
 #pragma endregion Metadata Overrides& caching
@@ -227,14 +225,14 @@ void audio_file_index::reset_all_metadata() {
 
 // Get the metadata for a song, either from the index, from the file path, or
 // from the file metadata itself (in that order of preference).
-std::optional<Shared::FullMetadata> audio_file_index::get_metadata(
+std::optional<Shared::FullMetadata> file_index::get_metadata(
     const fs::path& filePath) const {
   return get_metadata_rel(get_relative_path(filePath));
 }
 
 // Get the metadata for a song, either from the index, from the file path, or
 // from the file metadata itself (in that order of preference).
-std::optional<Shared::FullMetadata> audio_file_index::get_metadata(
+std::optional<Shared::FullMetadata> file_index::get_metadata(
     const Shared::SongKey& sk) const {
   auto song = key_to_file.find(sk);
   if (song == key_to_file.end()) {
@@ -244,13 +242,13 @@ std::optional<Shared::FullMetadata> audio_file_index::get_metadata(
 }
 
 // Get the metadata for a song from the file path only.
-std::optional<Shared::FullMetadata> audio_file_index::get_metadata_from_path(
+std::optional<Shared::FullMetadata> file_index::get_metadata_from_path(
     const fs::path& filePath) const {
   return get_metadata_rel(get_relative_path(filePath));
 }
 
 // Get the metadata for a song from the file path only.
-std::optional<Shared::FullMetadata> audio_file_index::get_metadata_from_path(
+std::optional<Shared::FullMetadata> file_index::get_metadata_from_path(
     const Shared::SongKey& sk) const {
   if (sk.empty()) {
     return std::nullopt; // NYI
@@ -259,7 +257,7 @@ std::optional<Shared::FullMetadata> audio_file_index::get_metadata_from_path(
 }
 
 // Get the metadata for a song from the file's metadata only.
-std::optional<Shared::FullMetadata> audio_file_index::get_metadata_from_file(
+std::optional<Shared::FullMetadata> file_index::get_metadata_from_file(
     const fs::path& filePath) const {
   if (filePath.empty()) {
     return std::nullopt; // NYI
@@ -268,7 +266,7 @@ std::optional<Shared::FullMetadata> audio_file_index::get_metadata_from_file(
 }
 
 // Get the metadata for a song from the file's metadata only.
-std::optional<Shared::FullMetadata> audio_file_index::get_metadata_from_file(
+std::optional<Shared::FullMetadata> file_index::get_metadata_from_file(
     const Shared::SongKey& sk) const {
   if (sk.empty()) {
     return std::nullopt; // NYI
@@ -279,5 +277,3 @@ std::optional<Shared::FullMetadata> audio_file_index::get_metadata_from_file(
 #pragma endregion Reading metadata from files / paths / cache
 
 #pragma endregion Public interface
-
-} // namespace afi

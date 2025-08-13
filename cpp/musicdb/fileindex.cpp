@@ -65,11 +65,10 @@ void foreach_line_in_file(const fs::path& filePath,
 }
 
 } // namespace
-namespace afi {
 
-audio_file_index::audio_file_index(const fs::path& _loc,
-                                   bool update_index,
-                                   std::size_t _hash)
+file_index::file_index(const fs::path& _loc,
+                       bool update_index,
+                       std::size_t _hash)
     : hash(_hash),
       loc(std::filesystem::canonical(_loc)),
       last_scan(std::chrono::system_clock::time_point::min()) {
@@ -100,7 +99,7 @@ audio_file_index::audio_file_index(const fs::path& _loc,
 std::unordered_set<std::string> suffixes = {
     ".mp3", ".flac", ".wav", ".m4a", ".aac", ".wma", ".png", ".jpg"};
 
-bool audio_file_index::belongs_here(const fs::path& path) const {
+bool file_index::belongs_here(const fs::path& path) const {
   // Check if the path is within the index location.
   return suffixes.contains(
       fs::proximate(path, loc).extension().generic_string());
@@ -108,7 +107,7 @@ bool audio_file_index::belongs_here(const fs::path& path) const {
 
 // Adds a new file to the index (if it doesn't already exist). Don't save
 // anything, just update the in-memory structures.
-bool audio_file_index::add_new_file(const fs::path& path) {
+bool file_index::add_new_file(const fs::path& path) {
   std::string relPath = get_relative_path(path);
   if (!file_to_key.contains(relPath)) {
     Shared::SongKey songKey = make_song_key(relPath);
@@ -121,7 +120,7 @@ bool audio_file_index::add_new_file(const fs::path& path) {
 
 // Removes an existing file from the index (if it exists). Don't save
 // anything, just update the in-memory structures.
-bool audio_file_index::remove_file(const fs::path& path) {
+bool file_index::remove_file(const fs::path& path) {
   std::string relPath = get_relative_path(path);
   if (file_to_key.contains(relPath)) {
     Shared::SongKey songKey = file_to_key[relPath];
@@ -133,7 +132,7 @@ bool audio_file_index::remove_file(const fs::path& path) {
 }
 
 // Get a normalized relative path from the root of the index.
-std::string audio_file_index::get_relative_path(const fs::path& path) const {
+std::string file_index::get_relative_path(const fs::path& path) const {
   auto prox = fs::proximate(path, loc);
   // Normalize to UTF-8 NFC:
   auto str = prox.generic_string();
@@ -145,7 +144,7 @@ std::string audio_file_index::get_relative_path(const fs::path& path) const {
   return txtnorm::normalize_utf8_or_latin(str);
 }
 
-bool audio_file_index::read_index_file() {
+bool file_index::read_index_file() {
   if (!fs::exists(loc)) {
     // std::cerr << "Index location does not exist: " << loc << "\n";
     return false;
@@ -179,7 +178,7 @@ bool audio_file_index::read_index_file() {
   return true;
 }
 
-void audio_file_index::write_index_file() const {
+void file_index::write_index_file() const {
   if (!fs::exists(loc)) {
     std::cerr << "Index location does not exist: " << loc << "\n";
     return;
@@ -207,8 +206,8 @@ void audio_file_index::write_index_file() const {
   ofs.close();
 }
 
-void audio_file_index::rescan_files(path_handler add_audio_file,
-                                    path_handler del_audio_file) {
+void file_index::rescan_files(path_handler add_audio_file,
+                              path_handler del_audio_file) {
   // For simplicity, we will just scan the directory and call addAudioFile
   // for each audio file found. In a real implementation, we would compare
   // with a cached list of files to determine which files were added or removed.
@@ -256,8 +255,7 @@ void audio_file_index::rescan_files(path_handler add_audio_file,
   write_index_file();
 }
 
-Shared::SongKey audio_file_index::make_song_key(
-    const std::string& relPath) const {
+Shared::SongKey file_index::make_song_key(const std::string& relPath) const {
   // Create a song key based on the relative path.
   // This is a placeholder implementation; actual implementation may vary.
   // TODO: Check for collisions
@@ -268,10 +266,8 @@ Shared::SongKey audio_file_index::make_song_key(
   return Shared::SongKey{oss.str()};
 }
 
-void audio_file_index::foreach_audio_file(path_handler fn) const {
+void file_index::foreach_audio_file(path_handler fn) const {
   for (const auto& [relPath, songKey] : file_to_key) {
     fn(loc / relPath);
   }
 }
-
-} // namespace afi
