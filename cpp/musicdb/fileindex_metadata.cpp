@@ -9,10 +9,10 @@
 // and produce the music-db map.
 
 #include "CommonTypes.hpp"
-#include "metadata.hpp"
+#include "fileindex.hpp"
 
 namespace fs = std::filesystem;
-namespace metadata {
+
 namespace {
 
 struct RegexPattern {
@@ -33,10 +33,11 @@ std::string_view get_no_suffix(const std::string_view& s) {
   }
   return s.substr(0, pos);
 }
-
 std::string_view get_no_suffix(const std::string& s) {
   return get_no_suffix(std::string_view(s));
 }
+
+} // namespace
 
 std::vector<RegexPattern> patterns{
     // va - (year - )albumTitle/(disc #- disc name/)## - artist - trackTitle
@@ -96,28 +97,22 @@ std::vector<RegexPattern> patterns{
          "^(.*\\/)?(?<artist>[^/]+)\\/(?<album>[^/]+)"
          "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$")};
 
-} // namespace
-
 // Metadata stuff:
+
+#pragma region Private interfaces
 
 // Get the metadata for a song from the relative path. (underlying
 // implementation for the public interface of "fs::path" or SongKey).
-std::optional<Shared::FullMetadata> cache::read(const std::string& item) {
+std::optional<Shared::FullMetadata> file_index::get_metadata_rel(
+    const std::string& relPath) const {
   // TODO: use a cache, overrides, the file path, then the file metadata.
-  auto override = read_override(item);
-  if (override.has_value()) {
-    return override; // Return the cached metadata.
-  }
-  auto from_path = read_path(item);
-  if (from_path.has_value()) {
-    return from_path; // Return the metadata from the path.
-  }
-  return read_content(item);
+  return get_metadata_from_path_rel(relPath);
 }
 
 // Get the metadata for a song from the file path only.i
-std::optional<Shared::FullMetadata> cache::read_path(const std::string& item) {
-  std::string noSuffix{get_no_suffix(item)};
+std::optional<Shared::FullMetadata> file_index::get_metadata_from_path_rel(
+    const std::string& relPath) const {
+  std::string noSuffix{get_no_suffix(relPath)};
   for (const RegexPattern& pattern : patterns) {
     // Match the pattern against the relPath.
     // If it matches, extract the metadata and return it.
@@ -126,7 +121,7 @@ std::optional<Shared::FullMetadata> cache::read_path(const std::string& item) {
       continue;
     }
     Shared::FullMetadata metadata;
-    metadata.originalPath = item;
+    metadata.originalPath = relPath;
     // Extract the metadata based on the pattern.
     auto artist = match["artist"];
     if (artist.matched) {
@@ -167,29 +162,118 @@ std::optional<Shared::FullMetadata> cache::read_path(const std::string& item) {
 }
 
 // Get the metadata for a song from the file's metadata only.
-std::optional<Shared::FullMetadata> cache::read_override(
-    const std::string& item) {
-  auto it = content_cache.find(item);
-  if (it != content_cache.end()) {
-    return it->second; // Return the cached metadata.
+std::optional<Shared::FullMetadata> file_index::get_metadata_from_file_rel(
+    const std::string& relPath) const {
+  if (relPath.length() == 0) {
+    return std::nullopt; // NYI
+  } else {
+    return std::nullopt; // NYI
   }
-  return std::nullopt; // No cached metadata found.
 }
 
-std::optional<Shared::FullMetadata> cache::read_content(
-    const std::string& item) {
-  if (item.empty()) {
-    return std::nullopt; // No item provided.
+#pragma endregion Private interfaces
+
+#pragma region Public interface
+
+#pragma region Metadata Overrides& caching:
+// Replace the local metadata cache with the new metadata.
+void file_index::update_metadata(const Shared::SongKey& songKey,
+                                 const Shared::SimpleMetadata& newMetadata) {
+  if (songKey.empty() || newMetadata.title.empty()) {
+    return; // NYI
   }
-  return std::nullopt; // NYI: Read from file content.
+  return; // NYI
 }
 
-//// Clear the local metadata *cache* (but maintain any overrides).
-// void cache::clear_metadata_cache(const Shared::SongKey& songKey) {
-//   // NYI
-//   if (songKey.empty()) {
-//     return;
-//   }
-// }
+// Replace the local metadata cache with the new metadata.
+void file_index::update_metadata(const Shared::SongKey& songKey,
+                                 const Shared::FullMetadata& newMetadata) {
+  if (songKey.empty() || newMetadata.title.empty()) {
+    return; // NYI
+  }
+  return; // NYI
+}
 
-} // namespace metadata
+// Clear the local metadata *cache* (but maintain any overrides).
+void file_index::clear_metadata_cache(const Shared::SongKey& songKey) {
+  // NYI
+  if (songKey.empty()) {
+    return;
+  }
+}
+
+// Clear the local metadata *cache* (but maintain any overrides).
+void file_index::clear_metadata_cache() {
+  // NYI
+}
+
+// Clear the local metadata cache AND overrides.
+void file_index::reset_all_metadata(const Shared::SongKey& songKey) {
+  // NYI
+  if (songKey.empty()) {
+    return;
+  }
+}
+
+// Clear the local metadata cache AND overrides.
+void file_index::reset_all_metadata() {
+  // NYI
+}
+#pragma endregion Metadata Overrides& caching
+
+#pragma region Reading metadata from files / paths / cache
+
+// Get the metadata for a song, either from the index, from the file path, or
+// from the file metadata itself (in that order of preference).
+std::optional<Shared::FullMetadata> file_index::get_metadata(
+    const fs::path& filePath) const {
+  return get_metadata_rel(get_relative_path(filePath));
+}
+
+// Get the metadata for a song, either from the index, from the file path, or
+// from the file metadata itself (in that order of preference).
+std::optional<Shared::FullMetadata> file_index::get_metadata(
+    const Shared::SongKey& sk) const {
+  auto song = key_to_file.find(sk);
+  if (song == key_to_file.end()) {
+    return std::nullopt; // NYI
+  }
+  return get_metadata_rel(song->second);
+}
+
+// Get the metadata for a song from the file path only.
+std::optional<Shared::FullMetadata> file_index::get_metadata_from_path(
+    const fs::path& filePath) const {
+  return get_metadata_rel(get_relative_path(filePath));
+}
+
+// Get the metadata for a song from the file path only.
+std::optional<Shared::FullMetadata> file_index::get_metadata_from_path(
+    const Shared::SongKey& sk) const {
+  if (sk.empty()) {
+    return std::nullopt; // NYI
+  }
+  return std::nullopt; // NYI
+}
+
+// Get the metadata for a song from the file's metadata only.
+std::optional<Shared::FullMetadata> file_index::get_metadata_from_file(
+    const fs::path& filePath) const {
+  if (filePath.empty()) {
+    return std::nullopt; // NYI
+  }
+  return std::nullopt; // NYI
+}
+
+// Get the metadata for a song from the file's metadata only.
+std::optional<Shared::FullMetadata> file_index::get_metadata_from_file(
+    const Shared::SongKey& sk) const {
+  if (sk.empty()) {
+    return std::nullopt; // NYI
+  }
+  return std::nullopt; // NYI
+}
+
+#pragma endregion Reading metadata from files / paths / cache
+
+#pragma endregion Public interface
