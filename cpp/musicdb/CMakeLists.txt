@@ -1,6 +1,7 @@
 set(
   MUSICDB_SRC_FILES
   fileindex.cpp
+  fileindex_metadata.cpp
   metadata.cpp
   musicdb.cpp
 )
