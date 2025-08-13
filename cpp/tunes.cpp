@@ -2,7 +2,7 @@
 #include <optional>
 #include <string>
 
-#include "config.h"
+#include "config.hpp"
 
 std::optional<std::filesystem::path> get_tune(const std::string& path) {
   // This function should return the path to the tune file if it exists.

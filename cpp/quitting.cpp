@@ -1,4 +1,4 @@
-#include "quitting.h"
+#include "quitting.hpp"
 
 namespace quitting {
 

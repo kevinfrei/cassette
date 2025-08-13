@@ -1,8 +1,8 @@
 set(
   MUSICDB_SRC_FILES
-  audiofileindex.cpp
+  fileindex.cpp
+  metadata.cpp
   musicdb.cpp
-  afi_metadata.cpp
 )
 
 add_library(

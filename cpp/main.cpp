@@ -6,12 +6,12 @@
 
 // #include "MediaInfo/MediaInfo.h"
 
-#include "files.h"
-#include "handlers.h"
-#include "quitting.h"
-#include "setup.h"
-#include "websocket.h"
-#include "window.h"
+#include "files.hpp"
+#include "handlers.hpp"
+#include "quitting.hpp"
+#include "setup.hpp"
+#include "websocket.hpp"
+#include "window.hpp"
 
 std::string GetRootUrl() {
   return "http://localhost:" + std::to_string(get_random_port()) +

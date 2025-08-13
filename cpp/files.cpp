@@ -7,8 +7,8 @@
 #include <portable-file-dialogs.h>
 
 #include "CommonTypes.hpp"
-#include "files.h"
-#include "tools.h"
+#include "files.hpp"
+#include "tools.hpp"
 
 namespace fs = std::filesystem;
 

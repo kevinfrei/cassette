@@ -4,8 +4,8 @@
 #include <crow.h>
 
 #include "CommonTypes.hpp"
-#include "handlers.h"
-#include "websocket.h"
+#include "handlers.hpp"
+#include "websocket.hpp"
 
 namespace websocket {
 

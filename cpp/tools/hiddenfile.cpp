@@ -4,7 +4,7 @@
 #include <windows.h>
 #endif
 
-#include "toolbox.h"
+#include "toolbox.hpp"
 
 namespace toolbox {
 
