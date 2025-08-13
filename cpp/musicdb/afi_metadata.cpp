@@ -127,6 +127,7 @@ audio_file_index::get_metadata_from_path_rel(const std::string& relPath) const {
     // Extract the metadata based on the pattern.
     auto artist = match["artist"];
     if (artist.matched) {
+      // TODO: Split artist names up.
       metadata.artist.push_back(artist.str());
     }
     auto album = match["album"];
@@ -143,6 +144,7 @@ audio_file_index::get_metadata_from_path_rel(const std::string& relPath) const {
     }
     auto title = match["title"];
     if (title.matched) {
+      // TODO: Split title into additional artists & variations.
       metadata.title = title.str();
     }
     auto discNum = match["discNum"];
