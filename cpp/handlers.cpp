@@ -5,15 +5,15 @@
 #include <crow.h>
 
 #include "CommonTypes.hpp"
-#include "api.h"
-#include "config.h"
-#include "files.h"
-#include "handlers.h"
+#include "api.hpp"
+#include "config.hpp"
+#include "files.hpp"
+#include "handlers.hpp"
 #include "musicdb.hpp"
-#include "quitting.h"
-#include "setup.h"
-#include "tools.h"
-#include "tunes.h"
+#include "quitting.hpp"
+#include "setup.hpp"
+#include "tools.hpp"
+#include "tunes.hpp"
 
 namespace handlers {
 

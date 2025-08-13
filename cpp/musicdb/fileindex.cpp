@@ -19,7 +19,7 @@
 #include "CommonTypes.hpp"
 #include "text_normalization.hpp"
 
-#include "audiofileindex.h"
+#include "fileindex.hpp"
 
 namespace fs = std::filesystem;
 

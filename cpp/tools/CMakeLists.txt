@@ -1,4 +1,4 @@
-set(TOOLS_HEADER_FILES toolbox.h)
+set(TOOLS_HEADER_FILES toolbox.hpp)
 set(TOOLS_SRC_FILES
   hiddenfile.cpp
   text_normalization.cpp

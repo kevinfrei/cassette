@@ -4,9 +4,9 @@
 #include <crow/http_response.h>
 #include <crow/json.h>
 
-#include "api.h"
-#include "config.h"
-#include "tools.h"
+#include "api.hpp"
+#include "config.hpp"
+#include "tools.hpp"
 
 namespace api {
 

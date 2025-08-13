@@ -9,7 +9,7 @@
 // and produce the music-db map.
 
 #include "CommonTypes.hpp"
-#include "audiofileindex.h"
+#include "fileindex.hpp"
 
 namespace fs = std::filesystem;
 

@@ -5,7 +5,7 @@
 #include <crow.h>
 
 #include "CommonTypes.hpp"
-#include "audiofileindex.h"
+#include "fileindex.hpp"
 
 namespace musicdb {
 
@@ -13,7 +13,21 @@ Shared::MusicDatabase* get_music_db();
 void send_music_db(crow::websocket::connection& conn);
 
 class MusicDatabase {
+  // To start with, the MusicDB will just be a wrapper around a single
+  // audio_file_index class, maintaining the full database in memory.
+  afi::audio_file_index* audioIndex;
+
  public:
+  MusicDatabase() : audioIndex(nullptr) {}
+  MusicDatabase(afi::audio_file_index* index) : audioIndex(index) {
+    // TODO: Index the AFI!
+  }
+  ~MusicDatabase() {
+    if (audioIndex) {
+      delete audioIndex;
+      audioIndex = nullptr;
+    }
+  }
   // Database API
   Shared::SongWithPath getSong(Shared::SongKey& key);
   Shared::Album getAlbum(Shared::AlbumKey& key);
@@ -22,8 +36,8 @@ class MusicDatabase {
   Shared::SearchResults searchIndex(bool substring, std::string& term);
 
   // Full File Index stuff
-  bool addAudioFileIndex(const afi::audio_file_index& idx);
-  bool removeAudioFileIndex(const afi::audio_file_index& idx);
+  bool addAudioFileIndex(afi::audio_file_index* idx);
+  bool removeAudioFileIndex(const afi::audio_file_index* idx);
 
   // "Implied" File Index stuff
   bool addFileLocation(const std::string& str);

@@ -4,9 +4,10 @@
 
 #include <gtest/gtest.h>
 
-#include "audiofileindex.h"
+#include "fileindex.hpp"
 
 namespace fs = std::filesystem;
+const char* dir_name = "fileindex";
 
 fs::path self{__FILE__};
 
@@ -24,8 +25,8 @@ class AFI : public ::testing::Test {
   }
   void remove_stuff() {
     auto testDir = self.parent_path();
-    rd(testDir / "audiofileindex" / ".afi");
-    rm(testDir / "audiofileindex" /
+    rd(testDir / dir_name / ".afi");
+    rm(testDir / dir_name /
        "Test Artist - 2010 - Test Album/04 - New File Not There.mp3");
   }
   void backup_index() {
@@ -77,7 +78,7 @@ class AFI : public ::testing::Test {
 TEST_F(AFI, SmallFileIndex_basics) {
   std::chrono::time_point<std::chrono::system_clock> start =
       std::chrono::system_clock::now();
-  auto afi = afi::audio_file_index{self.parent_path() / "audiofileindex"};
+  auto afi = afi::audio_file_index{self.parent_path() / dir_name};
   EXPECT_NE(afi.get_hash(), 0);
   auto p = afi.get_location();
   // std::cout << p.generic_string() << std::endl;
@@ -102,7 +103,7 @@ TEST_F(AFI, SmallFileIndex_basics) {
 }
 
 TEST_F(AFI, SmallFileIndex_metadata) {
-  auto afi = afi::audio_file_index{self.parent_path() / "audiofileindex"};
+  auto afi = afi::audio_file_index{self.parent_path() / dir_name};
   EXPECT_NE(afi.get_hash(), 0);
   auto p = afi.get_location();
   // std::cout << p.generic_string() << std::endl;
