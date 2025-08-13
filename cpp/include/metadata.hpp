@@ -25,6 +25,13 @@ class cache {
                      const Shared::FullMetadata& metadata);
   void write_full(const std::string& item,
                   const Shared::FullMetadata& metadata);
+
+  void clear();
+  void clear(const std::string& item);
+  void clear_metadata_cache();
+  void clear_metadata_cache(const std::string& item);
+  void clear_metadata_override();
+  void clear_metadata_override(const std::string& item);
 };
 
 } // namespace metadata

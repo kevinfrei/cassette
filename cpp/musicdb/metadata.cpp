@@ -5,6 +5,10 @@
 
 #include <boost/regex.hpp>
 
+#if defined(USE_XPRESSIVE)
+#include <boost/xpressive/xpressive.hpp>
+#endif
+
 // Initial implementation: Just read all the files in the directory
 // and produce the music-db map.
 
@@ -12,31 +16,61 @@
 #include "metadata.hpp"
 
 namespace fs = std::filesystem;
+using regexp = boost::regex;
+#if defined(USE_XPRESSIVE)
+using namespace boost::xpressive;
+#endif
+
 namespace metadata {
+
+// File-local stuff here:
 namespace {
 
 struct RegexPattern {
   Shared::VAType va;
-  boost::regex rgx;
+  regexp rgx;
 };
 
 RegexPattern make(Shared::VAType va, const char* pattern) {
-  return {va,
-          boost::regex(pattern, boost::regex::icase | boost::regex::optimize)};
+  return {va, regexp(pattern, regexp::icase | regexp::optimize)};
 }
 
 // Remove the suffix from a string(_view).
 std::string_view get_no_suffix(const std::string_view& s) {
   auto pos = s.find_last_of('.');
-  if (pos == std::string_view::npos) {
-    return s;
-  }
-  return s.substr(0, pos);
+  return (pos == std::string_view::npos) ? s : s.substr(0, pos);
 }
 
 std::string_view get_no_suffix(const std::string& s) {
   return get_no_suffix(std::string_view(s));
 }
+
+#if defined(USE_XPRESSIVE)
+// TODO: It would be fun to use Eric's Xpressive static regex library here,
+// instead of Boost's regex. I could start by trying to use the Xpressive
+// compiler...
+mark_tag year(1), album(2), discNum(3), discName(4), artist(5), track(6),
+    title(7), va_type(8);
+sregex various_1 = icase(
+    bos
+    << !(*_ << '/')
+    << (va_type = (('v' << 'a'
+                        << !('r' << 'i' << 'o' << 'u' << 's' << ' ' << 'a'
+                                 << 'r' << 't' << 'i' << 's' << 't' << 's')) |
+                   ('c' << 'o' << 'm' << 'p' << 'i' << 'l' << 'a' << 't' << 'i'
+                        << 'o' << 'n') |
+                   ('o' << 's' << 't') |
+                   ('s' << 'o' << 'u' << 'n' << 'd' << 't' << 'r' << 'a' << 'c'
+                        << 'k')))
+    << *(set = ' ', '-', '.', '/')
+    << !((year = repeat<4, 4>(_d)) << *(set = ' ', '-', '.', '/'))
+    << (album = +~'/')
+    << !('/' << (('c' << 'd') | ('d' << 'i' << 's' << ('c' | 'k'))) << !' '
+             << (discNum = +_d)
+             << !(*(set = ' ', '-', '.') << (discName = +~'/')))
+    << '/' << (track = +_d) << *(set = ' ', '-', '.') << (artist = +~'/')
+    << !' ' << '-' << ' ' << (title = +~'/') << eos);
+#endif
 
 std::vector<RegexPattern> patterns{
     // va - (year - )albumTitle/(disc #- disc name/)## - artist - trackTitle
@@ -103,7 +137,6 @@ std::vector<RegexPattern> patterns{
 // Get the metadata for a song from the relative path. (underlying
 // implementation for the public interface of "fs::path" or SongKey).
 std::optional<Shared::FullMetadata> cache::read(const std::string& item) {
-  // TODO: use a cache, overrides, the file path, then the file metadata.
   auto override = read_override(item);
   if (override.has_value()) {
     return override; // Return the cached metadata.
@@ -112,6 +145,7 @@ std::optional<Shared::FullMetadata> cache::read(const std::string& item) {
   if (from_path.has_value()) {
     return from_path; // Return the metadata from the path.
   }
+  // If we don't have an override or a path match, read the file itself.
   return read_content(item);
 }
 
@@ -184,12 +218,33 @@ std::optional<Shared::FullMetadata> cache::read_content(
   return std::nullopt; // NYI: Read from file content.
 }
 
-//// Clear the local metadata *cache* (but maintain any overrides).
-// void cache::clear_metadata_cache(const Shared::SongKey& songKey) {
-//   // NYI
-//   if (songKey.empty()) {
-//     return;
-//   }
-// }
+// Clear the *entire* local metadata cache (but maintain any overrides).
+void cache::clear_metadata_cache() {
+  content_cache.clear();
+}
+
+void cache::clear_metadata_cache(const std::string& item) {
+  content_cache.erase(item); // Remove the specific item from the cache.
+}
+
+// Clear all overrides.
+void cache::clear_metadata_override() {
+  specific_overrides.clear();
+}
+
+// Clear a specific override.
+void cache::clear_metadata_override(const std::string& item) {
+  specific_overrides.erase(item); // Remove the specific override.
+}
+
+void cache::clear() {
+  clear_metadata_cache();
+  clear_metadata_override();
+}
+
+void cache::clear(const std::string& item) {
+  clear_metadata_cache(item);
+  clear_metadata_override(item);
+}
 
 } // namespace metadata
