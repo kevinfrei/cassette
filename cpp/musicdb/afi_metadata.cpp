@@ -1,3 +1,4 @@
+#include <charconv>
 #include <filesystem>
 #include <optional>
 #include <string>
@@ -8,8 +9,6 @@
 // and produce the music-db map.
 
 #include "CommonTypes.hpp"
-#include "text_normalization.hpp"
-
 #include "audiofileindex.h"
 
 namespace fs = std::filesystem;
@@ -108,11 +107,8 @@ std::vector<RegexPattern> patterns{
 // implementation for the public interface of "fs::path" or SongKey).
 std::optional<Shared::FullMetadata> audio_file_index::get_metadata_rel(
     const std::string& relPath) const {
-  if (relPath.length() == 0) {
-    return std::nullopt; // NYI
-  } else {
-    return std::nullopt; // NYI
-  }
+  // TODO: use a cache, overrides, the file path, then the file metadata.
+  return get_metadata_from_path_rel(relPath);
 }
 
 // Get the metadata for a song from the file path only.i
@@ -122,15 +118,44 @@ audio_file_index::get_metadata_from_path_rel(const std::string& relPath) const {
   for (const RegexPattern& pattern : patterns) {
     // Match the pattern against the relPath.
     // If it matches, extract the metadata and return it.
-    boost::smatch match;
-    if (!boost::regex_match(noSuffix, match, pattern.rgx)) {
+    boost::cmatch match;
+    if (!boost::regex_match(noSuffix.c_str(), match, pattern.rgx)) {
       continue;
     }
-    // Find
     Shared::FullMetadata metadata;
     metadata.originalPath = relPath;
     // Extract the metadata based on the pattern.
-    // NYI!
+    auto artist = match["artist"];
+    if (artist.matched) {
+      metadata.artist.push_back(artist.str());
+    }
+    auto album = match["album"];
+    if (album.matched) {
+      metadata.album = album.str();
+    }
+    auto year = match["year"];
+    if (year.matched) {
+      std::from_chars(year.first, year.second, metadata.year);
+    }
+    auto track = match["track"];
+    if (track.matched) {
+      std::from_chars(track.first, track.second, metadata.track);
+    }
+    auto title = match["title"];
+    if (title.matched) {
+      metadata.title = title.str();
+    }
+    auto discNum = match["discNum"];
+    if (discNum.matched) {
+      std::from_chars(discNum.first, discNum.second, metadata.disk);
+    } else {
+      metadata.disk = 0; // Default to 0 if not matched.
+    }
+    auto discName = match["discName"];
+    if (discName.matched) {
+      metadata.diskName = discName.str();
+    }
+    metadata.vaType = pattern.va;
     return metadata; // Return the extracted metadata.
   }
   return std::nullopt; // No match found.
@@ -202,29 +227,24 @@ void audio_file_index::reset_all_metadata() {
 // from the file metadata itself (in that order of preference).
 std::optional<Shared::FullMetadata> audio_file_index::get_metadata(
     const fs::path& filePath) const {
-  if (filePath.empty()) {
-    return std::nullopt; // NYI
-  }
-  return std::nullopt; // NYI
+  return get_metadata_rel(get_relative_path(filePath));
 }
 
 // Get the metadata for a song, either from the index, from the file path, or
 // from the file metadata itself (in that order of preference).
 std::optional<Shared::FullMetadata> audio_file_index::get_metadata(
     const Shared::SongKey& sk) const {
-  if (sk.empty()) {
+  auto song = key_to_file.find(sk);
+  if (song == key_to_file.end()) {
     return std::nullopt; // NYI
   }
-  return std::nullopt; // NYI
+  return get_metadata_rel(song->second);
 }
 
 // Get the metadata for a song from the file path only.
 std::optional<Shared::FullMetadata> audio_file_index::get_metadata_from_path(
     const fs::path& filePath) const {
-  if (filePath.empty()) {
-    return std::nullopt; // NYI
-  }
-  return std::nullopt; // NYI
+  return get_metadata_rel(get_relative_path(filePath));
 }
 
 // Get the metadata for a song from the file path only.
