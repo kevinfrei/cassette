@@ -1,5 +1,4 @@
 #include <charconv>
-#include <filesystem>
 #include <optional>
 #include <string>
 
@@ -15,8 +14,8 @@
 #include "CommonTypes.hpp"
 #include "metadata.hpp"
 
-namespace fs = std::filesystem;
 using regexp = boost::regex;
+
 #if defined(USE_XPRESSIVE)
 using namespace boost::xpressive;
 #endif
@@ -51,6 +50,9 @@ std::string_view get_no_suffix(const std::string& s) {
 // compiler...
 mark_tag year(1), album(2), discNum(3), discName(4), artist(5), track(6),
     title(7), va_type(8);
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wshift-count-overflow"
+#pragma clang diagnostic ignored "-Wint-in-bool-context"
 sregex various_1 = icase(
     bos
     << !(*_ << '/')
@@ -70,6 +72,7 @@ sregex various_1 = icase(
              << !(*(set = ' ', '-', '.') << (discName = +~'/')))
     << '/' << (track = +_d) << *(set = ' ', '-', '.') << (artist = +~'/')
     << !' ' << '-' << ' ' << (title = +~'/') << eos);
+#pragma clang diagnostic pop
 #endif
 
 std::vector<RegexPattern> patterns{
