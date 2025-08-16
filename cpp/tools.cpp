@@ -1,16 +1,13 @@
+#include "tools.hpp"
+
 #include <cctype>
 #include <iomanip>
 #include <iostream>
-#include <optional>
 #include <sstream>
-#include <string>
-#include <string_view>
-
-#include <crow/http_response.h>
 
 namespace tools {
 
-void e404(crow::response& resp, const std::string& message) {
+void e404(crow::response &resp, const std::string &message) {
   std::cerr << "Error 404: " << message << std::endl;
   resp.code = 404;
   resp.body = message;

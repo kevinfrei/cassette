@@ -1,14 +1,12 @@
+#include "handlers.hpp"
+
 #include <filesystem>
 #include <iostream>
-#include <string>
-
-#include <crow.h>
 
 #include "CommonTypes.hpp"
 #include "api.hpp"
 #include "config.hpp"
 #include "files.hpp"
-#include "handlers.hpp"
 #include "musicdb.hpp"
 #include "quitting.hpp"
 #include "setup.hpp"
@@ -17,7 +15,7 @@
 
 namespace handlers {
 
-crow::response file_path(const crow::request&, const std::string& path) {
+crow::response file_path(const crow::request &, const std::string &path) {
   quitting::keep_alive();
 
   std::cout << "Path: " << path << std::endl;
@@ -38,8 +36,10 @@ crow::response file_path(const crow::request&, const std::string& path) {
       tools::e404(resp, "index.html not found");
       return resp;
     }
-    std::string content((std::istreambuf_iterator<char>(file)),
-                        std::istreambuf_iterator<char>());
+    std::string content(
+        (std::istreambuf_iterator<char>(file)),
+        std::istreambuf_iterator<char>()
+    );
     file.close();
     // Replace the placeholder with the actual port number
     std::string wsport = std::to_string(get_random_port());
@@ -63,7 +63,7 @@ crow::response file_path(const crow::request&, const std::string& path) {
   return resp;
 }
 
-crow::response images(const crow::request&, const std::string& /*path*/) {
+crow::response images(const crow::request &, const std::string & /*path*/) {
   quitting::keep_alive();
   crow::response resp;
   /*
@@ -80,7 +80,7 @@ crow::response images(const crow::request&, const std::string& /*path*/) {
   return resp;
 }
 
-crow::response tune(const crow::request&, const std::string& path) {
+crow::response tune(const crow::request &, const std::string &path) {
   quitting::keep_alive();
   crow::response resp;
   auto maybe_song = get_tune(path);
@@ -88,13 +88,13 @@ crow::response tune(const crow::request&, const std::string& path) {
     tools::e404(resp, "Tune not found");
     return resp;
   }
-  const auto& song = maybe_song.value();
+  const auto &song = maybe_song.value();
   resp.set_static_file_info_unsafe(song.generic_string());
   resp.set_header("Content-type", files::path_to_mime_type(song));
   return resp;
 }
 
-crow::response api(const crow::request&, const std::string& path) {
+crow::response api(const crow::request &, const std::string &path) {
   quitting::keep_alive();
 
   std::cout << "API Path: " << path << std::endl;
@@ -102,7 +102,7 @@ crow::response api(const crow::request&, const std::string& path) {
   size_t slashPos = path.find('/');
   slashPos = (slashPos == path.npos) ? path.size() : slashPos;
   auto maybeNum =
-      tools::read_uint64_t(std::string_view{path.c_str(), slashPos});
+      tools::read_uint64_t(std::string_view{ path.c_str(), slashPos });
   if (!maybeNum) {
     tools::e404(resp, "Invalid API arguments");
     return resp;
@@ -113,15 +113,18 @@ crow::response api(const crow::request&, const std::string& path) {
     return resp;
   }
   auto ValidateAndCall =
-      [&](std::function<void(crow::response&, std::string_view)> handle_call)
-      -> void {
+      [&](
+          std::function<void(crow::response &, std::string_view)> handle_call
+      ) -> void {
     if (slashPos == path.size()) {
       tools::e404(resp, "No data provided for API");
     } else {
       resp.code = 200;
-      handle_call(resp,
-                  std::string_view{path.c_str() + slashPos + 1,
-                                   path.size() - slashPos - 1});
+      handle_call(
+          resp,
+          std::string_view{ path.c_str() + slashPos + 1,
+                            path.size() - slashPos - 1 }
+      );
     }
   };
   switch (call) {
@@ -135,9 +138,11 @@ crow::response api(const crow::request&, const std::string& path) {
       ValidateAndCall(api::delete_from_storage);
       break;
     case Shared::IpcCall::ShowOpenDialog:
-      files::folder_picker(resp,
-                           std::string_view{path.c_str() + slashPos + 1,
-                                            path.size() - slashPos - 1});
+      files::folder_picker(
+          resp,
+          std::string_view{ path.c_str() + slashPos + 1,
+                            path.size() - slashPos - 1 }
+      );
       break;
     default:
       if (Shared::is_valid(call)) {
@@ -146,9 +151,9 @@ crow::response api(const crow::request&, const std::string& path) {
                   << static_cast<std::underlying_type_t<Shared::IpcCall>>(call)
                   << ") [" << path << "]" << std::endl;
       } else {
-        std::cerr
-            << "Unknown API call received: " << static_cast<std::uint64_t>(call)
-            << " [" << path << "]" << std::endl;
+        std::cerr << "Unknown API call received: "
+                  << static_cast<std::uint64_t>(call) << " [" << path << "]"
+                  << std::endl;
       }
 
       tools::e404(resp, "Unknown/Unimplemented API call");
@@ -172,9 +177,11 @@ crow::response quit() {
   return crow::response(200);
 }
 
-void socket_message(crow::websocket::connection& conn,
-                    const std::string& data,
-                    bool /* is_binary */) {
+void socket_message(
+    crow::websocket::connection &conn,
+    const std::string &data,
+    bool /* is_binary */
+) {
   std::cout << "Got a message from the client:";
   std::cout << data << std::endl;
   // Message is IpcMessage;[json-formatted array of arguments]
@@ -183,7 +190,7 @@ void socket_message(crow::websocket::connection& conn,
     std::cerr << "Invalid websocket message received: " << data << std::endl;
     return;
   }
-  auto maybeMsg = tools::read_uint64_t(std::string_view{data.c_str(), pos});
+  auto maybeMsg = tools::read_uint64_t(std::string_view{ data.c_str(), pos });
   if (!maybeMsg) {
     std::cerr << "Invalid websocket message received: " << data << std::endl;
     return;

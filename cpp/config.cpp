@@ -1,15 +1,12 @@
-#include <filesystem>
+#include "config.hpp"
+
 #include <fstream>
-#include <functional>
 #include <iostream>
 #include <map>
-#include <optional>
 #include <shared_mutex>
 #include <string>
-#include <string_view>
 #include <unordered_map>
 
-#include "config.hpp"
 #include "files.hpp"
 
 namespace fs = std::filesystem;
@@ -69,7 +66,7 @@ bool is_ready() {
   return config_ready;
 }
 
-const fs::path& get_home_path() {
+const fs::path &get_home_path() {
   init();
   return home_path;
 }
@@ -100,25 +97,27 @@ std::unordered_map<std::string, std::map<std::int32_t, listening_function>>
 std::unordered_map<std::int32_t, std::string> listening_keys;
 
 bool has_listener(std::string_view key) {
-  std::string key_str{key};
+  std::string key_str{ key };
   read_lock lock(the_mutex);
   auto it = listeners.find(key_str);
   return it != listeners.end() && !it->second.empty();
 }
 
-void notify_listeners(std::string_view key,
-                      std::optional<std::string> maybe_value,
-                      std::optional<std::string_view> new_value) {
+void notify_listeners(
+    std::string_view key,
+    std::optional<std::string> maybe_value,
+    std::optional<std::string_view> new_value
+) {
   // Notify listeners about the change
   // Let's fill a vector with callbacks, so we don't call them while holding
   // the read lock.
-  std::string key_str{key};
+  std::string key_str{ key };
   std::vector<listening_function> callbacks;
   {
     read_lock lock(the_mutex);
     auto it = listeners.find(key_str);
     if (it != listeners.end()) {
-      for (const auto& [listener_id, callback] : it->second) {
+      for (const auto &[listener_id, callback] : it->second) {
         callbacks.push_back(callback);
       }
     }
@@ -127,7 +126,7 @@ void notify_listeners(std::string_view key,
   if (maybe_value)
     old_value = *maybe_value;
   // Now call the callbacks outside of the lock
-  for (const auto& callback : callbacks)
+  for (const auto &callback : callbacks)
     callback(old_value, new_value);
 }
 
@@ -160,7 +159,7 @@ bool write_to_storage(std::string_view key, std::string_view value) {
       return false;
     }
     out << value;
-    cache[std::string{key}] = value;
+    cache[std::string{ key }] = value;
   }
   if (need_notification) {
     notify_listeners(key, maybe_value, value);
@@ -169,7 +168,7 @@ bool write_to_storage(std::string_view key, std::string_view value) {
 }
 
 std::optional<std::string> read_from_storage(std::string_view key) {
-  std::string key_str{key};
+  std::string key_str{ key };
   // Read from the cache first
   {
     read_lock lock(the_mutex);
@@ -209,7 +208,7 @@ bool delete_from_storage(std::string_view key) {
 
   {
     write_lock lock(the_mutex);
-    cache.erase(std::string{key});
+    cache.erase(std::string{ key });
     auto path_to_data = get_persistence_path() / files::file_name_encode(key);
     if (!fs::exists(path_to_data)) {
       return false; // Key does not exist
@@ -247,15 +246,15 @@ void clear_storage() {
 
 int32_t next_listener_id = 0;
 
-std::int32_t subscribe_to_change(std::string_view key,
-                                 listening_function callback) {
-  std::string key_str{key};
+std::int32_t
+subscribe_to_change(std::string_view key, listening_function callback) {
+  std::string key_str{ key };
   write_lock lock(the_mutex);
   if (listeners.find(key_str) == listeners.end()) {
     listeners[key_str] = {};
   }
   listeners[key_str][next_listener_id] = callback;
-  listening_keys.insert({next_listener_id, key_str});
+  listening_keys.insert({ next_listener_id, key_str });
   // std::cout << "Subscribed to changes for key: " << key_str
   //           << " with listener ID: " << next_listener_id << std::endl;
   return next_listener_id++;
@@ -267,7 +266,7 @@ bool unsubscribe_from_change(std::int32_t listener_id) {
   if (lk == listening_keys.end()) {
     return false; // Listener ID not found
   }
-  auto& key = lk->second;
+  auto &key = lk->second;
   auto listeners_for_key = listeners.find(key);
   if (listeners_for_key == listeners.end()) {
     return false; // Key not found in listeners

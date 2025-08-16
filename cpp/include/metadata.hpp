@@ -15,23 +15,23 @@ class cache {
   // metadata that has been explicitly overriden
   std::unordered_map<std::string, Shared::FullMetadata> specific_overrides;
 
- public:
-  cache(const std::filesystem::path& dir);
-  std::optional<Shared::FullMetadata> read(const std::string& item);
-  std::optional<Shared::FullMetadata> read_override(const std ::string& item);
-  std::optional<Shared::FullMetadata> read_content(const std::string& item);
-  std::optional<Shared::FullMetadata> read_path(const std ::string& item);
-  void write_partial(const std::string& item,
-                     const Shared::FullMetadata& metadata);
-  void write_full(const std::string& item,
-                  const Shared::FullMetadata& metadata);
+public:
+  cache(const std::filesystem::path &dir);
+  std::optional<Shared::FullMetadata> read(const std::string &item);
+  std::optional<Shared::FullMetadata> read_override(const std ::string &item);
+  std::optional<Shared::FullMetadata> read_content(const std::string &item);
+  std::optional<Shared::FullMetadata> read_path(const std ::string &item);
+  void
+  write_partial(const std::string &item, const Shared::FullMetadata &metadata);
+  void
+  write_full(const std::string &item, const Shared::FullMetadata &metadata);
 
   void clear();
-  void clear(const std::string& item);
+  void clear(const std::string &item);
   void clear_metadata_cache();
-  void clear_metadata_cache(const std::string& item);
+  void clear_metadata_cache(const std::string &item);
   void clear_metadata_override();
-  void clear_metadata_override(const std::string& item);
+  void clear_metadata_override(const std::string &item);
 };
 
 } // namespace metadata

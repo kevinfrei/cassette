@@ -18,7 +18,7 @@ std::string GetRootUrl() {
          "/www/index.html";
 }
 
-void ConfigureRoutes(crow::SimpleApp& app, const std::string& /*url*/) {
+void ConfigureRoutes(crow::SimpleApp &app, const std::string & /*url*/) {
   // Define the routes:
   // Try a websocket route:
   websocket::configure(app);
@@ -27,9 +27,9 @@ void ConfigureRoutes(crow::SimpleApp& app, const std::string& /*url*/) {
   CROW_ROUTE(app, "/tune/<path>")(handlers::tune);
   CROW_ROUTE(app, "/images/<path>")(handlers::images);
   CROW_ROUTE(app, "/keepalive")
-      .methods(crow::HTTPMethod::GET,
-               crow::HTTPMethod::POST,
-               crow::HTTPMethod::PUT)(handlers::keepalive);
+      .methods(crow::HTTPMethod::GET, crow::HTTPMethod::POST, crow::HTTPMethod::PUT)(
+          handlers::keepalive
+      );
   CROW_ROUTE(app, "/quit")(handlers::quit);
 }
 

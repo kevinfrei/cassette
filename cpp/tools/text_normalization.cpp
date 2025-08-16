@@ -1,7 +1,3 @@
-#include <cstdint>
-#include <string>
-#include <string_view>
-
 #include "text_normalization.hpp"
 
 namespace txtnorm {
@@ -18,12 +14,12 @@ constexpr char32_t COMBINING_SLASH = 0x0337;
 namespace {
 // This puts the codepoint, as UTF8, into result. It will split diacritics into
 // separate combining characters.
-void handle_codepoint(std::string& result, char32_t codepoint);
+void handle_codepoint(std::string &result, char32_t codepoint);
 
 // This will uncombine common Latin letters with diacritics into base letters,
 // returning true if it did so, false if it didn't.
 // If it returns false, the caller should handle the codepoint normally.
-bool uncombine_latin(std::string& result, char32_t codepoint);
+bool uncombine_latin(std::string &result, char32_t codepoint);
 
 bool is_onebyte(unsigned char c) {
   return c <= 0x7f;
@@ -33,9 +29,11 @@ bool is_twobyte_prefix(unsigned char c) {
   return (c & 0xe0) == 0xc0;
 }
 
-bool is_twobyte_continuation(std::string_view input,
-                             std::string_view::size_type i,
-                             unsigned char* c2) {
+bool is_twobyte_continuation(
+    std::string_view input,
+    std::string_view::size_type i,
+    unsigned char *c2
+) {
   if (i + 1 >= input.size())
     return false;
   *c2 = static_cast<unsigned char>(input[i + 1]);
@@ -46,10 +44,12 @@ bool is_threebyte_prefix(unsigned char c) {
   return (c & 0xf0) == 0xe0;
 }
 
-bool is_threebyte_continuation(std::string_view input,
-                               std::string_view::size_type i,
-                               unsigned char* c2,
-                               unsigned char* c3) {
+bool is_threebyte_continuation(
+    std::string_view input,
+    std::string_view::size_type i,
+    unsigned char *c2,
+    unsigned char *c3
+) {
   if (i + 2 >= input.size())
     return false;
   *c2 = static_cast<unsigned char>(input[i + 1]);
@@ -61,11 +61,13 @@ bool is_fourbyte_prefix(unsigned char c) {
   return (c & 0xf8) == 0xf0;
 }
 
-bool is_fourbyte_continuation(std::string_view input,
-                              std::string_view::size_type i,
-                              unsigned char* c2,
-                              unsigned char* c3,
-                              unsigned char* c4) {
+bool is_fourbyte_continuation(
+    std::string_view input,
+    std::string_view::size_type i,
+    unsigned char *c2,
+    unsigned char *c3,
+    unsigned char *c4
+) {
   if (i + 3 >= input.size())
     return false;
   *c2 = static_cast<unsigned char>(input[i + 1]);
@@ -74,7 +76,7 @@ bool is_fourbyte_continuation(std::string_view input,
   return ((*c2 & 0xc0) == 0x80 && (*c3 & 0xc0) == 0x80 && (*c4 & 0xc0) == 0x80);
 }
 
-void handle_codepoint(std::string& result, char32_t codepoint) {
+void handle_codepoint(std::string &result, char32_t codepoint) {
   // Convert the 'unified' diacritics to suffixed modifiers.
   if (!uncombine_latin(result, codepoint)) {
     if (codepoint <= 0x7f) {
@@ -95,7 +97,7 @@ void handle_codepoint(std::string& result, char32_t codepoint) {
   }
 }
 
-bool uncombine_latin(std::string& result, char32_t codepoint) {
+bool uncombine_latin(std::string &result, char32_t codepoint) {
   switch (codepoint) {
     case 0xc0:
       // Latin Capital Letter A with Grave
@@ -315,6 +317,7 @@ bool uncombine_latin(std::string& result, char32_t codepoint) {
 }
 
 } // namespace
+
 // Normalize a string to diacritic post-modifiers form. This is a very
 // simplistic implementation that only handles a few common cases. A full
 // implementation would use ICU or similar library.

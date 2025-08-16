@@ -8,7 +8,7 @@
 
 namespace toolbox {
 
-bool is_hidden_file(const std::filesystem::path& path) {
+bool is_hidden_file(const std::filesystem::path &path) {
   if (!std::filesystem::exists(path)) {
     return false; // File does not exist
   }

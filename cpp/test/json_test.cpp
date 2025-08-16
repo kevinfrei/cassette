@@ -177,7 +177,7 @@ TEST(JsonPickling, char) {
 
 TEST(JsonPickling, std_vector) {
   // Test the conversion of basic types to and from JSON
-  std::vector<int> vec = {1, 2, 3};
+  std::vector<int> vec = { 1, 2, 3 };
   crow::json::wvalue json_value = to_json(vec);
   EXPECT_EQ(json_value.t(), crow::json::type::List);
   std::string s = json_value.dump();
@@ -195,7 +195,7 @@ TEST(JsonPickling, std_vector) {
 
 TEST(JsonPickling, std_tuple) {
   // Test the conversion of basic types to and from JSON
-  std::tuple<int, double, std::string> tup = {1, 2.5, "hello"};
+  std::tuple<int, double, std::string> tup = { 1, 2.5, "hello" };
   crow::json::wvalue json_value = to_json(tup);
   EXPECT_EQ(json_value.t(), crow::json::type::List);
   std::string s = json_value.dump();
@@ -207,7 +207,8 @@ TEST(JsonPickling, std_tuple) {
   EXPECT_EQ(std::get<1>(tup_value.value()), 2.5);
   EXPECT_EQ(std::get<2>(tup_value.value()), "hello");
   auto tup2 = from_json<std::tuple<std::string, int, double, bool>>(
-      crow::json::load("[\"hi\",15,4.125,false]"));
+      crow::json::load("[\"hi\",15,4.125,false]")
+  );
   EXPECT_TRUE(tup2.has_value());
   EXPECT_EQ(std::get<0>(tup2.value()), "hi");
   EXPECT_EQ(std::get<1>(tup2.value()), 15);
@@ -215,16 +216,15 @@ TEST(JsonPickling, std_tuple) {
   EXPECT_EQ(std::get<3>(tup2.value()), false);
 }
 
-template <typename T>
-void testSet(const T& theSet) {
+template <typename T> void testSet(const T &theSet) {
   crow::json::wvalue json_value = to_json(theSet);
   // std::cout << "JSON of std::set<char>: " << json_value.dump() << std::endl;
   EXPECT_EQ(json_value.t(), crow::json::type::Object);
   EXPECT_EQ(json_value.keys().size(), 2);
   auto tag = json_value["@dataType"];
   auto val = json_value["@dataValue"];
-  crow::json::wvalue_reader trdr{tag};
-  std::string tagName = trdr.get(std::string{""});
+  crow::json::wvalue_reader trdr{ tag };
+  std::string tagName = trdr.get(std::string{ "" });
   // std::cout << "Tag: " << rdr.get(std::string{"---"}) << std::endl;
   EXPECT_EQ(tag.t(), crow::json::type::String);
   EXPECT_STREQ("freik.Set", tagName.c_str());
@@ -236,7 +236,7 @@ void testSet(const T& theSet) {
     auto elem = val[i];
     EXPECT_EQ(elem.t(), crow::json::type::String);
     std::string contents =
-        crow::json::wvalue_reader{elem}.get(std::string("NOPE"));
+        crow::json::wvalue_reader{ elem }.get(std::string("NOPE"));
     EXPECT_EQ(contents.size(), 1);
     switch (contents[0]) {
       case 'b':
@@ -265,22 +265,21 @@ void testSet(const T& theSet) {
 }
 
 TEST(JsonPickling, std_set_and_hash) {
-  std::set<char> theSet{'z', 'c', 'b', 'q'};
+  std::set<char> theSet{ 'z', 'c', 'b', 'q' };
   testSet(theSet);
-  std::unordered_set<char> hashSet{'c', 'b', 'q', 'z'};
+  std::unordered_set<char> hashSet{ 'c', 'b', 'q', 'z' };
   testSet(hashSet);
 }
 
-template <typename MapType>
-void testMap(const MapType& theMap) {
+template <typename MapType> void testMap(const MapType &theMap) {
   crow::json::wvalue json_value = to_json(theMap);
   // std::cout << json_value.dump() << std::endl;
   EXPECT_EQ(json_value.t(), crow::json::type::Object);
   EXPECT_EQ(json_value.keys().size(), 2);
   auto tag = json_value["@dataType"];
   auto val = json_value["@dataValue"];
-  crow::json::wvalue_reader trdr{tag};
-  std::string tagName = trdr.get(std::string{""});
+  crow::json::wvalue_reader trdr{ tag };
+  std::string tagName = trdr.get(std::string{ "" });
   EXPECT_EQ(tag.t(), crow::json::type::String);
   EXPECT_STREQ("freik.Map", tagName.c_str());
   // std::cout << json_value.dump() << std::endl;
@@ -293,12 +292,19 @@ void testMap(const MapType& theMap) {
   // Round-trip validation:
   EXPECT_EQ(*map_val, theMap);
 }
+
 TEST(JsonPickling, std_map_and_hash) {
-  std::map<std::string, int> theMap{
-      {"a1", 1}, {"b2", 2}, {"c3", 3}, {"d4", 4}, {"e5", 5}};
+  std::map<std::string, int> theMap{ { "a1", 1 },
+                                     { "b2", 2 },
+                                     { "c3", 3 },
+                                     { "d4", 4 },
+                                     { "e5", 5 } };
   testMap(theMap);
-  std::unordered_map<std::string, int> hashMap{
-      {"a1", 1}, {"b2", 2}, {"c3", 3}, {"d4", 4}, {"e5", 5}};
+  std::unordered_map<std::string, int> hashMap{ { "a1", 1 },
+                                                { "b2", 2 },
+                                                { "c3", 3 },
+                                                { "d4", 4 },
+                                                { "e5", 5 } };
   testMap(hashMap);
 }
 
@@ -346,10 +352,11 @@ TEST(JsonPickling, MixAndMatch) {
   using MapType = std::map<Shared::IgnoreItemType, std::vector<Tuple>>;
   MapType myType;
   myType[Shared::IgnoreItemType::DirName] =
-      std::vector<Tuple>({{Shared::CurrentView::albums, "Albums", 1.25},
-                          {Shared::CurrentView::artists, "Artists", 2.5}});
+      std::vector<Tuple>({ { Shared::CurrentView::albums, "Albums", 1.25 },
+                           { Shared::CurrentView::artists, "Artists", 2.5 } });
   myType[Shared::IgnoreItemType::PathKeyword] = std::vector<Tuple>(
-      {{Shared::CurrentView::now_playing, "Now Playing", 4.125}});
+      { { Shared::CurrentView::now_playing, "Now Playing", 4.125 } }
+  );
   myType[Shared::IgnoreItemType::PathRoot] = std::vector<Tuple>({});
   crow::json::wvalue json = to_json(myType);
   EXPECT_EQ(json.t(), crow::json::type::Object);
@@ -361,12 +368,12 @@ TEST(JsonPickling, MixAndMatch) {
   EXPECT_EQ(sentMap->size(), 3);
   EXPECT_EQ(sentMap->at(Shared::IgnoreItemType::DirName).size(), 2);
 
-  auto& dirname = sentMap->at(Shared::IgnoreItemType::DirName);
+  auto &dirname = sentMap->at(Shared::IgnoreItemType::DirName);
   EXPECT_EQ(dirname.size(), 2);
 
-  auto& curView = std::get<0>(dirname[0]);
-  auto& name = std::get<1>(dirname[0]);
-  auto& value = std::get<2>(dirname[0]);
+  auto &curView = std::get<0>(dirname[0]);
+  auto &name = std::get<1>(dirname[0]);
+  auto &value = std::get<2>(dirname[0]);
   EXPECT_EQ(curView, Shared::CurrentView::albums);
   EXPECT_EQ(name, "Albums");
   EXPECT_EQ(value, 1.25);
@@ -378,7 +385,7 @@ TEST(JsonPickling, MixAndMatch) {
   EXPECT_EQ(name, "Artists");
   EXPECT_EQ(value, 2.5);
 
-  auto& pathkeyword = sentMap->at(Shared::IgnoreItemType::PathKeyword);
+  auto &pathkeyword = sentMap->at(Shared::IgnoreItemType::PathKeyword);
   EXPECT_EQ(pathkeyword.size(), 1);
 
   curView = std::get<0>(pathkeyword[0]);
@@ -388,19 +395,20 @@ TEST(JsonPickling, MixAndMatch) {
   EXPECT_EQ(name, "Now Playing");
   EXPECT_EQ(value, 4.125);
 
-  auto& pathroot = sentMap->at(Shared::IgnoreItemType::PathRoot);
+  auto &pathroot = sentMap->at(Shared::IgnoreItemType::PathRoot);
   EXPECT_EQ(pathroot.size(), 0);
 }
 
 TEST(JsonPickling, CustomObject) {
   Shared::TranscodeState state;
   state.curStatus = "Transcoding";
-  state.filesTranscoded = {"file1.mp3", "file2.mp3"};
+  state.filesTranscoded = { "file1.mp3", "file2.mp3" };
   state.filesFound = 10;
   state.filesPending = 5;
   state.filesUntouched = 2;
-  state.filesFailed = {{"file3.mp3", "Error 1"}, {"file4.mp3", "Error 2"}};
-  state.itemsRemoved = {"item1", "item2"};
+  state.filesFailed = { { "file3.mp3", "Error 1" },
+                        { "file4.mp3", "Error 2" } };
+  state.itemsRemoved = { "item1", "item2" };
   crow::json::wvalue json = to_json(state);
   EXPECT_EQ(json.t(), crow::json::type::Object);
   std::string s = json.dump();

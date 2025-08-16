@@ -7,38 +7,44 @@
 #include "fileindex.hpp"
 
 namespace fs = std::filesystem;
-const char* dir_name = "fileindex";
-const char* idx_dir = ".afi";
+const char *dir_name = "fileindex";
+const char *idx_dir = ".afi";
 
-fs::path self{__FILE__};
+fs::path self{ __FILE__ };
 
 class FileIndex : public ::testing::Test {
   // delete the .afi subdirectory before and after running the tests.
-  void rd(const fs::path& dir) {
+  void rd(const fs::path &dir) {
     if (fs::exists(dir)) {
       fs::remove_all(dir);
     }
   }
-  void rm(const fs::path& file) {
+
+  void rm(const fs::path &file) {
     if (fs::exists(file)) {
       fs::remove(file);
     }
   }
+
   void remove_stuff() {
     auto testDir = self.parent_path();
     rd(testDir / dir_name / idx_dir);
     rm(testDir / dir_name /
        "Test Artist - 2010 - Test Album/04 - New File Not There.mp3");
   }
+
   void backup_index() {
     auto testDir = self.parent_path();
     auto indexFile = testDir / "NotActuallyFiles" / idx_dir / "index.txt";
     if (fs::exists(indexFile)) {
-      fs::copy(indexFile,
-               indexFile.string() + ".bak",
-               fs::copy_options::overwrite_existing);
+      fs::copy(
+          indexFile,
+          indexFile.string() + ".bak",
+          fs::copy_options::overwrite_existing
+      );
     }
   }
+
   void restore_index() {
     auto testDir = self.parent_path();
     auto indexFile = testDir / "NotActuallyFiles" / idx_dir / "index.txt";
@@ -49,7 +55,7 @@ class FileIndex : public ::testing::Test {
     }
   }
 
- protected:
+protected:
   FileIndex() {
     backup_index();
     remove_stuff();
@@ -59,6 +65,7 @@ class FileIndex : public ::testing::Test {
     restore_index();
     remove_stuff();
   }
+
   /*
   // SetUp() method for per-test setup
   void SetUp() override {
@@ -79,21 +86,25 @@ class FileIndex : public ::testing::Test {
 TEST_F(FileIndex, SmallFileIndex_basics) {
   std::chrono::time_point<std::chrono::system_clock> start =
       std::chrono::system_clock::now();
-  auto afi = file_index{self.parent_path() / dir_name};
+  auto afi = file_index{ self.parent_path() / dir_name };
   EXPECT_NE(afi.get_hash(), 0);
   auto p = afi.get_location();
   // std::cout << p.generic_string() << std::endl;
   EXPECT_FALSE(p.generic_string().ends_with("."));
   int i = 0;
-  afi.foreach_audio_file([&](const fs::path& path) {
+  afi.foreach_audio_file([&](const fs::path &path) {
     // std::cout << "Audio file: " << path.generic_string() << std::endl;
     EXPECT_TRUE(path.is_absolute());
     EXPECT_TRUE(path.has_filename());
     EXPECT_TRUE(path.has_extension());
-    EXPECT_TRUE(path.extension().generic_string() == ".mp3" ||
-                path.extension().generic_string() == ".flac");
-    EXPECT_TRUE(path.generic_string().find("/01 - ") != std::string::npos ||
-                path.generic_string().find("/02 - ") != std::string::npos);
+    EXPECT_TRUE(
+        path.extension().generic_string() == ".mp3" ||
+        path.extension().generic_string() == ".flac"
+    );
+    EXPECT_TRUE(
+        path.generic_string().find("/01 - ") != std::string::npos ||
+        path.generic_string().find("/02 - ") != std::string::npos
+    );
     i++;
   });
   // There should be a total of 6 files in the test directory.
@@ -104,19 +115,21 @@ TEST_F(FileIndex, SmallFileIndex_basics) {
 }
 
 TEST_F(FileIndex, SmallFileIndex_metadata) {
-  auto afi = file_index{self.parent_path() / dir_name};
+  auto afi = file_index{ self.parent_path() / dir_name };
   EXPECT_NE(afi.get_hash(), 0);
   auto p = afi.get_location();
   // std::cout << p.generic_string() << std::endl;
   EXPECT_FALSE(p.generic_string().ends_with("."));
   int i = 0;
-  afi.foreach_audio_file([&](const fs::path& path) {
+  afi.foreach_audio_file([&](const fs::path &path) {
     // std::cout << "Audio file: " << path.generic_string() << std::endl;
     EXPECT_TRUE(path.is_absolute());
     EXPECT_TRUE(path.has_filename());
     EXPECT_TRUE(path.has_extension());
-    EXPECT_TRUE(path.extension().generic_string() == ".mp3" ||
-                path.extension().generic_string() == ".flac");
+    EXPECT_TRUE(
+        path.extension().generic_string() == ".mp3" ||
+        path.extension().generic_string() == ".flac"
+    );
     i++;
     auto metadata = afi.get_metadata_from_path(path);
     EXPECT_TRUE(metadata.has_value());
@@ -142,18 +155,21 @@ TEST_F(FileIndex, SmallFileIndex_metadata) {
   // There should be a total of 6 files in the test directory.
   EXPECT_EQ(i, 6);
 }
+
 TEST_F(FileIndex, LargeFileIndex) {
-  auto afi = file_index{self.parent_path() / "NotActuallyFiles", false};
+  auto afi = file_index{ self.parent_path() / "NotActuallyFiles", false };
   EXPECT_NE(afi.get_hash(), 0);
-  EXPECT_EQ(afi.get_last_scan_time(),
-            std::chrono::system_clock::time_point::min());
+  EXPECT_EQ(
+      afi.get_last_scan_time(),
+      std::chrono::system_clock::time_point::min()
+  );
   auto p = afi.get_location();
   int i = 0;
   int mp3 = 0;
   int m4a = 0;
   int jpg = 0;
   int flac = 0;
-  afi.foreach_audio_file([&](const fs::path& path) {
+  afi.foreach_audio_file([&](const fs::path &path) {
     // std::cout << "Audio file: " << path.generic_string() << std::endl;
     EXPECT_TRUE(path.is_absolute());
     EXPECT_TRUE(path.has_filename());
@@ -184,31 +200,31 @@ TEST_F(FileIndex, LargeFileIndex) {
   int mp3delta = 0;
   int jpgdelta = 0;
   int otherdelta = 0;
-  afi.rescan_files(
-      [&](const fs::path& path) {
-        // std::cout << "Added file: " << path.generic_string() << std::endl;
-        added++;
-        if (path.extension() == ".mp3") {
-          mp3delta++;
-        } else if (path.extension() == ".jpg") {
-          jpgdelta++;
-        } else {
-          otherdelta++;
-        }
-      },
-      [&](const fs::path& path) {
-        // std::cout << "Removed file: " << path.generic_string() << std::endl;
-        removed++;
-        if (path.extension() == ".mp3") {
-          mp3delta--;
-        } else if (path.extension() == ".jpg") {
-          jpgdelta--;
-        } else {
-          otherdelta--;
-        }
-      });
-  EXPECT_GT(afi.get_last_scan_time(),
-            std::chrono::system_clock::time_point::min());
+  afi.rescan_files([&](const fs::path &path) {
+    // std::cout << "Added file: " << path.generic_string() << std::endl;
+    added++;
+    if (path.extension() == ".mp3") {
+      mp3delta++;
+    } else if (path.extension() == ".jpg") {
+      jpgdelta++;
+    } else {
+      otherdelta++;
+    }
+  }, [&](const fs::path &path) {
+    // std::cout << "Removed file: " << path.generic_string() << std::endl;
+    removed++;
+    if (path.extension() == ".mp3") {
+      mp3delta--;
+    } else if (path.extension() == ".jpg") {
+      jpgdelta--;
+    } else {
+      otherdelta--;
+    }
+  });
+  EXPECT_GT(
+      afi.get_last_scan_time(),
+      std::chrono::system_clock::time_point::min()
+  );
   EXPECT_LE(afi.get_last_scan_time(), std::chrono::system_clock::now());
   EXPECT_EQ(added, 2);
   EXPECT_EQ(removed, 2);

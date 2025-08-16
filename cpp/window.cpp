@@ -6,16 +6,14 @@ namespace window {
 // default location. I should, instead, detect if Chrome is installed in a
 // much more robust fashion. If it's not, then I should fall back to just
 // opening the URL
-void open(const std::string& url) {
+void open(const std::string &url) {
   std::string cmdln;
 #if defined(_WIN32)
-  cmdln =
-      "\"c:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" "
-      "--new-window --app=";
+  cmdln = "\"c:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" "
+          "--new-window --app=";
 #elif defined(__APPLE__)
-  cmdln =
-      "/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome "
-      "--new-window --app=";
+  cmdln = "/Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome "
+          "--new-window --app=";
 #elif defined(__linux__)
   // /opt/google/chrome/chrome --new-window --app=
   cmdln = "xdg-open ";

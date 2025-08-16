@@ -20,82 +20,108 @@ struct RegexPattern {
   boost::regex rgx;
 };
 
-RegexPattern make(Shared::VAType va, const char* pattern) {
-  return {va,
-          boost::regex(pattern, boost::regex::icase | boost::regex::optimize)};
+RegexPattern make(Shared::VAType va, const char *pattern) {
+  return {
+    va,
+    boost::regex(pattern, boost::regex::icase | boost::regex::optimize)
+  };
 }
 
 // Remove the suffix from a string(_view).
-std::string_view get_no_suffix(const std::string_view& s) {
+std::string_view get_no_suffix(const std::string_view &s) {
   auto pos = s.find_last_of('.');
   if (pos == std::string_view::npos) {
     return s;
   }
   return s.substr(0, pos);
 }
-std::string_view get_no_suffix(const std::string& s) {
+
+std::string_view get_no_suffix(const std::string &s) {
   return get_no_suffix(std::string_view(s));
 }
 
 } // namespace
 
 std::vector<RegexPattern> patterns{
-    // va - (year - )albumTitle/(disc #- disc name/)## - artist - trackTitle
-    make(Shared::VAType::va,
-         "^(.*\\/)?((va(rious artists)?)|(compilation)) - "
-         "((?<year>\\d{4}) - )?(?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"),
-    // ost - (year - )albumTitle/(disc #- disc name/)## - artist - trackTitle
-    make(Shared::VAType::ost,
-         "^(.*\\/)?((ost)|(soundtrack)) - "
-         "((?<year>\\d{4}) - )?(?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"),
-    // artist - year - album/(disc #- disc name/)## - trackTitle
-    make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+) - (?<year>\\d{4}) - (?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
-    // va/(year - )albumTitle/(CD # name/)## - artist - trackTitle
-    make(Shared::VAType::va,
-         "^(.*\\/)?((va(rious artists)?)|(compilation))"
-         "\\/((?<year>\\d{4}) - )?(?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"),
-    // ost/(year - )albumTitle/(CD # name/)## - artist - trackTitle
-    make(Shared::VAType::ost,
-         "^(.*\\/)?((ost)|(soundtrack))"
-         "\\/((?<year>\\d{4}) - )?(?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"),
-    // artist/year - albumTitle/CD # name/## - trackTitle
-    make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+)\\/(?<year>\\d{4}) - (?<album>[^/]+)"
-         "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
-         "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$"),
-    // artist/year - albumTitle/## - trackTitle
-    make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+)\\/(?<year>\\d{4}) - (?<album>[^/]+)"
-         "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$"),
-    // artist - album/CD # name/## - trackTitle
-    make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+) - (?<album>[^/]+)"
-         "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
-         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
-    // artist/albumTitle/CD # name/## - trackTitle
-    make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+)\\/(?<album>[^/]+)"
-         "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
-         "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$"),
-    // artist - album/## - trackTitle
-    make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+) - (?<album>[^/]+)"
-         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
-    // artist/albumTitle/## - trackTitle
-    make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+)\\/(?<album>[^/]+)"
-         "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$")};
+  // va - (year - )albumTitle/(disc #- disc name/)## - artist - trackTitle
+  make(
+      Shared::VAType::va,
+      "^(.*\\/)?((va(rious artists)?)|(compilation)) - "
+      "((?<year>\\d{4}) - )?(?<album>[^/]+)"
+      "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
+      "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"
+  ),
+  // ost - (year - )albumTitle/(disc #- disc name/)## - artist - trackTitle
+  make(
+      Shared::VAType::ost,
+      "^(.*\\/)?((ost)|(soundtrack)) - "
+      "((?<year>\\d{4}) - )?(?<album>[^/]+)"
+      "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
+      "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"
+  ),
+  // artist - year - album/(disc #- disc name/)## - trackTitle
+  make(
+      Shared::VAType::none,
+      "^(.*\\/)?(?<artist>[^/]+) - (?<year>\\d{4}) - (?<album>[^/]+)"
+      "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
+      "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"
+  ),
+  // va/(year - )albumTitle/(CD # name/)## - artist - trackTitle
+  make(
+      Shared::VAType::va,
+      "^(.*\\/)?((va(rious artists)?)|(compilation))"
+      "\\/((?<year>\\d{4}) - )?(?<album>[^/]+)"
+      "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
+      "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"
+  ),
+  // ost/(year - )albumTitle/(CD # name/)## - artist - trackTitle
+  make(
+      Shared::VAType::ost,
+      "^(.*\\/)?((ost)|(soundtrack))"
+      "\\/((?<year>\\d{4}) - )?(?<album>[^/]+)"
+      "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
+      "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"
+  ),
+  // artist/year - albumTitle/CD # name/## - trackTitle
+  make(
+      Shared::VAType::none,
+      "^(.*\\/)?(?<artist>[^/]+)\\/(?<year>\\d{4}) - (?<album>[^/]+)"
+      "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
+      "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$"
+  ),
+  // artist/year - albumTitle/## - trackTitle
+  make(
+      Shared::VAType::none,
+      "^(.*\\/)?(?<artist>[^/]+)\\/(?<year>\\d{4}) - (?<album>[^/]+)"
+      "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$"
+  ),
+  // artist - album/CD # name/## - trackTitle
+  make(
+      Shared::VAType::none,
+      "^(.*\\/)?(?<artist>[^/]+) - (?<album>[^/]+)"
+      "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
+      "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"
+  ),
+  // artist/albumTitle/CD # name/## - trackTitle
+  make(
+      Shared::VAType::none,
+      "^(.*\\/)?(?<artist>[^/]+)\\/(?<album>[^/]+)"
+      "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
+      "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$"
+  ),
+  // artist - album/## - trackTitle
+  make(
+      Shared::VAType::none,
+      "^(.*\\/)?(?<artist>[^/]+) - (?<album>[^/]+)"
+      "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"
+  ),
+  // artist/albumTitle/## - trackTitle
+  make(
+      Shared::VAType::none,
+      "^(.*\\/)?(?<artist>[^/]+)\\/(?<album>[^/]+)"
+      "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$"
+  )
+};
 
 // Metadata stuff:
 
@@ -103,17 +129,17 @@ std::vector<RegexPattern> patterns{
 
 // Get the metadata for a song from the relative path. (underlying
 // implementation for the public interface of "fs::path" or SongKey).
-std::optional<Shared::FullMetadata> file_index::get_metadata_rel(
-    const std::string& relPath) const {
+std::optional<Shared::FullMetadata>
+file_index::get_metadata_rel(const std::string &relPath) const {
   // TODO: use a cache, overrides, the file path, then the file metadata.
   return get_metadata_from_path_rel(relPath);
 }
 
 // Get the metadata for a song from the file path only.i
-std::optional<Shared::FullMetadata> file_index::get_metadata_from_path_rel(
-    const std::string& relPath) const {
-  std::string noSuffix{get_no_suffix(relPath)};
-  for (const RegexPattern& pattern : patterns) {
+std::optional<Shared::FullMetadata>
+file_index::get_metadata_from_path_rel(const std::string &relPath) const {
+  std::string noSuffix{ get_no_suffix(relPath) };
+  for (const RegexPattern &pattern : patterns) {
     // Match the pattern against the relPath.
     // If it matches, extract the metadata and return it.
     boost::cmatch match;
@@ -162,8 +188,8 @@ std::optional<Shared::FullMetadata> file_index::get_metadata_from_path_rel(
 }
 
 // Get the metadata for a song from the file's metadata only.
-std::optional<Shared::FullMetadata> file_index::get_metadata_from_file_rel(
-    const std::string& relPath) const {
+std::optional<Shared::FullMetadata>
+file_index::get_metadata_from_file_rel(const std::string &relPath) const {
   if (relPath.length() == 0) {
     return std::nullopt; // NYI
   } else {
@@ -176,9 +202,12 @@ std::optional<Shared::FullMetadata> file_index::get_metadata_from_file_rel(
 #pragma region Public interface
 
 #pragma region Metadata Overrides& caching:
+
 // Replace the local metadata cache with the new metadata.
-void file_index::update_metadata(const Shared::SongKey& songKey,
-                                 const Shared::SimpleMetadata& newMetadata) {
+void file_index::update_metadata(
+    const Shared::SongKey &songKey,
+    const Shared::SimpleMetadata &newMetadata
+) {
   if (songKey.empty() || newMetadata.title.empty()) {
     return; // NYI
   }
@@ -186,8 +215,10 @@ void file_index::update_metadata(const Shared::SongKey& songKey,
 }
 
 // Replace the local metadata cache with the new metadata.
-void file_index::update_metadata(const Shared::SongKey& songKey,
-                                 const Shared::FullMetadata& newMetadata) {
+void file_index::update_metadata(
+    const Shared::SongKey &songKey,
+    const Shared::FullMetadata &newMetadata
+) {
   if (songKey.empty() || newMetadata.title.empty()) {
     return; // NYI
   }
@@ -195,7 +226,7 @@ void file_index::update_metadata(const Shared::SongKey& songKey,
 }
 
 // Clear the local metadata *cache* (but maintain any overrides).
-void file_index::clear_metadata_cache(const Shared::SongKey& songKey) {
+void file_index::clear_metadata_cache(const Shared::SongKey &songKey) {
   // NYI
   if (songKey.empty()) {
     return;
@@ -208,7 +239,7 @@ void file_index::clear_metadata_cache() {
 }
 
 // Clear the local metadata cache AND overrides.
-void file_index::reset_all_metadata(const Shared::SongKey& songKey) {
+void file_index::reset_all_metadata(const Shared::SongKey &songKey) {
   // NYI
   if (songKey.empty()) {
     return;
@@ -219,21 +250,22 @@ void file_index::reset_all_metadata(const Shared::SongKey& songKey) {
 void file_index::reset_all_metadata() {
   // NYI
 }
-#pragma endregion Metadata Overrides& caching
+
+#pragma endregion Metadata Overrides &caching
 
 #pragma region Reading metadata from files / paths / cache
 
 // Get the metadata for a song, either from the index, from the file path, or
 // from the file metadata itself (in that order of preference).
-std::optional<Shared::FullMetadata> file_index::get_metadata(
-    const fs::path& filePath) const {
+std::optional<Shared::FullMetadata>
+file_index::get_metadata(const fs::path &filePath) const {
   return get_metadata_rel(get_relative_path(filePath));
 }
 
 // Get the metadata for a song, either from the index, from the file path, or
 // from the file metadata itself (in that order of preference).
-std::optional<Shared::FullMetadata> file_index::get_metadata(
-    const Shared::SongKey& sk) const {
+std::optional<Shared::FullMetadata>
+file_index::get_metadata(const Shared::SongKey &sk) const {
   auto song = key_to_file.find(sk);
   if (song == key_to_file.end()) {
     return std::nullopt; // NYI
@@ -242,14 +274,14 @@ std::optional<Shared::FullMetadata> file_index::get_metadata(
 }
 
 // Get the metadata for a song from the file path only.
-std::optional<Shared::FullMetadata> file_index::get_metadata_from_path(
-    const fs::path& filePath) const {
+std::optional<Shared::FullMetadata>
+file_index::get_metadata_from_path(const fs::path &filePath) const {
   return get_metadata_rel(get_relative_path(filePath));
 }
 
 // Get the metadata for a song from the file path only.
-std::optional<Shared::FullMetadata> file_index::get_metadata_from_path(
-    const Shared::SongKey& sk) const {
+std::optional<Shared::FullMetadata>
+file_index::get_metadata_from_path(const Shared::SongKey &sk) const {
   if (sk.empty()) {
     return std::nullopt; // NYI
   }
@@ -257,8 +289,8 @@ std::optional<Shared::FullMetadata> file_index::get_metadata_from_path(
 }
 
 // Get the metadata for a song from the file's metadata only.
-std::optional<Shared::FullMetadata> file_index::get_metadata_from_file(
-    const fs::path& filePath) const {
+std::optional<Shared::FullMetadata>
+file_index::get_metadata_from_file(const fs::path &filePath) const {
   if (filePath.empty()) {
     return std::nullopt; // NYI
   }
@@ -266,8 +298,8 @@ std::optional<Shared::FullMetadata> file_index::get_metadata_from_file(
 }
 
 // Get the metadata for a song from the file's metadata only.
-std::optional<Shared::FullMetadata> file_index::get_metadata_from_file(
-    const Shared::SongKey& sk) const {
+std::optional<Shared::FullMetadata>
+file_index::get_metadata_from_file(const Shared::SongKey &sk) const {
   if (sk.empty()) {
     return std::nullopt; // NYI
   }

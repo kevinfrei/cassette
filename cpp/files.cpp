@@ -1,13 +1,12 @@
-#include <filesystem>
+#include "files.hpp"
+
 #include <fstream>
 #include <iostream>
 
 #include <boost/dll/runtime_symbol_info.hpp>
-#include <crow/http_response.h>
 #include <portable-file-dialogs.h>
 
 #include "CommonTypes.hpp"
-#include "files.hpp"
 #include "tools.hpp"
 
 namespace fs = std::filesystem;
@@ -33,7 +32,7 @@ fs::path get_app_name() {
   return program_location.stem();
 }
 
-std::string path_to_mime_type(const fs::path& file_path) {
+std::string path_to_mime_type(const fs::path &file_path) {
   const std::string extension = file_path.extension().generic_string();
   if (extension == ".txt") {
     return "text/plain";
@@ -271,8 +270,9 @@ std::optional<std::string> file_name_decode(std::string_view filename) {
       }
       control_char = false; // Reset the flag after processing
     } else {
-      oss << static_cast<char>(is_upper ? toupper(c)
-                                        : tolower(c)); // Convert to lowercase
+      oss << static_cast<char>(
+          is_upper ? toupper(c) : tolower(c)
+      ); // Convert to lowercase
     }
   }
   if (post_underscore || control_char) {
@@ -301,7 +301,7 @@ std::optional<std::string> read_file(fs::path file_path) {
 }
 
 template <typename T>
-void show_opt(std::string_view name, const std::optional<T>& opt) {
+void show_opt(std::string_view name, const std::optional<T> &opt) {
   if (opt) {
     std::cout << "  " << name << ": " << *opt << std::endl;
   } else {
@@ -309,7 +309,7 @@ void show_opt(std::string_view name, const std::optional<T>& opt) {
   }
 }
 
-void folder_picker(crow::response& resp, std::string_view data) {
+void folder_picker(crow::response &resp, std::string_view data) {
   // TODO: Allow data to specify a title, default path or a platform path.
   // For now, I'm waiting on platform folders to get updated (see the
   // conan file)
@@ -326,10 +326,10 @@ void folder_picker(crow::response& resp, std::string_view data) {
       show_opt("multiSelections", options->multiSelections);
       if (options->filters) {
         std::cout << "  filters: " << std::endl;
-        for (const auto& filter : *options->filters) {
+        for (const auto &filter : *options->filters) {
           std::cout << "    name: " << filter.name << std::endl;
           std::cout << "    extensions: ";
-          for (const auto& ext : filter.extensions) {
+          for (const auto &ext : filter.extensions) {
             std::cout << ext << " ";
           }
           std::cout << std::endl;
@@ -349,7 +349,7 @@ void folder_picker(crow::response& resp, std::string_view data) {
     std::cout << "Folder picker selected: " << result << std::endl;
     resp.code = 200; // OK
     resp.set_header("Content-Type", "text/json");
-    resp.body = to_json(std::vector<std::string>{result}).dump();
+    resp.body = to_json(std::vector<std::string>{ result }).dump();
   }
   /*
   auto json = crow::json::load(*maybe_value);

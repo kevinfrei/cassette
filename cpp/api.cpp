@@ -1,10 +1,9 @@
-#include <iostream>
-#include <string_view>
+#include "api.hpp"
 
-#include <crow/http_response.h>
+#include <iostream>
+
 #include <crow/json.h>
 
-#include "api.hpp"
 #include "config.hpp"
 #include "tools.hpp"
 
@@ -19,7 +18,7 @@ std::string_view get_key(std::string_view data) {
   return data; // Return the whole data if no space found
 }
 
-void read_from_storage(crow::response& resp, std::string_view data) {
+void read_from_storage(crow::response &resp, std::string_view data) {
   auto key = get_key(data);
   std::cout << "Reading " << key << " from storage: <" << data << ">"
             << std::endl;
@@ -35,7 +34,7 @@ void read_from_storage(crow::response& resp, std::string_view data) {
   }
 }
 
-void write_to_storage(crow::response& resp, std::string_view data) {
+void write_to_storage(crow::response &resp, std::string_view data) {
   auto key = get_key(data);
   if (key.length() == data.length()) {
     // If the key is the same as the data, it means no slash was found
@@ -61,7 +60,7 @@ void write_to_storage(crow::response& resp, std::string_view data) {
   }
 }
 
-void delete_from_storage(crow::response& resp, std::string_view data) {
+void delete_from_storage(crow::response &resp, std::string_view data) {
   auto key = get_key(data);
   std::cout << "Deleting " << key << " from storage: <" << data << ">"
             << std::endl;

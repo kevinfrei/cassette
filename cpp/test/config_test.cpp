@@ -48,15 +48,15 @@ TEST(Config, StorageNotifcations) {
   config::listening_function listener1 =
       [&](std::optional<std::string_view> old_value,
           std::optional<std::string_view> new_value) {
-        old1 = old_value;
-        new1 = new_value;
-      };
+    old1 = old_value;
+    new1 = new_value;
+  };
   config::listening_function listener2 =
       [&](std::optional<std::string_view> old_value,
           std::optional<std::string_view> new_value) {
-        old2 = old_value;
-        new2 = new_value;
-      };
+    old2 = old_value;
+    new2 = new_value;
+  };
   config::clear_storage();
   id1 = config::subscribe_to_change("lk1", listener1);
   id2 = config::subscribe_to_change("lk2", listener2);

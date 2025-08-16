@@ -6,10 +6,10 @@
 
 namespace config {
 
-const std::filesystem::path& get_home_path();
+const std::filesystem::path &get_home_path();
 
-using listening_function = std::function<void(std::optional<std::string_view>,
-                                              std::optional<std::string_view>)>;
+using listening_function = std::function<
+    void(std::optional<std::string_view>, std::optional<std::string_view>)>;
 
 std::filesystem::path get_path();
 
@@ -17,8 +17,8 @@ bool write_to_storage(std::string_view key, std::string_view value);
 std::optional<std::string> read_from_storage(std::string_view key);
 bool delete_from_storage(std::string_view key);
 
-std::int32_t subscribe_to_change(std::string_view key,
-                                 listening_function callback);
+std::int32_t
+subscribe_to_change(std::string_view key, listening_function callback);
 bool unsubscribe_from_change(std::int32_t listener_id);
 
 void flush_storage_cache();

@@ -1,57 +1,59 @@
 ---
-AccessModifierOffset: -1
-AlignAfterOpenBracket: Align
-AlignEscapedNewlinesLeft: true
+AlignAfterOpenBracket: BlockIndent
+AlignConsecutiveMacros: false
+AlignEscapedNewlines: DontAlign
+AlignOperands: Align
 AlignTrailingComments: false
-AllowAllParametersOfDeclarationOnNextLine: true
-AllowShortBlocksOnASingleLine: false
-AllowShortFunctionsOnASingleLine: Empty
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Inline
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
-AlwaysBreakBeforeMultilineStrings: true
-AlwaysBreakTemplateDeclarations: true
 BinPackArguments: false
 BinPackParameters: false
-BreakBeforeBinaryOperators: false
-BreakBeforeBraces: Attach
-BreakBeforeTernaryOperators: true
+BreakBeforeInheritanceComma: false
+BreakConstructorInitializers: AfterColon
 BreakConstructorInitializersBeforeComma: false
-ColumnLimit:     80
+BreakInheritanceList: AfterColon
+BreakStringLiterals: false
+ColumnLimit: 80
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
-Cpp11BracedListStyle: true
-DerivePointerAlignment: false
-DeriveLineEnding: false
-IndentWrappedFunctionNames: false
-ExperimentalAutoDetectBinPacking: true
+Cpp11BracedListStyle: false
+DeriveLineEnding: true
+FixNamespaceComments: false
 IndentCaseLabels: true
-IndentFunctionDeclarationAfterType: false
-IndentWidth:     2
-JavaScriptQuotes: Single
-MaxEmptyLinesToKeep: 1
+IndentWidth: 2
+LambdaBodyIndentation: OuterScope
+Language: Cpp
 NamespaceIndentation: None
-ObjCSpaceBeforeProtocolList: false
-PenaltyBreakBeforeFirstCallParameter: 10
-PenaltyBreakComment: 60
-PenaltyBreakFirstLessLess: 20
-PenaltyBreakString: 1000
-PenaltyExcessCharacter: 1000000
-PenaltyReturnTypeOnItsOwnLine: 200
-PointerAlignment: Left
-SpaceAfterCStyleCast: false
-SpaceAfterTemplateKeyword: true
-SpaceAfterControlStatementKeyword: true
-SpaceBeforeAssignmentOperators: true
-SpaceBeforeParens: ControlStatements
-SpaceInEmptyParentheses: false
-SpacesBeforeTrailingComments: 1
-SpacesInAngles: false
+PackConstructorInitializers: CurrentLine
+PointerAlignment: Right
+QualifierAlignment: Left
+ReferenceAlignment: Right
+ReflowComments: true
+SeparateDefinitionBlocks: Always
+SortIncludes: true
+IncludeBlocks: Regroup
+SortUsingDeclarations: false
+IncludeCategories:
+  - Regex:           '<[[:alnum:]_]+>'
+    Priority:        1
+    SortPriority:    1
+  - Regex:           '<.*[/-\.].*>'
+    Priority:        2
+    SortPriority:    2
+  - Regex:           '"[[:alnum:]._-]+"'
+    Priority:        4
+    SortPriority:    3
+  - Regex:           '^(".*/)'
+    Priority:        3
+    SortPriority:    4
+SpaceBeforeCtorInitializerColon: true
 SpacesInContainerLiterals: false
-SpacesInCStyleCastParentheses: false
-SpacesInParentheses: false
-Standard:        Auto
-TabWidth:        2
-UseCRLF:  false
-UseTab:          Never
-...
+TabWidth: 2
+UseTab: Never

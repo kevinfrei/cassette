@@ -6,6 +6,6 @@
 #include <optional>
 #include <string>
 
-std::optional<std::filesystem::path> get_tune(const std::string& path);
+std::optional<std::filesystem::path> get_tune(const std::string &path);
 
 #endif

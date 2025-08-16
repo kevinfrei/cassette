@@ -27,7 +27,7 @@
 namespace Shared {
 
 template <typename T>
-constexpr std::optional<T> from_string(const std::string_view& str);
+constexpr std::optional<T> from_string(const std::string_view &str);
 
 #pragma region string enum Keys
 
@@ -124,8 +124,8 @@ inline constexpr std::string_view to_string(Keys _value) {
 // This is *super* simplistic, and should be optimized, cuz this is bad.
 // A deeply nested switch statement would be pretty fun to generate...
 template <>
-inline constexpr std::optional<Keys> from_string<Keys>(
-    const std::string_view& str) {
+inline constexpr std::optional<Keys>
+from_string<Keys>(const std::string_view &str) {
   if (str == "O")
     return Keys::AddFileLocation;
   if (str == "2")
@@ -347,8 +347,8 @@ inline constexpr std::string_view to_string(StrId _value) {
 // This is *super* simplistic, and should be optimized, cuz this is bad.
 // A deeply nested switch statement would be pretty fun to generate...
 template <>
-inline constexpr std::optional<StrId> from_string<StrId>(
-    const std::string_view& str) {
+inline constexpr std::optional<StrId>
+from_string<StrId>(const std::string_view &str) {
   if (str == "mono")
     return StrId::Mono;
   if (str == "stereo")
@@ -750,7 +750,11 @@ inline constexpr std::string_view to_string(SocketMsg _value) {
 
 #pragma region string enum IgnoreItemType
 
-enum class IgnoreItemType { PathRoot, PathKeyword, DirName };
+enum class IgnoreItemType {
+  PathRoot,
+  PathKeyword,
+  DirName
+};
 
 inline constexpr bool is_valid(IgnoreItemType _value) {
   switch (_value) {
@@ -779,8 +783,8 @@ inline constexpr std::string_view to_string(IgnoreItemType _value) {
 // This is *super* simplistic, and should be optimized, cuz this is bad.
 // A deeply nested switch statement would be pretty fun to generate...
 template <>
-inline constexpr std::optional<IgnoreItemType> from_string<IgnoreItemType>(
-    const std::string_view& str) {
+inline constexpr std::optional<IgnoreItemType>
+from_string<IgnoreItemType>(const std::string_view &str) {
   if (str == "path-root")
     return IgnoreItemType::PathRoot;
   if (str == "path-keyword")
@@ -936,8 +940,8 @@ inline constexpr std::string_view to_string(StorageId _value) {
 // This is *super* simplistic, and should be optimized, cuz this is bad.
 // A deeply nested switch statement would be pretty fun to generate...
 template <>
-inline constexpr std::optional<StorageId> from_string<StorageId>(
-    const std::string_view& str) {
+inline constexpr std::optional<StorageId>
+from_string<StorageId>(const std::string_view &str) {
   if (str == "currentView")
     return StorageId::CurrentView;
   if (str == "shuffle")
@@ -1003,7 +1007,11 @@ inline constexpr std::optional<StorageId> from_string<StorageId>(
 
 #pragma region string enum TranscodeFormatTargetName
 
-enum class TranscodeFormatTargetName { m4a, mp3, aac };
+enum class TranscodeFormatTargetName {
+  m4a,
+  mp3,
+  aac
+};
 
 inline constexpr bool is_valid(TranscodeFormatTargetName _value) {
   switch (_value) {
@@ -1033,7 +1041,7 @@ inline constexpr std::string_view to_string(TranscodeFormatTargetName _value) {
 // A deeply nested switch statement would be pretty fun to generate...
 template <>
 inline constexpr std::optional<TranscodeFormatTargetName>
-from_string<TranscodeFormatTargetName>(const std::string_view& str) {
+from_string<TranscodeFormatTargetName>(const std::string_view &str) {
   if (str == "m4a")
     return TranscodeFormatTargetName::m4a;
   if (str == "mp3")
@@ -1047,7 +1055,12 @@ from_string<TranscodeFormatTargetName>(const std::string_view& str) {
 
 #pragma region string enum TranscodeSource
 
-enum class TranscodeSource { Playlist, Artist, Album, Disk };
+enum class TranscodeSource {
+  Playlist,
+  Artist,
+  Album,
+  Disk
+};
 
 inline constexpr bool is_valid(TranscodeSource _value) {
   switch (_value) {
@@ -1079,8 +1092,8 @@ inline constexpr std::string_view to_string(TranscodeSource _value) {
 // This is *super* simplistic, and should be optimized, cuz this is bad.
 // A deeply nested switch statement would be pretty fun to generate...
 template <>
-inline constexpr std::optional<TranscodeSource> from_string<TranscodeSource>(
-    const std::string_view& str) {
+inline constexpr std::optional<TranscodeSource>
+from_string<TranscodeSource>(const std::string_view &str) {
   if (str == "p")
     return TranscodeSource::Playlist;
   if (str == "r")
@@ -1122,6 +1135,7 @@ struct TranscodeInfo {
   TranscodeFormatTargetName format;
   std::uint16_t bitrate;
 };
+
 using SongKey = std::string;
 using AlbumKey = std::string;
 using ArtistKey = std::string;
@@ -1145,7 +1159,11 @@ struct SongWithPath : public Song {
 
 #pragma region string enum VAType
 
-enum class VAType { none, va, ost };
+enum class VAType {
+  none,
+  va,
+  ost
+};
 
 inline constexpr bool is_valid(VAType _value) {
   switch (_value) {
@@ -1174,8 +1192,8 @@ inline constexpr std::string_view to_string(VAType _value) {
 // This is *super* simplistic, and should be optimized, cuz this is bad.
 // A deeply nested switch statement would be pretty fun to generate...
 template <>
-inline constexpr std::optional<VAType> from_string<VAType>(
-    const std::string_view& str) {
+inline constexpr std::optional<VAType>
+from_string<VAType>(const std::string_view &str) {
   if (str == "None")
     return VAType::none;
   if (str == "VA")
@@ -1273,65 +1291,69 @@ struct SearchResults {
 
 } // namespace Shared
 #pragma region JSON serialization for string enum Keys
+
 template <>
 inline crow::json::wvalue to_json<Shared::Keys>(Shared::Keys _value) {
   return to_json(to_string(_value));
 }
-template <>
-struct impl_from_json<Shared::Keys> {
-  static inline std::optional<Shared::Keys> process(
-      const crow::json::rvalue& _value) {
+
+template <> struct impl_from_json<Shared::Keys> {
+  static inline std::optional<Shared::Keys>
+  process(const crow::json::rvalue &_value) {
     if (_value.t() != crow::json::type::String)
       return std::nullopt;
     auto _str = _value.s();
-    return Shared::from_string<Shared::Keys>(
-        std::string_view{_str.begin(), _str.size()});
+    return Shared::from_string<Shared::Keys>(std::string_view{ _str.begin(),
+                                                               _str.size() });
   }
 };
 #pragma endregion JSON serialization for string enum Keys
 
 #pragma region JSON serialization for string enum StrId
+
 template <>
 inline crow::json::wvalue to_json<Shared::StrId>(Shared::StrId _value) {
   return to_json(to_string(_value));
 }
-template <>
-struct impl_from_json<Shared::StrId> {
-  static inline std::optional<Shared::StrId> process(
-      const crow::json::rvalue& _value) {
+
+template <> struct impl_from_json<Shared::StrId> {
+  static inline std::optional<Shared::StrId>
+  process(const crow::json::rvalue &_value) {
     if (_value.t() != crow::json::type::String)
       return std::nullopt;
     auto _str = _value.s();
-    return Shared::from_string<Shared::StrId>(
-        std::string_view{_str.begin(), _str.size()});
+    return Shared::from_string<Shared::StrId>(std::string_view{ _str.begin(),
+                                                                _str.size() });
   }
 };
 #pragma endregion JSON serialization for string enum StrId
 
 #pragma region JSON serialization for string enum IgnoreItemType
+
 template <>
-inline crow::json::wvalue to_json<Shared::IgnoreItemType>(
-    Shared::IgnoreItemType _value) {
+inline crow::json::wvalue
+to_json<Shared::IgnoreItemType>(Shared::IgnoreItemType _value) {
   return to_json(to_string(_value));
 }
-template <>
-struct impl_from_json<Shared::IgnoreItemType> {
-  static inline std::optional<Shared::IgnoreItemType> process(
-      const crow::json::rvalue& _value) {
+
+template <> struct impl_from_json<Shared::IgnoreItemType> {
+  static inline std::optional<Shared::IgnoreItemType>
+  process(const crow::json::rvalue &_value) {
     if (_value.t() != crow::json::type::String)
       return std::nullopt;
     auto _str = _value.s();
     return Shared::from_string<Shared::IgnoreItemType>(
-        std::string_view{_str.begin(), _str.size()});
+        std::string_view{ _str.begin(), _str.size() }
+    );
   }
 };
 #pragma endregion JSON serialization for string enum IgnoreItemType
 
 #pragma region JSON serialization for object IgnoreItemPair
-template <>
-struct impl_to_json<Shared::IgnoreItemPair> {
-  static inline crow::json::wvalue process(
-      const Shared::IgnoreItemPair& _value) {
+
+template <> struct impl_to_json<Shared::IgnoreItemPair> {
+  static inline crow::json::wvalue
+  process(const Shared::IgnoreItemPair &_value) {
     crow::json::wvalue _res;
     _res["type"] = to_json(_value.type);
     _res["value"] = to_json(_value.value);
@@ -1341,8 +1363,8 @@ struct impl_to_json<Shared::IgnoreItemPair> {
 };
 
 template <>
-inline std::optional<Shared::IgnoreItemPair> from_json<Shared::IgnoreItemPair>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::IgnoreItemPair>
+from_json<Shared::IgnoreItemPair>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::IgnoreItemPair _res;
@@ -1363,69 +1385,77 @@ inline std::optional<Shared::IgnoreItemPair> from_json<Shared::IgnoreItemPair>(
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object IgnoreItemPair
 
 #pragma region JSON serialization for string enum StorageId
+
 template <>
 inline crow::json::wvalue to_json<Shared::StorageId>(Shared::StorageId _value) {
   return to_json(to_string(_value));
 }
-template <>
-struct impl_from_json<Shared::StorageId> {
-  static inline std::optional<Shared::StorageId> process(
-      const crow::json::rvalue& _value) {
+
+template <> struct impl_from_json<Shared::StorageId> {
+  static inline std::optional<Shared::StorageId>
+  process(const crow::json::rvalue &_value) {
     if (_value.t() != crow::json::type::String)
       return std::nullopt;
     auto _str = _value.s();
     return Shared::from_string<Shared::StorageId>(
-        std::string_view{_str.begin(), _str.size()});
+        std::string_view{ _str.begin(), _str.size() }
+    );
   }
 };
 #pragma endregion JSON serialization for string enum StorageId
 
 #pragma region JSON serialization for string enum TranscodeFormatTargetName
+
 template <>
 inline crow::json::wvalue to_json<Shared::TranscodeFormatTargetName>(
-    Shared::TranscodeFormatTargetName _value) {
+    Shared::TranscodeFormatTargetName _value
+) {
   return to_json(to_string(_value));
 }
-template <>
-struct impl_from_json<Shared::TranscodeFormatTargetName> {
-  static inline std::optional<Shared::TranscodeFormatTargetName> process(
-      const crow::json::rvalue& _value) {
+
+template <> struct impl_from_json<Shared::TranscodeFormatTargetName> {
+  static inline std::optional<Shared::TranscodeFormatTargetName>
+  process(const crow::json::rvalue &_value) {
     if (_value.t() != crow::json::type::String)
       return std::nullopt;
     auto _str = _value.s();
     return Shared::from_string<Shared::TranscodeFormatTargetName>(
-        std::string_view{_str.begin(), _str.size()});
+        std::string_view{ _str.begin(), _str.size() }
+    );
   }
 };
 #pragma endregion JSON serialization for string enum TranscodeFormatTargetName
 
 #pragma region JSON serialization for string enum TranscodeSource
+
 template <>
-inline crow::json::wvalue to_json<Shared::TranscodeSource>(
-    Shared::TranscodeSource _value) {
+inline crow::json::wvalue
+to_json<Shared::TranscodeSource>(Shared::TranscodeSource _value) {
   return to_json(to_string(_value));
 }
-template <>
-struct impl_from_json<Shared::TranscodeSource> {
-  static inline std::optional<Shared::TranscodeSource> process(
-      const crow::json::rvalue& _value) {
+
+template <> struct impl_from_json<Shared::TranscodeSource> {
+  static inline std::optional<Shared::TranscodeSource>
+  process(const crow::json::rvalue &_value) {
     if (_value.t() != crow::json::type::String)
       return std::nullopt;
     auto _str = _value.s();
     return Shared::from_string<Shared::TranscodeSource>(
-        std::string_view{_str.begin(), _str.size()});
+        std::string_view{ _str.begin(), _str.size() }
+    );
   }
 };
 #pragma endregion JSON serialization for string enum TranscodeSource
 
 #pragma region JSON serialization for object TranscodeSourceLocation
-template <>
-struct impl_to_json<Shared::TranscodeSourceLocation> {
-  static inline crow::json::wvalue process(
-      const Shared::TranscodeSourceLocation& _value) {
+
+template <> struct impl_to_json<Shared::TranscodeSourceLocation> {
+  static inline crow::json::wvalue
+  process(const Shared::TranscodeSourceLocation &_value) {
     crow::json::wvalue _res;
     _res["type"] = to_json(_value.type);
     _res["loc"] = to_json(_value.loc);
@@ -1436,7 +1466,7 @@ struct impl_to_json<Shared::TranscodeSourceLocation> {
 
 template <>
 inline std::optional<Shared::TranscodeSourceLocation>
-from_json<Shared::TranscodeSourceLocation>(const crow::json::rvalue& _value) {
+from_json<Shared::TranscodeSourceLocation>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::TranscodeSourceLocation _res;
@@ -1457,12 +1487,13 @@ from_json<Shared::TranscodeSourceLocation>(const crow::json::rvalue& _value) {
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object TranscodeSourceLocation
 
 #pragma region JSON serialization for object FileFailure
-template <>
-struct impl_to_json<Shared::FileFailure> {
-  static inline crow::json::wvalue process(const Shared::FileFailure& _value) {
+
+template <> struct impl_to_json<Shared::FileFailure> {
+  static inline crow::json::wvalue process(const Shared::FileFailure &_value) {
     crow::json::wvalue _res;
     _res["file"] = to_json(_value.file);
     _res["error"] = to_json(_value.error);
@@ -1472,8 +1503,8 @@ struct impl_to_json<Shared::FileFailure> {
 };
 
 template <>
-inline std::optional<Shared::FileFailure> from_json<Shared::FileFailure>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::FileFailure>
+from_json<Shared::FileFailure>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::FileFailure _res;
@@ -1494,13 +1525,14 @@ inline std::optional<Shared::FileFailure> from_json<Shared::FileFailure>(
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object FileFailure
 
 #pragma region JSON serialization for object TranscodeState
-template <>
-struct impl_to_json<Shared::TranscodeState> {
-  static inline crow::json::wvalue process(
-      const Shared::TranscodeState& _value) {
+
+template <> struct impl_to_json<Shared::TranscodeState> {
+  static inline crow::json::wvalue
+  process(const Shared::TranscodeState &_value) {
     crow::json::wvalue _res;
     _res["curStatus"] = to_json(_value.curStatus);
     _res["filesTranscoded"] = to_json(_value.filesTranscoded);
@@ -1515,8 +1547,8 @@ struct impl_to_json<Shared::TranscodeState> {
 };
 
 template <>
-inline std::optional<Shared::TranscodeState> from_json<Shared::TranscodeState>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::TranscodeState>
+from_json<Shared::TranscodeState>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::TranscodeState _res;
@@ -1575,13 +1607,14 @@ inline std::optional<Shared::TranscodeState> from_json<Shared::TranscodeState>(
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object TranscodeState
 
 #pragma region JSON serialization for object TranscodeInfo
-template <>
-struct impl_to_json<Shared::TranscodeInfo> {
-  static inline crow::json::wvalue process(
-      const Shared::TranscodeInfo& _value) {
+
+template <> struct impl_to_json<Shared::TranscodeInfo> {
+  static inline crow::json::wvalue
+  process(const Shared::TranscodeInfo &_value) {
     crow::json::wvalue _res;
     _res["source"] = to_json(_value.source);
     _res["dest"] = to_json(_value.dest);
@@ -1595,8 +1628,8 @@ struct impl_to_json<Shared::TranscodeInfo> {
 };
 
 template <>
-inline std::optional<Shared::TranscodeInfo> from_json<Shared::TranscodeInfo>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::TranscodeInfo>
+from_json<Shared::TranscodeInfo>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::TranscodeInfo _res;
@@ -1647,12 +1680,13 @@ inline std::optional<Shared::TranscodeInfo> from_json<Shared::TranscodeInfo>(
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object TranscodeInfo
 
 #pragma region JSON serialization for object Song
-template <>
-struct impl_to_json<Shared::Song> {
-  static inline crow::json::wvalue process(const Shared::Song& _value) {
+
+template <> struct impl_to_json<Shared::Song> {
+  static inline crow::json::wvalue process(const Shared::Song &_value) {
     crow::json::wvalue _res;
     _res["key"] = to_json(_value.key);
     _res["track"] = to_json(_value.track);
@@ -1667,8 +1701,8 @@ struct impl_to_json<Shared::Song> {
 };
 
 template <>
-inline std::optional<Shared::Song> from_json<Shared::Song>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::Song>
+from_json<Shared::Song>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::Song _res;
@@ -1727,12 +1761,13 @@ inline std::optional<Shared::Song> from_json<Shared::Song>(
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object Song
 
 #pragma region JSON serialization for object SongWithPath
-template <>
-struct impl_to_json<Shared::SongWithPath> {
-  static inline crow::json::wvalue process(const Shared::SongWithPath& _value) {
+
+template <> struct impl_to_json<Shared::SongWithPath> {
+  static inline crow::json::wvalue process(const Shared::SongWithPath &_value) {
     crow::json::wvalue _res = impl_to_json<Shared::Song>::process(_value);
     _res["path"] = to_json(_value.path);
     return _res;
@@ -1740,8 +1775,8 @@ struct impl_to_json<Shared::SongWithPath> {
 };
 
 template <>
-inline std::optional<Shared::SongWithPath> from_json<Shared::SongWithPath>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::SongWithPath>
+from_json<Shared::SongWithPath>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   std::optional<Shared::Song> _base = from_json<Shared::Song>(_value);
@@ -1754,34 +1789,36 @@ inline std::optional<Shared::SongWithPath> from_json<Shared::SongWithPath>(
   if (!_path_opt_.has_value())
     return std::nullopt;
 
-  Shared::SongWithPath _res{std::move(*_base), std::move(*_path_opt_)};
+  Shared::SongWithPath _res{ std::move(*_base), std::move(*_path_opt_) };
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object SongWithPath
 
 #pragma region JSON serialization for string enum VAType
+
 template <>
 inline crow::json::wvalue to_json<Shared::VAType>(Shared::VAType _value) {
   return to_json(to_string(_value));
 }
-template <>
-struct impl_from_json<Shared::VAType> {
-  static inline std::optional<Shared::VAType> process(
-      const crow::json::rvalue& _value) {
+
+template <> struct impl_from_json<Shared::VAType> {
+  static inline std::optional<Shared::VAType>
+  process(const crow::json::rvalue &_value) {
     if (_value.t() != crow::json::type::String)
       return std::nullopt;
     auto _str = _value.s();
-    return Shared::from_string<Shared::VAType>(
-        std::string_view{_str.begin(), _str.size()});
+    return Shared::from_string<Shared::VAType>(std::string_view{ _str.begin(),
+                                                                 _str.size() });
   }
 };
 #pragma endregion JSON serialization for string enum VAType
 
 #pragma region JSON serialization for object Artist
-template <>
-struct impl_to_json<Shared::Artist> {
-  static inline crow::json::wvalue process(const Shared::Artist& _value) {
+
+template <> struct impl_to_json<Shared::Artist> {
+  static inline crow::json::wvalue process(const Shared::Artist &_value) {
     crow::json::wvalue _res;
     _res["key"] = to_json(_value.key);
     _res["name"] = to_json(_value.name);
@@ -1793,8 +1830,8 @@ struct impl_to_json<Shared::Artist> {
 };
 
 template <>
-inline std::optional<Shared::Artist> from_json<Shared::Artist>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::Artist>
+from_json<Shared::Artist>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::Artist _res;
@@ -1830,12 +1867,13 @@ inline std::optional<Shared::Artist> from_json<Shared::Artist>(
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object Artist
 
 #pragma region JSON serialization for object Album
-template <>
-struct impl_to_json<Shared::Album> {
-  static inline crow::json::wvalue process(const Shared::Album& _value) {
+
+template <> struct impl_to_json<Shared::Album> {
+  static inline crow::json::wvalue process(const Shared::Album &_value) {
     crow::json::wvalue _res;
     _res["key"] = to_json(_value.key);
     _res["year"] = to_json(_value.year);
@@ -1850,8 +1888,8 @@ struct impl_to_json<Shared::Album> {
 };
 
 template <>
-inline std::optional<Shared::Album> from_json<Shared::Album>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::Album>
+from_json<Shared::Album>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::Album _res;
@@ -1909,12 +1947,13 @@ inline std::optional<Shared::Album> from_json<Shared::Album>(
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object Album
 
 #pragma region JSON serialization for object MediaInfo
-template <>
-struct impl_to_json<Shared::MediaInfo> {
-  static inline crow::json::wvalue process(const Shared::MediaInfo& _value) {
+
+template <> struct impl_to_json<Shared::MediaInfo> {
+  static inline crow::json::wvalue process(const Shared::MediaInfo &_value) {
     crow::json::wvalue _res;
     _res["general"] = to_json(_value.general);
     _res["audio"] = to_json(_value.audio);
@@ -1924,8 +1963,8 @@ struct impl_to_json<Shared::MediaInfo> {
 };
 
 template <>
-inline std::optional<Shared::MediaInfo> from_json<Shared::MediaInfo>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::MediaInfo>
+from_json<Shared::MediaInfo>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::MediaInfo _res;
@@ -1948,13 +1987,14 @@ inline std::optional<Shared::MediaInfo> from_json<Shared::MediaInfo>(
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object MediaInfo
 
 #pragma region JSON serialization for object SimpleMetadata
-template <>
-struct impl_to_json<Shared::SimpleMetadata> {
-  static inline crow::json::wvalue process(
-      const Shared::SimpleMetadata& _value) {
+
+template <> struct impl_to_json<Shared::SimpleMetadata> {
+  static inline crow::json::wvalue
+  process(const Shared::SimpleMetadata &_value) {
     crow::json::wvalue _res;
     _res["artist"] = to_json(_value.artist);
     _res["album"] = to_json(_value.album);
@@ -1970,8 +2010,8 @@ struct impl_to_json<Shared::SimpleMetadata> {
 };
 
 template <>
-inline std::optional<Shared::SimpleMetadata> from_json<Shared::SimpleMetadata>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::SimpleMetadata>
+from_json<Shared::SimpleMetadata>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::SimpleMetadata _res;
@@ -2034,12 +2074,13 @@ inline std::optional<Shared::SimpleMetadata> from_json<Shared::SimpleMetadata>(
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object SimpleMetadata
 
 #pragma region JSON serialization for object FullMetadata
-template <>
-struct impl_to_json<Shared::FullMetadata> {
-  static inline crow::json::wvalue process(const Shared::FullMetadata& _value) {
+
+template <> struct impl_to_json<Shared::FullMetadata> {
+  static inline crow::json::wvalue process(const Shared::FullMetadata &_value) {
     crow::json::wvalue _res;
     _res["originalPath"] = to_json(_value.originalPath);
     _res["artist"] = to_json(_value.artist);
@@ -2058,8 +2099,8 @@ struct impl_to_json<Shared::FullMetadata> {
 };
 
 template <>
-inline std::optional<Shared::FullMetadata> from_json<Shared::FullMetadata>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::FullMetadata>
+from_json<Shared::FullMetadata>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::FullMetadata _res;
@@ -2145,13 +2186,14 @@ inline std::optional<Shared::FullMetadata> from_json<Shared::FullMetadata>(
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object FullMetadata
 
 #pragma region JSON serialization for object AudioFileRegexPattern
-template <>
-struct impl_to_json<Shared::AudioFileRegexPattern> {
-  static inline crow::json::wvalue process(
-      const Shared::AudioFileRegexPattern& _value) {
+
+template <> struct impl_to_json<Shared::AudioFileRegexPattern> {
+  static inline crow::json::wvalue
+  process(const Shared::AudioFileRegexPattern &_value) {
     crow::json::wvalue _res;
     _res["compilation"] = to_json(_value.compilation);
     _res["rgx"] = to_json(_value.rgx);
@@ -2162,7 +2204,7 @@ struct impl_to_json<Shared::AudioFileRegexPattern> {
 
 template <>
 inline std::optional<Shared::AudioFileRegexPattern>
-from_json<Shared::AudioFileRegexPattern>(const crow::json::rvalue& _value) {
+from_json<Shared::AudioFileRegexPattern>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::AudioFileRegexPattern _res;
@@ -2183,12 +2225,13 @@ from_json<Shared::AudioFileRegexPattern>(const crow::json::rvalue& _value) {
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object AudioFileRegexPattern
 
 #pragma region JSON serialization for object MimeData
-template <>
-struct impl_to_json<Shared::MimeData> {
-  static inline crow::json::wvalue process(const Shared::MimeData& _value) {
+
+template <> struct impl_to_json<Shared::MimeData> {
+  static inline crow::json::wvalue process(const Shared::MimeData &_value) {
     crow::json::wvalue _res;
     _res["type"] = to_json(_value.type);
     _res["data"] = to_json(_value.data);
@@ -2198,8 +2241,8 @@ struct impl_to_json<Shared::MimeData> {
 };
 
 template <>
-inline std::optional<Shared::MimeData> from_json<Shared::MimeData>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::MimeData>
+from_json<Shared::MimeData>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::MimeData _res;
@@ -2220,13 +2263,14 @@ inline std::optional<Shared::MimeData> from_json<Shared::MimeData>(
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object MimeData
 
 #pragma region JSON serialization for object MusicDatabase
-template <>
-struct impl_to_json<Shared::MusicDatabase> {
-  static inline crow::json::wvalue process(
-      const Shared::MusicDatabase& _value) {
+
+template <> struct impl_to_json<Shared::MusicDatabase> {
+  static inline crow::json::wvalue
+  process(const Shared::MusicDatabase &_value) {
     crow::json::wvalue _res;
     _res["artists"] = to_json(_value.artists);
     _res["albums"] = to_json(_value.albums);
@@ -2238,8 +2282,8 @@ struct impl_to_json<Shared::MusicDatabase> {
 };
 
 template <>
-inline std::optional<Shared::MusicDatabase> from_json<Shared::MusicDatabase>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::MusicDatabase>
+from_json<Shared::MusicDatabase>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::MusicDatabase _res;
@@ -2248,7 +2292,8 @@ inline std::optional<Shared::MusicDatabase> from_json<Shared::MusicDatabase>(
     return std::nullopt;
   auto _artists_opt_ =
       from_json<std::unordered_map<Shared::ArtistKey, Shared::Artist>>(
-          _value["artists"]);
+          _value["artists"]
+      );
   if (!_artists_opt_.has_value())
     return std::nullopt;
   _res.artists = std::move(*_artists_opt_);
@@ -2257,7 +2302,8 @@ inline std::optional<Shared::MusicDatabase> from_json<Shared::MusicDatabase>(
     return std::nullopt;
   auto _albums_opt_ =
       from_json<std::unordered_map<Shared::AlbumKey, Shared::Album>>(
-          _value["albums"]);
+          _value["albums"]
+      );
   if (!_albums_opt_.has_value())
     return std::nullopt;
   _res.albums = std::move(*_albums_opt_);
@@ -2266,7 +2312,8 @@ inline std::optional<Shared::MusicDatabase> from_json<Shared::MusicDatabase>(
     return std::nullopt;
   auto _songs_opt_ =
       from_json<std::unordered_map<Shared::SongKey, Shared::Song>>(
-          _value["songs"]);
+          _value["songs"]
+      );
   if (!_songs_opt_.has_value())
     return std::nullopt;
   _res.songs = std::move(*_songs_opt_);
@@ -2281,13 +2328,14 @@ inline std::optional<Shared::MusicDatabase> from_json<Shared::MusicDatabase>(
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object MusicDatabase
 
 #pragma region JSON serialization for object FileFilterItem
-template <>
-struct impl_to_json<Shared::FileFilterItem> {
-  static inline crow::json::wvalue process(
-      const Shared::FileFilterItem& _value) {
+
+template <> struct impl_to_json<Shared::FileFilterItem> {
+  static inline crow::json::wvalue
+  process(const Shared::FileFilterItem &_value) {
     crow::json::wvalue _res;
     _res["name"] = to_json(_value.name);
     _res["extensions"] = to_json(_value.extensions);
@@ -2297,8 +2345,8 @@ struct impl_to_json<Shared::FileFilterItem> {
 };
 
 template <>
-inline std::optional<Shared::FileFilterItem> from_json<Shared::FileFilterItem>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::FileFilterItem>
+from_json<Shared::FileFilterItem>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::FileFilterItem _res;
@@ -2320,13 +2368,14 @@ inline std::optional<Shared::FileFilterItem> from_json<Shared::FileFilterItem>(
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object FileFilterItem
 
 #pragma region JSON serialization for object OpenDialogOptions
-template <>
-struct impl_to_json<Shared::OpenDialogOptions> {
-  static inline crow::json::wvalue process(
-      const Shared::OpenDialogOptions& _value) {
+
+template <> struct impl_to_json<Shared::OpenDialogOptions> {
+  static inline crow::json::wvalue
+  process(const Shared::OpenDialogOptions &_value) {
     crow::json::wvalue _res;
 
     if (_value.folder) {
@@ -2353,7 +2402,7 @@ struct impl_to_json<Shared::OpenDialogOptions> {
 
 template <>
 inline std::optional<Shared::OpenDialogOptions>
-from_json<Shared::OpenDialogOptions>(const crow::json::rvalue& _value) {
+from_json<Shared::OpenDialogOptions>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::OpenDialogOptions _res;
@@ -2414,13 +2463,14 @@ from_json<Shared::OpenDialogOptions>(const crow::json::rvalue& _value) {
   }
   return _res;
 }
+
 #pragma endregion JSON serialization for object OpenDialogOptions
 
 #pragma region JSON serialization for object SearchResults
-template <>
-struct impl_to_json<Shared::SearchResults> {
-  static inline crow::json::wvalue process(
-      const Shared::SearchResults& _value) {
+
+template <> struct impl_to_json<Shared::SearchResults> {
+  static inline crow::json::wvalue
+  process(const Shared::SearchResults &_value) {
     crow::json::wvalue _res;
     _res["songs"] = to_json(_value.songs);
     _res["artists"] = to_json(_value.artists);
@@ -2431,8 +2481,8 @@ struct impl_to_json<Shared::SearchResults> {
 };
 
 template <>
-inline std::optional<Shared::SearchResults> from_json<Shared::SearchResults>(
-    const crow::json::rvalue& _value) {
+inline std::optional<Shared::SearchResults>
+from_json<Shared::SearchResults>(const crow::json::rvalue &_value) {
   if (_value.t() != crow::json::type::Object)
     return std::nullopt;
   Shared::SearchResults _res;
@@ -2462,6 +2512,7 @@ inline std::optional<Shared::SearchResults> from_json<Shared::SearchResults>(
 
   return _res;
 }
+
 #pragma endregion JSON serialization for object SearchResults
 
 #endif // CPP_INCLUDE_COMMONTYPES_HPP
