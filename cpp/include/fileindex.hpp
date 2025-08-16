@@ -46,16 +46,6 @@ class file_index {
   // Create a song key for a given relative path.
   Shared::SongKey make_song_key(const std::string &relPath) const;
 
-  // Get the metadata for a song from the relative path. (underlying
-  // implementation for the public interface of "fs::path" or SongKey).
-  std::optional<Shared::FullMetadata>
-  get_metadata_rel(const std::string &relPath) const;
-  // Get the metadata for a song from the file path only.i
-  std::optional<Shared::FullMetadata>
-  get_metadata_from_path_rel(const std::string &relPath) const;
-  // Get the metadata for a song from the file's metadata only.
-  std::optional<Shared::FullMetadata>
-  get_metadata_from_file_rel(const std::string &relPath) const;
   // Read the index file from disk and populate the in-memory structures.
   // Returns true if the index file was successfully read, false otherwise.
   bool read_index_file();
@@ -111,56 +101,4 @@ public:
   bool
   remove_ignore_item(Shared::IgnoreItemType which, const std::string &value);
   std::set<Shared::IgnoreItemPair> get_ignore_items() const;
-
-  // Metadata stuff (NYI):
-  // Get the metadata for a song, either from the index, from the file path, or
-  // from the file metadata itself (in that order of preference).
-  std::optional<Shared::FullMetadata>
-  get_metadata(const std::filesystem::path &filePath) const;
-  // Get the metadata for a song, either from the index, from the file path, or
-  // from the file metadata itself (in that order of preference).
-  std::optional<Shared::FullMetadata>
-  get_metadata(const Shared::SongKey &sk) const;
-  // Get the metadata for a song from the file path only.
-  std::optional<Shared::FullMetadata>
-  get_metadata_from_path(const std::filesystem::path &filePath) const;
-  // Get the metadata for a song from the file path only.
-  std::optional<Shared::FullMetadata>
-  get_metadata_from_path(const Shared::SongKey &sk) const;
-  // Get the metadata for a song from the file's metadata only.
-  std::optional<Shared::FullMetadata>
-  get_metadata_from_file(const std::filesystem::path &filePath) const;
-  // Get the metadata for a song from the file's metadata only.
-  std::optional<Shared::FullMetadata>
-  get_metadata_from_file(const Shared::SongKey &sk) const;
-
-  // Replace the local metadata cache with the new metadata.
-  void update_metadata(
-      const Shared::SongKey &songKey,
-      const Shared::SimpleMetadata &newMetadata
-  );
-  // Replace the local metadata cache with the new metadata.
-  void update_metadata(
-      const Shared::SongKey &songKey,
-      const Shared::FullMetadata &newMetadata
-  );
-  // Clear the local metadata *cache* for a single song (but maintain any
-  // overrides).
-  void clear_metadata_cache(const Shared::SongKey &songKey);
-  // Clear the local metadata cache for all songs.
-  void clear_metadata_cache();
-  // Clear the local metadata cache AND overrides for a single song.
-  void reset_all_metadata(const Shared::SongKey &songKey);
-  // Clear the local metadata cache AND overrides.
-  void reset_all_metadata();
-
-  // Images for songs & the like (NYI):
-  void set_image(
-      const Shared::SongKey &songKey,
-      const std::vector<std::uint8_t> &buf
-  );
-  bool clear_image(const Shared::SongKey &songKey);
-  std::optional<std::vector<std::uint8_t>>
-  get_image(const Shared::SongKey &songKey, bool preferInternal = false) const;
-  void clear_local_image_cache();
 };

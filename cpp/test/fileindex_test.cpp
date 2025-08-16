@@ -114,6 +114,15 @@ TEST_F(FileIndex, SmallFileIndex_basics) {
   EXPECT_GT(lastScan, start);
 }
 
+std::unordered_set<std::string> expected_files{
+  "Test Artist - 2010 - Test Album/01 - This isn't actually an mp3.mp3",
+  "Test Artist - 2010 - Test Album/02 - This isn't actually a Flac file.flac",
+  "Test Artist - 2011 - Another Album/01 - This isn't actually an mp3.mp3",
+  "Test Artist - 2011 - Another Album/02 - This isn't actually a Flac file.flac",
+  "Different Artist - 1999 - Their Most Favoritist Album Ever/01 - This isn't actually an mp3.mp3",
+  "Different Artist - 1999 - Their Most Favoritist Album Ever/02 - This isn't actually a Flac file.flac"
+};
+
 TEST_F(FileIndex, SmallFileIndex_metadata) {
   auto afi = file_index{ self.parent_path() / dir_name };
   EXPECT_NE(afi.get_hash(), 0);
@@ -126,34 +135,19 @@ TEST_F(FileIndex, SmallFileIndex_metadata) {
     EXPECT_TRUE(path.is_absolute());
     EXPECT_TRUE(path.has_filename());
     EXPECT_TRUE(path.has_extension());
-    EXPECT_TRUE(
-        path.extension().generic_string() == ".mp3" ||
-        path.extension().generic_string() == ".flac"
-    );
-    i++;
-    auto metadata = afi.get_metadata_from_path(path);
-    EXPECT_TRUE(metadata.has_value());
-    if (metadata.has_value()) {
-      // std::cout << "Metadata: " << metadata->title << std::endl;
-      EXPECT_TRUE(path.generic_string().ends_with(metadata->originalPath));
-      EXPECT_FALSE(metadata->title.empty());
-      EXPECT_EQ(metadata->artist.size(), 1);
-      EXPECT_TRUE(metadata->artist[0].ends_with("Artist"));
-      EXPECT_FALSE(metadata->album.empty());
-      EXPECT_NE(metadata->album.find("Album"), std::string::npos);
-      EXPECT_GT(metadata->year, 1990);
-      EXPECT_LT(metadata->year, 2026);
-      EXPECT_GT(metadata->track, 0);
-      EXPECT_LT(metadata->track, 3);
-      EXPECT_EQ(metadata->vaType, Shared::VAType::none);
-      EXPECT_TRUE(metadata->diskName.empty());
-      EXPECT_EQ(metadata->disk, 0);
-      EXPECT_TRUE(metadata->moreArtists.empty());
-      EXPECT_TRUE(metadata->variations.empty());
+    auto rel = fs::proximate(path, p);
+    auto it = expected_files.find(rel.generic_string());
+    if (it == expected_files.end()) {
+      std::cerr << "Unfound file: " << rel.generic_string() << "\n"
+                << p.generic_string() << "\n"
+                << path.generic_string() << std::endl;
+      EXPECT_TRUE(false);
+    } else {
+      i++;
     }
   });
   // There should be a total of 6 files in the test directory.
-  EXPECT_EQ(i, 6);
+  EXPECT_EQ(i, expected_files.size());
 }
 
 TEST_F(FileIndex, LargeFileIndex) {
@@ -164,11 +158,7 @@ TEST_F(FileIndex, LargeFileIndex) {
       std::chrono::system_clock::time_point::min()
   );
   auto p = afi.get_location();
-  int i = 0;
-  int mp3 = 0;
-  int m4a = 0;
-  int jpg = 0;
-  int flac = 0;
+  int i = 0, mp3 = 0, m4a = 0, jpg = 0, flac = 0;
   afi.foreach_audio_file([&](const fs::path &path) {
     // std::cout << "Audio file: " << path.generic_string() << std::endl;
     EXPECT_TRUE(path.is_absolute());
