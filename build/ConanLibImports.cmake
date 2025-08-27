@@ -12,4 +12,3 @@ set(GTEST_LIB gtest::gtest)
 
 find_package(portable-file-dialogs REQUIRED)
 set(PFD_LIB portable-file-dialogs::portable-file-dialogs)
-
