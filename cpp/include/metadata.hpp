@@ -17,10 +17,19 @@ class cache {
 
  public:
   cache(const std::filesystem::path& dir);
+  // Get the metadata for a song from any available source. In order:
+  // 1. Explicit override
+  // 2. Cached content (from prior file based metadata read)
+  // 3. Path-based metadata
+  // 4. File-based metadata
   std::optional<Shared::FullMetadata> read(const std::string& item);
-  std::optional<Shared::FullMetadata> read_override(const std ::string& item);
+  // This only reads the metadata that was explicitly overridden.
+  std::optional<Shared::FullMetadata> read_override(const std::string& item);
+  // This explicitly reads the metadata from the file itself.
   std::optional<Shared::FullMetadata> read_content(const std::string& item);
-  std::optional<Shared::FullMetadata> read_path(const std ::string& item);
+  // This isn't every cached. It's just the metadata that can be extracted
+  // from the path.
+  std::optional<Shared::FullMetadata> read_path(const std::string& item);
   void write_partial(const std::string& item,
                      const Shared::FullMetadata& metadata);
   void write_full(const std::string& item,

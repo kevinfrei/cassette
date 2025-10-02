@@ -76,8 +76,8 @@ function TheActualApp(): ReactElement {
       <span id="left-column" />
       <span id="top-row" />
       <PlaybackControls audioRef={audioRef} />
-      <SongPlaying ref={audioRef} />
-      <VolumeControl />
+      <SongPlaying audioRef={audioRef} />
+      <VolumeControl audioRef={audioRef} />
       <Sidebar />
       <ViewSelector />
       <div className="SongDetailPanel" />

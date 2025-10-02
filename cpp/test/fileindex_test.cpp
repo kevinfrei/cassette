@@ -8,6 +8,7 @@
 
 namespace fs = std::filesystem;
 const char* dir_name = "fileindex";
+const char* large_dir_name = "NotActuallyFiles";
 const char* idx_dir = ".afi";
 
 fs::path self{__FILE__};
@@ -32,7 +33,7 @@ class FileIndex : public ::testing::Test {
   }
   void backup_index() {
     auto testDir = self.parent_path();
-    auto indexFile = testDir / "NotActuallyFiles" / idx_dir / "index.txt";
+    auto indexFile = testDir / large_dir_name / idx_dir / "index.txt";
     if (fs::exists(indexFile)) {
       fs::copy(indexFile,
                indexFile.string() + ".bak",
@@ -41,7 +42,7 @@ class FileIndex : public ::testing::Test {
   }
   void restore_index() {
     auto testDir = self.parent_path();
-    auto indexFile = testDir / "NotActuallyFiles" / idx_dir / "index.txt";
+    auto indexFile = testDir / large_dir_name / idx_dir / "index.txt";
     auto backupFile = indexFile.string() + ".bak";
     if (fs::exists(backupFile)) {
       fs::copy(backupFile, indexFile, fs::copy_options::overwrite_existing);
@@ -143,7 +144,7 @@ TEST_F(FileIndex, SmallFileIndex_metadata) {
   EXPECT_EQ(i, 6);
 }
 TEST_F(FileIndex, LargeFileIndex) {
-  auto afi = file_index{self.parent_path() / "NotActuallyFiles", false};
+  auto afi = file_index{self.parent_path() / large_dir_name, false};
   EXPECT_NE(afi.get_hash(), 0);
   EXPECT_EQ(afi.get_last_scan_time(),
             std::chrono::system_clock::time_point::min());

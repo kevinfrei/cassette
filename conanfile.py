@@ -34,7 +34,7 @@ libraries = [
     # Library("zlib", "1.3.1", CMakeInfo("ZLIB", "ZLIB::ZLIB")),
     # Probiably only need one of these two:
     # Library("libmediainfo", "22.03", CMakeInfo("MediaInfoLib", "mediainfo", "MEDIAINFO_LIB")),
-    # Library("taglib", "2.0", CMakeInfo("taglib", "taglib::taglib")),
+    Library("taglib", "2.0", CMakeInfo("taglib", "taglib::taglib")),
 ]
 
 # I don't think I want anything other than just the pair for these

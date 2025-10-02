@@ -1,17 +1,28 @@
 import { FontIcon, ISliderStyles, Slider } from '@fluentui/react';
 import { useAtom } from 'jotai';
-import { ReactElement } from 'react';
+import { ReactElement, useEffect } from 'react';
 import { mutedState, volumeState } from 'www/State/SongPlayback';
 import { mySliderStyles } from 'www/Tools/Utilities';
 
+import { isValidRefObject } from 'www/Utils';
 import '../styles/VolumeControl.css';
 
-export function VolumeControl(): ReactElement {
+export function VolumeControl({
+  audioRef,
+}: {
+  audioRef: React.Ref<HTMLAudioElement>;
+}): ReactElement {
   const [muted, setMuted] = useAtom(mutedState);
   const [volume, setVolume] = useAtom(volumeState);
   // Make the icon reflect approximate volume
   const iconNum = Math.min(3, Math.floor(4 * (volume + 0.1))).toString();
   const cls = 'volume-container-win-linux'; // Yoinked Mac, cuz I have a title bar
+  useEffect(() => {
+    if (isValidRefObject<HTMLAudioElement>(audioRef)) {
+      audioRef.current.muted = muted;
+      audioRef.current.volume = volume;
+    }
+  }, [audioRef, muted, volume]);
   return (
     <span className={cls} id="volume-container">
       <FontIcon

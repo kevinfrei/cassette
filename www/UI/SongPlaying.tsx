@@ -2,7 +2,13 @@ import { Slider, Text } from '@fluentui/react';
 import { ListIcon } from '@fluentui/react-icons-mdl2';
 import { MakeLog } from '@freik/logger';
 import { useAtom, useAtomValue } from 'jotai';
-import { ForwardedRef, forwardRef, ReactElement, useEffect } from 'react';
+import {
+  ForwardedRef,
+  forwardRef,
+  ReactElement,
+  useCallback,
+  useEffect,
+} from 'react';
 import { MaybePlayNext } from 'www/State/API';
 import { useJotaiAsyncCallback } from 'www/State/Helpers';
 import {
@@ -79,22 +85,57 @@ function MediaTimeRemaining(): ReactElement {
   );
 }
 
-function MediaTimeSlider(): ReactElement {
+function MediaTimeSlider({
+  audioRef,
+}: {
+  audioRef: ForwardedRef<HTMLAudioElement>;
+}): ReactElement {
   const songKey = useAtomValue(curSongKeyState);
   const [mediaTimePercent, setMediaTimePercent] = useAtom(
     mediaTimePercentState,
   );
+  const onChange = useCallback(
+    (value: number) => {
+      // This is only called when the user moves the slider.
+      // Super handy!
+      setMediaTimePercent(value);
+
+      if (isValidRefObject<HTMLAudioElement>(audioRef)) {
+        console.log('setting it here to ', value);
+        const targetTime = audioRef.current.duration * value;
+        if (targetTime < Number.MAX_SAFE_INTEGER && targetTime >= 0) {
+          console.log('current time is ', audioRef.current.currentTime);
+          console.log('and setting current time to ', targetTime);
+          audioRef.current.currentTime = targetTime;
+        }
+      }
+    },
+    [audioRef, setMediaTimePercent],
+  );
+  useEffect(() => {
+    setTimeout(() => {
+      if (isValidRefObject<HTMLAudioElement>(audioRef)) {
+        const currentTime = audioRef.current.currentTime;
+        console.log(
+          'time update setting current time to ',
+          30,
+          ' from ',
+          currentTime,
+        );
+        audioRef.current.currentTime = 30;
+      }
+    }, 5000);
+  }, [audioRef]);
   return (
     <Slider
       className="song-slider" /* Can't put an ID on a slider :( */
       value={mediaTimePercent}
       min={0}
       max={1}
-      disabled={songKey.length === 0}
+      // disabled={songKey.length === 0}
       step={1e-7}
       styles={mySliderStyles}
-      onChange={(value: number) => setMediaTimePercent(value)}
-      // onChanged={(, value: number) => log('Changed:' + value)}
+      onChange={onChange}
       showValue={false}
     />
   );
@@ -131,141 +172,119 @@ function ArtistAlbum(): ReactElement {
   }
 }
 
-export const SongPlaying = forwardRef(
-  (_props, audioRef: ForwardedRef<HTMLAudioElement>): ReactElement => {
-    const songKey = useAtomValue(curSongKeyState);
-    const isShuffle = useAtomValue(shuffleState);
-    const volumeLevel = useAtomValue(volumeState);
-    const playbackPercent = useAtomValue(mediaTimePercentState);
-    // const setMediaTime = useSetAtom(mediaTimeState);
-    // const onPlayPause = useCallback(
-    //   () => onClickPlayPause(audioRef),
-    //   [audioRef],
-    // );
-    // const onEnded = useJotaiAsyncCallback(async (get, set) => {
-    //   /* TODO: What happens when the song ends? */
-    //   log('Heading to the next song!!!');
-    //   const songList = await get(songListState);
-    //   const rep = await get(repeatState);
-    //   if (rep && songList.length === 1) {
-    //     // Because we rely on auto-play, if we just try to play the same song
-    //     // again, it won't start playing
-    //     if (isValidRefObject<HTMLAudioElement>(audioRef)) {
-    //       void audioRef.current.play();
-    //     }
-    //   } else {
-    //     await MaybePlayNext();
-    //   }
-    // }, []);
-    // const onTimeUpdate = (ev: SyntheticEvent<HTMLMediaElement>) => {
-    //   const ae = ev.currentTarget;
-    //   log('time update');
-    //   log(ev);
+export function SongPlaying({
+  audioRef,
+}: {
+  audioRef: ForwardedRef<HTMLAudioElement>;
+}): ReactElement {
+  const songKey = useAtomValue(curSongKeyState);
+  const isShuffle = useAtomValue(shuffleState);
+  const playbackPercent = useAtomValue(mediaTimePercentState);
+  // const setMediaTime = useSetAtom(mediaTimeState);
+  // const onPlayPause = useCallback(
+  //   () => onClickPlayPause(audioRef),
+  //   [audioRef],
+  // );
+  // const onEnded = useJotaiAsyncCallback(async (get, set) => {
+  //   /* TODO: What happens when the song ends? */
+  //   log('Heading to the next song!!!');
+  //   const songList = await get(songListState);
+  //   const rep = await get(repeatState);
+  //   if (rep && songList.length === 1) {
+  //     // Because we rely on auto-play, if we just try to play the same song
+  //     // again, it won't start playing
+  //     if (isValidRefObject<HTMLAudioElement>(audioRef)) {
+  //       void audioRef.current.play();
+  //     }
+  //   } else {
+  //     await MaybePlayNext();
+  //   }
+  // }, []);
+  // const onTimeUpdate = (ev: SyntheticEvent<HTMLMediaElement>) => {
+  //   const ae = ev.currentTarget;
+  //   log('time update');
+  //   log(ev);
 
-    //   if (!Number.isNaN(ae.duration)) {
-    //     setMediaTime((prevTime: MediaTime) => {
-    //       if (
-    //         Math.trunc(ae.duration) !== Math.trunc(prevTime.duration) ||
-    //         Math.trunc(ae.currentTime) !== Math.trunc(prevTime.position)
-    //       ) {
-    //         return { position: ae.currentTime, duration: ae.duration };
-    //       } else {
-    //         return prevTime;
-    //       }
-    //     });
-    //   }
-    // };
-    const metadata = useAtomValue(songDescriptionForSongState(songKey));
-    const picDataUri = '/images/tune/key'; // JODO: useRecoilValue(picForKeyFam(songKey));
-    useEffect(() => {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        artist: metadata.artist,
-        album: metadata.album,
-        title: metadata.title,
-        artwork: [
-          {
-            src: picDataUri,
-          },
-        ],
-      });
-    }, [songKey, metadata, picDataUri]);
-    useEffect(() => {
-      if (isValidRefObject<HTMLAudioElement>(audioRef)) {
-        audioRef.current.volume = volumeLevel * volumeLevel;
-      }
-    }, [audioRef, volumeLevel]);
+  //   if (!Number.isNaN(ae.duration)) {
+  //     setMediaTime((prevTime: MediaTime) => {
+  //       if (
+  //         Math.trunc(ae.duration) !== Math.trunc(prevTime.duration) ||
+  //         Math.trunc(ae.currentTime) !== Math.trunc(prevTime.position)
+  //       ) {
+  //         return { position: ae.currentTime, duration: ae.duration };
+  //       } else {
+  //         return prevTime;
+  //       }
+  //     });
+  //   }
+  // };
+  const metadata = useAtomValue(songDescriptionForSongState(songKey));
+  const picDataUri = '/images/tune/key'; // JODO: useRecoilValue(picForKeyFam(songKey));
+  useEffect(() => {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      artist: metadata.artist,
+      album: metadata.album,
+      title: metadata.title,
+      artwork: [
+        {
+          src: picDataUri,
+        },
+      ],
+    });
+  }, [songKey, metadata, picDataUri]);
 
-    // TODO: Make this effect only trigger due to user intervention
-    useEffect(() => {
-      if (isValidRefObject<HTMLAudioElement>(audioRef)) {
-        const targetTime = audioRef.current.duration * playbackPercent;
-        const currentTime = audioRef.current.currentTime;
+  // TODO: Make this effect only trigger due to user intervention
+  // useEffect(() => {
+  //   if (isValidRefObject<HTMLAudioElement>(audioRef)) {
+  //     const targetTime = audioRef.current.duration * playbackPercent;
+  //     const currentTime = audioRef.current.currentTime;
 
-        if (
-          targetTime < Number.MAX_SAFE_INTEGER &&
-          targetTime >= 0 &&
-          Math.abs(targetTime - currentTime) > 1.5
-        ) {
-          audioRef.current.currentTime = targetTime;
+  //     if (
+  //       targetTime < Number.MAX_SAFE_INTEGER &&
+  //       targetTime >= 0 &&
+  //       Math.abs(targetTime - currentTime) > 1.5
+  //     ) {
+  //       audioRef.current.currentTime = targetTime;
+  //     }
+  //   }
+  // }, [audioRef, playbackPercent]);
+  const showDetail = useJotaiAsyncCallback(
+    async (get, set, event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+      if (songKey !== '') {
+        const songs = await get(allSongsState);
+        const song = songs.get(songKey);
+        if (song) {
+          SongDetailClick(song, event.shiftKey);
         }
       }
-    }, [audioRef, playbackPercent]);
-    // const audio = (
-    //   <audio
-    //     // src={songKey !== '' ? '/tune/' + songKey : ''}
-    //     src={'/tune/song.m4a'}
-    //     ref={audioRef}
-    //     autoPlay={true}
-    //     onPlay={onPlayPause}
-    //     onPause={onPlayPause}
-    //     onEnded={onEnded}
-    //     onTimeUpdate={onTimeUpdate}
-    //     muted={isMuted}
-    //     controls={true}
-    //   />
-    // );
-    const showDetail = useJotaiAsyncCallback(
-      async (
-        get,
-        set,
-        event: React.MouseEvent<HTMLSpanElement, MouseEvent>,
-      ) => {
-        if (songKey !== '') {
-          const songs = await get(allSongsState);
-          const song = songs.get(songKey);
-          if (song) {
-            SongDetailClick(song, event.shiftKey);
-          }
-        }
-      },
-      [songKey],
-    );
-    const flipDisplay = useJotaiAsyncCallback(
-      async (get, set) =>
-        await set(
-          playOrderDisplayingState,
-          !(await get(playOrderDisplayingState)),
-        ),
-      [],
-    );
-    return (
-      <span id="song-container" onAuxClick={showDetail}>
-        <CoverArt />
-        <SongName />
-        <ArtistAlbum />
-        <MediaTimePosition />
-        <MediaTimeSlider />
-        <MediaTimeRemaining />
-        <ListIcon
-          id="showPlayOrder"
-          onClick={flipDisplay}
-          style={{
-            width: '12px',
-            display: isShuffle ? 'block' : 'none',
-            cursor: 'pointer',
-          }}
-        />
-      </span>
-    );
-  },
-);
+    },
+    [songKey],
+  );
+  const flipDisplay = useJotaiAsyncCallback(
+    async (get, set) =>
+      await set(
+        playOrderDisplayingState,
+        !(await get(playOrderDisplayingState)),
+      ),
+    [],
+  );
+  return (
+    <span id="song-container" onAuxClick={showDetail}>
+      <CoverArt />
+      <SongName />
+      <ArtistAlbum />
+      <MediaTimePosition />
+      <MediaTimeSlider audioRef={audioRef} />
+      <MediaTimeRemaining />
+      <ListIcon
+        id="showPlayOrder"
+        onClick={flipDisplay}
+        style={{
+          width: '12px',
+          display: isShuffle ? 'block' : 'none',
+          cursor: 'pointer',
+        }}
+      />
+    </span>
+  );
+}

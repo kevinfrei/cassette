@@ -1,6 +1,6 @@
 import { MakeLog } from '@freik/logger';
 import { onRejected } from '@freik/react-tools';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { ForwardedRef, ReactElement, useCallback } from 'react';
 import { Keys } from 'www/Shared/CommonTypes';
 import { NextRepeat, repeatState, shuffleState } from 'www/State/SongPlayback';
@@ -51,7 +51,7 @@ export type PlaybackControlsProps = {
 export function PlaybackControls({
   audioRef,
 }: PlaybackControlsProps): ReactElement {
-  const isPlaying = true; // TODO: useAtomValue(playingState);
+  const isPlaying = useAtomValue(playingState);
 
   const hasAnySong = true; // TODO: useRecoilValue(hasAnySongsFunc);
   const [shuf, setShuf] = useAtom(shuffleState);

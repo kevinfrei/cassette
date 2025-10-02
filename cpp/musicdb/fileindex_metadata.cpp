@@ -109,7 +109,7 @@ std::optional<Shared::FullMetadata> file_index::get_metadata_rel(
   return get_metadata_from_path_rel(relPath);
 }
 
-// Get the metadata for a song from the file path only.i
+// Get the metadata for a song from the file path only.
 std::optional<Shared::FullMetadata> file_index::get_metadata_from_path_rel(
     const std::string& relPath) const {
   std::string noSuffix{get_no_suffix(relPath)};
