@@ -1,8 +1,9 @@
+#include <boost/regex.hpp>
 #include <charconv>
 #include <optional>
 #include <string>
-
-#include <boost/regex.hpp>
+#include <taglib/fileref.h>
+#include <taglib/tag.h>
 
 #if defined(USE_XPRESSIVE)
 #include <boost/xpressive/xpressive.hpp>
@@ -225,6 +226,29 @@ std::optional<Shared::FullMetadata> cache::read_content(
     const std::string& item) {
   if (item.empty()) {
     return std::nullopt; // No item provided.
+  }
+  TagLib::FileRef f(item.c_str());
+  if (!f.isNull() && f.tag()) {
+    Shared::FullMetadata metadata;
+    metadata.originalPath = item;
+    TagLib::Tag* tag = f.tag();
+    if (!tag->artist().isEmpty()) {
+      metadata.artist.push_back(tag->artist().to8Bit(true));
+    }
+    if (!tag->album().isEmpty()) {
+      metadata.album = tag->album().to8Bit(true);
+    }
+    if (!tag->title().isEmpty()) {
+      metadata.title = tag->title().to8Bit(true);
+    }
+    if (tag->year() != 0) {
+      metadata.year = static_cast<std::int16_t>(tag->year());
+    }
+    if (tag->track() != 0) {
+      metadata.track = static_cast<std::int16_t>(tag->track());
+    }
+    metadata.vaType = Shared::VAType::none; // NYI: Determine VAType
+    return metadata; // Return the extracted metadata.
   }
   return std::nullopt; // NYI: Read from file content.
 }

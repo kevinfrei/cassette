@@ -33,7 +33,7 @@ endif()
 target_link_libraries(
   cassette_lib
   PUBLIC
-    tools_lib musicdb_lib ${BOOST_LIB} ${CROW_LIB} ${MEDIAINFO_LIB} ${PFD_LIB}
+    tools_lib musicdb_lib ${BOOST_LIB} ${CROW_LIB} ${PFD_LIB} ${TAGLIB_LIB}
 )
 
 # Compile main.cpp

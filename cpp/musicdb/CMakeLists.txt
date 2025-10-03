@@ -15,7 +15,7 @@ endif()
 target_link_libraries(
   musicdb_lib
   PUBLIC
-    ${BOOST_LIB} ${CROW_LIB} ${MEDIAINFO_LIB}
+    ${BOOST_LIB} ${CROW_LIB} ${TAGLIB_LIB}
 )
 
 # Specify the include directories for consumers of this library
