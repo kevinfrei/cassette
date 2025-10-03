@@ -3,12 +3,9 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
-#include <iomanip>
 #include <iostream>
-#include <optional>
 #include <set>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -71,6 +68,7 @@ file_index::file_index(const fs::path& _loc,
                        std::size_t _hash)
     : hash(_hash),
       loc(std::filesystem::canonical(_loc)),
+      metadata_cache(loc / ".afi" / "metadata_cache"),
       last_scan(std::chrono::system_clock::time_point::min()) {
 
   if (hash == 0) {

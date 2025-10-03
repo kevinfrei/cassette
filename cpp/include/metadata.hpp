@@ -1,3 +1,7 @@
+#if !defined(METADATA_HPP)
+#define METADATA_HPP
+#pragma once
+
 #include <filesystem>
 #include <optional>
 #include <unordered_map>
@@ -14,6 +18,10 @@ class cache {
   std::unordered_map<std::string, Shared::FullMetadata> content_cache;
   // metadata that has been explicitly overriden
   std::unordered_map<std::string, Shared::FullMetadata> specific_overrides;
+
+  // Storage paths for the cache files
+  std::filesystem::path cache_file;
+  std::filesystem::path override_file;
 
  public:
   cache(const std::filesystem::path& dir);
@@ -44,3 +52,5 @@ class cache {
 };
 
 } // namespace metadata
+
+#endif // METADATA_HPP

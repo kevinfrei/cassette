@@ -1,4 +1,3 @@
-#include <charconv>
 #include <filesystem>
 #include <optional>
 #include <string>
@@ -10,6 +9,7 @@
 
 #include "CommonTypes.hpp"
 #include "fileindex.hpp"
+#include "metadata.hpp"
 
 namespace fs = std::filesystem;
 
@@ -25,6 +25,7 @@ RegexPattern make(Shared::VAType va, const char* pattern) {
           boost::regex(pattern, boost::regex::icase | boost::regex::optimize)};
 }
 
+/*
 // Remove the suffix from a string(_view).
 std::string_view get_no_suffix(const std::string_view& s) {
   auto pos = s.find_last_of('.');
@@ -33,10 +34,11 @@ std::string_view get_no_suffix(const std::string_view& s) {
   }
   return s.substr(0, pos);
 }
+
 std::string_view get_no_suffix(const std::string& s) {
   return get_no_suffix(std::string_view(s));
 }
-
+*/
 } // namespace
 
 std::vector<RegexPattern> patterns{
@@ -100,6 +102,8 @@ std::vector<RegexPattern> patterns{
 // Metadata stuff:
 
 #pragma region Private interfaces
+
+/*
 
 // Get the metadata for a song from the relative path. (underlying
 // implementation for the public interface of "fs::path" or SongKey).
@@ -171,6 +175,8 @@ std::optional<Shared::FullMetadata> file_index::get_metadata_from_file_rel(
   }
 }
 
+*/
+
 #pragma endregion Private interfaces
 
 #pragma region Public interface
@@ -226,30 +232,30 @@ void file_index::reset_all_metadata() {
 // Get the metadata for a song, either from the index, from the file path, or
 // from the file metadata itself (in that order of preference).
 std::optional<Shared::FullMetadata> file_index::get_metadata(
-    const fs::path& filePath) const {
-  return get_metadata_rel(get_relative_path(filePath));
+    const fs::path& filePath) {
+  return metadata_cache.read(get_relative_path(filePath));
 }
 
 // Get the metadata for a song, either from the index, from the file path, or
 // from the file metadata itself (in that order of preference).
 std::optional<Shared::FullMetadata> file_index::get_metadata(
-    const Shared::SongKey& sk) const {
+    const Shared::SongKey& sk) {
   auto song = key_to_file.find(sk);
   if (song == key_to_file.end()) {
     return std::nullopt; // NYI
   }
-  return get_metadata_rel(song->second);
+  return metadata_cache.read(song->second);
 }
 
 // Get the metadata for a song from the file path only.
 std::optional<Shared::FullMetadata> file_index::get_metadata_from_path(
-    const fs::path& filePath) const {
-  return get_metadata_rel(get_relative_path(filePath));
+    const fs::path& filePath) {
+  return metadata_cache.read(get_relative_path(filePath));
 }
 
 // Get the metadata for a song from the file path only.
 std::optional<Shared::FullMetadata> file_index::get_metadata_from_path(
-    const Shared::SongKey& sk) const {
+    const Shared::SongKey& sk) {
   if (sk.empty()) {
     return std::nullopt; // NYI
   }
@@ -258,7 +264,7 @@ std::optional<Shared::FullMetadata> file_index::get_metadata_from_path(
 
 // Get the metadata for a song from the file's metadata only.
 std::optional<Shared::FullMetadata> file_index::get_metadata_from_file(
-    const fs::path& filePath) const {
+    const fs::path& filePath) {
   if (filePath.empty()) {
     return std::nullopt; // NYI
   }
@@ -267,7 +273,7 @@ std::optional<Shared::FullMetadata> file_index::get_metadata_from_file(
 
 // Get the metadata for a song from the file's metadata only.
 std::optional<Shared::FullMetadata> file_index::get_metadata_from_file(
-    const Shared::SongKey& sk) const {
+    const Shared::SongKey& sk) {
   if (sk.empty()) {
     return std::nullopt; // NYI
   }

@@ -137,6 +137,14 @@ std::vector<RegexPattern> patterns{
 
 // Metadata stuff:
 
+cache::cache(const std::filesystem::path& dir)
+    : content_cache(),
+      specific_overrides(),
+      cache_file(dir / "metadata_cache.json"),
+      override_file(dir / "metadata_overrides.json") {
+  // NYI: Load any existing cache from disk.
+}
+
 // Get the metadata for a song from the relative path. (underlying
 // implementation for the public interface of "fs::path" or SongKey).
 std::optional<Shared::FullMetadata> cache::read(const std::string& item) {
