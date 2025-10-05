@@ -138,7 +138,7 @@ std::vector<RegexPattern> patterns{
 
 // Metadata stuff:
 
-cache::cache(const std::filesystem::path& dir)
+store::store(const std::filesystem::path& dir)
     : content_cache(),
       specific_overrides(),
       cache_file(dir / "metadata_cache.json"),
@@ -148,7 +148,7 @@ cache::cache(const std::filesystem::path& dir)
 
 // Get the metadata for a song from the relative path. (underlying
 // implementation for the public interface of "fs::path" or SongKey).
-std::optional<Shared::FullMetadata> cache::read(const std::string& item) {
+std::optional<Shared::FullMetadata> store::read(const std::string& item) {
   auto override = read_override(item);
   if (override.has_value()) {
     return override; // Return the cached metadata.
@@ -161,8 +161,8 @@ std::optional<Shared::FullMetadata> cache::read(const std::string& item) {
   return read_content(item);
 }
 
-// Get the metadata for a song from the file path only.i
-std::optional<Shared::FullMetadata> cache::read_path(const std::string& item) {
+// Get the metadata for a song from the file path only.
+std::optional<Shared::FullMetadata> store::read_path(const std::string& item) {
   std::string noSuffix{get_no_suffix(item)};
   for (const RegexPattern& pattern : patterns) {
     // Match the pattern against the relPath.
@@ -213,7 +213,7 @@ std::optional<Shared::FullMetadata> cache::read_path(const std::string& item) {
 }
 
 // Get the metadata for a song from the file's metadata only.
-std::optional<Shared::FullMetadata> cache::read_override(
+std::optional<Shared::FullMetadata> store::read_override(
     const std::string& item) {
   auto it = content_cache.find(item);
   if (it != content_cache.end()) {
@@ -222,7 +222,7 @@ std::optional<Shared::FullMetadata> cache::read_override(
   return std::nullopt; // No cached metadata found.
 }
 
-std::optional<Shared::FullMetadata> cache::read_content(
+std::optional<Shared::FullMetadata> store::read_content(
     const std::string& item) {
   if (item.empty()) {
     return std::nullopt; // No item provided.
@@ -254,30 +254,30 @@ std::optional<Shared::FullMetadata> cache::read_content(
 }
 
 // Clear the *entire* local metadata cache (but maintain any overrides).
-void cache::clear_metadata_cache() {
+void store::clear_metadata_cache() {
   content_cache.clear();
 }
 
-void cache::clear_metadata_cache(const std::string& item) {
+void store::clear_metadata_cache(const Shared::SongKey& item) {
   content_cache.erase(item); // Remove the specific item from the cache.
 }
 
 // Clear all overrides.
-void cache::clear_metadata_override() {
+void store::clear_metadata_override() {
   specific_overrides.clear();
 }
 
 // Clear a specific override.
-void cache::clear_metadata_override(const std::string& item) {
+void store::clear_metadata_override(const Shared::SongKey& item) {
   specific_overrides.erase(item); // Remove the specific override.
 }
 
-void cache::clear() {
+void store::clear() {
   clear_metadata_cache();
   clear_metadata_override();
 }
 
-void cache::clear(const std::string& item) {
+void store::clear(const Shared::SongKey& item) {
   clear_metadata_cache(item);
   clear_metadata_override(item);
 }

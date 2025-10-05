@@ -6,5 +6,5 @@ target_include_directories(musicdb_lib PUBLIC include)
 target_link_libraries(
   musicdb_lib
   PUBLIC
-    ipc_lib ftools_lib fileindex_lib metadata_store_lib
+    ipc_lib tools_lib fileindex_lib metadata_store_lib
 )
