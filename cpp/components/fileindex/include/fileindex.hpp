@@ -12,20 +12,17 @@
 
 class file_index {
   using path_handler = std::function<void(const std::filesystem::path&)>;
+  using FileKey = uint64_t;
 
-  // The hash of the index, used to identify it.
-  std::size_t hash;
-  // The location of the index, where the audio files are stored.
+  // The location of the index, where the files are stored.
   std::filesystem::path loc;
-  // The prefix for the song keys, based on the index hash.
-  std::string key_prefix;
   // The index file path, if it exists.
   std::optional<std::filesystem::path> index_file_path;
 
-  // Lookup from canonical, proximate paths to song keys.
-  std::unordered_map<std::string, Shared::SongKey> file_to_key;
-  // Lookup from song keys to canonical, proximate paths.
-  std::unordered_map<Shared::SongKey, std::string> key_to_file;
+  // Lookup from canonical, proximate paths to file keys.
+  std::unordered_map<std::string, FileKey> file_to_key;
+  // Lookup from file keys to canonical, proximate paths.
+  std::unordered_map<FileKey, std::string> key_to_file;
 
   // The last time the storage was scanned for files.
   std::chrono::time_point<std::chrono::system_clock> last_scan;
@@ -43,8 +40,8 @@ class file_index {
   bool remove_file(const std::filesystem::path& path);
   // Get a normalized relative path from the root of the index.
   std::string get_relative_path(const std::filesystem::path& path) const;
-  // Create a song key for a given relative path.
-  Shared::SongKey make_song_key(const std::string& relPath) const;
+  // Create a file key for a given relative path.
+  FileKey make_file_key(const std::string& relPath) const;
 
   // Read the index file from disk and populate the in-memory structures.
   // Returns true if the index file was successfully read, false otherwise.
@@ -53,28 +50,15 @@ class file_index {
   void write_index_file() const;
 
  public:
-  // Constructs an audio file index at the given location.
-  // If the hash is not provided, it will be computed based on the location.
-  // If an index already exists, it will be read from disk, and the source will
-  // *NOT* be rescanned.
-  file_index(const std::filesystem::path& loc, std::size_t hash = 0)
-      : file_index(loc, false, hash) {}
-  // Constructs an audio file index at the given location.
+  // Constructs a file index at the given location.
   // Update the index, even if it already exists, if update_index is true.
-  file_index(const std::filesystem::path& loc,
-             bool update_index,
-             std::size_t hash = 0);
+  file_index(const std::filesystem::path& loc, bool update_index = false);
 
   // No copying!
   file_index(const file_index&) = delete;
   file_index& operator=(const file_index&) = delete;
   file_index(file_index&&) = default;
   file_index& operator=(file_index&&) = default;
-
-  // Get the hash of the index.
-  std::size_t get_hash() const {
-    return hash;
-  }
 
   // Get the location of the index.
   const std::filesystem::path& get_location() const {
@@ -87,15 +71,15 @@ class file_index {
     return last_scan;
   }
 
-  // Get the song key fora  path (if it belongs to the index).
-  std::optional<Shared::SongKey> get_song_key(
-      const std::filesystem::path& songPath) const;
+  // Get the file key for a path (if it belongs to the index).
+  std::optional<FileKey> get_file_key(
+      const std::filesystem::path& filePath) const;
 
-  // Just run a function for each audio file in the index.
-  void foreach_audio_file(path_handler fn) const;
+  // Just run a function for each file in the index.
+  void foreach_file(path_handler fn) const;
 
   // Update the index with any changes, invoking the provided handlers.
-  void rescan_files(path_handler addAudioFile, path_handler delAudioFile);
+  void rescan_files(path_handler addFile, path_handler delFile);
 
   // Ignore items 'stuff' (NYI):
   void add_ignore_item(Shared::IgnoreItemType which, const std::string& value);

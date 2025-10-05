@@ -1,10 +1,8 @@
+#include <chrono>
 #include <cstdint>
-#include <iostream>
 #include <string>
 
 #include <crow.h>
-
-// #include "MediaInfo/MediaInfo.h"
 
 #include "files.hpp"
 #include "handlers.hpp"
@@ -14,7 +12,7 @@
 #include "window.hpp"
 
 std::string GetRootUrl() {
-  return "http://localhost:" + std::to_string(get_random_port()) +
+  return "http://localhost:" + std::to_string(setup::get_random_port()) +
          "/www/index.html";
 }
 
@@ -38,7 +36,7 @@ int main(void) {
 
   files::set_program_location();
 
-  const uint16_t port = get_random_port();
+  const uint16_t port = setup::get_random_port();
   std::string url = GetRootUrl();
   ConfigureRoutes(app, url);
   window::open(url);

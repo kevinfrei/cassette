@@ -3,8 +3,11 @@
 #include <random>
 
 namespace {
+
 uint16_t port = 0;
+
 }
+namespace setup {
 
 uint16_t get_random_port() {
   if (port == 0) {
@@ -15,3 +18,5 @@ uint16_t get_random_port() {
   }
   return port;
 }
+
+} // namespace setup

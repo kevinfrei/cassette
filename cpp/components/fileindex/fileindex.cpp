@@ -63,13 +63,11 @@ void foreach_line_in_file(const fs::path& filePath,
 
 } // namespace
 
-file_index::file_index(const fs::path& _loc,
-                       bool update_index,
-                       std::size_t _hash)
-    : hash(_hash),
-      loc(std::filesystem::canonical(_loc)),
+file_index::file_index(const fs::path& _loc, bool update_index)
+    : loc(std::filesystem::canonical(_loc)),
       last_scan(std::chrono::system_clock::time_point::min()) {
 
+  /*
   if (hash == 0) {
     // Compute hash based on the location, if not provided.
     std::hash<std::string> hasher;
@@ -79,6 +77,7 @@ file_index::file_index(const fs::path& _loc,
   std::uint64_t b64 = base64_string_as_int(hash % 0x7fffffff);
   oss << "S" << reinterpret_cast<const char*>(&b64) << ".";
   key_prefix = oss.str();
+  */
 
   // If there's already an index, read it first, then run a rescan.
   // Maybe rescan on a background thread?
@@ -107,9 +106,9 @@ bool file_index::belongs_here(const fs::path& path) const {
 bool file_index::add_new_file(const fs::path& path) {
   std::string relPath = get_relative_path(path);
   if (!file_to_key.contains(relPath)) {
-    Shared::SongKey songKey = make_song_key(relPath);
-    file_to_key[relPath] = songKey;
-    key_to_file[songKey] = relPath;
+    FileKey key = make_file_key(relPath);
+    file_to_key[relPath] = key;
+    key_to_file[key] = relPath;
     return true;
   }
   return false;
@@ -120,9 +119,9 @@ bool file_index::add_new_file(const fs::path& path) {
 bool file_index::remove_file(const fs::path& path) {
   std::string relPath = get_relative_path(path);
   if (file_to_key.contains(relPath)) {
-    Shared::SongKey songKey = file_to_key[relPath];
+    FileKey key = file_to_key[relPath];
     file_to_key.erase(relPath);
-    key_to_file.erase(songKey);
+    key_to_file.erase(key);
     return true;
   }
   return false;
@@ -194,7 +193,7 @@ void file_index::write_index_file() const {
   std::set<std::string> sortedFiles;
   // Sort the keys to ensure consistent order in the index file.
   // TODO: Maybe in the future, this is time-ordered?
-  for (const auto& [relPath, songKey] : file_to_key) {
+  for (const auto& [relPath, key] : file_to_key) {
     sortedFiles.insert(relPath);
   }
   for (const auto& relPath : sortedFiles) {
@@ -203,10 +202,9 @@ void file_index::write_index_file() const {
   ofs.close();
 }
 
-void file_index::rescan_files(path_handler add_audio_file,
-                              path_handler del_audio_file) {
-  // For simplicity, we will just scan the directory and call addAudioFile
-  // for each audio file found. In a real implementation, we would compare
+void file_index::rescan_files(path_handler add_file, path_handler del_file) {
+  // For simplicity, we will just scan the directory and call addFile
+  // for each file found. In a real implementation, we would compare
   // with a cached list of files to determine which files were added or removed.
   if (!fs::exists(loc) || !fs::is_directory(loc)) {
     std::cerr << "Location does not exist or is not a directory: " << loc
@@ -217,7 +215,7 @@ void file_index::rescan_files(path_handler add_audio_file,
   std::unordered_set<std::string> existingFiles;
   existingFiles.reserve(file_to_key.size());
   // Populate existingFiles with the currently indexed files.
-  for (const auto& [relPath, songKey] : file_to_key) {
+  for (const auto& [relPath, key] : file_to_key) {
     existingFiles.insert(relPath);
   }
   std::set<std::string> newAdds;
@@ -230,15 +228,15 @@ void file_index::rescan_files(path_handler add_audio_file,
         // File already indexed, skip it.
         continue;
       }
-      // Here we would check if the file is an audio file based on extension
-      // or content. For simplicity, we assume all files are audio files.
-      add_audio_file(relativePath);
+      // Here we would check if the file is a file based on extension
+      // or content. For simplicity, we assume all files are files.
+      add_file(relativePath);
       newAdds.insert(relativePath);
     }
   }
   for (const auto& relPath : existingFiles) {
     // These files were not found in the current scan, so they are removed.
-    del_audio_file(relPath);
+    del_file(relPath);
     newDels.insert(relPath);
   }
   // Add/Remove files to/from the index.
@@ -252,19 +250,23 @@ void file_index::rescan_files(path_handler add_audio_file,
   write_index_file();
 }
 
-Shared::SongKey file_index::make_song_key(const std::string& relPath) const {
-  // Create a song key based on the relative path.
+file_index::FileKey file_index::make_file_key(
+    const std::string& relPath) const {
+  // Create a file key based on the relative path.
   // This is a placeholder implementation; actual implementation may vary.
   // TODO: Check for collisions
+  return std::hash<std::string>{}(relPath) % 0x7fffffff;
+  /*
   std::ostringstream oss;
   std::uint64_t b64 =
       base64_string_as_int(std::hash<std::string>{}(relPath) % 0x7fffffff);
   oss << key_prefix << reinterpret_cast<const char*>(&b64);
-  return Shared::SongKey{oss.str()};
+  return FileKey{oss.str()};
+  */
 }
 
-void file_index::foreach_audio_file(path_handler fn) const {
-  for (const auto& [relPath, songKey] : file_to_key) {
+void file_index::foreach_file(path_handler fn) const {
+  for (const auto& [relPath, key] : file_to_key) {
     fn(loc / relPath);
   }
 }

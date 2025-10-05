@@ -42,7 +42,7 @@ crow::response file_path(const crow::request&, const std::string& path) {
                         std::istreambuf_iterator<char>());
     file.close();
     // Replace the placeholder with the actual port number
-    std::string wsport = std::to_string(get_random_port());
+    std::string wsport = std::to_string(setup::get_random_port());
     size_t pos = content.find("window.wsport = 42;");
     if (pos != std::string::npos) {
       content.replace(pos, 20, "window.wsport = " + wsport + ";");

@@ -81,12 +81,11 @@ TEST_F(FileIndex, SmallFileIndex_basics) {
   std::chrono::time_point<std::chrono::system_clock> start =
       std::chrono::system_clock::now();
   auto afi = file_index{self.parent_path() / dir_name};
-  EXPECT_NE(afi.get_hash(), 0);
   auto p = afi.get_location();
   // std::cout << p.generic_string() << std::endl;
   EXPECT_FALSE(p.generic_string().ends_with("."));
   int i = 0;
-  afi.foreach_audio_file([&](const fs::path& path) {
+  afi.foreach_file([&](const fs::path& path) {
     // std::cout << "Audio file: " << path.generic_string() << std::endl;
     EXPECT_TRUE(path.is_absolute());
     EXPECT_TRUE(path.has_filename());
@@ -106,12 +105,11 @@ TEST_F(FileIndex, SmallFileIndex_basics) {
 
 TEST_F(FileIndex, SmallFileIndex_metadata) {
   auto afi = file_index{self.parent_path() / dir_name};
-  EXPECT_NE(afi.get_hash(), 0);
   auto p = afi.get_location();
   // std::cout << p.generic_string() << std::endl;
   EXPECT_FALSE(p.generic_string().ends_with("."));
   int i = 0;
-  afi.foreach_audio_file([&](const fs::path& path) {
+  afi.foreach_file([&](const fs::path& path) {
     // std::cout << "Audio file: " << path.generic_string() << std::endl;
     EXPECT_TRUE(path.is_absolute());
     EXPECT_TRUE(path.has_filename());
@@ -147,7 +145,6 @@ TEST_F(FileIndex, SmallFileIndex_metadata) {
 }
 TEST_F(FileIndex, LargeFileIndex) {
   auto afi = file_index{self.parent_path() / large_dir_name, false};
-  EXPECT_NE(afi.get_hash(), 0);
   EXPECT_EQ(afi.get_last_scan_time(),
             std::chrono::system_clock::time_point::min());
   auto p = afi.get_location();
@@ -156,7 +153,7 @@ TEST_F(FileIndex, LargeFileIndex) {
   int m4a = 0;
   int jpg = 0;
   int flac = 0;
-  afi.foreach_audio_file([&](const fs::path& path) {
+  afi.foreach_file([&](const fs::path& path) {
     // std::cout << "Audio file: " << path.generic_string() << std::endl;
     EXPECT_TRUE(path.is_absolute());
     EXPECT_TRUE(path.has_filename());

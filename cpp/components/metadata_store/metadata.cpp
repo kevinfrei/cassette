@@ -5,21 +5,11 @@
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
 
-#if defined(USE_XPRESSIVE)
-#include <boost/xpressive/xpressive.hpp>
-#endif
-
 // Initial implementation: Just read all the files in the directory
 // and produce the music-db map.
 
 #include "CommonTypes.hpp"
 #include "metadata.hpp"
-
-using regexp = boost::regex;
-
-#if defined(USE_XPRESSIVE)
-using namespace boost::xpressive;
-#endif
 
 namespace metadata {
 
@@ -28,11 +18,12 @@ namespace {
 
 struct RegexPattern {
   Shared::VAType va;
-  regexp rgx;
+  boost::regex rgx;
 };
 
 RegexPattern make(Shared::VAType va, const char* pattern) {
-  return {va, regexp(pattern, regexp::icase | regexp::optimize)};
+  return {va,
+          boost::regex(pattern, boost::regex::icase | boost::regex::optimize)};
 }
 
 // Remove the suffix from a string(_view).
@@ -44,37 +35,6 @@ std::string_view get_no_suffix(const std::string_view& s) {
 std::string_view get_no_suffix(const std::string& s) {
   return get_no_suffix(std::string_view(s));
 }
-
-#if defined(USE_XPRESSIVE)
-// TODO: It would be fun to use Eric's Xpressive static regex library here,
-// instead of Boost's regex. I could start by trying to use the Xpressive
-// compiler...
-mark_tag year(1), album(2), discNum(3), discName(4), artist(5), track(6),
-    title(7), va_type(8);
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wshift-count-overflow"
-#pragma clang diagnostic ignored "-Wint-in-bool-context"
-sregex various_1 = icase(
-    bos
-    << !(*_ << '/')
-    << (va_type = (('v' << 'a'
-                        << !('r' << 'i' << 'o' << 'u' << 's' << ' ' << 'a'
-                                 << 'r' << 't' << 'i' << 's' << 't' << 's')) |
-                   ('c' << 'o' << 'm' << 'p' << 'i' << 'l' << 'a' << 't' << 'i'
-                        << 'o' << 'n') |
-                   ('o' << 's' << 't') |
-                   ('s' << 'o' << 'u' << 'n' << 'd' << 't' << 'r' << 'a' << 'c'
-                        << 'k')))
-    << *(set = ' ', '-', '.', '/')
-    << !((year = repeat<4, 4>(_d)) << *(set = ' ', '-', '.', '/'))
-    << (album = +~'/')
-    << !('/' << (('c' << 'd') | ('d' << 'i' << 's' << ('c' | 'k'))) << !' '
-             << (discNum = +_d)
-             << !(*(set = ' ', '-', '.') << (discName = +~'/')))
-    << '/' << (track = +_d) << *(set = ' ', '-', '.') << (artist = +~'/')
-    << !' ' << '-' << ' ' << (title = +~'/') << eos);
-#pragma clang diagnostic pop
-#endif
 
 std::vector<RegexPattern> patterns{
     // va - (year - )albumTitle/(disc #- disc name/)## - artist - trackTitle
