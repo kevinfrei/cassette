@@ -5,7 +5,8 @@
   "scripts": {
     "prepare": "husky",
     "format": "tools format bun",
-    "fmt": "tools format bun && passable -i '**/CMakeLists.txt' '**/*.cmake'",
+    "cfmt": "passable -i \"**/CMakeLists.txt\"",
+    "fmt": "tools format bun && bun run cfmt",
     "clean": "bun run build/clean.ts",
     "dcfg": "cmake --preset debug",
     "rcfg": "cmake --preset release",
@@ -34,8 +35,7 @@
     "typecheck": "tsc --noEmit",
     "typechk": "tsc --noEmit",
     "***": "Generate the TypeScript & C++ types from the Crow IDL definitions",
-    "gen": "crow-idl www/Shared/Definitions.ts -c:cpp/include/CommonTypes.hpp -t:www/Shared/CommonTypes.ts",
-    "cfmt": "passable -i **/CMakeLists.txt"
+    "gen": "crow-idl www/Shared/Definitions.ts -c:cpp/components/core/impl/CommonTypes.hpp -t:www/Shared/CommonTypes.ts"
   },
   "dependencies": {
     "@fluentui/react": "^8.125.3",

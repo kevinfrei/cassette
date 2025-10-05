@@ -19,12 +19,12 @@ if(MSVC)
     # I wonder if RTC still works. I should use it, since I did the work:
     add_compile_options(/W4 /Od /RTC1 /D_CRT_SECURE_NO_WARNINGS)
   else()
-    add_compile_options(/W4 /O2 /D_CRT_SECURE_NO_WARNINGS)
+    add_compile_options(/ltcg /W4 /O2 /D_CRT_SECURE_NO_WARNINGS)
+    add_link_options(/ltcg)
   endif()
-  set(USE_COMMON_PCH OFF)
 else()
   # For non-windows compilers, enable sanitizers and stuff
-  add_compile_options(-Wpedantic -Wall -Wextra -Werror -pedantic)
+  add_compile_options(-Wpedantic -Wall -Wextra -pedantic)
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-O0 -g) # -fsanitize=address,undefined -O0 -g)
     add_link_options(-O0 -g) # -fsanitize=address,undefined -O0 -g)
@@ -32,42 +32,10 @@ else()
     add_compile_options(-flto -O2)
     add_link_options(-flto)
   endif()
-  set(USE_COMMON_PCH ON)
 endif()
 
 # Find Conan2 generated libraries
 include(build/ConanLibImports.cmake)
 
-if(${USE_COMMON_PCH})
-  add_library(pch_target OBJECT cpp/pch.cpp)
-  target_precompile_headers(
-    pch_target
-    PRIVATE
-      <atomic>
-      <cctype>
-      <chrono>
-      <cstdint>
-      <cstdlib>
-      <filesystem>
-      <fstream>
-      <functional>
-      <iomanip>
-      <iostream>
-      <map>
-      <optional>
-      <random>
-      <set>
-      <shared_mutex>
-      <sstream>
-      <string_view>
-      <string>
-      <tuple>
-      <type_traits>
-      <unordered_map>
-      <unordered_set>
-      <utility>
-      <vector>
-  )
-endif()
-
+# The actual C++ project lives in the cpp/ subdirectory
 add_subdirectory(cpp)
