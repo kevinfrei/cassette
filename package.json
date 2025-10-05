@@ -35,7 +35,7 @@
     "typecheck": "tsc --noEmit",
     "typechk": "tsc --noEmit",
     "***": "Generate the TypeScript & C++ types from the Crow IDL definitions",
-    "gen": "crow-idl www/Shared/Definitions.ts -c:cpp/components/core/impl/CommonTypes.hpp -t:www/Shared/CommonTypes.ts"
+    "gen": "crow-idl www/Shared/Definitions.ts -c:cpp/components/ipc/CommonTypes.hpp -t:www/Shared/CommonTypes.ts"
   },
   "dependencies": {
     "@fluentui/react": "^8.125.3",
