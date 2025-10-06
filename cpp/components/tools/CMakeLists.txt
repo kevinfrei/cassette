@@ -6,3 +6,5 @@ target_include_directories(tools_lib PUBLIC include)
 
 # Link the dependencies with our binary
 # target_link_libraries(tools_lib PUBLIC ...)
+
+add_subdirectory(test)

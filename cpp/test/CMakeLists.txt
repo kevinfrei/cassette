@@ -5,7 +5,6 @@ add_executable(
   json_test.cpp
   config_test.cpp
   fileindex_test.cpp
-  text_norm_test.cpp
 )
 target_link_libraries(
   cassette_testing
