@@ -25,3 +25,5 @@ target_link_libraries(
   PUBLIC
     ipc_lib tools_lib musicdb_lib ${BOOST_LIB} ${CROW_LIB} ${PFD_LIB}
 )
+
+add_subdirectory(test)

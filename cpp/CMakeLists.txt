@@ -9,4 +9,4 @@ add_executable(cassette main.cpp)
 # Most of the code lives in there, so it's more easily tested.
 target_link_libraries(cassette PRIVATE core_lib ${CROW_LIB})
 
-add_subdirectory(test)
+# add_subdirectory(test)
