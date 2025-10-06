@@ -23,5 +23,5 @@ target_include_directories(core_lib PRIVATE impl)
 target_link_libraries(
   core_lib
   PUBLIC
-    ipc_lib tools_lib musicdb_lib ${CROW_LIB} ${PFD_LIB}
+    ipc_lib tools_lib musicdb_lib ${BOOST_LIB} ${CROW_LIB} ${PFD_LIB}
 )

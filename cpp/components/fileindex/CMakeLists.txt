@@ -7,3 +7,5 @@ target_include_directories(fileindex_lib PUBLIC include)
 
 # Link the dependencies with our binary
 target_link_libraries(fileindex_lib PUBLIC ipc_lib tools_lib)
+
+add_subdirectory(test)

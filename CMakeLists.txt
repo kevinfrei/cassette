@@ -36,6 +36,8 @@ endif()
 
 # Find Conan2 generated libraries
 include(build/ConanLibImports.cmake)
+enable_testing()
+include(GoogleTest)
 
 # The actual C++ project lives in the cpp/ subdirectory
 add_subdirectory(cpp)
