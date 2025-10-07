@@ -1,5 +1,6 @@
 #include <boost/regex.hpp>
 #include <charconv>
+#include <filesystem>
 #include <optional>
 #include <string>
 #include <taglib/fileref.h>
@@ -10,6 +11,8 @@
 
 #include "CommonTypes.hpp"
 #include "metadata.hpp"
+
+namespace fs = std::filesystem;
 
 namespace metadata {
 
@@ -26,14 +29,11 @@ RegexPattern make(Shared::VAType va, const char* pattern) {
           boost::regex(pattern, boost::regex::icase | boost::regex::optimize)};
 }
 
-// Remove the suffix from a string(_view).
-std::string_view get_no_suffix(const std::string_view& s) {
+// Remove the suffix from a path
+std::string get_no_suffix(const fs::path& p) {
+  std::string s = p.generic_string();
   auto pos = s.find_last_of('.');
   return (pos == std::string_view::npos) ? s : s.substr(0, pos);
-}
-
-std::string_view get_no_suffix(const std::string& s) {
-  return get_no_suffix(std::string_view(s));
 }
 
 std::vector<RegexPattern> patterns{
@@ -98,7 +98,7 @@ std::vector<RegexPattern> patterns{
 
 // Metadata stuff:
 
-store::store(const std::filesystem::path& dir)
+store::store(const fs::path& dir)
     : content_cache(),
       specific_overrides(),
       cache_file(dir / "metadata_cache.json"),
@@ -107,8 +107,8 @@ store::store(const std::filesystem::path& dir)
 }
 
 // Get the metadata for a song from the relative path. (underlying
-// implementation for the public interface of "fs::path" or SongKey).
-std::optional<Shared::FullMetadata> store::read(const std::string& item) {
+// implementation for the public interface of "fs::path").
+std::optional<Shared::FullMetadata> store::read(const fs::path& item) {
   auto override = read_override(item);
   if (override.has_value()) {
     return override; // Return the cached metadata.
@@ -122,7 +122,7 @@ std::optional<Shared::FullMetadata> store::read(const std::string& item) {
 }
 
 // Get the metadata for a song from the file path only.
-std::optional<Shared::FullMetadata> store::read_path(const std::string& item) {
+std::optional<Shared::FullMetadata> store::read_path(const fs::path& item) {
   std::string noSuffix{get_no_suffix(item)};
   for (const RegexPattern& pattern : patterns) {
     // Match the pattern against the relPath.
@@ -132,7 +132,7 @@ std::optional<Shared::FullMetadata> store::read_path(const std::string& item) {
       continue;
     }
     Shared::FullMetadata metadata;
-    metadata.originalPath = item;
+    metadata.originalPath = item.generic_string();
     // Extract the metadata based on the pattern.
     auto artist = match["artist"];
     if (artist.matched) {
@@ -173,24 +173,22 @@ std::optional<Shared::FullMetadata> store::read_path(const std::string& item) {
 }
 
 // Get the metadata for a song from the file's metadata only.
-std::optional<Shared::FullMetadata> store::read_override(
-    const std::string& item) {
-  auto it = content_cache.find(item);
+std::optional<Shared::FullMetadata> store::read_override(const fs::path& item) {
+  auto it = content_cache.find(item.generic_string());
   if (it != content_cache.end()) {
     return it->second; // Return the cached metadata.
   }
   return std::nullopt; // No cached metadata found.
 }
 
-std::optional<Shared::FullMetadata> store::read_content(
-    const std::string& item) {
+std::optional<Shared::FullMetadata> store::read_content(const fs::path& item) {
   if (item.empty()) {
     return std::nullopt; // No item provided.
   }
   TagLib::FileRef f(item.c_str());
   if (!f.isNull() && f.tag()) {
     Shared::FullMetadata metadata;
-    metadata.originalPath = item;
+    metadata.originalPath = item.generic_string();
     TagLib::Tag* tag = f.tag();
     if (!tag->artist().isEmpty()) {
       metadata.artist.push_back(tag->artist().to8Bit(true));
@@ -218,8 +216,9 @@ void store::clear_metadata_cache() {
   content_cache.clear();
 }
 
-void store::clear_metadata_cache(const Shared::SongKey& item) {
-  content_cache.erase(item); // Remove the specific item from the cache.
+void store::clear_metadata_cache(const fs::path& item) {
+  content_cache.erase(item.generic_string()); // Remove the specific item from
+                                              // the cache.
 }
 
 // Clear all overrides.
@@ -228,8 +227,9 @@ void store::clear_metadata_override() {
 }
 
 // Clear a specific override.
-void store::clear_metadata_override(const Shared::SongKey& item) {
-  specific_overrides.erase(item); // Remove the specific override.
+void store::clear_metadata_override(const fs::path& item) {
+  specific_overrides.erase(item.generic_string()); // Remove the specific
+                                                   // override.
 }
 
 void store::clear() {
@@ -237,7 +237,7 @@ void store::clear() {
   clear_metadata_override();
 }
 
-void store::clear(const Shared::SongKey& item) {
+void store::clear(const fs::path& item) {
   clear_metadata_cache(item);
   clear_metadata_override(item);
 }

@@ -1,3 +1,4 @@
+#include <array>
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
@@ -26,7 +27,7 @@ namespace musicdb {
 namespace {
 
 std::shared_mutex music_db_mutex;
-std::unordered_set<std::string> extensions = {
+std::array<std::string, 5> extensions = {
     ".mp3", ".flac", ".m4a", ".jpg", ".png"};
 
 } // namespace
@@ -270,6 +271,88 @@ void send_music_db(crow::websocket::connection& conn) {
       << to_json(*db).dump();
 
   conn.send_text(oss.str());
+}
+
+MusicDatabase::~MusicDatabase() {
+  if (audioIndex) {
+    delete audioIndex;
+    audioIndex = nullptr;
+  }
+  if (metadata_cache) {
+    delete metadata_cache;
+    metadata_cache = nullptr;
+  }
+}
+
+bool MusicDatabase::addFileLocation(const std::filesystem::path& str) {
+  // NYI
+  return false;
+}
+bool MusicDatabase::removeFileLocation(const std::filesystem::path& str) {
+  // NYI
+  return false;
+}
+
+std::vector<std::string> MusicDatabase::getLocations() const {
+  if (audioIndex) {
+    return std::vector<std::string>{
+        audioIndex->get_location().generic_string()};
+  }
+  return std::vector<std::string>{};
+}
+
+std::string MusicDatabase::normalized_path(const std::filesystem::path& p) {
+  return std::filesystem::weakly_canonical(p).generic_string();
+}
+
+std::vector<Shared::ArtistKey> MusicDatabase::getOrCreateArtists(
+    const std::vector<std::string>& artistNames) {
+  // NYI
+  return std::vector<Shared::ArtistKey>{};
+}
+
+Shared::AlbumKey MusicDatabase::getOrCreateAlbum(
+    const std::string& title,
+    std::int16_t year,
+    const std::vector<std::string>& artists,
+    Shared::VAType vaType) {
+  // NYI
+  return Shared::AlbumKey{};
+}
+
+void MusicDatabase::addSongToDB(const fs::path& song) {
+  // First, get the metadata for the song
+  auto md = metadata_cache->read(song);
+  if (!md) {
+    std::cerr << "Failed to get metadata for song: " << song.string()
+              << std::endl;
+    return;
+  }
+
+  // First, create the SongKey:
+  auto pathKey = normalized_path(song);
+  Shared::SongKey skey = "S" + std::to_string(hasher(pathKey));
+  path_to_songkey[pathKey] = skey;
+  songkey_to_path[skey] = pathKey;
+
+  // Moving on to Artists:
+  std::vector<Shared::ArtistKey> artistsIds = getOrCreateArtists(md->artist);
+  std::vector<Shared::ArtistKey> secondaryIds =
+      getOrCreateArtists(md->moreArtists);
+  // Album:
+  Shared::AlbumKey albumId =
+      getOrCreateAlbum(md->album, md->year, artistsIds, md->vaType);
+  // Finally, the Song itself:
+  Shared::SongWithPath songEntry;
+  songEntry.key = skey;
+  songEntry.track = md->track;
+  songEntry.title = md->title;
+  songEntry.albumId = albumId;
+  songEntry.artistIds = artistsIds;
+  songEntry.secondaryIds = secondaryIds;
+  songEntry.variations = md->variations;
+  songEntry.path = pathKey;
+  songs[skey] = songEntry;
 }
 
 } // namespace musicdb

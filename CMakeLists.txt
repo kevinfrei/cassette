@@ -14,7 +14,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(MSVC)
   # For windows/VC++, run normal exception handling & windows 10 APIs
   add_compile_options(/EHsc /W4)
-  add_compile_definitions(_WIN32_WINNT=0x0A00 WINVER=0x0A00 _CRT_SECURE_NO_WARNINGS)
+  add_compile_definitions(
+    _WIN32_WINNT=0x0A00
+    WINVER=0x0A00
+    _CRT_SECURE_NO_WARNINGS
+  )
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT EditAndContinue)
     set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
@@ -26,7 +30,7 @@ if(MSVC)
   else()
     set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT ProgramDatabase)
     set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded)
-    
+
     # Enable WPO explicitly, instead of relying on CMake's specific support
     add_compile_options(/GL /O2)
     add_link_options(/LTCG /OPT:REF /OPT:ICF)

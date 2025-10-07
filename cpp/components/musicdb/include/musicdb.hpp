@@ -2,10 +2,13 @@
 #define MUSICDB_HPP
 #pragma once
 
+#include <filesystem>
+
 #include <crow.h>
 
 #include "CommonTypes.hpp"
 #include "fileindex.hpp"
+#include "metadata.hpp"
 
 namespace musicdb {
 
@@ -15,19 +18,34 @@ void send_music_db(crow::websocket::connection& conn);
 class MusicDatabase {
   // To start with, the MusicDB will just be a wrapper around a single
   // file_index class, maintaining the full database in memory.
+  // The metadata store will be used for metadata overrides and caching.
+  // Later, we can expand this to multiple indexes (e.g., for different
+  // locations, or different types of media).
   file_index* audioIndex;
+  metadata::store* metadata_cache;
+
+  std::unordered_map<std::string, Shared::SongKey> path_to_songkey;
+  std::unordered_map<Shared::SongKey, std::string> songkey_to_path;
+
+  std::unordered_map<Shared::SongKey, Shared::Song> songs;
+  std::unordered_map<Shared::ArtistKey, Shared::Artist> artists;
+  std::unordered_map<Shared::AlbumKey, Shared::Album> albums;
+  std::hash<std::string> hasher;
+
+  static std::string normalized_path(const std::filesystem::path& p);
+
+  void addSongToDB(const std::filesystem::path& item);
+  std::vector<Shared::ArtistKey> getOrCreateArtists(
+      const std::vector<std::string>& artistNames);
+  Shared::AlbumKey getOrCreateAlbum(const std::string& title,
+                                    std::int16_t year,
+                                    const std::vector<std::string>& artists,
+                                    Shared::VAType vaType);
 
  public:
-  MusicDatabase() : audioIndex(nullptr) {}
-  MusicDatabase(file_index* index) : audioIndex(index) {
-    // TODO: initialize the index if it is not already initialized
-  }
-  ~MusicDatabase() {
-    if (audioIndex) {
-      delete audioIndex;
-      audioIndex = nullptr;
-    }
-  }
+  MusicDatabase() : audioIndex(nullptr), metadata_cache(nullptr) {}
+  ~MusicDatabase();
+
   // Database API
   Shared::SongWithPath getSong(Shared::SongKey& key);
   Shared::Album getAlbum(Shared::AlbumKey& key);
@@ -35,13 +53,9 @@ class MusicDatabase {
   Shared::SongKey getSongFromPath(std::string& filepath);
   Shared::SearchResults searchIndex(bool substring, std::string& term);
 
-  // Full File Index stuff
-  bool addAudioFileIndex(file_index* idx);
-  bool removeAudioFileIndex(const file_index* idx);
-
   // "Implied" File Index stuff
-  bool addFileLocation(const std::string& str);
-  bool removeFileLocation(const std::string& str);
+  bool addFileLocation(const std::filesystem::path& str);
+  bool removeFileLocation(const std::filesystem::path& str);
   std::vector<std::string> getLocations() const;
 
   // Pictures
@@ -80,7 +94,6 @@ class MusicDatabase {
   std::string getCanonicalFileName(const Shared::SongKey& song) const;
   void clearMetadataCache();
   void clearLocalMetadataOverrides();
-  // addOrUpdateSong(md: FullMetadata): void;
 };
 
 } // namespace musicdb
