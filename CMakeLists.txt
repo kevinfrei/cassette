@@ -13,14 +13,23 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(MSVC)
   # For windows/VC++, run normal exception handling & windows 10 APIs
-  set(CMAKE_CXX_FLAGS "/EHsc /D_WIN32_WINNT=0x0A00 /DWINVER=0x0A00")
+  add_compile_options(/EHsc /W4)
+  add_compile_definitions(_WIN32_WINNT=0x0A00 WINVER=0x0A00 _CRT_SECURE_NO_WARNINGS)
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    # untested.
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT EditAndContinue)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
     # I wonder if RTC still works. I should use it, since I did the work:
-    add_compile_options(/W4 /Od /RTC1 /D_CRT_SECURE_NO_WARNINGS)
+    set(CMAKE_MSVC_RUNTIME_CHECKS "StackFrameErrorCheck;UninitializedVariable")
+
+    add_compile_options(/Od /FS)
+    add_link_options(/DEBUG:FULL /OPT:NOREF /PROFILE)
   else()
-    add_compile_options(/ltcg /W4 /O2 /D_CRT_SECURE_NO_WARNINGS)
-    add_link_options(/ltcg)
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT ProgramDatabase)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded)
+    
+    # Enable WPO explicitly, instead of relying on CMake's specific support
+    add_compile_options(/GL /O2)
+    add_link_options(/LTCG /OPT:REF /OPT:ICF)
   endif()
 else()
   # For non-windows compilers, enable sanitizers and stuff

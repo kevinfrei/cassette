@@ -356,10 +356,28 @@ async function GetAs<T>(
 ): Promise<T | undefined> {
   const res = await Get(endpoint, ...args);
   if (isString(res)) {
-    return SafelyUnpickle(res, validator);
+    try {
+      if (
+        endpoint === IpcCall.ReadFromStorage &&
+        args.length === 1 &&
+        args[0] === 'locations'
+      ) {
+        console.error(`ReadFromStorage("locations") returned: "${res}"`);
+      }
+      return SafelyUnpickle(res, validator);
+    } catch (e) {
+      console.error(
+        `Failed to unpickle response from Get(${endpoint}, ${args.join(', ')}):`,
+        e,
+      );
+      console.error(validator);
+      return undefined;
+    }
   }
-  // console.log('GetAs failed to validate result');
-  // console.log(res);
+  console.log(
+    `GetAs failed to validate result from Get(${endpoint}, ${args.join(', ')}):`,
+  );
+  console.log(res);
   return undefined;
 }
 
