@@ -40,8 +40,12 @@ class store {
   // This isn't every cached. It's just the metadata that can be extracted
   // from the path.
   std::optional<Shared::FullMetadata> read_path(const Shared::SongKey& item);
+  void write_partial(const Shared::SongKey& songKey,
+                     const Shared::SimpleMetadata& newMetadata);
   void write_partial(const Shared::SongKey& item,
                      const Shared::FullMetadata& metadata);
+  void write_full(const Shared::SongKey& songKey,
+                  const Shared::SimpleMetadata& newMetadata);
   void write_full(const Shared::SongKey& item,
                   const Shared::FullMetadata& metadata);
 

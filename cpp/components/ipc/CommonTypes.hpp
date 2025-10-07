@@ -1212,10 +1212,10 @@ struct MediaInfo {
 struct SimpleMetadata {
   std::string artist;
   std::string album;
-  std::string year;
-  std::string track;
+  std::int16_t year;
+  std::int16_t track;
   std::string title;
-  std::string discNum;
+  std::int16_t discNum;
   std::string discName;
   VAType compilation;
 };
@@ -1992,14 +1992,14 @@ inline std::optional<Shared::SimpleMetadata> from_json<Shared::SimpleMetadata>(
 
   if (!_value.has("year"))
     return std::nullopt;
-  auto _year_opt_ = from_json<std::string>(_value["year"]);
+  auto _year_opt_ = from_json<std::int16_t>(_value["year"]);
   if (!_year_opt_.has_value())
     return std::nullopt;
   _res.year = std::move(*_year_opt_);
 
   if (!_value.has("track"))
     return std::nullopt;
-  auto _track_opt_ = from_json<std::string>(_value["track"]);
+  auto _track_opt_ = from_json<std::int16_t>(_value["track"]);
   if (!_track_opt_.has_value())
     return std::nullopt;
   _res.track = std::move(*_track_opt_);
@@ -2013,7 +2013,7 @@ inline std::optional<Shared::SimpleMetadata> from_json<Shared::SimpleMetadata>(
 
   if (!_value.has("discNum"))
     return std::nullopt;
-  auto _discNum_opt_ = from_json<std::string>(_value["discNum"]);
+  auto _discNum_opt_ = from_json<std::int16_t>(_value["discNum"]);
   if (!_discNum_opt_.has_value())
     return std::nullopt;
   _res.discNum = std::move(*_discNum_opt_);

@@ -332,10 +332,10 @@ const MediaInfo = obj({
 const SimpleMetadata = obj({
   artist: str(),
   album: str(),
-  year: str(),
-  track: str(),
+  year: i16(),
+  track: i16(),
   title: str(),
-  discNum: str(),
+  discNum: i16(),
   discName: str(),
   compilation: ref('VAType'),
 });

@@ -88,6 +88,7 @@ inline std::string escape_json_string(std::string_view sv) {
   }
   return o.str();
 }
+
 template <>
 struct impl_to_json<std::string> {
   static inline crow::json::wvalue process(const std::string& value) {

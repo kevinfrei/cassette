@@ -49,11 +49,10 @@ void write_to_storage(crow::response& resp, std::string_view data) {
               << " in storage request: <" << data << ">" << std::endl;
     return;
   }
-  auto json = crow::json::load(*maybe_value);
-  std::cout << "Writing data " << json << " for " << key << " to storage"
-            << std::endl;
+  std::cout << "Writing data " << *maybe_value << " for " << key
+            << " to storage" << std::endl;
   std::ostringstream os;
-  os << json;
+  os << *maybe_value;
   if (!config::write_to_storage(key, os.str())) {
     resp.code = 500; // Internal Server Error
   } else {

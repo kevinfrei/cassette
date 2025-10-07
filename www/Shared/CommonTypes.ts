@@ -460,10 +460,10 @@ export const chkMediaInfo: TC.typecheck<MediaInfo> = TC.chkObjectOfType(
 export type SimpleMetadata = {
   artist: string;
   album: string;
-  year: string;
-  track: string;
+  year: number;
+  track: number;
   title: string;
-  discNum: string;
+  discNum: number;
   discName: string;
   compilation: VAType;
 };
@@ -472,10 +472,10 @@ export const chkSimpleMetadata: TC.typecheck<SimpleMetadata> =
     {
       artist: TC.isString,
       album: TC.isString,
-      year: TC.isString,
-      track: TC.isString,
+      year: chkIdlI16,
+      track: chkIdlI16,
       title: TC.isString,
-      discNum: TC.isString,
+      discNum: chkIdlI16,
       discName: TC.isString,
       compilation: chkVAType,
     },
