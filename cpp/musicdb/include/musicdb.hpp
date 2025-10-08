@@ -9,6 +9,7 @@
 #include "CommonTypes.hpp"
 #include "fileindex.hpp"
 #include "metadata.hpp"
+#include "tuple_hash.hpp"
 
 namespace musicdb {
 
@@ -24,19 +25,25 @@ class MusicDatabase {
   file_index* audioIndex;
   metadata::store* metadata_cache;
 
+  std::hash<std::string> hasher;
+
   std::unordered_map<std::string, Shared::SongKey> path_to_songkey;
   std::unordered_map<Shared::SongKey, std::string> songkey_to_path;
 
   std::unordered_map<Shared::SongKey, Shared::Song> songs;
   std::unordered_map<Shared::ArtistKey, Shared::Artist> artists;
   std::unordered_map<Shared::AlbumKey, Shared::Album> albums;
-  std::hash<std::string> hasher;
+
+  std::unordered_map<std::string, Shared::ArtistKey> artist_name_to_key;
+  std::unordered_multimap<std::tuple<std::string, std::int16_t, std::string>,
+                          Shared::AlbumKey,
+                          TupleHash>
+      album_year_artist_to_key;
 
   static std::string normalized_path(const std::filesystem::path& p);
 
   void addSongToDB(const std::filesystem::path& item);
-  std::vector<Shared::ArtistKey> getOrCreateArtists(
-      const std::vector<std::string>& artistNames);
+  Shared::ArtistKey getOrCreateArtist(const std::string& artistName);
   Shared::AlbumKey getOrCreateAlbum(const std::string& title,
                                     std::int16_t year,
                                     const std::vector<std::string>& artists,

@@ -305,10 +305,16 @@ std::string MusicDatabase::normalized_path(const std::filesystem::path& p) {
   return std::filesystem::weakly_canonical(p).generic_string();
 }
 
-std::vector<Shared::ArtistKey> MusicDatabase::getOrCreateArtists(
-    const std::vector<std::string>& artistNames) {
-  // NYI
-  return std::vector<Shared::ArtistKey>{};
+Shared::ArtistKey MusicDatabase::getOrCreateArtist(
+    const std::string& artistName) {
+  auto it = artist_name_to_key.find(artistName);
+  if (it != artist_name_to_key.end()) {
+    return it->second;
+  }
+
+  Shared::ArtistKey newKey = "R" + std::to_string(artist_name_to_key.size());
+  artist_name_to_key[artistName] = newKey;
+  return newKey;
 }
 
 Shared::AlbumKey MusicDatabase::getOrCreateAlbum(
@@ -336,9 +342,14 @@ void MusicDatabase::addSongToDB(const fs::path& song) {
   songkey_to_path[skey] = pathKey;
 
   // Moving on to Artists:
-  std::vector<Shared::ArtistKey> artistsIds = getOrCreateArtists(md->artist);
-  std::vector<Shared::ArtistKey> secondaryIds =
-      getOrCreateArtists(md->moreArtists);
+  std::vector<Shared::ArtistKey> artistsIds;
+  for (auto& artistName : md->artist) {
+    artistsIds.push_back(getOrCreateArtist(artistName));
+  }
+  std::vector<Shared::ArtistKey> secondaryIds;
+  for (auto& artistName : md->moreArtists) {
+    secondaryIds.push_back(getOrCreateArtist(artistName));
+  }
   // Album:
   Shared::AlbumKey albumId =
       getOrCreateAlbum(md->album, md->year, artistsIds, md->vaType);
@@ -353,6 +364,21 @@ void MusicDatabase::addSongToDB(const fs::path& song) {
   songEntry.variations = md->variations;
   songEntry.path = pathKey;
   songs[skey] = songEntry;
+
+  // Now wire up the song to the album and the artist(s):
+  auto& album = albums[albumId];
+  album.songs.push_back(skey);
+
+  for (const auto& aid : artistsIds) {
+    auto& artist = artists[aid];
+    artist.songs.push_back(skey);
+    artist.albums.push_back(albumId);
+  }
+  for (const auto& aid : secondaryIds) {
+    auto& artist = artists[aid];
+    artist.songs.push_back(skey);
+    artist.albums.push_back(albumId);
+  }
 }
 
 } // namespace musicdb
