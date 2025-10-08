@@ -90,7 +90,7 @@ Shared::MusicDatabase* get_music_db() {
   }
   */
   // TODO: Temporary data for testing:
-  *music_db = mdb->getDatabase();
+  music_db = new Shared::MusicDatabase(mdb->getDatabase());
   return music_db;
 }
 
@@ -177,7 +177,7 @@ Shared::AlbumKey MusicDatabase::getOrCreateAlbum(
       artistHashValue += artist + "|";
     }
   }
-  std::tuple keyTuple = {title, year, artistHashValue};
+  AlbumTriple keyTuple = {title, year, artistHashValue};
   auto it = album_year_artist_to_key.find(keyTuple);
   if (it != album_year_artist_to_key.end()) {
     return it->second;
@@ -185,6 +185,19 @@ Shared::AlbumKey MusicDatabase::getOrCreateAlbum(
   Shared::AlbumKey newKey =
       "L" + std::to_string(album_year_artist_to_key.size());
   album_year_artist_to_key[keyTuple] = newKey;
+  Shared::Album albumEntry;
+  albumEntry.key = newKey;
+  albumEntry.year = year;
+  albumEntry.title = title;
+  albumEntry.vatype = vaType;
+  for (const auto& artist : artists) {
+    Shared::ArtistKey artistKey = getOrCreateArtist(artist);
+    albumEntry.primaryArtists.push_back(artistKey);
+    // Now, add this album to the artist's list of albums:
+    Shared::Artist& theArtist = this->artists[artistKey];
+    theArtist.albums.push_back(newKey);
+  }
+  albums[newKey] = albumEntry;
   return newKey;
 }
 
@@ -199,7 +212,7 @@ void MusicDatabase::addSongToDB(const fs::path& song) {
 
   // First, create the SongKey:
   auto pathKey = normalized_path(song);
-  Shared::SongKey skey = "S" + std::to_string(hasher(pathKey));
+  Shared::SongKey skey = "S" + std::to_string(path_to_songkey.size());
   path_to_songkey[pathKey] = skey;
   songkey_to_path[skey] = pathKey;
 
@@ -234,12 +247,10 @@ void MusicDatabase::addSongToDB(const fs::path& song) {
   for (const auto& aid : artistsIds) {
     auto& artist = artists[aid];
     artist.songs.push_back(skey);
-    artist.albums.push_back(albumId);
   }
   for (const auto& aid : secondaryIds) {
     auto& artist = artists[aid];
     artist.songs.push_back(skey);
-    artist.albums.push_back(albumId);
   }
 }
 

@@ -16,6 +16,8 @@ namespace musicdb {
 Shared::MusicDatabase* get_music_db();
 void send_music_db(crow::websocket::connection& conn);
 
+using AlbumTriple = std::tuple<std::string, std::int16_t, std::string>;
+
 class MusicDatabase {
   // To start with, the MusicDB will just be a wrapper around a single
   // file_index class, maintaining the full database in memory.
@@ -35,9 +37,7 @@ class MusicDatabase {
   std::unordered_map<Shared::AlbumKey, Shared::Album> albums;
 
   std::unordered_map<std::string, Shared::ArtistKey> artist_name_to_key;
-  std::unordered_map<std::tuple<std::string, std::int16_t, std::string>,
-                     Shared::AlbumKey,
-                     TupleHash>
+  std::unordered_map<AlbumTriple, Shared::AlbumKey, TupleHash>
       album_year_artist_to_key;
 
   static std::string normalized_path(const std::filesystem::path& p);
