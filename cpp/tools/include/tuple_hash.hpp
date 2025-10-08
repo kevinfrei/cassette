@@ -16,7 +16,7 @@ void hash_combine(std::size_t& seed, const T& v) {
 struct TupleHash {
   template <typename... Args>
   size_t operator()(const std::tuple<Args...>& t) const {
-    size_t seed = 0;
+    size_t seed = 9999991;
     // Use std::apply to unpack the tuple and combine hashes of its elements
     std::apply(
         [&](const auto&... elements) {
