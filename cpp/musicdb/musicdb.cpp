@@ -54,6 +54,7 @@ Shared::MusicDatabase* get_music_db() {
   mdb = new MusicDatabase();
   // This is wrong, because I've overriden addFileLocation to just add a single
   // file for testing.
+  /*
   fs::path O = "O";
   fs::path C = "C";
   fs::path OneDay = O / "One Day as a Lion - 2008 - One Day as a Lion";
@@ -74,7 +75,8 @@ Shared::MusicDatabase* get_music_db() {
   mdb->addFileLocation(Every / "02 - Leave a Trace.flac");
   mdb->addFileLocation(Every / "03 - Keep You On My Side.flac");
   mdb->addFileLocation(Every / "04 - Make Them Gold.flac");
-  // mdb->addFileLocation(root);
+  */
+  mdb->addFileLocation(root);
 
   /*
   fs::recursive_directory_iterator it(root);
@@ -122,14 +124,24 @@ MusicDatabase::~MusicDatabase() {
 bool MusicDatabase::addFileLocation(const std::filesystem::path& str) {
   // NYI
   // For now, this is used to add a single file for testing.
-  if (!audioIndex) {
-    std::string home = getenv(user_root);
-    fs::path root = fs::path(home) / "Music";
-    audioIndex = new file_index(root, true);
-    metadata_cache = new metadata::store(root);
+  if (audioIndex) {
+    delete audioIndex;
+    delete metadata_cache;
   }
-  addSongToDB(str.generic_string());
-  return false;
+  std::string home = getenv(user_root);
+  fs::path root = fs::path(home) / "Music";
+  audioIndex = new file_index(root, true);
+  metadata_cache = new metadata::store(root);
+  audioIndex->foreach_file([this](const fs::path& p) {
+    std::string ext = p.extension().string();
+    for (const auto& validExt : extensions) {
+      if (ext == validExt) {
+        addSongToDB(p);
+        break;
+      }
+    }
+  });
+  return true;
 }
 bool MusicDatabase::removeFileLocation(const std::filesystem::path& str) {
   // NYI
@@ -158,6 +170,10 @@ Shared::ArtistKey MusicDatabase::getOrCreateArtist(
 
   Shared::ArtistKey newKey = "R" + std::to_string(artist_name_to_key.size());
   artist_name_to_key[artistName] = newKey;
+  Shared::Artist artistEntry;
+  artistEntry.key = newKey;
+  artistEntry.name = artistName;
+  artists[newKey] = artistEntry;
   return newKey;
 }
 

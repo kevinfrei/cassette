@@ -206,6 +206,8 @@ std::optional<Shared::FullMetadata> store::read_content(const fs::path& item) {
       metadata.track = static_cast<std::int16_t>(tag->track());
     }
     metadata.vaType = Shared::VAType::none; // NYI: Determine VAType
+    metadata.disk = 0; // NYI: Determine disk number
+    metadata.diskName = ""; // NYI: Determine disk name
     return metadata; // Return the extracted metadata.
   }
   return std::nullopt; // NYI: Read from file content.
