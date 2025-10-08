@@ -35,13 +35,14 @@ class MusicDatabase {
   std::unordered_map<Shared::AlbumKey, Shared::Album> albums;
 
   std::unordered_map<std::string, Shared::ArtistKey> artist_name_to_key;
-  std::unordered_multimap<std::tuple<std::string, std::int16_t, std::string>,
-                          Shared::AlbumKey,
-                          TupleHash>
+  std::unordered_map<std::tuple<std::string, std::int16_t, std::string>,
+                     Shared::AlbumKey,
+                     TupleHash>
       album_year_artist_to_key;
 
   static std::string normalized_path(const std::filesystem::path& p);
 
+  // Helpers for adding items to the DB
   void addSongToDB(const std::filesystem::path& item);
   Shared::ArtistKey getOrCreateArtist(const std::string& artistName);
   Shared::AlbumKey getOrCreateAlbum(const std::string& title,

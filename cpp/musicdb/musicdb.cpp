@@ -29,6 +29,7 @@ namespace {
 std::shared_mutex music_db_mutex;
 std::array<std::string, 5> extensions = {
     ".mp3", ".flac", ".m4a", ".jpg", ".png"};
+MusicDatabase* mdb = nullptr;
 
 } // namespace
 
@@ -50,7 +51,31 @@ Shared::MusicDatabase* get_music_db() {
               << std::endl;
     return nullptr;
   }
-  auto db = new Shared::MusicDatabase();
+  mdb = new MusicDatabase();
+  // This is wrong, because I've overriden addFileLocation to just add a single
+  // file for testing.
+  fs::path O = "O";
+  fs::path C = "C";
+  fs::path OneDay = O / "One Day as a Lion - 2008 - One Day as a Lion";
+  fs::path CHVRCHES = C / "CHVRCHES";
+  fs::path Bones = CHVRCHES / "2013 - The Bones of What You Believe";
+  fs::path Every = CHVRCHES / "2015 - Every Open Eye";
+  mdb->addFileLocation(OneDay / "01 - Wild International.mp3");
+  mdb->addFileLocation(OneDay / "02 - Ocean View.mp3");
+  mdb->addFileLocation(OneDay / "03 - Last Letter.mp3");
+  mdb->addFileLocation(OneDay / "04 - If You Fear Dying.mp3");
+  mdb->addFileLocation(OneDay / "05 - One Day As A Lion.mp3");
+  mdb->addFileLocation(Bones / "01 - The Mother We Share.flac");
+  mdb->addFileLocation(Bones / "02 - We Sink.flac");
+  mdb->addFileLocation(Bones / "03 - Gun.flac");
+  mdb->addFileLocation(Bones / "04 - Tether.flac");
+  mdb->addFileLocation(Bones / "05 - Lies.flac");
+  mdb->addFileLocation(Every / "01 - Never Ending Circles.flac");
+  mdb->addFileLocation(Every / "02 - Leave a Trace.flac");
+  mdb->addFileLocation(Every / "03 - Keep You On My Side.flac");
+  mdb->addFileLocation(Every / "04 - Make Them Gold.flac");
+  // mdb->addFileLocation(root);
+
   /*
   fs::recursive_directory_iterator it(root);
   fs::recursive_directory_iterator end;
@@ -65,198 +90,8 @@ Shared::MusicDatabase* get_music_db() {
   }
   */
   // TODO: Temporary data for testing:
-  Shared::ArtistKey arist_oneday = {"r1"};
-  Shared::ArtistKey artist_chv = {"r2"};
-  Shared::AlbumKey album_oneday = {"a1"};
-  Shared::AlbumKey album_bones = {"a2"};
-  Shared::AlbumKey album_eye = {"a3"};
-
-  Shared::Song oo1 = {//.path = "O/One Day as a Lion - 2008 - One Day as a
-                      // Lion/01 - Wild International.mp3",
-                      .key = Shared::SongKey{"s1"},
-                      .track = 1,
-                      .title = "Wild International",
-                      .albumId = album_oneday,
-                      .artistIds = {arist_oneday},
-                      .secondaryIds = {},
-                      .variations = {}};
-  Shared::Song oo2 = {//.path = "O/One Day as a Lion - 2008 - One Day as a
-                      // Lion/02 - Ocean View.mp3",
-                      .key = Shared::SongKey{"s2"},
-                      .track = 2,
-                      .title = "Ocean View",
-                      .albumId = album_oneday,
-                      .artistIds = {arist_oneday},
-                      .secondaryIds = {},
-                      .variations = {}};
-  Shared::Song oo3 = {//.path = "O/One Day as a Lion - 2008 - One Day as a
-                      // Lion/03 - Last Letter.mp3",
-                      .key = Shared::SongKey{"s3"},
-                      .track = 3,
-                      .title = "Last Letter",
-                      .albumId = album_oneday,
-                      .artistIds = {arist_oneday},
-                      .secondaryIds = {},
-                      .variations = {}};
-  Shared::Song oo4 = {//.path = "O/One Day as a Lion - 2008 - One Day as a
-                      // Lion/04 - If You Fear Dying.mp3",
-                      .key = Shared::SongKey{"s4"},
-                      .track = 4,
-                      .title = "If You Fear Dying",
-                      .albumId = album_oneday,
-                      .artistIds = {arist_oneday},
-                      .secondaryIds = {},
-                      .variations = {}};
-  Shared::Song oo5 = {//.path = "O/One Day as a Lion - 2008 - One Day as a
-                      // Lion/05 - One Day As A Lion.mp3",
-                      .key = Shared::SongKey{"s5"},
-                      .track = 5,
-                      .title = "One Day As A Lion",
-                      .albumId = album_oneday,
-                      .artistIds = {arist_oneday},
-                      .secondaryIds = {},
-                      .variations = {}};
-  Shared::Song cb1 = {//.path = "C/CHVRCHES/2013 - The Bones of What You
-                      // Believe/01 - The Mother We Share.flac",
-                      .key = Shared::SongKey{"s6"},
-                      .track = 1,
-                      .title = "The Mother We Share",
-                      .albumId = album_bones,
-                      .artistIds = {artist_chv},
-                      .secondaryIds = {},
-                      .variations = {}};
-  Shared::Song cb2 = {//.path = "C/CHVRCHES/2013 - The Bones of What You
-                      // Believe/02 - We Sink.flac",
-                      .key = Shared::SongKey{"s7"},
-                      .track = 2,
-                      .title = "We Sink",
-                      .albumId = album_bones,
-                      .artistIds = {artist_chv},
-                      .secondaryIds = {},
-                      .variations = {}};
-  Shared::Song cb3 = {// .path = "C/CHVRCHES/2013 - The Bones of What You
-                      // Believe/03 - Gun.flac",
-                      .key = Shared::SongKey{"s8"},
-                      .track = 3,
-                      .title = "Gun",
-                      .albumId = album_bones,
-                      .artistIds = {artist_chv},
-                      .secondaryIds = {},
-                      .variations = {}};
-  Shared::Song cb4 = {//.path = "C/CHVRCHES/2013 - The Bones of What You
-                      // Believe/04 - Tether.flac",
-                      .key = Shared::SongKey{"s9"},
-                      .track = 4,
-                      .title = "Tether",
-                      .albumId = album_bones,
-                      .artistIds = {artist_chv},
-                      .secondaryIds = {},
-                      .variations = {}};
-  Shared::Song cb5 = {//.path = "C/CHVRCHES/2013 - The Bones of What You
-                      // Believe/05 - Lies.flac",
-                      .key = Shared::SongKey{"s10"},
-                      .track = 5,
-                      .title = "Lies",
-                      .albumId = album_bones,
-                      .artistIds = {artist_chv},
-                      .secondaryIds = {},
-                      .variations = {}};
-  Shared::Song ce1 = {//.path = "C/CHVRCHES/2015 - Every Open Eye/01 - Never
-                      // Ending Circles.flac",
-                      .key = Shared::SongKey{"s11"},
-                      .track = 1,
-                      .title = "Never Ending Circles",
-                      .albumId = album_eye,
-                      .artistIds = {artist_chv},
-                      .secondaryIds = {},
-                      .variations = {}};
-  Shared::Song ce2 = {
-      //.path = "C/CHVRCHES/2015 - Every Open Eye/02 - Leave a Trace.flac",
-      .key = Shared::SongKey{"s12"},
-      .track = 2,
-      .title = "Leave a Trace",
-      .albumId = album_eye,
-      .artistIds = {artist_chv},
-      .secondaryIds = {},
-      .variations = {}};
-  Shared::Song ce3 = {//.path = "C/CHVRCHES/2015 - Every Open Eye/03 - Keep You
-                      // On My Side.flac",
-                      .key = Shared::SongKey{"s13"},
-                      .track = 3,
-                      .title = "Keep You On My Side",
-                      .albumId = album_eye,
-                      .artistIds = {artist_chv},
-                      .secondaryIds = {},
-                      .variations = {}};
-  Shared::Song ce4 = {
-      //.path = "C/CHVRCHES/2015 - Every Open Eye/04 - Make Them Gold.flac",
-      .key = Shared::SongKey{"s14"},
-      .track = 4,
-      .title = "Make Them Gold",
-      .albumId = album_eye,
-      .artistIds = {artist_chv},
-      .secondaryIds = {},
-      .variations = {}};
-  Shared::Album l_oneday = {
-      .key = album_oneday,
-      .year = 2008,
-      .title = "One Day as a Lion",
-      .vatype = Shared::VAType::none,
-      .primaryArtists = {arist_oneday},
-      .songs = {oo1.key, oo2.key, oo3.key, oo4.key, oo5.key},
-      .diskNames = {}};
-  Shared::Album l_bones = {
-      .key = album_bones,
-      .year = 2013,
-      .title = "The Bones of What You Believe",
-      .vatype = Shared::VAType::none,
-      .primaryArtists = {artist_chv},
-      .songs = {cb1.key, cb2.key, cb3.key, cb4.key, cb5.key},
-      .diskNames = {}};
-  Shared::Album l_eye = {.key = album_eye,
-                         .year = 2015,
-                         .title = "Every Open Eye",
-                         .vatype = Shared::VAType::none,
-                         .primaryArtists = {artist_chv},
-                         .songs = {ce1.key, ce2.key, ce3.key, ce4.key},
-                         .diskNames = {}};
-  Shared::Artist a_oneday = {
-      .key = arist_oneday,
-      .name = "One Day as a Lion",
-      .albums = {album_oneday},
-      .songs = {oo1.key, oo2.key, oo3.key, oo4.key, oo5.key}};
-  Shared::Artist a_chv = {.key = artist_chv,
-                          .name = "CHVRCHES",
-                          .albums = {album_bones, album_eye},
-                          .songs = {cb1.key,
-                                    cb2.key,
-                                    cb3.key,
-                                    cb4.key,
-                                    cb5.key,
-                                    ce1.key,
-                                    ce2.key,
-                                    ce3.key,
-                                    ce4.key}};
-  db->artists[a_oneday.key] = a_oneday;
-  db->artists[a_chv.key] = a_chv;
-  db->albums[l_oneday.key] = l_oneday;
-  db->albums[l_bones.key] = l_bones;
-  db->albums[l_eye.key] = l_eye;
-  db->songs[oo1.key] = oo1;
-  db->songs[oo2.key] = oo2;
-  db->songs[oo3.key] = oo3;
-  db->songs[oo4.key] = oo4;
-  db->songs[oo5.key] = oo5;
-  db->songs[cb1.key] = cb1;
-  db->songs[cb2.key] = cb2;
-  db->songs[cb3.key] = cb3;
-  db->songs[cb4.key] = cb4;
-  db->songs[cb5.key] = cb5;
-  db->songs[ce1.key] = ce1;
-  db->songs[ce2.key] = ce2;
-  db->songs[ce3.key] = ce3;
-  db->songs[ce4.key] = ce4;
-  return music_db = db;
+  *music_db = mdb->getDatabase();
+  return music_db;
 }
 
 void send_music_db(crow::websocket::connection& conn) {
@@ -286,6 +121,14 @@ MusicDatabase::~MusicDatabase() {
 
 bool MusicDatabase::addFileLocation(const std::filesystem::path& str) {
   // NYI
+  // For now, this is used to add a single file for testing.
+  if (!audioIndex) {
+    std::string home = getenv(user_root);
+    fs::path root = fs::path(home) / "Music";
+    audioIndex = new file_index(root, true);
+    metadata_cache = new metadata::store(root);
+  }
+  addSongToDB(str.generic_string());
   return false;
 }
 bool MusicDatabase::removeFileLocation(const std::filesystem::path& str) {
@@ -307,6 +150,7 @@ std::string MusicDatabase::normalized_path(const std::filesystem::path& p) {
 
 Shared::ArtistKey MusicDatabase::getOrCreateArtist(
     const std::string& artistName) {
+  // TODO: Make this case-insensitive
   auto it = artist_name_to_key.find(artistName);
   if (it != artist_name_to_key.end()) {
     return it->second;
@@ -322,8 +166,26 @@ Shared::AlbumKey MusicDatabase::getOrCreateAlbum(
     std::int16_t year,
     const std::vector<std::string>& artists,
     Shared::VAType vaType) {
-  // NYI
-  return Shared::AlbumKey{};
+  std::string artistHashValue;
+  if (vaType != Shared::VAType::none) {
+    // For VA albums, we can't really do a good job of deduping.
+    artistHashValue = Shared::to_string(vaType);
+    artistHashValue.push_back('*');
+  } else {
+    // TODO: Make this case-insensitive
+    for (const auto& artist : artists) {
+      artistHashValue += artist + "|";
+    }
+  }
+  std::tuple keyTuple = {title, year, artistHashValue};
+  auto it = album_year_artist_to_key.find(keyTuple);
+  if (it != album_year_artist_to_key.end()) {
+    return it->second;
+  }
+  Shared::AlbumKey newKey =
+      "L" + std::to_string(album_year_artist_to_key.size());
+  album_year_artist_to_key[keyTuple] = newKey;
+  return newKey;
 }
 
 void MusicDatabase::addSongToDB(const fs::path& song) {
@@ -352,7 +214,7 @@ void MusicDatabase::addSongToDB(const fs::path& song) {
   }
   // Album:
   Shared::AlbumKey albumId =
-      getOrCreateAlbum(md->album, md->year, artistsIds, md->vaType);
+      getOrCreateAlbum(md->album, md->year, md->artist, md->vaType);
   // Finally, the Song itself:
   Shared::SongWithPath songEntry;
   songEntry.key = skey;
@@ -379,6 +241,15 @@ void MusicDatabase::addSongToDB(const fs::path& song) {
     artist.songs.push_back(skey);
     artist.albums.push_back(albumId);
   }
+}
+
+Shared::MusicDatabase MusicDatabase::getDatabase() const {
+  Shared::MusicDatabase db;
+  db.songs = songs;
+  db.albums = albums;
+  db.artists = artists;
+  // NYI: playlists
+  return db;
 }
 
 } // namespace musicdb
