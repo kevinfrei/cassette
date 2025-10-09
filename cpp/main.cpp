@@ -32,6 +32,7 @@ void ConfigureRoutes(crow::SimpleApp& app, const std::string& /*url*/) {
 }
 
 int main(void) {
+  setlocale(LC_ALL, ".UTF8");
   crow::SimpleApp app;
 
   files::set_program_location();

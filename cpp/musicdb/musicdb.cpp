@@ -29,6 +29,7 @@ namespace {
 std::shared_mutex music_db_mutex;
 std::array<std::string, 5> extensions = {
     ".mp3", ".flac", ".m4a", ".jpg", ".png"};
+std::array<std::string, 3> audio_ext = {".mp3", ".flac", ".m4a"};
 MusicDatabase* mdb = nullptr;
 
 } // namespace
@@ -134,7 +135,7 @@ bool MusicDatabase::addFileLocation(const std::filesystem::path& str) {
   metadata_cache = new metadata::store(root);
   audioIndex->foreach_file([this](const fs::path& p) {
     std::string ext = p.extension().string();
-    for (const auto& validExt : extensions) {
+    for (const auto& validExt : audio_ext) {
       if (ext == validExt) {
         addSongToDB(p);
         break;

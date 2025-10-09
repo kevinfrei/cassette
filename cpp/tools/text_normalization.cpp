@@ -331,6 +331,12 @@ std::string normalize_latin_to_utf8(std::string_view input) {
   return result;
 }
 
+std::string normalize_utf8_or_latin(std::u8string_view input) {
+  std::string_view sv(reinterpret_cast<const char*>(input.data()),
+                      input.length());
+  return normalize_utf8_or_latin(sv);
+}
+
 // This is the most likely entrypoint for callers. It will take a string that
 // may be in UTF-8 or Latin-1, and return a normalized UTF-8 string with
 // diacritics as combining characters.

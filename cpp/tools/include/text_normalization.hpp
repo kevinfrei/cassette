@@ -12,5 +12,6 @@ std::string normalize_latin_to_utf8(std::string_view input);
 // may be in UTF-8 or Latin-1, and return a normalized UTF-8 string with
 // diacritics as combining characters.
 std::string normalize_utf8_or_latin(std::string_view input);
+std::string normalize_utf8_or_latin(std::u8string_view input);
 
 } // namespace txtnorm
