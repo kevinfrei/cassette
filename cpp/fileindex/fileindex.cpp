@@ -223,15 +223,13 @@ void file_index::rescan_files(path_handler add_file, path_handler del_file) {
   for (auto it = fs::recursive_directory_iterator(loc);
        it != fs::recursive_directory_iterator();
        ++it) {
-    auto thePath = it->path();
+    const fs::path& thePath = it->path();
     if (it->is_directory()) {
-      // Skip hidden directories (like .git, .afi, etc.)
+      // Skip hidden directories (like .git, .afi, etc...)
       if (thePath.filename().string().starts_with('.')) {
         it.disable_recursion_pending();
       }
-      continue;
-    }
-    if (belongs_here(thePath)) {
+    } else if (belongs_here(thePath)) {
       const auto relativePath = get_relative_path(thePath);
       existingFiles.erase(relativePath);
       if (file_to_key.contains(relativePath)) {

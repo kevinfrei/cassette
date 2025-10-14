@@ -44,55 +44,20 @@ Shared::MusicDatabase* get_music_db() {
     // Ah, double-checked locking, you're so weird...
     return music_db;
   }
-  // TODO: Get the location from the config.
+// TODO: Get the location from the config.
+#if defined(__APPLE__)
+  fs::path root = "/Volumes/DDrive$/Audio/Sorted";
+#else
   std::string home = getenv(user_root);
   fs::path root = fs::path(home) / "Music";
+#endif
   if (!fs::exists(root)) {
     std::cerr << "Music directory does not exist: " << root.string()
               << std::endl;
     return nullptr;
   }
   mdb = new MusicDatabase();
-  // This is wrong, because I've overriden addFileLocation to just add a single
-  // file for testing.
-  /*
-  fs::path O = "O";
-  fs::path C = "C";
-  fs::path OneDay = O / "One Day as a Lion - 2008 - One Day as a Lion";
-  fs::path CHVRCHES = C / "CHVRCHES";
-  fs::path Bones = CHVRCHES / "2013 - The Bones of What You Believe";
-  fs::path Every = CHVRCHES / "2015 - Every Open Eye";
-  mdb->addFileLocation(OneDay / "01 - Wild International.mp3");
-  mdb->addFileLocation(OneDay / "02 - Ocean View.mp3");
-  mdb->addFileLocation(OneDay / "03 - Last Letter.mp3");
-  mdb->addFileLocation(OneDay / "04 - If You Fear Dying.mp3");
-  mdb->addFileLocation(OneDay / "05 - One Day As A Lion.mp3");
-  mdb->addFileLocation(Bones / "01 - The Mother We Share.flac");
-  mdb->addFileLocation(Bones / "02 - We Sink.flac");
-  mdb->addFileLocation(Bones / "03 - Gun.flac");
-  mdb->addFileLocation(Bones / "04 - Tether.flac");
-  mdb->addFileLocation(Bones / "05 - Lies.flac");
-  mdb->addFileLocation(Every / "01 - Never Ending Circles.flac");
-  mdb->addFileLocation(Every / "02 - Leave a Trace.flac");
-  mdb->addFileLocation(Every / "03 - Keep You On My Side.flac");
-  mdb->addFileLocation(Every / "04 - Make Them Gold.flac");
-  */
   mdb->addFileLocation(root);
-
-  /*
-  fs::recursive_directory_iterator it(root);
-  fs::recursive_directory_iterator end;
-  for (; it != end; ++it) {
-    if (it->is_regular_file()) {
-      auto path = it->path();
-      auto ext = path.extension();
-      if (if (extensions.find(path.extension() == ".mp3" || path.extension() ==
-  ".flac" || path.extension() == ".m4a") {
-      }
-    }
-  }
-  */
-  // TODO: Temporary data for testing:
   music_db = new Shared::MusicDatabase(mdb->getDatabase());
   return music_db;
 }
@@ -122,15 +87,13 @@ MusicDatabase::~MusicDatabase() {
   }
 }
 
-bool MusicDatabase::addFileLocation(const std::filesystem::path& str) {
+bool MusicDatabase::addFileLocation(const std::filesystem::path& root) {
   // NYI
   // For now, this is used to add a single file for testing.
   if (audioIndex) {
     delete audioIndex;
     delete metadata_cache;
   }
-  std::string home = getenv(user_root);
-  fs::path root = fs::path(home) / "Music";
   audioIndex = new file_index(root, true);
   metadata_cache = new metadata::store(root);
   audioIndex->foreach_file([this](const fs::path& p) {
