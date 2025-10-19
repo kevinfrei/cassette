@@ -6,6 +6,16 @@
 #include <optional>
 #include <string>
 
-std::optional<std::filesystem::path> get_tune(const std::string& path);
+#include <crow.h>
 
-#endif
+#include "CommonTypes.hpp"
+
+namespace tunes {
+
+std::optional<std::filesystem::path> get_tune(const std::string& path);
+Shared::MusicDatabase* get_music_db();
+void send_music_db(crow::websocket::connection& conn);
+
+} // namespace tunes
+
+#endif // __TUNES_H__

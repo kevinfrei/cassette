@@ -83,7 +83,7 @@ crow::response images(const crow::request&, const std::string& /*path*/) {
 crow::response tune(const crow::request&, const std::string& path) {
   quitting::keep_alive();
   crow::response resp;
-  auto maybe_song = get_tune(path);
+  auto maybe_song = tunes::get_tune(path);
   if (!maybe_song) {
     tools::e404(resp, "Tune not found");
     return resp;
@@ -200,7 +200,7 @@ void socket_message(crow::websocket::connection& conn,
       break;
     case Shared::SocketMsg::ContentLoaded:
       config::set_ready();
-      musicdb::send_music_db(conn);
+      tunes::send_music_db(conn);
       break;
     default: // Unsupported message
       std::cerr << "Unsupported message received: " << Shared::to_string(msg)

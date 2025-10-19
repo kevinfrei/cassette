@@ -14,14 +14,6 @@
 
 namespace fs = std::filesystem;
 
-#if defined(_WIN32)
-const char* user_root = "USERPROFILE";
-#elif defined(__APPLE__) || defined(__linux__)
-const char* user_root = "HOME";
-#else
-#error Unsupported platform
-#endif
-
 namespace musicdb {
 
 namespace {
@@ -34,46 +26,16 @@ MusicDatabase* mdb = nullptr;
 
 } // namespace
 
-Shared::MusicDatabase* get_music_db() {
-  static Shared::MusicDatabase* music_db = nullptr;
-  if (music_db) {
-    return music_db; // Already initialized
-  }
+void set_locations(const std::vector<fs::path>& locations) {
   std::unique_lock<std::shared_mutex> lock(music_db_mutex);
-  if (music_db) {
-    // Ah, double-checked locking, you're so weird...
-    return music_db;
-  }
-// TODO: Get the location from the config.
-#if defined(__APPLE__)
-  fs::path root = "/Volumes/DDrive$/Audio/Sorted";
-#else
-  std::string home = getenv(user_root);
-  fs::path root = fs::path(home) / "Music";
-#endif
-  if (!fs::exists(root)) {
-    std::cerr << "Music directory does not exist: " << root.string()
-              << std::endl;
-    return nullptr;
+  if (mdb) {
+    delete mdb;
+    mdb = nullptr;
   }
   mdb = new MusicDatabase();
-  mdb->addFileLocation(root);
-  music_db = new Shared::MusicDatabase(mdb->getDatabase());
-  return music_db;
-}
-
-void send_music_db(crow::websocket::connection& conn) {
-  // Send the music database to the client.
-  Shared::MusicDatabase* db = get_music_db();
-  if (!db) {
-    std::cerr << "Failed to get music database!" << std::endl;
-    return;
+  for (const auto& loc : locations) {
+    mdb->addFileLocation(loc);
   }
-  std::ostringstream oss;
-  oss << static_cast<uint64_t>(Shared::SocketMsg::MusicDBUpdate) << ";"
-      << to_json(*db).dump();
-
-  conn.send_text(oss.str());
 }
 
 MusicDatabase::~MusicDatabase() {
@@ -85,6 +47,18 @@ MusicDatabase::~MusicDatabase() {
     delete metadata_cache;
     metadata_cache = nullptr;
   }
+}
+
+std::string MusicDatabase::getNewSongKey() {
+  return "S" + std::to_string(song_key_counter++);
+}
+
+std::string MusicDatabase::getNewArtistKey() {
+  return "R" + std::to_string(artist_key_counter++);
+}
+
+std::string MusicDatabase::getNewAlbumKey() {
+  return "L" + std::to_string(album_key_counter++);
 }
 
 bool MusicDatabase::addFileLocation(const std::filesystem::path& root) {
@@ -107,17 +81,17 @@ bool MusicDatabase::addFileLocation(const std::filesystem::path& root) {
   });
   return true;
 }
-bool MusicDatabase::removeFileLocation(const std::filesystem::path& str) {
+
+bool MusicDatabase::removeFileLocation(const std::filesystem::path&) {
   // NYI
   return false;
 }
 
-std::vector<std::string> MusicDatabase::getLocations() const {
+std::vector<std::filesystem::path> MusicDatabase::getLocations() const {
   if (audioIndex) {
-    return std::vector<std::string>{
-        audioIndex->get_location().generic_string()};
+    return std::vector<std::filesystem::path>{audioIndex->get_location()};
   }
-  return std::vector<std::string>{};
+  return std::vector<std::filesystem::path>{};
 }
 
 std::string MusicDatabase::normalized_path(const std::filesystem::path& p) {
@@ -132,7 +106,7 @@ Shared::ArtistKey MusicDatabase::getOrCreateArtist(
     return it->second;
   }
 
-  Shared::ArtistKey newKey = "R" + std::to_string(artist_name_to_key.size());
+  Shared::ArtistKey newKey = getNewArtistKey();
   artist_name_to_key[artistName] = newKey;
   Shared::Artist artistEntry;
   artistEntry.key = newKey;
@@ -162,8 +136,7 @@ Shared::AlbumKey MusicDatabase::getOrCreateAlbum(
   if (it != album_year_artist_to_key.end()) {
     return it->second;
   }
-  Shared::AlbumKey newKey =
-      "L" + std::to_string(album_year_artist_to_key.size());
+  Shared::AlbumKey newKey = getNewAlbumKey();
   album_year_artist_to_key[keyTuple] = newKey;
   Shared::Album albumEntry;
   albumEntry.key = newKey;
@@ -192,7 +165,7 @@ void MusicDatabase::addSongToDB(const fs::path& song) {
 
   // First, create the SongKey:
   auto pathKey = normalized_path(song);
-  Shared::SongKey skey = "S" + std::to_string(path_to_songkey.size());
+  Shared::SongKey skey = getNewSongKey();
   path_to_songkey[pathKey] = skey;
   songkey_to_path[skey] = pathKey;
 

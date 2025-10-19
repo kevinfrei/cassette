@@ -2,7 +2,11 @@
 #define MUSICDB_HPP
 #pragma once
 
+#include <cctype>
 #include <filesystem>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 #include <crow.h>
 
@@ -12,9 +16,6 @@
 #include "tuple_hash.hpp"
 
 namespace musicdb {
-
-Shared::MusicDatabase* get_music_db();
-void send_music_db(crow::websocket::connection& conn);
 
 using AlbumTriple = std::tuple<std::string, std::int16_t, std::string>;
 
@@ -30,7 +31,7 @@ class MusicDatabase {
   std::hash<std::string> hasher;
 
   std::unordered_map<std::string, Shared::SongKey> path_to_songkey;
-  std::unordered_map<Shared::SongKey, std::string> songkey_to_path;
+  std::unordered_map<Shared::SongKey, std::filesystem::path> songkey_to_path;
 
   std::unordered_map<Shared::SongKey, Shared::Song> songs;
   std::unordered_map<Shared::ArtistKey, Shared::Artist> artists;
@@ -39,6 +40,13 @@ class MusicDatabase {
   std::unordered_map<std::string, Shared::ArtistKey> artist_name_to_key;
   std::unordered_map<AlbumTriple, Shared::AlbumKey, TupleHash>
       album_year_artist_to_key;
+
+  std::uint32_t song_key_counter = 0;
+  std::uint32_t artist_key_counter = 0;
+  std::uint32_t album_key_counter = 0;
+  std::string getNewSongKey();
+  std::string getNewArtistKey();
+  std::string getNewAlbumKey();
 
   static std::string normalized_path(const std::filesystem::path& p);
 
@@ -55,16 +63,17 @@ class MusicDatabase {
   ~MusicDatabase();
 
   // Database API
+  Shared::SongKey getSongFromPath(const std::filesystem::path& filepath);
   Shared::SongWithPath getSong(Shared::SongKey& key);
   Shared::Album getAlbum(Shared::AlbumKey& key);
   Shared::Artist getArtist(Shared::ArtistKey& key);
-  Shared::SongKey getSongFromPath(std::string& filepath);
+
   Shared::SearchResults searchIndex(bool substring, std::string& term);
 
   // "Implied" File Index stuff
   bool addFileLocation(const std::filesystem::path& str);
   bool removeFileLocation(const std::filesystem::path& str);
-  std::vector<std::string> getLocations() const;
+  std::vector<std::filesystem::path> getLocations() const;
 
   // Pictures
   void getAlbumPicture(const Shared::AlbumKey& key) const;
@@ -96,7 +105,7 @@ class MusicDatabase {
   bool refresh();
 
   // Metadata
-  bool updateMetadata(const std::string& fullPath,
+  bool updateMetadata(const std::filesystem::path& fullPath,
                       const Shared::FullMetadata& newMetadata);
   Shared::FullMetadata getMetadata(const std::string& fullPathOrKey) const;
   std::string getCanonicalFileName(const Shared::SongKey& song) const;
