@@ -160,15 +160,10 @@ bool file_index::read_index_file() {
   // Each line is expected to be a file path relative to loc.
   foreach_line_in_file(indexFile, [&](const std::string& line) {
     if (!line.empty()) {
-      /* fs::path filePath = loc / line;
-      if (fs::exists(filePath) && fs::is_regular_file(filePath)) {
-       */
-      add_new_file(loc / line);
-      /*
-      } else {
-        std::cerr << "Indexed file does not exist: " << filePath << "\n";
-      }
-      */
+      // The text file is UTF-8, so we can safely reinterpret it as char8_t.
+      const std::u8string_view sv =
+          reinterpret_cast<const char8_t*>(line.c_str());
+      add_new_file(loc / sv);
     }
   });
   return true;
