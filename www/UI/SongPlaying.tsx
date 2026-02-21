@@ -112,8 +112,9 @@ function MediaTimeSlider({
     },
     [audioRef, setMediaTimePercent],
   );
+  /*  
   useEffect(() => {
-    setTimeout(() => {
+    setInterval(() => {
       if (isValidRefObject<HTMLAudioElement>(audioRef)) {
         const currentTime = audioRef.current.currentTime;
         console.log(
@@ -126,6 +127,7 @@ function MediaTimeSlider({
       }
     }, 5000);
   }, [audioRef]);
+  */
   return (
     <Slider
       className="song-slider" /* Can't put an ID on a slider :( */

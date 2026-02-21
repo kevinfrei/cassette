@@ -21,8 +21,8 @@ std::string_view get_key(std::string_view data) {
 
 void read_from_storage(crow::response& resp, std::string_view data) {
   auto key = get_key(data);
-  std::cout << "Reading " << key << " from storage: <" << data << ">"
-            << std::endl;
+  // std::cout << "Reading " << key << " from storage: <" << data << ">"
+  //           << std::endl;
   auto result = config::read_from_storage(key);
   if (!result) {
     resp.code = 204; // No Content
@@ -30,8 +30,8 @@ void read_from_storage(crow::response& resp, std::string_view data) {
     resp.code = 200; // OK
     resp.set_header("Content-Type", "text/plain");
     resp.body = *result;
-    std::cout << "Read data for <" << key << "> from storage: <" << *result
-              << ">" << std::endl;
+    // std::cout << "Read data for <" << key << "> from storage: <" << *result
+    //           << ">" << std::endl;
   }
 }
 
@@ -49,8 +49,8 @@ void write_to_storage(crow::response& resp, std::string_view data) {
               << " in storage request: <" << data << ">" << std::endl;
     return;
   }
-  std::cout << "Writing data " << *maybe_value << " for " << key
-            << " to storage" << std::endl;
+  // std::cout << "Writing data " << *maybe_value << " for " << key
+  //           << " to storage" << std::endl;
   std::ostringstream os;
   os << *maybe_value;
   if (!config::write_to_storage(key, os.str())) {
@@ -62,8 +62,8 @@ void write_to_storage(crow::response& resp, std::string_view data) {
 
 void delete_from_storage(crow::response& resp, std::string_view data) {
   auto key = get_key(data);
-  std::cout << "Deleting " << key << " from storage: <" << data << ">"
-            << std::endl;
+  // std::cout << "Deleting " << key << " from storage: <" << data << ">"
+  //           << std::endl;
   if (!config::delete_from_storage(key)) {
     resp.code = 500; // Internal Server Error
   } else {

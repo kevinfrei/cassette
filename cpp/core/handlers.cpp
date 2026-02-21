@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include <crow.h>
@@ -80,7 +81,7 @@ crow::response images(const crow::request&, const std::string& /*path*/) {
   return resp;
 }
 
-crow::response tune(const crow::request&, const std::string& path) {
+crow::response tune(const crow::request& req, const std::string& path) {
   quitting::keep_alive();
   crow::response resp;
   auto maybe_song = tunes::get_tune(path);
@@ -88,16 +89,42 @@ crow::response tune(const crow::request&, const std::string& path) {
     tools::e404(resp, "Tune not found");
     return resp;
   }
+  /*
+  A minimal implementation needs to:
+  Parse the Range header
+  Compute the correct byte offsets
+  Return 206 Partial Content
+  Include Content-Range and Accept-Ranges: bytes
+  Send only the requested slice of the file
+  */
+  std::cout << "Serving tune: " << maybe_song->generic_string() << std::endl;
+  std::cout << "Path: " << path << std::endl;
+  std::cout << "Request details: " << std::endl;
+  std::cout << req.raw_url << std::endl;
+  std::cout << "URL Params:" << std::endl;
+  std::cout << req.url_params << std::endl;
+  std::cout << "Body Params:" << std::endl;
+  std::cout << req.get_body_params() << std::endl;
+  for (const auto& header : req.headers) {
+    std::cout << "Header: " << header.first << " = " << header.second
+              << std::endl;
+  }
   const auto& song = maybe_song.value();
   resp.set_static_file_info_unsafe(song.generic_string());
   resp.set_header("Content-type", files::path_to_mime_type(song));
+  resp.set_header("Accept-Ranges", "bytes");
+  std::size_t fileSize = std::filesystem::file_size(song);
+  std::ostringstream o;
+  o << "bytes 0-" << fileSize - 1 << "/" << fileSize;
+  resp.set_header("Content-Range", o.str());
+  resp.code = 206; // Partial Content
   return resp;
 }
 
 crow::response api(const crow::request&, const std::string& path) {
   quitting::keep_alive();
 
-  std::cout << "API Path: " << path << std::endl;
+  // std::cout << "API Path: " << path << std::endl;
   crow::response resp;
   size_t slashPos = path.find('/');
   slashPos = (slashPos == path.npos) ? path.size() : slashPos;

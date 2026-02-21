@@ -55,6 +55,7 @@ function AudioElement({ audioRef }: AudioElementProps): ReactElement {
     },
     [setMediaTime],
   );
+  console.log('Auto element render');
   return (
     <audio
       // src={songKey !== '' ? '/tune/' + songKey : ''}

@@ -34,11 +34,12 @@ void ConfigureRoutes(crow::SimpleApp& app, const std::string& /*url*/) {
 int main(void) {
   setlocale(LC_ALL, ".UTF8");
   crow::SimpleApp app;
-
+  app.loglevel(crow::LogLevel::Warning);
   files::set_program_location();
 
   const uint16_t port = setup::get_random_port();
   std::string url = GetRootUrl();
+  std::cerr << "Starting server at " << url << " port " << port << std::endl;
   ConfigureRoutes(app, url);
   window::open(url);
   auto _a = app.port(port).multithreaded().run_async();

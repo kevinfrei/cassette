@@ -19,6 +19,7 @@ function ignore(view: CurrentView): boolean {
 }
 
 export function ViewSelector(): ReactElement {
+  return <>No view right now. Sorry.</>;
   const which = useAtomValue(curViewState);
   const [rendered, setRendered] = useState(new Set<CurrentView>([which]));
   // Let's see if I can speed this up a bit by not trying to render everything
