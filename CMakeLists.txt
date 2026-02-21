@@ -52,5 +52,17 @@ include(build/ConanLibImports.cmake)
 enable_testing()
 include(GoogleTest)
 
+# webview isn't on conan, or vcpkg, but this is how it says to use it
+include(FetchContent)
+FetchContent_Declare(
+  webview
+  GIT_REPOSITORY
+  https://github.com/webview/webview
+  GIT_TAG
+  0.12.0
+)
+FetchContent_MakeAvailable(webview)
+set(WEBVIEW_LIB webview::core)
+
 # The actual C++ project lives in the cpp/ subdirectory
 add_subdirectory(cpp)

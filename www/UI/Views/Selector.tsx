@@ -19,7 +19,19 @@ function ignore(view: CurrentView): boolean {
 }
 
 export function ViewSelector(): ReactElement {
-  return <>No view right now. Sorry.</>;
+  return (
+    <button
+      onClick={() =>
+        window.open(
+          'http://www.google.com',
+          '_blank',
+          'toolbar=0,location=0,menubar=0',
+        )
+      }>
+      Open Google
+    </button>
+  );
+  //return <>No view right now. Sorry.</>;
   const which = useAtomValue(curViewState);
   const [rendered, setRendered] = useState(new Set<CurrentView>([which]));
   // Let's see if I can speed this up a bit by not trying to render everything

@@ -15,4 +15,3 @@ set(PFD_LIB portable-file-dialogs::portable-file-dialogs)
 
 find_package(taglib REQUIRED)
 set(TAGLIB_LIB taglib::taglib)
-

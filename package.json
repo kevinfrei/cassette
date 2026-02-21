@@ -26,8 +26,14 @@
     "rtest": "bun run rcpp && cd build/Release && ctest",
     "tst": "bun run dtst",
     "test": "bun run dtst",
-    "drun": "./build/Debug/cpp/cassette",
-    "rrun": "./build/Release/cpp/cassette",
+    "drun": "bun run os drun",
+    "rrun": "bun run os rrun",
+    "drun:win": "cmd /c build\\\\Debug\\\\cpp\\\\cassette.exe",
+    "rrun:win": "cmd /c build\\\\Release\\\\cpp\\\\cassette.exe",
+    "drun:mac": "./build/Debug/cpp/cassette",
+    "rrun:mac": "./build/Release/cpp/cassette",
+    "drun:lin": "./build/Debug/cpp/cassette",
+    "rrun:lin": "./build/Release/cpp/cassette",
     "run": "bun run drun",
     "dbr": "bun run dbld && bun run drun",
     "rbr": "bun run rbld && bun run rrun",
@@ -35,7 +41,9 @@
     "typecheck": "tsc --noEmit",
     "typechk": "tsc --noEmit",
     "***": "Generate the TypeScript & C++ types from the Crow IDL definitions",
-    "gen": "crow-idl www/Shared/Definitions.ts -c:cpp/ipc/CommonTypes.hpp -t:www/Shared/CommonTypes.ts"
+    "gen": "crow-idl www/Shared/Definitions.ts -c:cpp/ipc/CommonTypes.hpp -t:www/Shared/CommonTypes.ts",
+    "*-*": "Helper to do OS-specific things",
+    "os": "bun run build/os.ts"
   },
   "dependencies": {
     "@fluentui/react": "^8.125.4",

@@ -81,6 +81,11 @@ crow::response images(const crow::request&, const std::string& /*path*/) {
   return resp;
 }
 
+// TODO: Make this actually validate the Range header
+bool validate_range_header(const std::string& range) {
+  return true;
+}
+
 crow::response tune(const crow::request& req, const std::string& path) {
   quitting::keep_alive();
   crow::response resp;
@@ -97,17 +102,14 @@ crow::response tune(const crow::request& req, const std::string& path) {
   Include Content-Range and Accept-Ranges: bytes
   Send only the requested slice of the file
   */
-  std::cout << "Serving tune: " << maybe_song->generic_string() << std::endl;
-  std::cout << "Path: " << path << std::endl;
-  std::cout << "Request details: " << std::endl;
-  std::cout << req.raw_url << std::endl;
-  std::cout << "URL Params:" << std::endl;
-  std::cout << req.url_params << std::endl;
-  std::cout << "Body Params:" << std::endl;
-  std::cout << req.get_body_params() << std::endl;
-  for (const auto& header : req.headers) {
-    std::cout << "Header: " << header.first << " = " << header.second
-              << std::endl;
+  const auto& range = req.headers.find("Range");
+  if (range != req.headers.end()) {
+    std::cout << "Range header: " << range->second << std::endl;
+    if (!validate_range_header(range->second)) {
+      // TODO: Handle actual ranges. For now, requesting a small part of
+      // the file can result in the entire file being sent, which is bad
+      // but better than nothing.
+    }
   }
   const auto& song = maybe_song.value();
   resp.set_static_file_info_unsafe(song.generic_string());

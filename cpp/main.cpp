@@ -1,6 +1,7 @@
 #include <chrono>
 #include <cstdint>
 #include <string>
+#include <thread>
 
 #include <crow.h>
 
@@ -33,23 +34,28 @@ void ConfigureRoutes(crow::SimpleApp& app, const std::string& /*url*/) {
 
 int main(void) {
   setlocale(LC_ALL, ".UTF8");
+
   crow::SimpleApp app;
   app.loglevel(crow::LogLevel::Warning);
   files::set_program_location();
 
   const uint16_t port = setup::get_random_port();
   std::string url = GetRootUrl();
-  std::cerr << "Starting server at " << url << " port " << port << std::endl;
+  std::cerr << "Starting server at " << url << std::endl;
   ConfigureRoutes(app, url);
+  std::thread server_thread(
+      [&app, port]() { app.port(port).multithreaded().run(); });
+  server_thread.detach(); // Allow it to run independently
+  // Wait for a while (this is dumb: I should be able to detect when the server
+  // is ready, but this is good enough for now)
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  // Block until the page is closed
+  std::cerr << "******************** Launching the browser..." << std::endl;
   window::open(url);
-  auto _a = app.port(port).multithreaded().run_async();
-  int i = 0;
-  while (!quitting::should_quit()) {
-    _a.wait_for(std::chrono::seconds(1));
-    quitting::loop_wait();
-    if (i++ % 5 == 0)
-      websocket::keep_alive();
-  }
+  std::cerr << "******************** Shutting down server..." << std::endl;
   app.stop();
+  if (server_thread.joinable()) {
+    server_thread.join();
+  }
   return 0;
 }
