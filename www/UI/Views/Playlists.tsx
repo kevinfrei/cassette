@@ -12,7 +12,7 @@ import { useDialogState } from '@freik/react-tools';
 import { hasFieldType, isDefined, isNumber, isUndefined } from '@freik/typechk';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
-import { ReactElement, useCallback, useState } from 'react';
+import { ReactElement, Suspense, useCallback, useState } from 'react';
 import { PlaylistName, Song, SongKey } from 'www/Shared/CommonTypes';
 import { useJotaiAsyncCallback, useJotaiCallback } from 'www/State/Helpers';
 import { MakeSetAtomFamily } from 'www/State/Hooks';
@@ -257,99 +257,105 @@ export function PlaylistView(): ReactElement {
     setSort,
   );
   return (
-    <div data-is-scrollable="true">
-      <ScrollablePane scrollbarVisibility={ScrollbarVisibility.always}>
-        <Dialogs.ConfirmationDialog
-          data={playlistDeleteData}
-          confirmFunc={deleteConfirmed}
-          title="Are you sure?"
-          text={`Do you really want to delete the playlist ${selected}?`}
-          yesText="Delete"
-          noText="Cancel"
-        />
-        <Dialogs.ConfirmationDialog
-          data={removeSongData}
-          confirmFunc={removeSongConfirmed}
-          title="Are you sure?"
-          text="Do you really want to remove the song from the playlist?"
-          yesText="Remove"
-          noText="Cancel"
-        />
-        <Dialogs.TextInput
-          data={renameData}
-          onConfirm={renameConfirmed}
-          title={`Rename ${selected}...`}
-          text="What would you like the playlist to be renamed to?"
-          initialValue={selected}
-          yesText="Rename"
-          noText="Cancel"
-        />
-        <DetailsList
-          items={expItems}
-          selectionMode={SelectionMode.none}
-          columns={expColumns}
-          groups={groups}
-          onRenderRow={altRowRenderer()}
-          compact={true}
-          onItemInvoked={onPlaylistInvoked}
-          groupProps={detailGroupRenderer}
-          onRenderDetailsHeader={StickyRenderDetailsHeader}
-          onItemContextMenu={(item?: ItemType, _index?: number, ev?: Event) => {
-            if (
-              ev &&
-              item &&
-              hasFieldType(ev, 'clientX', isNumber) &&
-              hasFieldType(ev, 'clientY', isNumber)
-            ) {
-              setSongContext({
-                data: item.key,
-                spot: { left: ev.clientX + 14, top: ev.clientY },
-              });
-            }
-            return false;
-          }}
-        />
-        <SongListMenu
-          context={playlistContext}
-          onClearContext={onClearPlaylist}
-          onGetSongList={onGetSongList}
-          onGetPlaylistName={(data: string) => data}
-          items={[
-            'add',
-            'rep',
-            {
-              key: 'rename',
-              text: `Rename "${playlistContext.data}"`,
-              iconProps: { iconName: 'Rename' },
-              onClick: () => {
-                setSelected(playlistContext.data);
-                showRename();
-                return true;
+    <Suspense fallback={<div className="loading-view">Loading...</div>}>
+      <div data-is-scrollable="true">
+        <ScrollablePane scrollbarVisibility={ScrollbarVisibility.always}>
+          <Dialogs.ConfirmationDialog
+            data={playlistDeleteData}
+            confirmFunc={deleteConfirmed}
+            title="Are you sure?"
+            text={`Do you really want to delete the playlist ${selected}?`}
+            yesText="Delete"
+            noText="Cancel"
+          />
+          <Dialogs.ConfirmationDialog
+            data={removeSongData}
+            confirmFunc={removeSongConfirmed}
+            title="Are you sure?"
+            text="Do you really want to remove the song from the playlist?"
+            yesText="Remove"
+            noText="Cancel"
+          />
+          <Dialogs.TextInput
+            data={renameData}
+            onConfirm={renameConfirmed}
+            title={`Rename ${selected}...`}
+            text="What would you like the playlist to be renamed to?"
+            initialValue={selected}
+            yesText="Rename"
+            noText="Cancel"
+          />
+          <DetailsList
+            items={expItems}
+            selectionMode={SelectionMode.none}
+            columns={expColumns}
+            groups={groups}
+            onRenderRow={altRowRenderer()}
+            compact={true}
+            onItemInvoked={onPlaylistInvoked}
+            groupProps={detailGroupRenderer}
+            onRenderDetailsHeader={StickyRenderDetailsHeader}
+            onItemContextMenu={(
+              item?: ItemType,
+              _index?: number,
+              ev?: Event,
+            ) => {
+              if (
+                ev &&
+                item &&
+                hasFieldType(ev, 'clientX', isNumber) &&
+                hasFieldType(ev, 'clientY', isNumber)
+              ) {
+                setSongContext({
+                  data: item.key,
+                  spot: { left: ev.clientX + 14, top: ev.clientY },
+                });
+              }
+              return false;
+            }}
+          />
+          <SongListMenu
+            context={playlistContext}
+            onClearContext={onClearPlaylist}
+            onGetSongList={onGetSongList}
+            onGetPlaylistName={(data: string) => data}
+            items={[
+              'add',
+              'rep',
+              {
+                key: 'rename',
+                text: `Rename "${playlistContext.data}"`,
+                iconProps: { iconName: 'Rename' },
+                onClick: () => {
+                  setSelected(playlistContext.data);
+                  showRename();
+                  return true;
+                },
               },
-            },
-            {
-              key: 'delete',
-              text: `Delete "${playlistContext.data}"`,
-              iconProps: { iconName: 'Delete' },
-              onClick: () => {
-                setSelected(playlistContext.data);
-                showPlaylistDelete();
+              {
+                key: 'delete',
+                text: `Delete "${playlistContext.data}"`,
+                iconProps: { iconName: 'Delete' },
+                onClick: () => {
+                  setSelected(playlistContext.data);
+                  showPlaylistDelete();
+                },
               },
-            },
-            {
-              key: 'unique',
-              text: 'Remove Duplicates',
-              iconProps: { iconName: 'MergeDuplicate' },
-              onClick: onRemoveDupes,
-            },
-          ]}
-        />
-        <SongListMenu
-          context={songContext}
-          onClearContext={clearSongContext}
-          onGetSongList={(data) => [data]}
-        />
-      </ScrollablePane>
-    </div>
+              {
+                key: 'unique',
+                text: 'Remove Duplicates',
+                iconProps: { iconName: 'MergeDuplicate' },
+                onClick: onRemoveDupes,
+              },
+            ]}
+          />
+          <SongListMenu
+            context={songContext}
+            onClearContext={clearSongContext}
+            onGetSongList={(data) => [data]}
+          />
+        </ScrollablePane>
+      </div>
+    </Suspense>
   );
 }

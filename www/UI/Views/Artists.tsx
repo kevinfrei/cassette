@@ -13,7 +13,7 @@ import {
 import { MakeLog } from '@freik/logger';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
-import { ReactElement, useCallback, useState } from 'react';
+import { ReactElement, Suspense, useCallback, useState } from 'react';
 import {
   Album,
   AlbumKey,
@@ -222,27 +222,29 @@ export function GroupedAristList(): ReactElement {
   }
 
   return (
-    <div className="artistView" data-is-scrollable="true">
-      <ScrollablePane scrollbarVisibility={ScrollbarVisibility.always}>
-        <DetailsList
-          columns={columns}
-          compact
-          componentRef={(ref) => setDetailRef(ref)}
-          selectionMode={SelectionMode.none}
-          items={sortedSongs}
-          groups={groups}
-          groupProps={groupProps}
-          onItemContextMenu={onRightClick}
-          onItemInvoked={onAddSongClick}
-          onRenderDetailsHeader={StickyRenderDetailsHeader}
-          onRenderRow={altRowRenderer()}
-        />
-        <SongListMenu
-          context={artistContext}
-          onClearContext={resetArtistContext}
-          onGetSongList={onGetSongList}
-        />
-      </ScrollablePane>
-    </div>
+    <Suspense fallback={<div className="loading-view">Loading...</div>}>
+      <div className="artistView" data-is-scrollable="true">
+        <ScrollablePane scrollbarVisibility={ScrollbarVisibility.always}>
+          <DetailsList
+            columns={columns}
+            compact
+            componentRef={(ref) => setDetailRef(ref)}
+            selectionMode={SelectionMode.none}
+            items={sortedSongs}
+            groups={groups}
+            groupProps={groupProps}
+            onItemContextMenu={onRightClick}
+            onItemInvoked={onAddSongClick}
+            onRenderDetailsHeader={StickyRenderDetailsHeader}
+            onRenderRow={altRowRenderer()}
+          />
+          <SongListMenu
+            context={artistContext}
+            onClearContext={resetArtistContext}
+            onGetSongList={onGetSongList}
+          />
+        </ScrollablePane>
+      </div>
+    </Suspense>
   );
 }

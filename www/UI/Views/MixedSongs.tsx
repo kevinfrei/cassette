@@ -8,7 +8,7 @@ import {
 import { MakeLog } from '@freik/logger';
 import { isNumber } from '@freik/typechk';
 import { atom, useAtom, useAtomValue } from 'jotai';
-import { ReactElement, useCallback } from 'react';
+import { ReactElement, Suspense, useCallback } from 'react';
 import { Song, SongKey } from 'www/Shared/CommonTypes';
 import { allAlbumsState } from 'www/State/Albums';
 import { AddSongs } from 'www/State/API';
@@ -94,27 +94,29 @@ export function MixedSongsList(): ReactElement {
     setSortOrder,
   );
   return (
-    <div className="songView" data-is-scrollable="true">
-      <ScrollablePane scrollbarVisibility={ScrollbarVisibility.auto}>
-        <DetailsList
-          items={sortedItems}
-          columns={columns}
-          compact={true}
-          selectionMode={SelectionMode.none}
-          onRenderRow={altRowRenderer()}
-          onRenderDetailsHeader={StickyRenderDetailsHeader}
-          onItemContextMenu={onRightClick}
-          onItemInvoked={onAddSongClick}
-        />
-        <SongListMenu
-          context={songContext}
-          onClearContext={() =>
-            setSongContext({ data: '', spot: { left: 0, top: 0 } })
-          }
-          onGetSongList={(data) => (data.length > 0 ? [data] : [])}
-        />
-      </ScrollablePane>
-    </div>
+    <Suspense fallback={<div className="loading-view">Loading...</div>}>
+      <div className="songView" data-is-scrollable="true">
+        <ScrollablePane scrollbarVisibility={ScrollbarVisibility.auto}>
+          <DetailsList
+            items={sortedItems}
+            columns={columns}
+            compact={true}
+            selectionMode={SelectionMode.none}
+            onRenderRow={altRowRenderer()}
+            onRenderDetailsHeader={StickyRenderDetailsHeader}
+            onItemContextMenu={onRightClick}
+            onItemInvoked={onAddSongClick}
+          />
+          <SongListMenu
+            context={songContext}
+            onClearContext={() =>
+              setSongContext({ data: '', spot: { left: 0, top: 0 } })
+            }
+            onGetSongList={(data) => (data.length > 0 ? [data] : [])}
+          />
+        </ScrollablePane>
+      </div>
+    </Suspense>
   );
 }
 

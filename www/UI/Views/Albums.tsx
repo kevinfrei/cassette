@@ -14,7 +14,7 @@ import { MakeLog } from '@freik/logger';
 import { hasFieldType, isDefined, isNumber } from '@freik/typechk';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
-import { ReactElement, useCallback, useState } from 'react';
+import { ReactElement, Suspense, useCallback, useState } from 'react';
 import { AlbumKey, CurrentView, Song } from 'www/Shared/CommonTypes';
 import { AddSongs, dataForAlbumByKey } from 'www/State/API';
 import { useJotaiCallback } from 'www/State/Helpers';
@@ -183,27 +183,29 @@ export function GroupedAlbumList(): ReactElement {
     detailRef.focusIndex(index);
   }
   return (
-    <div className="songListForAlbum" data-is-scrollable="true">
-      <ScrollablePane scrollbarVisibility={ScrollbarVisibility.always}>
-        <DetailsList
-          componentRef={(ref) => setDetailRef(ref)}
-          items={sortedSongs}
-          selectionMode={SelectionMode.none}
-          groups={groups}
-          columns={columns}
-          compact
-          onRenderRow={altRowRenderer()}
-          onRenderDetailsHeader={StickyRenderDetailsHeader}
-          onItemContextMenu={onRightClick}
-          onItemInvoked={onAddSongClick}
-          groupProps={groupProps}
-        />
-        <SongListMenu
-          context={albumContext}
-          onClearContext={resetAlbumContext}
-          onGetSongList={onGetSongList}
-        />
-      </ScrollablePane>
-    </div>
+    <Suspense fallback={<div className="loading-view">Loading...</div>}>
+      <div className="songListForAlbum" data-is-scrollable="true">
+        <ScrollablePane scrollbarVisibility={ScrollbarVisibility.always}>
+          <DetailsList
+            componentRef={(ref) => setDetailRef(ref)}
+            items={sortedSongs}
+            selectionMode={SelectionMode.none}
+            groups={groups}
+            columns={columns}
+            compact
+            onRenderRow={altRowRenderer()}
+            onRenderDetailsHeader={StickyRenderDetailsHeader}
+            onItemContextMenu={onRightClick}
+            onItemInvoked={onAddSongClick}
+            groupProps={groupProps}
+          />
+          <SongListMenu
+            context={albumContext}
+            onClearContext={resetAlbumContext}
+            onGetSongList={onGetSongList}
+          />
+        </ScrollablePane>
+      </div>
+    </Suspense>
   );
 }
