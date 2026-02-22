@@ -13,5 +13,9 @@ set(GTEST_LIB gtest::gtest)
 find_package(portable-file-dialogs REQUIRED)
 set(PFD_LIB portable-file-dialogs::portable-file-dialogs)
 
+find_package(zstd REQUIRED)
+set(ZSTD_LIB zstd::libzstd_static)
+
 find_package(taglib REQUIRED)
 set(TAGLIB_LIB taglib::taglib)
+

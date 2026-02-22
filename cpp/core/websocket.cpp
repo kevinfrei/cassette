@@ -20,7 +20,8 @@ void configure(crow::SimpleApp& app) {
       })
       .onmessage(handlers::socket_message)
       .onclose([&](crow::websocket::connection& conn,
-                   const std::string& reason /*, uint16_t code*/) {
+                   const std::string& reason,
+                   uint16_t /*code*/) {
         std::cout << "WebSocket connection closed from " << conn.get_remote_ip()
                   << " with reason: "
                   << reason /* << " and code " << code */ << std::endl;
