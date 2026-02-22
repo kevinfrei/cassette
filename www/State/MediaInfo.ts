@@ -1,7 +1,7 @@
 import { MakeLog } from '@freik/logger';
 import { Fail } from '@freik/react-tools';
 import { atom, Atom } from 'jotai';
-import { atomFamily } from 'jotai/utils';
+import { atomFamily } from 'jotai-family';
 import {
   chkMediaInfo,
   IpcCall,

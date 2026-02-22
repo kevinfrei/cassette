@@ -1,7 +1,7 @@
 import { isAlbumKey, isArtistKey, isSongKey } from '@freik/media-core';
 import { Fail } from '@freik/react-tools';
 import { atom, Atom } from 'jotai';
-import { atomFamily } from 'jotai/utils';
+import { atomFamily } from 'jotai-family';
 import { AlbumKey, ArtistKey, MediaKey, SongKey } from 'www/Shared/CommonTypes';
 import { albumByKey } from './Albums';
 import { artistByKey } from './Artists';

@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { atomFamily } from 'jotai/utils';
+import { atomFamily } from 'jotai-family';
 import { Album, AlbumKey, SongKey, VAType } from 'www/Shared/CommonTypes';
 import { albumByKey, allAlbumsState } from './Albums';
 import { artistStringStateFamily } from './Artists';
