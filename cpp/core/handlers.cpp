@@ -1,5 +1,7 @@
+#include <cctype>
 #include <filesystem>
 #include <iostream>
+#include <optional>
 #include <sstream>
 #include <string>
 
@@ -82,8 +84,37 @@ crow::response images(const crow::request&, const std::string& /*path*/) {
 }
 
 // TODO: Make this actually validate the Range header
-bool validate_range_header(const std::string& range) {
-  return true;
+struct range_header {
+  std::uint64_t start;
+  std::uint64_t end;
+  bool start_present;
+  bool end_present;
+};
+
+std::optional<range_header> validate_range_header(const std::string& range) {
+  std::optional<range_header> res;
+  if (range.substr(0, 6) != "bytes=") {
+    return res;
+  }
+  size_t dashPos = range.find('-');
+  if (dashPos == std::string::npos) {
+    return res;
+  }
+  range_header rh;
+  rh.start_present = false;
+  rh.end_present = false;
+  if (dashPos > 6) {
+    rh.start = std::stoull(range.substr(6, dashPos - 6));
+    rh.start_present = true;
+  }
+  if (dashPos + 1 < range.size()) {
+    rh.end = std::stoull(range.substr(dashPos + 1));
+    rh.end_present = true;
+  }
+  if (rh.start_present || rh.end_present) {
+    res = rh;
+  }
+  return res;
 }
 
 crow::response tune(const crow::request& req, const std::string& path) {
@@ -103,21 +134,46 @@ crow::response tune(const crow::request& req, const std::string& path) {
   Send only the requested slice of the file
   */
   const auto& range = req.headers.find("Range");
+  range_header rh;
   if (range != req.headers.end()) {
     std::cout << "Range header: " << range->second << std::endl;
-    if (!validate_range_header(range->second)) {
-      // TODO: Handle actual ranges. For now, requesting a small part of
-      // the file can result in the entire file being sent, which is bad
-      // but better than nothing.
+    auto maybe_range = validate_range_header(range->second);
+    if (!maybe_range.has_value()) {
+      // TODO: Handle weirder ranges?
+      resp.code = 416;
+      return resp;
+    } else {
+      rh = maybe_range.value();
     }
   }
   const auto& song = maybe_song.value();
+  // TODO: Get the file size, check to see we can send the amount requested.
+  // If we can, go ahead & send it.
+  // Common case: Safari asks for 0-1 for audio files, presumably to detect
+  // the total file size?
+  if (rh.start_present && rh.end_present && rh.start == 0 && rh.end == 1) {
+    // Send the two starting bytes for 'song':
+    std::ifstream file(song, std::ios::binary);
+    if (file.is_open()) {
+      char buffer[2];
+      file.read(buffer, 2);
+      resp.body = std::string(buffer, 2);
+      resp.code = 206;
+      resp.set_header("Content-Type", files::path_to_mime_type(song));
+      resp.set_header("Accept-Ranges", "bytes");
+      resp.set_header(
+          "Content-Range",
+          "bytes 0-1/" + std::to_string(std::filesystem::file_size(song)));
+      return resp;
+    }
+  }
   resp.set_static_file_info_unsafe(song.generic_string());
   resp.set_header("Content-type", files::path_to_mime_type(song));
   resp.set_header("Accept-Ranges", "bytes");
   std::size_t fileSize = std::filesystem::file_size(song);
   std::ostringstream o;
   o << "bytes 0-" << fileSize - 1 << "/" << fileSize;
+  std::cout << o.str() << std::endl;
   resp.set_header("Content-Range", o.str());
   resp.code = 206; // Partial Content
   return resp;
