@@ -1,7 +1,7 @@
 import { isAlbumKey, isArtistKey } from '@freik/media-core';
 import { isArrayOfString, isBoolean } from '@freik/typechk';
 import { atom } from 'jotai';
-import { atomFamily } from 'jotai/utils';
+import { atomFamily } from 'jotai-family';
 import {
   AlbumKey,
   ArtistKey,
