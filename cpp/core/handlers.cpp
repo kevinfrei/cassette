@@ -20,7 +20,7 @@
 
 namespace handlers {
 
-crow::response file_path(const crow::request&, const std::string& path) {
+crow::response www_path(const crow::request&, const std::string& path) {
   quitting::keep_alive();
 
   std::cout << "Path: " << path << std::endl;
