@@ -21,7 +21,7 @@ void ConfigureRoutes(crow::SimpleApp& app, const std::string& /*url*/) {
   // Define the routes:
   // Try a websocket route:
   websocket::configure(app);
-  CROW_ROUTE(app, "/www/<path>")(handlers::file_path);
+  CROW_ROUTE(app, "/www/<path>")(handlers::www_path);
   CROW_ROUTE(app, "/api/<path>")(handlers::api);
   CROW_ROUTE(app, "/tune/<path>")(handlers::tune);
   CROW_ROUTE(app, "/images/<path>")(handlers::images);
