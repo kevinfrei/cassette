@@ -19,3 +19,6 @@ set(ZSTD_LIB zstd::libzstd_static)
 find_package(taglib REQUIRED)
 set(TAGLIB_LIB taglib::taglib)
 
+find_package(reproc++ REQUIRED)
+set(REPROC_LIB reproc::reproc)
+

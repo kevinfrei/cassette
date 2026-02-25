@@ -13,6 +13,7 @@ add_library(
     quitting.cpp
     setup.cpp
     tools.cpp
+    transpile.cpp
     tunes.cpp
     websocket.cpp
     window.cpp
@@ -30,6 +31,7 @@ target_link_libraries(
     ${BOOST_LIB}
     ${CROW_LIB}
     ${PFD_LIB}
+    ${REPROC_LIB}
     ${WEBVIEW_LIB}
 )
 
