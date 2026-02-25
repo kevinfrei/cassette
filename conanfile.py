@@ -36,6 +36,8 @@ libraries = [
     # Library("libmediainfo", "22.03", CMakeInfo("MediaInfoLib", "mediainfo", "MEDIAINFO_LIB")),
     Library("zstd", "1.5.7", CMakeInfo("zstd", "zstd::libzstd_static")),
     Library("taglib", "2.0", CMakeInfo("taglib", "taglib::taglib")),
+    Library("reproc", "14.2.5", CMakeInfo("reproc++", "reproc::reproc", "REPROC_LIB")),
+    Library("efsw", "1.5.1"),
 ]
 
 # I don't think I want anything other than just the pair for these
