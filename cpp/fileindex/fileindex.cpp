@@ -104,6 +104,9 @@ bool file_index::belongs_here(const fs::path& path) const {
 // Adds a new file to the index (if it doesn't already exist). Don't save
 // anything, just update the in-memory structures.
 bool file_index::add_new_file(const fs::path& path) {
+  if (!belongs_here(path)) {
+    return false;
+  }
   std::string relPath = get_relative_path(path);
   if (!file_to_key.contains(relPath)) {
     FileKey key = make_file_key(relPath);
