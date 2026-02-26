@@ -1,6 +1,10 @@
 # A few little tools for everyone to use
 
-add_library(tools_lib STATIC hiddenfile.cpp text_normalization.cpp)
+add_library(
+  tools_lib
+  STATIC
+    hiddenfile.cpp lowercase.cpp text_normalization.cpp
+)
 target_include_directories(tools_lib PUBLIC include)
 # target_include_directories(tools_lib PRIVATE impl)
 

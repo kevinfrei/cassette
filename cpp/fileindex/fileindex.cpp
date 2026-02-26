@@ -14,6 +14,7 @@
 // and produce the music-db map.
 
 #include "CommonTypes.hpp"
+#include "lowercase.hpp"
 #include "text_normalization.hpp"
 
 #include "fileindex.hpp"
@@ -28,7 +29,7 @@ namespace {
 std::uint64_t base64_string_as_int(std::uint32_t val) {
   char buffer[sizeof(std::uint64_t)];
   int i = 0;
-  for (; i < 6 && val; i++) {
+  for (; i < 6 && (val || (i == 0)); i++) {
     buffer[i] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
             [val & 0x3f];
@@ -37,10 +38,6 @@ std::uint64_t base64_string_as_int(std::uint32_t val) {
   // Reverse the buffer:
   for (int j = 0; j < i / 2; j++) {
     std::swap(buffer[j], buffer[i - j - 1]);
-  }
-  if (!i) {
-    // Special case for zero:
-    buffer[i++] = 'A';
   }
   // Null-terminate the string:
   buffer[i] = '\0';
@@ -96,9 +93,13 @@ std::unordered_set<std::string> suffixes = {
     ".mp3", ".flac", ".wav", ".m4a", ".aac", ".wma", ".png", ".jpg"};
 
 bool file_index::belongs_here(const fs::path& path) const {
-  // Check if the path is within the index location.
-  return suffixes.contains(
-      fs::proximate(path, loc).extension().generic_string());
+  // Check if the path has a valid suffix, and is located within the location
+  // of the index. We use proximate here to get a path relative to the index
+  // location,
+  auto prox = fs::proximate(path, loc);
+  lowercase_extension(prox);
+  return prox.is_relative() &&
+         suffixes.find(prox.extension().string()) != suffixes.end();
 }
 
 // Adds a new file to the index (if it doesn't already exist). Don't save
@@ -230,7 +231,7 @@ void file_index::rescan_files(path_handler add_file, path_handler del_file) {
     } else if (belongs_here(thePath)) {
       const auto relativePath = get_relative_path(thePath);
       existingFiles.erase(relativePath);
-      if (file_to_key.contains(relativePath)) {
+      if (file_to_key.find(relativePath) != file_to_key.end()) {
         // File already indexed, skip it.
         continue;
       }
