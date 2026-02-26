@@ -56,7 +56,7 @@ class FileIndex : public ::testing::Test {
     remove_stuff();
   }
 
-  ~FileIndex() override {
+  virtual ~FileIndex() {
     restore_index();
     remove_stuff();
   }
