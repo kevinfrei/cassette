@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include "base64.hpp"
+#include "lowercase.hpp"
 #include "text_normalization.hpp"
 
 // clang-format off
@@ -17,7 +19,7 @@ constexpr uint8_t latin_chars[] = {
 };
 // clang-format on
 
-TEST(unicode, BasicNormalization) {
+TEST(Text, BasicNormalization) {
   // const char *input =
   // u8"ÀÁÂÃÄÅàáâãäåÈÉÊËèéêëÌÍÎÏìíîïÒÓÔÕÖØòóôõöøÙÚÛÜùúûüÇçÑñÝýÿ";
   const char* input = reinterpret_cast<const char*>(&latin_chars[0]);
@@ -42,4 +44,34 @@ TEST(unicode, BasicNormalization) {
     EXPECT_EQ(normalized[i], expected[i]);
   }
   EXPECT_TRUE(normalized == expected);
+}
+
+TEST(Text, lowercasing) {
+  std::string input = "Hello, World!";
+  std::string expected = "hello, world!";
+  std::string result = lowercase(input);
+  EXPECT_EQ(result, expected);
+  EXPECT_EQ(lowercase(result), result);
+  std::filesystem::path p("C:\\Path\\To\\File.TXT");
+  std::filesystem::path expected_path("C:\\Path\\To\\File.txt");
+  lowercase_extension(p);
+  EXPECT_EQ(p, expected_path);
+}
+
+TEST(Text, Base64_silliness) {
+  std::uint32_t input = 2345678;
+  std::uint64_t result = base64_string_as_int(input);
+  std::string expected = "I8rO";
+  std::string result_str(reinterpret_cast<const char*>(&result));
+  EXPECT_EQ(result_str, expected);
+  input = 0;
+  result = base64_string_as_int(input);
+  expected = "A";
+  result_str = std::string(reinterpret_cast<const char*>(&result));
+  EXPECT_EQ(result_str, expected);
+  input = 1;
+  result = base64_string_as_int(input);
+  expected = "B";
+  result_str = std::string(reinterpret_cast<const char*>(&result));
+  EXPECT_EQ(result_str, expected);
 }
