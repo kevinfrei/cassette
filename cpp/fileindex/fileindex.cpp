@@ -14,29 +14,12 @@
 // and produce the music-db map.
 
 #include "CommonTypes.hpp"
-#include "lowercase.hpp"
-#include "text_normalization.hpp"
+#include "file_tools.hpp"
+#include "text_tools.hpp"
 
 #include "fileindex.hpp"
 
 namespace fs = std::filesystem;
-
-namespace {
-
-void foreach_line_in_file(const fs::path& filePath,
-                          const std::function<void(const std::string&)>& fn) {
-  std::ifstream file(filePath);
-  if (!file.is_open()) {
-    std::cerr << "Failed to open file: " << filePath << "\n";
-    return;
-  }
-  std::string line;
-  while (std::getline(file, line)) {
-    fn(line);
-  }
-}
-
-} // namespace
 
 file_index::file_index(const fs::path& _loc, bool update_index)
     : loc(std::filesystem::canonical(_loc)),
@@ -75,7 +58,7 @@ bool file_index::belongs_here(const fs::path& path) const {
   // of the index. We use proximate here to get a path relative to the index
   // location,
   auto prox = fs::proximate(path, loc);
-  lowercase_extension(prox);
+  files::lowercase_extension(prox);
   return prox.is_relative() &&
          suffixes.find(prox.extension().string()) != suffixes.end();
 }
@@ -119,7 +102,7 @@ std::string file_index::get_relative_path(const fs::path& path) const {
   //   std::cout << "Normalized: " << txtnorm::normalize_utf8_or_latin(str)
   //             << "\n";
   // }
-  return txtnorm::normalize_utf8_or_latin(str);
+  return text::normalize_utf8_or_latin(str);
 }
 
 bool file_index::read_index_file() {
@@ -140,7 +123,7 @@ bool file_index::read_index_file() {
 
   // For simplicity, we will just read the index file line by line.
   // Each line is expected to be a file path relative to loc.
-  foreach_line_in_file(indexFile, [&](const std::string& line) {
+  files::foreach_line_in_file(indexFile, [&](const std::string& line) {
     if (!line.empty()) {
       // The text file is UTF-8, so we can safely reinterpret it as char8_t.
       const std::u8string_view sv =
