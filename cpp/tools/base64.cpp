@@ -1,6 +1,8 @@
 #include <utility>
 
-#include "base64.hpp"
+#include "hacks.hpp"
+
+namespace hacks {
 
 // Base 64: A-Za-z0-9+/
 // My silly Base 64: A-Za-z0-9-_
@@ -24,3 +26,5 @@ std::uint64_t base64_string_as_int(std::uint32_t val) {
   std::uint64_t result = *reinterpret_cast<std::uint64_t*>(&buffer[0]);
   return result;
 }
+
+} // namespace hacks

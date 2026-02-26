@@ -2,9 +2,9 @@
 #include <string>
 #include <string_view>
 
-#include "text_normalization.hpp"
+#include "text_tools.hpp"
 
-namespace txtnorm {
+namespace text {
 
 constexpr char32_t COMBINING_GRAVE = 0x0300;
 constexpr char32_t COMBINING_ACUTE = 0x0301;
@@ -389,4 +389,14 @@ std::string normalize_utf8_or_latin(std::string_view input) {
   return result;
 }
 
-} // namespace txtnorm
+// Just lowercase an ASCII string
+std::string lowercase(std::string_view str) {
+  std::string result;
+  result.reserve(str.size());
+  for (char c : str) {
+    result += toggle_lower(c);
+  }
+  return result;
+}
+
+} // namespace text

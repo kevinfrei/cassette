@@ -2,9 +2,9 @@
 
 #include <gtest/gtest.h>
 
-#include "base64.hpp"
-#include "lowercase.hpp"
-#include "text_normalization.hpp"
+#include "file_tools.hpp"
+#include "hacks.hpp"
+#include "text_tools.hpp"
 
 // clang-format off
 constexpr uint8_t latin_chars[] = {
@@ -33,7 +33,7 @@ TEST(Text, BasicNormalization) {
       u8"o\u0300o\u0301o\u0302o\u0303o\u0308o\u0337"
       u8"U\u0300U\u0301U\u0302U\u0308u\u0300u\u0301u\u0302u\u0308"
       u8"C\u0327c\u0327N\u0303n\u0303"); // Y\u0301y\u0301 ");
-  std::string normalized = txtnorm::normalize_latin_to_utf8(input);
+  std::string normalized = text::normalize_latin_to_utf8(input);
   for (size_t i = 0; i < normalized.size(); i++) {
     if (normalized[i] != expected[i]) {
       std::cout << "Mismatch at " << i << ": expected '" << expected[i]
@@ -49,28 +49,28 @@ TEST(Text, BasicNormalization) {
 TEST(Text, lowercasing) {
   std::string input = "Hello, World!";
   std::string expected = "hello, world!";
-  std::string result = lowercase(input);
+  std::string result = text::lowercase(input);
   EXPECT_EQ(result, expected);
-  EXPECT_EQ(lowercase(result), result);
+  EXPECT_EQ(text::lowercase(result), result);
   std::filesystem::path p("C:\\Path\\To\\File.TXT");
   std::filesystem::path expected_path("C:\\Path\\To\\File.txt");
-  lowercase_extension(p);
+  files::lowercase_extension(p);
   EXPECT_EQ(p, expected_path);
 }
 
 TEST(Text, Base64_silliness) {
   std::uint32_t input = 2345678;
-  std::uint64_t result = base64_string_as_int(input);
+  std::uint64_t result = hacks::base64_string_as_int(input);
   std::string expected = "I8rO";
   std::string result_str(reinterpret_cast<const char*>(&result));
   EXPECT_EQ(result_str, expected);
   input = 0;
-  result = base64_string_as_int(input);
+  result = hacks::base64_string_as_int(input);
   expected = "A";
   result_str = std::string(reinterpret_cast<const char*>(&result));
   EXPECT_EQ(result_str, expected);
   input = 1;
-  result = base64_string_as_int(input);
+  result = hacks::base64_string_as_int(input);
   expected = "B";
   result_str = std::string(reinterpret_cast<const char*>(&result));
   EXPECT_EQ(result_str, expected);
