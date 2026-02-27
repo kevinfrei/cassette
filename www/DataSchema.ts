@@ -21,7 +21,7 @@ export type AlbumData = { title: string; year: number; artist: string };
 
 export function GetArtistString(artistList: Artist[]): string {
   if (artistList.length === 1) return artistList[0].name;
-  const artists = artistList;
+  const artists = [...artistList];
   const lastPart = ' & ' + (artists.pop()?.name || 'OOPS!');
   return artists.map((a) => a.name).join(', ') + lastPart;
 }

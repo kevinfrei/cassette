@@ -8,6 +8,7 @@ add_library(
     config.cpp
     files.cpp
     from_json.cpp
+    images.cpp
     handlers.cpp
     playlists.cpp
     quitting.cpp

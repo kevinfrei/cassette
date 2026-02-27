@@ -21,4 +21,3 @@ set(TAGLIB_LIB taglib::taglib)
 
 find_package(reproc++ REQUIRED)
 set(REPROC_LIB reproc::reproc)
-
