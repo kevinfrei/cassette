@@ -1,4 +1,3 @@
-#include <iostream>
 #include <string_view>
 
 #include <crow/http_response.h>
@@ -6,7 +5,9 @@
 
 #include "api.hpp"
 #include "config.hpp"
-#include "tools.hpp"
+#include "json_pickling.hpp"
+#include "playlists.hpp"
+// #include "tools.hpp"
 
 namespace api {
 
@@ -21,8 +22,7 @@ std::string_view get_key(std::string_view data) {
 
 void read_from_storage(crow::response& resp, std::string_view data) {
   auto key = get_key(data);
-  // std::cout << "Reading " << key << " from storage: <" << data << ">"
-  //           << std::endl;
+  CROW_LOG_INFO << "Reading " << key << " from storage: <" << data << ">";
   auto result = config::read_from_storage(key);
   if (!result) {
     resp.code = 204; // No Content
@@ -30,8 +30,8 @@ void read_from_storage(crow::response& resp, std::string_view data) {
     resp.code = 200; // OK
     resp.set_header("Content-Type", "text/plain");
     resp.body = *result;
-    // std::cout << "Read data for <" << key << "> from storage: <" << *result
-    //           << ">" << std::endl;
+    CROW_LOG_INFO << "Read data for <" << key << "> from storage: <" << *result
+                  << ">";
   }
 }
 
@@ -39,21 +39,13 @@ void write_to_storage(crow::response& resp, std::string_view data) {
   auto key = get_key(data);
   if (key.length() == data.length()) {
     // If the key is the same as the data, it means no slash was found
-    std::cerr << "Invalid (missing) data for key " << key
-              << " in storage request: <" << data << ">" << std::endl;
+    CROW_LOG_ERROR << "Invalid (missing) data for key " << key
+                   << " in storage request: <" << data << ">";
     return;
   }
-  auto maybe_value = tools::url_decode(data.substr(key.length() + 1));
-  if (!maybe_value) {
-    std::cerr << "Invalid (malformed) value for key " << key
-              << " in storage request: <" << data << ">" << std::endl;
-    return;
-  }
-  // std::cout << "Writing data " << *maybe_value << " for " << key
-  //           << " to storage" << std::endl;
-  std::ostringstream os;
-  os << *maybe_value;
-  if (!config::write_to_storage(key, os.str())) {
+  auto value = data.substr(key.length() + 1);
+  CROW_LOG_INFO << "Writing data " << value << " for " << key << " to storage";
+  if (!config::write_to_storage(key, value)) {
     resp.code = 500; // Internal Server Error
   } else {
     resp.code = 200; // OK
@@ -62,12 +54,38 @@ void write_to_storage(crow::response& resp, std::string_view data) {
 
 void delete_from_storage(crow::response& resp, std::string_view data) {
   auto key = get_key(data);
-  // std::cout << "Deleting " << key << " from storage: <" << data << ">"
-  //           << std::endl;
+  CROW_LOG_INFO << "Deleting " << key << " from storage: <" << data << ">";
   if (!config::delete_from_storage(key)) {
     resp.code = 500; // Internal Server Error
   } else {
     resp.code = 200; // OK
+  }
+}
+
+void get_playlists(crow::response& resp) {
+  CROW_LOG_INFO << "Getting playlists from storage";
+  auto result = playlist::get_names();
+  if (!result) {
+    resp.code = 204; // No Content
+  } else {
+    resp.code = 200; // OK
+    resp.set_header("Content-Type", "application/json");
+    resp.body = to_json(*result).dump();
+    CROW_LOG_INFO << "Got playlists from storage: <" << resp.body << ">";
+  }
+}
+
+void load_playlist(crow::response& resp, std::string_view name) {
+  CROW_LOG_INFO << "Loading playlist " << name;
+  auto result = playlist::load(name);
+  if (!result) {
+    resp.code = 204; // No Content
+  } else {
+    resp.code = 200; // OK
+    resp.set_header("Content-Type", "application/json");
+    resp.body = to_json(*result).dump();
+    CROW_LOG_INFO << "Loaded playlist " << name << " from storage: <"
+                  << resp.body << ">";
   }
 }
 

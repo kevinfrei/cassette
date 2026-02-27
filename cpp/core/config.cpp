@@ -86,8 +86,8 @@ fs::path get_persistence_path() {
     return res;
   }
   if (!fs::create_directories(res)) {
-    std::cerr << "Failed to create persistence directory: " << res.string()
-              << std::endl;
+    CROW_LOG_ERROR << "Failed to create persistence directory: "
+                   << res.string();
   }
   return res;
 }
@@ -148,15 +148,15 @@ bool write_to_storage(std::string_view key, std::string_view value) {
     write_lock lock(the_mutex);
     if (fs::exists(path_to_data)) {
       if (!fs::remove(path_to_data)) {
-        std::cerr << "Failed to remove existing file: " << path_to_data.string()
-                  << std::endl;
+        CROW_LOG_ERROR << "Failed to remove existing file: "
+                       << path_to_data.string();
         return false;
       }
     }
     std::ofstream out(path_to_data);
     if (!out) {
-      std::cerr << "Failed to open file for writing: " << path_to_data.string()
-                << std::endl;
+      CROW_LOG_ERROR << "Failed to open file for writing: "
+                     << path_to_data.string();
       return false;
     }
     out << value;
@@ -215,8 +215,7 @@ bool delete_from_storage(std::string_view key) {
       return false; // Key does not exist
     }
     if (!fs::remove(path_to_data)) {
-      std::cerr << "Failed to remove file: " << path_to_data.string()
-                << std::endl;
+      CROW_LOG_ERROR << "Failed to remove file: " << path_to_data.string();
       return false; // Failed to delete the file
     }
   }
@@ -238,8 +237,8 @@ void clear_storage() {
   if (fs::exists(path_to_data)) {
     write_lock lock(the_mutex);
     if (!fs::remove_all(path_to_data)) {
-      std::cerr << "Failed to clear storage directory: "
-                << path_to_data.string() << std::endl;
+      CROW_LOG_ERROR << "Failed to clear storage directory: "
+                     << path_to_data.string();
       return;
     }
   }
@@ -256,8 +255,8 @@ std::int32_t subscribe_to_change(std::string_view key,
   }
   listeners[key_str][next_listener_id] = callback;
   listening_keys.insert({next_listener_id, key_str});
-  // std::cout << "Subscribed to changes for key: " << key_str
-  //           << " with listener ID: " << next_listener_id << std::endl;
+  CROW_LOG_INFO << "Subscribed to changes for key: " << key_str
+                << " with listener ID: " << next_listener_id;
   return next_listener_id++;
 }
 
@@ -276,8 +275,8 @@ bool unsubscribe_from_change(std::int32_t listener_id) {
   if (listener == listeners_for_key->second.end()) {
     return false; // Listener ID not found for the key
   }
-  // std::cout << "Unsubscribed from changes for key: " << key
-  //           << " with listener ID: " << listener_id << std::endl;
+  CROW_LOG_INFO << "Unsubscribed from changes for key: " << key
+                << " with listener ID: " << listener_id;
   listeners_for_key->second.erase(listener);
   listening_keys.erase(lk);
   return true;

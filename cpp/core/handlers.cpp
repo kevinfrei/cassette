@@ -23,7 +23,7 @@ namespace handlers {
 crow::response www_path(const crow::request&, const std::string& path) {
   quitting::keep_alive();
 
-  std::cout << "Path: " << path << std::endl;
+  CROW_LOG_INFO << "Path: " << path;
   crow::response resp;
   std::filesystem::path p =
       files::get_web_dir() / (path.empty() ? "index.html" : path);
@@ -53,8 +53,8 @@ crow::response www_path(const crow::request&, const std::string& path) {
       resp.code = 200;
       resp.set_header("Content-Type", "text/html");
     } else {
-      std::cerr << "Placeholder not found in index.html file: "
-                << p.generic_string() << std::endl;
+      CROW_LOG_ERROR << "Placeholder not found in index.html file: "
+                     << p.generic_string();
       resp.code = 500;
       resp.body = "Internal Server Error";
       resp.set_header("Content-Type", "text/plain");
@@ -136,7 +136,7 @@ crow::response tune(const crow::request& req, const std::string& path) {
   const auto& range = req.headers.find("Range");
   range_header rh;
   if (range != req.headers.end()) {
-    std::cout << "Range header: " << range->second << std::endl;
+    CROW_LOG_INFO << "Range header: " << range->second;
     auto maybe_range = validate_range_header(range->second);
     if (!maybe_range.has_value()) {
       // TODO: Handle weirder ranges?
@@ -173,7 +173,7 @@ crow::response tune(const crow::request& req, const std::string& path) {
   std::size_t fileSize = std::filesystem::file_size(song);
   std::ostringstream o;
   o << "bytes 0-" << fileSize - 1 << "/" << fileSize;
-  std::cout << o.str() << std::endl;
+  CROW_LOG_DEBUG << o.str();
   resp.set_header("Content-Range", o.str());
   resp.code = 206; // Partial Content
   return resp;
@@ -182,18 +182,20 @@ crow::response tune(const crow::request& req, const std::string& path) {
 crow::response api(const crow::request&, const std::string& path) {
   quitting::keep_alive();
 
-  // std::cout << "API Path: " << path << std::endl;
+  CROW_LOG_DEBUG << "API Path: " << path;
   crow::response resp;
   size_t slashPos = path.find('/');
   slashPos = (slashPos == path.npos) ? path.size() : slashPos;
   auto maybeNum =
       tools::read_uint64_t(std::string_view{path.c_str(), slashPos});
   if (!maybeNum) {
+    CROW_LOG_ERROR << "Error 404: Invalid API arguments for path: " << path;
     tools::e404(resp, "Invalid API arguments");
     return resp;
   }
   Shared::IpcCall call = static_cast<Shared::IpcCall>(*maybeNum);
   if (!Shared::is_valid(call)) {
+    CROW_LOG_ERROR << "Error 404: Unknown API for path: " << path;
     tools::e404(resp, "Unknown API");
     return resp;
   }
@@ -201,12 +203,19 @@ crow::response api(const crow::request&, const std::string& path) {
       [&](std::function<void(crow::response&, std::string_view)> handle_call)
       -> void {
     if (slashPos == path.size()) {
+      CROW_LOG_ERROR << "Error 404: No data provided for API: " << path;
       tools::e404(resp, "No data provided for API");
     } else {
+      const std::string_view data{path.c_str() + slashPos + 1,
+                                  path.size() - slashPos - 1};
+      auto maybeDecoded = tools::url_decode(data);
+      if (!maybeDecoded) {
+        CROW_LOG_ERROR << "Error 404: Invalid URL encoding for API: " << path;
+        tools::e404(resp, "Invalid URL encoding for API");
+        return;
+      }
       resp.code = 200;
-      handle_call(resp,
-                  std::string_view{path.c_str() + slashPos + 1,
-                                   path.size() - slashPos - 1});
+      handle_call(resp, *maybeDecoded);
     }
   };
   switch (call) {
@@ -224,19 +233,31 @@ crow::response api(const crow::request&, const std::string& path) {
                            std::string_view{path.c_str() + slashPos + 1,
                                             path.size() - slashPos - 1});
       break;
+    case Shared::IpcCall::GetPlaylists:
+      api::get_playlists(resp);
+      break;
+    case Shared::IpcCall::LoadPlaylist:
+      ValidateAndCall(api::load_playlist);
+      break;
     default:
       if (Shared::is_valid(call)) {
-        std::cerr << "Unimplemented API call received: "
-                  << Shared::to_string(call) << " ("
-                  << static_cast<std::underlying_type_t<Shared::IpcCall>>(call)
-                  << ") [" << path << "]" << std::endl;
+        CROW_LOG_ERROR
+            << "Unimplemented API call received: " << Shared::to_string(call)
+            << " ("
+            << static_cast<std::underlying_type_t<Shared::IpcCall>>(call)
+            << ") [" << path << "]";
       } else {
-        std::cerr
+        CROW_LOG_ERROR
             << "Unknown API call received: " << static_cast<std::uint64_t>(call)
-            << " [" << path << "]" << std::endl;
+            << " [" << path << "]";
       }
-
-      tools::e404(resp, "Unknown/Unimplemented API call");
+      std::string error_message =
+          Shared::is_valid(call)
+              ? "Unimplemented API call: " +
+                    std::string(Shared::to_string(call))
+              : "Unknown API call: " +
+                    std::to_string(static_cast<std::uint64_t>(call));
+      tools::e404(resp, error_message);
       return resp;
   }
 
@@ -260,38 +281,39 @@ crow::response quit() {
 void socket_message(crow::websocket::connection& conn,
                     const std::string& data,
                     bool /* is_binary */) {
-  std::cout << "Got a message from the client:";
-  std::cout << data << std::endl;
+  CROW_LOG_INFO << "Got a message from the client:" << data;
   // Message is IpcMessage;[json-formatted array of arguments]
   size_t pos = data.find(';');
   if (pos == data.npos) {
-    std::cerr << "Invalid websocket message received: " << data << std::endl;
+    CROW_LOG_ERROR << "Invalid websocket message received: " << data;
     return;
   }
   auto maybeMsg = tools::read_uint64_t(std::string_view{data.c_str(), pos});
   if (!maybeMsg) {
-    std::cerr << "Invalid websocket message received: " << data << std::endl;
+    CROW_LOG_ERROR << "Invalid websocket message received: " << data;
     return;
   }
   Shared::SocketMsg msg = static_cast<Shared::SocketMsg>(*maybeMsg);
   if (!Shared::is_valid(msg)) {
-    std::cerr << "Invalid Socket message received: " << data << std::endl;
+    CROW_LOG_ERROR << "Invalid Socket message received: " << data;
     return;
   }
   // This is the only message we support *receiving* from the client
   switch (msg) {
     case Shared::SocketMsg::ManualRescan:
-      std::cout << "TODO: Implement ManualRescan" << std::endl;
+      CROW_LOG_ERROR << "TODO: Implement ManualRescan";
       break;
     case Shared::SocketMsg::ContentLoaded:
+      CROW_LOG_INFO << "Client finished loading content.\n"
+                    << "marking config as ready and sending music db";
       config::set_ready();
       tunes::send_music_db(conn);
       break;
     default: // Unsupported message
-      std::cerr << "Unsupported message received: " << Shared::to_string(msg)
-                << " ("
-                << static_cast<std::underlying_type_t<Shared::SocketMsg>>(msg)
-                << ") [" << data << "]" << std::endl;
+      CROW_LOG_ERROR
+          << "Unsupported message received: " << Shared::to_string(msg) << " ("
+          << static_cast<std::underlying_type_t<Shared::SocketMsg>>(msg)
+          << ") [" << data << "]";
   }
 }
 

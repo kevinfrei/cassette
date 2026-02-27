@@ -14,17 +14,17 @@ crow::websocket::connection* webSocket = nullptr;
 void configure(crow::SimpleApp& app) {
   CROW_WEBSOCKET_ROUTE(app, "/ws")
       .onopen([&](crow::websocket::connection& conn) -> void {
-        std::cout << "WebSocket connection opened from " << conn.get_remote_ip()
-                  << std::endl;
+        CROW_LOG_INFO << "WebSocket connection opened from "
+                      << conn.get_remote_ip();
         webSocket = &conn;
       })
       .onmessage(handlers::socket_message)
       .onclose([&](crow::websocket::connection& conn,
                    const std::string& reason,
                    uint16_t /*code*/) {
-        std::cout << "WebSocket connection closed from " << conn.get_remote_ip()
-                  << " with reason: "
-                  << reason /* << " and code " << code */ << std::endl;
+        CROW_LOG_INFO
+            << "WebSocket connection closed from " << conn.get_remote_ip()
+            << " with reason: " << reason /* << " and code " << code */;
         webSocket = nullptr;
       });
 }

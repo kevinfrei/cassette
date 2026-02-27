@@ -54,7 +54,7 @@ Shared::MusicDatabase* get_music_db() {
     auto maybe_roots = from_json<std::vector<std::string>>(
         crow::json::load(*maybe_roots_json));
     if (!maybe_roots || maybe_roots->empty()) {
-      std::cerr << "Failed to parse music locations from storage." << std::endl;
+      CROW_LOG_ERROR << "Failed to parse music locations from storage.";
       return nullptr;
     }
     for (const auto& root : *maybe_roots) {
@@ -71,8 +71,7 @@ Shared::MusicDatabase* get_music_db() {
   }
   for (const auto& root : roots) {
     if (!fs::exists(root)) {
-      std::cerr << "Music directory does not exist: " << root.string()
-                << std::endl;
+      CROW_LOG_ERROR << "Music directory does not exist: " << root.string();
     }
   }
   auto mdb = new musicdb::MusicDatabase();
@@ -87,7 +86,7 @@ void send_music_db(crow::websocket::connection& conn) {
   // Send the music database to the client.
   Shared::MusicDatabase* db = get_music_db();
   if (!db) {
-    std::cerr << "Failed to get music database!" << std::endl;
+    CROW_LOG_ERROR << "Failed to get music database!";
     return;
   }
   std::ostringstream oss;
