@@ -60,6 +60,9 @@ class CassetteRecipe(ConanFile):
               imports.append(f'set({var_name} {library.info.target})\n')
               imports.append('\n')
         file_location = os.path.join(self.recipe_folder, "build/ConanLibImports.cmake")
+        # Remove newlines from the end of the output:
+        while imports and imports[-1] == '\n':
+            imports.pop()
         if os.path.exists(file_location):
             # Check to see if the file is the same as what we're about to write, so we don't
             # unnecessarily trigger a camke reconfig
