@@ -24,21 +24,20 @@ class Library(NamedTuple):
 libraries = [
     Library("boost", "1.90.0", CMakeInfo("Boost", "boost::boost")),
     Library("crowcpp-crow", "1.3.0", CMakeInfo("Crow", "Crow::Crow")),
+    Library("efsw", "1.5.1"),
     Library("gtest", "1.17.0", CMakeInfo("GTest", "gtest::gtest")),
-    Library("portable-file-dialogs", "0.1.0", CMakeInfo("portable-file-dialogs", "portable-file-dialogs::portable-file-dialogs", "PFD_LIB")),
     # Library("libjpeg", "9f"),
+    # Using TagLib instead of this one:
+    # Library("libmediainfo", "22.03", CMakeInfo("MediaInfoLib", "mediainfo", "MEDIAINFO_LIB")),
     # Library("libpng", "1.6.48", CMakeInfo("PNG", "PNG::PNG")),
     # Library("libtiff", "4.7.0", CMakeInfo("TIFF", "TIFF::TIFF")),
-    # 4.2.0 doesn't work with the latest cmake, so I'll postpone this for now
-    # Library("platformfolders", "4.2.0", CMakeInfo("platform_folders", "sago::platform_folders", "PLATFORMFOLDERS_LIB")),
-    # Library("zlib", "1.3.1", CMakeInfo("ZLIB", "ZLIB::ZLIB")),
-    # Probiably only need one of these two:
-    # Library("libmediainfo", "22.03", CMakeInfo("MediaInfoLib", "mediainfo", "MEDIAINFO_LIB")),
-    Library("zstd", "1.5.7", CMakeInfo("zstd", "zstd::libzstd_static")),
-    Library("taglib", "2.0", CMakeInfo("taglib", "taglib::taglib")),
+    Library("platformfolders", "4.3.0", CMakeInfo("platform_folders", "sago::platform_folders", "PLATFORMFOLDERS_LIB")),
+    Library("portable-file-dialogs", "0.1.0", CMakeInfo("portable-file-dialogs", "portable-file-dialogs::portable-file-dialogs", "PFD_LIB")),
     Library("reproc", "14.2.5", CMakeInfo("reproc++", "reproc::reproc", "REPROC_LIB")),
-    Library("efsw", "1.5.1"),
-]
+    Library("taglib", "2.0", CMakeInfo("taglib", "taglib::taglib")),
+    # Library("zlib", "1.3.1", CMakeInfo("ZLIB", "ZLIB::ZLIB")),
+    Library("zstd", "1.5.7", CMakeInfo("zstd", "zstd::libzstd_static")),
+] 
 
 # I don't think I want anything other than just the pair for these
 tools = [] # [Library("doxygen", "1.14.0")]
