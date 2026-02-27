@@ -2,6 +2,7 @@
 
 #include <crow/http_request.h>
 #include <crow/http_response.h>
+#include <crow/websocket.h>
 
 namespace handlers {
 
@@ -14,4 +15,5 @@ crow::response quit();
 void socket_message(crow::websocket::connection& conn,
                     const std::string& data,
                     bool is_binary);
+
 } // namespace handlers

@@ -3,17 +3,20 @@ import { BuildOutput } from 'bun';
 import { BuildType, GetBuildType } from './buildtype';
 
 export function WebBuild(buildType: BuildType): Promise<BuildOutput> {
+  const isDebug = buildType === 'Debug';
   return Bun.build({
     entrypoints: ['www/index.html'],
     outdir: `build/${buildType}/www`,
-    minify: buildType !== 'Debug',
-    sourcemap: buildType === 'Debug' ? 'linked' : 'none',
+    minify: !isDebug,
+    sourcemap: isDebug ? 'inline' : 'none',
     target: 'browser',
     define: {
-      'process.env.NODE_ENV':
-        buildType === 'Debug' ? '"debug"' : '"production"',
+      'process.env.NODE_ENV': isDebug ? '"debug"' : '"production"',
     },
     env: 'BUN_PUBLIC_*',
+    splitting: isDebug,
+    // packages: isDebug ? 'external' : 'bundle',
+    //external: isDebug ? ['*']: [],
   });
 }
 

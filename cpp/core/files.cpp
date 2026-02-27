@@ -62,8 +62,7 @@ std::string path_to_mime_type(const fs::path& file_path) {
   } else if (extension == ".json") {
     return "application/json";
   }
-  std::cerr << "unknown: " << extension << ", reverting to text/html"
-            << std::endl;
+  CROW_LOG_ERROR << "unknown: " << extension << ", reverting to text/html";
   return "text/html";
 }
 
@@ -303,9 +302,9 @@ std::optional<std::string> read_file(fs::path file_path) {
 template <typename T>
 void show_opt(std::string_view name, const std::optional<T>& opt) {
   if (opt) {
-    std::cout << "  " << name << ": " << *opt << std::endl;
+    CROW_LOG_INFO << "  " << name << ": " << *opt;
   } else {
-    std::cout << "  " << name << ": <none>" << std::endl;
+    CROW_LOG_INFO << "  " << name << ": <none>";
   }
 }
 
@@ -315,46 +314,45 @@ void folder_picker(crow::response& resp, std::string_view data) {
   // conan file)
   auto res = tools::url_decode(data);
   if (res) {
-    std::cout << "Folder picker called with data: " << *res << std::endl;
+    CROW_LOG_INFO << "Folder picker called with data: " << *res;
     auto options = from_json<Shared::OpenDialogOptions>(crow::json::load(*res));
     if (options) {
-      std::cout << "Options: " << std::endl;
+      CROW_LOG_INFO << "Options: ";
       show_opt("folder", options->folder);
       show_opt("title", options->title);
       show_opt("defaultPath", options->defaultPath);
       show_opt("buttonLabel", options->buttonLabel);
       show_opt("multiSelections", options->multiSelections);
       if (options->filters) {
-        std::cout << "  filters: " << std::endl;
+        CROW_LOG_INFO << "  filters: ";
         for (const auto& filter : *options->filters) {
-          std::cout << "    name: " << filter.name << std::endl;
-          std::cout << "    extensions: ";
+          CROW_LOG_INFO << "    name: " << filter.name;
+          CROW_LOG_INFO << "    extensions: ";
           for (const auto& ext : filter.extensions) {
-            std::cout << ext << " ";
+            CROW_LOG_INFO << "      " << ext;
           }
-          std::cout << std::endl;
         }
       }
     }
   } else {
-    std::cout << "Folder picker called with bad data: " << data << std::endl;
+    CROW_LOG_ERROR << "Folder picker called with bad data: " << data;
   }
   auto result =
       pfd::select_folder("Select a folder", "", pfd::opt::none).result();
   if (result.empty()) {
-    std::cout << "Folder picker cancelled." << std::endl;
+    CROW_LOG_INFO << "Folder picker cancelled.";
     resp.code = 204; // No Content
     resp.body = "";
   } else {
-    std::cout << "Folder picker selected: " << result << std::endl;
+    CROW_LOG_INFO << "Folder picker selected: " << result;
     resp.code = 200; // OK
     resp.set_header("Content-Type", "text/plain");
     resp.body = to_json(std::vector<std::string>{result}).dump();
   }
   /*
   auto json = crow::json::load(*maybe_value);
-  std::cout << "Writing data " << json << " for " << key << " to storage"
-            << std::endl;
+  CROW_LOG_INFO << "Writing data " << json << " for " << key << " to storage"
+            ;
   std::ostringstream os;
   os << json;
   if (!config::write_to_storage(key, os.str())) {

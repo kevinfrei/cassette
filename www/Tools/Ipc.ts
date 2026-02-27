@@ -319,34 +319,33 @@ function encodeForCall(arg: unknown): string {
 }
 
 async function Get(endpoint: IpcCall, ...args: unknown[]): Promise<unknown> {
-  try {
-    const response = await fetch(
-      ['/api', endpoint.toString(10), ...args.map(encodeForCall)].join('/'),
-      {
-        method: 'GET',
-      },
-    );
-    if (response.ok) {
-      const contentType = response.headers.get('Content-Type');
-      const isJson = contentType && contentType.includes('json');
-      const isText = contentType && contentType.includes('text');
-      if (isJson || isText) {
-        const txt = await response.text();
-        if (txt.length === 0) {
-          return undefined;
-        }
-        return txt;
-      } else {
-        // console.log(
-        //   `Received non-JSON/text response from ${endpoint}, contentType: ${contentType}`,
-        // );
-        return await response.blob();
+  const response = await fetch(
+    ['/api', endpoint.toString(10), ...args.map(encodeForCall)].join('/'),
+    {
+      method: 'GET',
+    },
+  );
+  if (response.ok) {
+    const contentType = response.headers.get('Content-Type');
+    const isJson = contentType && contentType.includes('json');
+    const isText = contentType && contentType.includes('text');
+    if (isJson || isText) {
+      const txt = await response.text();
+      if (txt.length === 0) {
+        return undefined;
       }
+      return txt;
+    } else {
+      // console.log(
+      //   `Received non-JSON/text response from ${endpoint}, contentType: ${contentType}`,
+      // );
+      return await response.blob();
     }
-  } catch (err) {
-    return err;
   }
-  return { error: `Failed to fetch ${endpoint} with args: ${args.join(', ')}` };
+  return {
+    error: `Failed to fetch ${endpoint} with args: ${args.join(', ')}`,
+    response,
+  };
 }
 
 async function GetAs<T>(
@@ -381,6 +380,14 @@ async function GetAs<T>(
   return undefined;
 }
 
+async function Post(endpoint: IpcCall, ...args: unknown[]): Promise<void> {
+  try {
+    await Get(endpoint, ...args);
+  } catch (e) {
+    console.error(`Post failed for (${endpoint}, ${args.join(', ')}):`, e);
+  }
+}
+
 /**
  * @async
  * Call a remote function with type checking on the return value.
@@ -404,7 +411,7 @@ export async function PostMain(
   ...args: unknown[]
 ): Promise<void> {
   try {
-    await CallMain(channel, (a): a is void => true, ...args);
+    await Post(channel, ...args);
   } catch (e) {
     // Get the name of the IpcCall, cuz it's useful:
     const key = Object.keys(IpcCall).find(

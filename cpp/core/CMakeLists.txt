@@ -9,6 +9,7 @@ add_library(
     files.cpp
     from_json.cpp
     handlers.cpp
+    playlists.cpp
     quitting.cpp
     setup.cpp
     tools.cpp

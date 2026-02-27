@@ -138,6 +138,7 @@ export async function AddSongs(
   playlistName?: string,
   mstore?: MaybeStore,
 ): Promise<void> {
+  console.log('Adding a song: ', [...listToAdd]);
   const store = getStore(mstore);
   const songList = await store.get(songListState);
   if (songList.length === 0) {
