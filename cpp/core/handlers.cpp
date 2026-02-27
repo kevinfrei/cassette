@@ -11,12 +11,13 @@
 #include "api.hpp"
 #include "config.hpp"
 #include "files.hpp"
-#include "handlers.hpp"
-#include "musicdb.hpp"
+#include "images.hpp"
 #include "quitting.hpp"
 #include "setup.hpp"
 #include "tools.hpp"
 #include "tunes.hpp"
+
+#include "handlers.hpp"
 
 namespace handlers {
 
@@ -66,18 +67,10 @@ crow::response www_path(const crow::request&, const std::string& path) {
   return resp;
 }
 
-crow::response images(const crow::request&, const std::string& /*path*/) {
+crow::response images(const crow::request&, const std::string& query) {
   quitting::keep_alive();
   crow::response resp;
-  /*
-  std::filesystem::path p = files::get_web_dir() / "images" / path;
-  if (!std::filesystem::exists(p)) {
-    tools::e404(resp, "Image not found");
-    return resp;
-  }*/
-  // TODO: This is clearly bad & wrong, but I don't care right now.
-  std::filesystem::path p = config::get_home_path() / "src" / "cassette" /
-                            "www" / "img" / "album.svg";
+  std::filesystem::path p = image::get_image_path(query);
   resp.set_static_file_info_unsafe(p.generic_string());
   resp.set_header("Content-type", files::path_to_mime_type(p));
   return resp;

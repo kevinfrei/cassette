@@ -126,11 +126,11 @@ export function isValidRefObject<T>(
 }
 
 export function getAlbumImageUrl(albumKey: AlbumKey) {
-  return `pic://key/${albumKey}`;
+  return `/images/album/${albumKey}`;
 }
 
 export function getArtistImageUrl(artistKey: ArtistKey) {
-  return `pic://key/${artistKey}`;
+  return `/images/artist/${artistKey}`;
 }
 
 export function diskNumName(
