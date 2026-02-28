@@ -207,6 +207,15 @@ void MusicDatabase::addSongToDB(const fs::path& song) {
   }
 }
 
+std::optional<std::filesystem::path> MusicDatabase::getSongPath(
+    const Shared::SongKey& key) {
+  auto it = songkey_to_path.find(key);
+  if (it == songkey_to_path.end()) {
+    return std::nullopt;
+  }
+  return it->second;
+}
+
 Shared::MusicDatabase MusicDatabase::getDatabase() const {
   Shared::MusicDatabase db;
   db.songs = songs;

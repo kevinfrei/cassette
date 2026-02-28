@@ -13,6 +13,7 @@ namespace fs = std::filesystem;
 
 namespace {
 std::shared_mutex get_db_mutex;
+musicdb::MusicDatabase* mdb = nullptr;
 
 #if defined(_WIN32)
 const char* user_root = "USERPROFILE";
@@ -26,13 +27,17 @@ const char* user_root = "HOME";
 
 namespace tunes {
 
-std::optional<std::filesystem::path> get_tune(const std::string& path) {
+std::optional<std::filesystem::path> get_tune(const std::string& song_key) {
   // This function should return the path to the tune file if it exists.
   // For now, we will just simulate it.
-  if (path.empty() || !path.empty()) {
-    return config::get_home_path() / "song.m4a";
+  if (song_key.empty()) {
+    return std::nullopt;
   }
-  return std::nullopt;
+  auto* musicdb = get_music_db();
+  if (!musicdb) {
+    return std::nullopt;
+  }
+  return mdb->getSongPath(song_key);
 }
 
 Shared::MusicDatabase* get_music_db() {
@@ -74,7 +79,7 @@ Shared::MusicDatabase* get_music_db() {
       CROW_LOG_ERROR << "Music directory does not exist: " << root.string();
     }
   }
-  auto mdb = new musicdb::MusicDatabase();
+  mdb = new musicdb::MusicDatabase();
   for (const auto& root : roots) {
     mdb->addFileLocation(root);
   }

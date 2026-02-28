@@ -63,10 +63,12 @@ class MusicDatabase {
   ~MusicDatabase();
 
   // Database API
-  Shared::SongKey getSongFromPath(const std::filesystem::path& filepath);
-  Shared::SongWithPath getSong(Shared::SongKey& key);
-  Shared::Album getAlbum(Shared::AlbumKey& key);
-  Shared::Artist getArtist(Shared::ArtistKey& key);
+  std::optional<Shared::SongKey> getSongFromPath(
+      const std::filesystem::path& filepath);
+  std::optional<Shared::SongWithPath> getSong(const Shared::SongKey& key);
+  std::optional<std::filesystem::path> getSongPath(const Shared::SongKey& key);
+  std::optional<Shared::Album> getAlbum(const Shared::AlbumKey& key);
+  std::optional<Shared::Artist> getArtist(const Shared::ArtistKey& key);
 
   Shared::SearchResults searchIndex(bool substring, std::string& term);
 
