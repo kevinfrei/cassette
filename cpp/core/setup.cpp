@@ -66,7 +66,7 @@ void init() {
 
   // Configure the server in a separate thread
   theApp = new crow::SimpleApp();
-  theApp->loglevel(crow::LogLevel::Debug);
+  theApp->loglevel(crow::LogLevel::Warning);
   ConfigureRoutes(*theApp, url);
   server_thread = new std::thread(server_thread_func);
   server_thread->detach(); // Allow it to run independently

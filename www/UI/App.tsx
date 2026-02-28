@@ -2,7 +2,12 @@ import { Provider, useAtomValue, useSetAtom } from 'jotai';
 import { ReactElement, SyntheticEvent, useCallback, useRef } from 'react';
 import { KeepAlive } from 'www/KeepAlive';
 import { useJotaiAsyncCallback } from 'www/State/Helpers';
-import { mutedState, repeatState, songListState } from 'www/State/SongPlayback';
+import {
+  curSongKeyState,
+  mutedState,
+  repeatState,
+  songListState,
+} from 'www/State/SongPlayback';
 import { getStore } from 'www/State/Storage';
 import { MediaTime, mediaTimeState } from 'www/State/TimeState';
 import { MusicDbListener } from 'www/Tools/MusicDbListener';
@@ -19,6 +24,7 @@ import '../styles/App.css';
 type AudioElementProps = { audioRef: React.Ref<HTMLAudioElement> };
 
 function AudioElement({ audioRef }: AudioElementProps): ReactElement {
+  const songKey = useAtomValue(curSongKeyState);
   const setMediaTime = useSetAtom(mediaTimeState);
   const isMuted = useAtomValue(mutedState);
   const onEnded = useJotaiAsyncCallback(async (get, set) => {
@@ -58,8 +64,7 @@ function AudioElement({ audioRef }: AudioElementProps): ReactElement {
   console.log('Auto element render');
   return (
     <audio
-      // src={songKey !== '' ? '/tune/' + songKey : ''}
-      src={'/tune/song.m4a'}
+      src={songKey !== '' ? '/tune/' + songKey : ''}
       ref={audioRef}
       onEnded={onEnded}
       onTimeUpdate={onTimeUpdate}
