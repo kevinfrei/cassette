@@ -232,6 +232,9 @@ crow::response api(const crow::request&, const std::string& path) {
     case Shared::IpcCall::LoadPlaylist:
       ValidateAndCall(api::load_playlist);
       break;
+    case Shared::IpcCall::SavePlaylist:
+      ValidateAndCall(api::save_playlist);
+      break;
     default:
       if (Shared::is_valid(call)) {
         CROW_LOG_ERROR

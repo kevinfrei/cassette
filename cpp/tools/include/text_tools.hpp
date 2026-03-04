@@ -30,5 +30,6 @@ T toggle_lower(T c) {
 }
 
 std::string lowercase(std::string_view str);
+bool iequals(std::string_view lhs, std::string_view rhs);
 
 } // namespace text

@@ -12,6 +12,7 @@ using listening_function = std::function<void(std::optional<std::string_view>,
                                               std::optional<std::string_view>)>;
 
 std::filesystem::path get_path();
+std::filesystem::path get_playlist_path();
 
 bool write_to_storage(std::string_view key, std::string_view value);
 std::optional<std::string> read_from_storage(std::string_view key);

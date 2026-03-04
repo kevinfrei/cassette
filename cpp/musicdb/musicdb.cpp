@@ -115,7 +115,7 @@ Shared::ArtistKey MusicDatabase::getOrCreateArtist(
   return newKey;
 }
 
-Shared::AlbumKey MusicDatabase::getOrCreateAlbum(
+AlbumTriple MusicDatabase::makeAlbumTriple(
     const std::string& title,
     std::int16_t year,
     const std::vector<std::string>& artists,
@@ -131,7 +131,15 @@ Shared::AlbumKey MusicDatabase::getOrCreateAlbum(
       artistHashValue += artist + "|";
     }
   }
-  AlbumTriple keyTuple = {title, year, artistHashValue};
+  return AlbumTriple{title, year, artistHashValue};
+}
+
+Shared::AlbumKey MusicDatabase::getOrCreateAlbum(
+    const std::string& title,
+    std::int16_t year,
+    const std::vector<std::string>& artists,
+    Shared::VAType vaType) {
+  AlbumTriple keyTuple = makeAlbumTriple(title, year, artists, vaType);
   auto it = album_year_artist_to_key.find(keyTuple);
   if (it != album_year_artist_to_key.end()) {
     return it->second;

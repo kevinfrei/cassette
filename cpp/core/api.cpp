@@ -89,4 +89,9 @@ void load_playlist(crow::response& resp, std::string_view name) {
   }
 }
 
+void save_playlist(crow::response& resp, std::string_view name_and_keys) {
+  CROW_LOG_INFO << "TODO: Saving playlist " << name_and_keys;
+  resp.code = 200; // OK
+}
+
 } // namespace api

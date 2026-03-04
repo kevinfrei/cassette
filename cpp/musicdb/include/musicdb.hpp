@@ -53,10 +53,16 @@ class MusicDatabase {
   // Helpers for adding items to the DB
   void addSongToDB(const std::filesystem::path& item);
   Shared::ArtistKey getOrCreateArtist(const std::string& artistName);
+  std::optional<Shared::ArtistKey> getArtist(const std::string& artistName);
   Shared::AlbumKey getOrCreateAlbum(const std::string& title,
                                     std::int16_t year,
                                     const std::vector<std::string>& artists,
                                     Shared::VAType vaType);
+  std::optional<Shared::AlbumKey> getAlbum(
+      const std::string& title,
+      std::int16_t year,
+      const std::vector<std::string>& artists,
+      Shared::VAType vaType);
 
  public:
   MusicDatabase() : audioIndex(nullptr), metadata_cache(nullptr) {}
@@ -67,8 +73,12 @@ class MusicDatabase {
       const std::filesystem::path& filepath);
   std::optional<Shared::SongWithPath> getSong(const Shared::SongKey& key);
   std::optional<std::filesystem::path> getSongPath(const Shared::SongKey& key);
-  std::optional<Shared::Album> getAlbum(const Shared::AlbumKey& key);
-  std::optional<Shared::Artist> getArtist(const Shared::ArtistKey& key);
+  std::optional<Shared::Album> getAlbumFromKey(const Shared::AlbumKey& key);
+  AlbumTriple makeAlbumTriple(const std::string& title,
+                              std::int16_t year,
+                              const std::vector<std::string>& artists,
+                              Shared::VAType vaType);
+  std::optional<Shared::Artist> getArtistFromKey(const Shared::ArtistKey& key);
 
   Shared::SearchResults searchIndex(bool substring, std::string& term);
 
