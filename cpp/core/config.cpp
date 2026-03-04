@@ -82,12 +82,17 @@ fs::path get_path() {
 
 fs::path get_persistence_path() {
   fs::path res = get_path() / "persistence";
-  if (fs::exists(res)) {
-    return res;
-  }
-  if (!fs::create_directories(res)) {
+  if (!fs::exists(res) && !fs::create_directories(res)) {
     CROW_LOG_ERROR << "Failed to create persistence directory: "
                    << res.string();
+  }
+  return res;
+}
+
+fs::path get_playlist_path() {
+  fs::path res = get_persistence_path() / "playlists";
+  if (!fs::exists(res) && !fs::create_directories(res)) {
+    CROW_LOG_ERROR << "Failed to create playlists directory: " << res.string();
   }
   return res;
 }

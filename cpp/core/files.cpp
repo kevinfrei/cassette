@@ -310,32 +310,28 @@ void show_opt(std::string_view name, const std::optional<T>& opt) {
 
 void folder_picker(crow::response& resp, std::string_view data) {
   // TODO: Allow data to specify a title, default path or a platform path.
-  // For now, I'm waiting on platform folders to get updated (see the
-  // conan file)
-  auto res = tools::url_decode(data);
-  if (res) {
-    CROW_LOG_INFO << "Folder picker called with data: " << *res;
-    auto options = from_json<Shared::OpenDialogOptions>(crow::json::load(*res));
-    if (options) {
-      CROW_LOG_INFO << "Options: ";
-      show_opt("folder", options->folder);
-      show_opt("title", options->title);
-      show_opt("defaultPath", options->defaultPath);
-      show_opt("buttonLabel", options->buttonLabel);
-      show_opt("multiSelections", options->multiSelections);
-      if (options->filters) {
-        CROW_LOG_INFO << "  filters: ";
-        for (const auto& filter : *options->filters) {
-          CROW_LOG_INFO << "    name: " << filter.name;
-          CROW_LOG_INFO << "    extensions: ";
-          for (const auto& ext : filter.extensions) {
-            CROW_LOG_INFO << "      " << ext;
-          }
+  // Use the sago::platform_folders thing, as it's started working in Conan
+  // with 4.3.0
+  CROW_LOG_INFO << "Folder picker called with data: " << data;
+  auto options = from_json<Shared::OpenDialogOptions>(
+      crow::json::load(data.data(), data.size()));
+  if (options) {
+    CROW_LOG_INFO << "Options: ";
+    show_opt("folder", options->folder);
+    show_opt("title", options->title);
+    show_opt("defaultPath", options->defaultPath);
+    show_opt("buttonLabel", options->buttonLabel);
+    show_opt("multiSelections", options->multiSelections);
+    if (options->filters) {
+      CROW_LOG_INFO << "  filters: ";
+      for (const auto& filter : *options->filters) {
+        CROW_LOG_INFO << "    name: " << filter.name;
+        CROW_LOG_INFO << "    extensions: ";
+        for (const auto& ext : filter.extensions) {
+          CROW_LOG_INFO << "      " << ext;
         }
       }
     }
-  } else {
-    CROW_LOG_ERROR << "Folder picker called with bad data: " << data;
   }
   auto result =
       pfd::select_folder("Select a folder", "", pfd::opt::none).result();
