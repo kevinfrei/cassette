@@ -16,11 +16,11 @@ namespace {
 std::optional<Shared::SongKey> song_key_for_playlist_entry(
     std::string_view song_data) {
   // Get the music database and look up this particular song.
-  musicdb::MusicDatabase& db = musicdb::get_music_database();
+  // musicdb::MusicDatabase& db = musicdb::get_music_database();
+  return std::nullopt;
 }
 
-std::optional<std::string> playlist_entry_for_song_key(
-    const Shared::SongKey& key) {
+std::optional<std::string> playlist_entry_for_song_key(std::string_view key) {
   // For now, let's just return the key as the song data. In the future, we
   // should look up the song data for the given key.
   return std::string(key);
@@ -88,7 +88,7 @@ std::optional<std::vector<Shared::SongKey>> load(std::string_view name) {
   return keys;
 }
 
-void save(std::string_view name, const std::vector<Shared::SongKey>& keys) {
+void save(std::string_view name, const std::vector<std::string_view>& keys) {
   CROW_LOG_INFO << "Saving playlist " << name << " with keys: ";
   for (const auto& key : keys) {
     CROW_LOG_INFO << "  " << key;

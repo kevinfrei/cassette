@@ -11,5 +11,6 @@ void delete_from_storage(crow::response& resp, std::string_view data);
 
 void get_playlists(crow::response& resp);
 void load_playlist(crow::response& resp, std::string_view name);
+void save_playlist(crow::response& resp, std::string_view name);
 
 } // namespace api

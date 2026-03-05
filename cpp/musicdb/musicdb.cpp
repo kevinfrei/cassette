@@ -3,11 +3,6 @@
 #include <filesystem>
 #include <iostream>
 #include <shared_mutex>
-#include <sstream>
-#include <type_traits>
-
-// Initial implementation: Just read all the files in the directory
-// and produce the music-db map.
 
 #include "CommonTypes.hpp"
 #include "musicdb.hpp"

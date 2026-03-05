@@ -1,3 +1,4 @@
+#include <sstream>
 #include <string_view>
 
 #include <crow/http_response.h>
@@ -82,8 +83,12 @@ void load_playlist(crow::response& resp, std::string_view name) {
     resp.code = 204; // No Content
   } else {
     resp.code = 200; // OK
-    resp.set_header("Content-Type", "application/json");
-    resp.body = to_json(*result).dump();
+    resp.set_header("Content-Type", "text/plain");
+    std::ostringstream oss;
+    for (auto& i : *result) {
+      oss << i << "\n";
+    }
+    resp.body = oss.str();
     CROW_LOG_INFO << "Loaded playlist " << name << " from storage: <"
                   << resp.body << ">";
   }
@@ -91,6 +96,27 @@ void load_playlist(crow::response& resp, std::string_view name) {
 
 void save_playlist(crow::response& resp, std::string_view name_and_keys) {
   CROW_LOG_INFO << "TODO: Saving playlist " << name_and_keys;
+  std::vector<std::string_view> items;
+  // Create a vector of string_views of pieces of name & keys, split with a '~'
+  size_t start = 0;
+  std::string_view name;
+  while (start < name_and_keys.size()) {
+    auto pos = name_and_keys.find('~', start);
+    if (pos == std::string_view::npos) {
+      if (start == 0) {
+        name = name_and_keys;
+      } else {
+        items.emplace_back(name_and_keys.substr(start));
+      }
+      break;
+    } else if (start == 0) {
+      name = name_and_keys.substr(0, pos);
+    } else {
+      items.emplace_back(name_and_keys.substr(start, pos - start));
+    }
+    start = pos + 1;
+  }
+  playlist::save(name, items);
   resp.code = 200; // OK
 }
 
