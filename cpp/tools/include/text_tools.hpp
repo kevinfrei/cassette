@@ -1,7 +1,6 @@
-#include <algorithm>
 #include <cctype>
+#include <charconv>
 #include <cwctype>
-#include <filesystem>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -27,6 +26,16 @@ T toggle_lower(T c) {
   } else {
     return static_cast<T>(std::tolower(static_cast<unsigned char>(c)));
   }
+}
+
+template <typename T>
+std::optional<T> to_integer(std::string_view sv) {
+  T value;
+  auto [ptr, ec] = std::from_chars(sv.data(), sv.data() + sv.size(), value);
+  if (ec == std::errc{} && ptr == sv.data() + sv.size()) {
+    return value;
+  }
+  return std::nullopt;
 }
 
 std::string lowercase(std::string_view str);

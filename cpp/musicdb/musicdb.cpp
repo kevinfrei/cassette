@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#include <set>
 #include <shared_mutex>
 
 #include "CommonTypes.hpp"
@@ -17,59 +18,68 @@ std::shared_mutex music_db_mutex;
 std::array<std::string, 5> extensions = {
     ".mp3", ".flac", ".m4a", ".jpg", ".png"};
 std::array<std::string, 3> audio_ext = {".mp3", ".flac", ".m4a"};
-MusicDatabase* mdb = nullptr;
 
 } // namespace
 
 void set_locations(const std::vector<fs::path>& locations) {
-  std::unique_lock<std::shared_mutex> lock(music_db_mutex);
-  if (mdb) {
-    delete mdb;
-    mdb = nullptr;
+  MusicDatabase::set_locations(locations);
+}
+
+MusicDatabase& MusicDatabase::get() {
+  static MusicDatabase singleton;
+  return singleton;
+};
+
+void MusicDatabase::set_locations(const std::vector<fs::path>& locations) {
+  // Remove any current locations that aren't in the list, just to be safe
+  MusicDatabase& mdb = get();
+  std::set<fs::path> loc_set{locations.cbegin(), locations.cend()};
+  for (const auto& cur_loc : mdb.get_locations()) {
+    if (loc_set.find(cur_loc) != loc_set.end()) {
+      mdb.remove_file_location(cur_loc);
+    }
   }
-  mdb = new MusicDatabase();
+  // Add all the locations. The API should be resilient to duplicate locations.
   for (const auto& loc : locations) {
-    mdb->addFileLocation(loc);
+    mdb.add_file_location(loc);
   }
 }
 
+MusicDatabase::MusicDatabase() {}
+
 MusicDatabase::~MusicDatabase() {
-  if (audioIndex) {
-    delete audioIndex;
-    audioIndex = nullptr;
-  }
   if (metadata_cache) {
     delete metadata_cache;
     metadata_cache = nullptr;
   }
 }
 
-std::string MusicDatabase::getNewSongKey() {
+std::string MusicDatabase::get_new_song_key() {
   return "S" + std::to_string(song_key_counter++);
 }
 
-std::string MusicDatabase::getNewArtistKey() {
+std::string MusicDatabase::get_new_artist_key() {
   return "R" + std::to_string(artist_key_counter++);
 }
 
-std::string MusicDatabase::getNewAlbumKey() {
+std::string MusicDatabase::get_new_album_key() {
   return "L" + std::to_string(album_key_counter++);
 }
 
-bool MusicDatabase::addFileLocation(const std::filesystem::path& root) {
-  // NYI
-  // For now, this is used to add a single file for testing.
-  if (audioIndex) {
-    delete audioIndex;
-    delete metadata_cache;
+bool MusicDatabase::add_file_location(const std::filesystem::path& root) {
+  if (std::find_if(
+          audio_index.cbegin(), audio_index.cend(), [&](const file_index& i) {
+            return i.get_location() == root;
+          }) != audio_index.cend()) {
+    return false;
   }
-  audioIndex = new file_index(root, true);
-  metadata_cache = new metadata::store(root);
-  audioIndex->foreach_file([this](const fs::path& p) {
+  audio_index.push_back(file_index{root, true});
+  auto& ai = *audio_index.rend();
+  ai.foreach_file([this](const fs::path& p) {
     std::string ext = p.extension().string();
     for (const auto& validExt : audio_ext) {
       if (ext == validExt) {
-        addSongToDB(p);
+        add_song_to_db(p);
         break;
       }
     }
@@ -77,23 +87,64 @@ bool MusicDatabase::addFileLocation(const std::filesystem::path& root) {
   return true;
 }
 
-bool MusicDatabase::removeFileLocation(const std::filesystem::path&) {
+std::optional<Shared::Album> MusicDatabase::get_album_from_key(
+    const Shared::AlbumKey& key) {
+  auto maybe = albums.find(key);
+  if (maybe == albums.end()) {
+    return std::nullopt;
+  }
+  return maybe->second;
+}
+
+std::optional<Shared::SongWithPath> MusicDatabase::get_song(
+    const Shared::SongKey& key) {
+  auto maybe = songs.find(key);
+  if (maybe == songs.end()) {
+    return std::nullopt;
+  }
+  return maybe->second;
+}
+
+std::optional<Shared::AlbumKey> MusicDatabase::get_album(
+    const std::string& title,
+    std::int16_t year,
+    const std::vector<std::string>& artists,
+    Shared::VAType vaType) {
+  return get_album_helper(title, year, artists, vaType).first;
+}
+
+std::pair<std::optional<Shared::AlbumKey>, AlbumTriple>
+MusicDatabase::get_album_helper(const std::string& title,
+                                std::int16_t year,
+                                const std::vector<std::string>& artists,
+                                Shared::VAType vaType) {
+  AlbumTriple keyTuple = make_album_triple(title, year, artists, vaType);
+  auto it = album_year_artist_to_key.find(keyTuple);
+  if (it != album_year_artist_to_key.end()) {
+    return std::make_pair(it->second, keyTuple);
+  }
+  return std::make_pair(std::nullopt, keyTuple);
+}
+
+bool MusicDatabase::remove_file_location(const std::filesystem::path&) {
   // NYI
   return false;
 }
 
-std::vector<std::filesystem::path> MusicDatabase::getLocations() const {
-  if (audioIndex) {
-    return std::vector<std::filesystem::path>{audioIndex->get_location()};
+std::vector<std::filesystem::path> MusicDatabase::get_locations() const {
+  std::vector<std::filesystem::path> locations;
+  locations.reserve(audio_index.size());
+  for (const auto& value : audio_index) {
+    locations.push_back(value.get_location());
   }
-  return std::vector<std::filesystem::path>{};
+  return locations;
 }
 
 std::string MusicDatabase::normalized_path(const std::filesystem::path& p) {
   return std::filesystem::weakly_canonical(p).generic_string();
 }
 
-Shared::ArtistKey MusicDatabase::getOrCreateArtist(
+Shared::ArtistKey MusicDatabase::get_or_create_artist(
     const std::string& artistName) {
   // TODO: Make this case-insensitive
   auto it = artist_name_to_key.find(artistName);
@@ -101,7 +152,7 @@ Shared::ArtistKey MusicDatabase::getOrCreateArtist(
     return it->second;
   }
 
-  Shared::ArtistKey newKey = getNewArtistKey();
+  Shared::ArtistKey newKey = get_new_artist_key();
   artist_name_to_key[artistName] = newKey;
   Shared::Artist artistEntry;
   artistEntry.key = newKey;
@@ -110,7 +161,7 @@ Shared::ArtistKey MusicDatabase::getOrCreateArtist(
   return newKey;
 }
 
-AlbumTriple MusicDatabase::makeAlbumTriple(
+AlbumTriple MusicDatabase::make_album_triple(
     const std::string& title,
     std::int16_t year,
     const std::vector<std::string>& artists,
@@ -129,17 +180,18 @@ AlbumTriple MusicDatabase::makeAlbumTriple(
   return AlbumTriple{title, year, artistHashValue};
 }
 
-Shared::AlbumKey MusicDatabase::getOrCreateAlbum(
+Shared::AlbumKey MusicDatabase::get_or_create_album(
     const std::string& title,
     std::int16_t year,
     const std::vector<std::string>& artists,
     Shared::VAType vaType) {
-  AlbumTriple keyTuple = makeAlbumTriple(title, year, artists, vaType);
-  auto it = album_year_artist_to_key.find(keyTuple);
-  if (it != album_year_artist_to_key.end()) {
-    return it->second;
+  auto [existing_album, keyTuple] =
+      get_album_helper(title, year, artists, vaType);
+  if (existing_album) {
+    return *existing_album;
   }
-  Shared::AlbumKey newKey = getNewAlbumKey();
+
+  Shared::AlbumKey newKey = get_new_album_key();
   album_year_artist_to_key[keyTuple] = newKey;
   Shared::Album albumEntry;
   albumEntry.key = newKey;
@@ -147,7 +199,7 @@ Shared::AlbumKey MusicDatabase::getOrCreateAlbum(
   albumEntry.title = title;
   albumEntry.vatype = vaType;
   for (const auto& artist : artists) {
-    Shared::ArtistKey artistKey = getOrCreateArtist(artist);
+    Shared::ArtistKey artistKey = get_or_create_artist(artist);
     albumEntry.primaryArtists.push_back(artistKey);
     // Now, add this album to the artist's list of albums:
     Shared::Artist& theArtist = this->artists[artistKey];
@@ -157,7 +209,7 @@ Shared::AlbumKey MusicDatabase::getOrCreateAlbum(
   return newKey;
 }
 
-void MusicDatabase::addSongToDB(const fs::path& song) {
+void MusicDatabase::add_song_to_db(const fs::path& song) {
   // First, get the metadata for the song
   auto md = metadata_cache->read(song);
   if (!md) {
@@ -168,22 +220,21 @@ void MusicDatabase::addSongToDB(const fs::path& song) {
 
   // First, create the SongKey:
   auto pathKey = normalized_path(song);
-  Shared::SongKey skey = getNewSongKey();
+  Shared::SongKey skey = get_new_song_key();
   path_to_songkey[pathKey] = skey;
-  songkey_to_path[skey] = pathKey;
 
   // Moving on to Artists:
   std::vector<Shared::ArtistKey> artistsIds;
   for (auto& artistName : md->artist) {
-    artistsIds.push_back(getOrCreateArtist(artistName));
+    artistsIds.push_back(get_or_create_artist(artistName));
   }
   std::vector<Shared::ArtistKey> secondaryIds;
   for (auto& artistName : md->moreArtists) {
-    secondaryIds.push_back(getOrCreateArtist(artistName));
+    secondaryIds.push_back(get_or_create_artist(artistName));
   }
   // Album:
   Shared::AlbumKey albumId =
-      getOrCreateAlbum(md->album, md->year, md->artist, md->vaType);
+      get_or_create_album(md->album, md->year, md->artist, md->vaType);
   // Finally, the Song itself:
   Shared::SongWithPath songEntry;
   songEntry.key = skey;
@@ -198,7 +249,7 @@ void MusicDatabase::addSongToDB(const fs::path& song) {
 
   // Now wire up the song to the album and the artist(s):
   auto& album = albums[albumId];
-  album.songs.push_back(skey);
+  album.songs.insert(std::make_pair(songEntry.track, skey));
 
   for (const auto& aid : artistsIds) {
     auto& artist = artists[aid];
@@ -210,22 +261,24 @@ void MusicDatabase::addSongToDB(const fs::path& song) {
   }
 }
 
-std::optional<std::filesystem::path> MusicDatabase::getSongPath(
+std::optional<std::filesystem::path> MusicDatabase::get_song_path(
     const Shared::SongKey& key) {
-  auto it = songkey_to_path.find(key);
-  if (it == songkey_to_path.end()) {
+  auto it = songs.find(key);
+  if (it == songs.end()) {
     return std::nullopt;
   }
-  return it->second;
+  return it->second.path;
 }
 
-Shared::MusicDatabase MusicDatabase::getDatabase() const {
-  Shared::MusicDatabase db;
-  db.songs = songs;
-  db.albums = albums;
-  db.artists = artists;
+const Shared::MusicDatabase& MusicDatabase::get_flat_database() {
+  flat_db.songs.clear();
+  flat_db.albums.clear();
+  flat_db.artists.clear();
+  flat_db.songs.insert(songs.begin(), songs.end());
+  flat_db.albums = albums;
+  flat_db.artists = artists;
   // NYI: playlists
-  return db;
+  return flat_db;
 }
 
 } // namespace musicdb

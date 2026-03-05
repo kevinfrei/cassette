@@ -1200,7 +1200,7 @@ struct Album {
   std::string title;
   VAType vatype;
   std::vector<ArtistKey> primaryArtists;
-  std::vector<SongKey> songs;
+  std::map<std::int16_t, SongKey> songs;
   std::vector<std::string> diskNames;
 };
 
@@ -1893,7 +1893,8 @@ inline std::optional<Shared::Album> from_json<Shared::Album>(
 
   if (!_value.has("songs"))
     return std::nullopt;
-  auto _songs_opt_ = from_json<std::vector<Shared::SongKey>>(_value["songs"]);
+  auto _songs_opt_ =
+      from_json<std::map<std::int16_t, Shared::SongKey>>(_value["songs"]);
   if (!_songs_opt_.has_value())
     return std::nullopt;
   _res.songs = std::move(*_songs_opt_);
