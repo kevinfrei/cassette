@@ -4,6 +4,7 @@
 #include <string>
 
 #include <crow/json.h>
+#include <sago/platform_folders.h>
 
 #include "config.hpp"
 #include "musicdb.hpp"
@@ -12,16 +13,8 @@
 namespace fs = std::filesystem;
 
 namespace {
-std::shared_mutex get_db_mutex;
-musicdb::MusicDatabase* mdb = nullptr;
 
-#if defined(_WIN32)
-const char* user_root = "USERPROFILE";
-#elif defined(__APPLE__) || defined(__linux__)
-const char* user_root = "HOME";
-#else
-#error Unsupported platform
-#endif
+std::shared_mutex get_db_mutex;
 
 } // namespace
 
@@ -33,70 +26,21 @@ std::optional<std::filesystem::path> get_tune(const std::string& song_key) {
   if (song_key.empty()) {
     return std::nullopt;
   }
-  auto* musicdb = get_music_db();
-  if (!musicdb) {
-    return std::nullopt;
-  }
-  return mdb->getSongPath(song_key);
+  auto& mdb = musicdb::get();
+  return mdb.get_song_path(song_key);
 }
 
-Shared::MusicDatabase* get_music_db() {
-  static Shared::MusicDatabase* music_db = nullptr;
-  if (music_db) {
-    return music_db; // Already initialized
-  }
-  std::unique_lock<std::shared_mutex> lock(get_db_mutex);
-  if (music_db) {
-    // Ah, double-checked locking, you're so weird...
-    return music_db;
-  }
-  // Get the location from the config.
-  auto maybe_roots_json = config::read_from_storage(
-      Shared::to_string(Shared::StorageId::Locations));
-  std::vector<fs::path> roots;
-  if (maybe_roots_json.has_value() && !maybe_roots_json->empty()) {
-    // TODO: This is wrong for now...
-    auto maybe_roots = from_json<std::vector<std::string>>(
-        crow::json::load(*maybe_roots_json));
-    if (!maybe_roots || maybe_roots->empty()) {
-      CROW_LOG_ERROR << "Failed to parse music locations from storage.";
-      return nullptr;
-    }
-    for (const auto& root : *maybe_roots) {
-      roots.push_back(fs::path(root));
-    }
-  }
-  if (roots.empty()) {
-    // TODO: Not sure about this stuff
-#if defined(__APPLE__) && false
-    roots.push_back(fs::path("/Volumes/DDrive$/Audio/Sorted"));
-#else
-    roots.push_back(fs::path(getenv(user_root)) / "Music");
-#endif
-  }
-  for (const auto& root : roots) {
-    if (!fs::exists(root)) {
-      CROW_LOG_ERROR << "Music directory does not exist: " << root.string();
-    }
-  }
-  mdb = new musicdb::MusicDatabase();
-  for (const auto& root : roots) {
-    mdb->addFileLocation(root);
-  }
-  music_db = new Shared::MusicDatabase(mdb->getDatabase());
-  return music_db;
+const Shared::MusicDatabase& get_music_db() {
+  return musicdb::get().get_flat_database();
 }
 
 void send_music_db(crow::websocket::connection& conn) {
   // Send the music database to the client.
-  Shared::MusicDatabase* db = get_music_db();
-  if (!db) {
-    CROW_LOG_ERROR << "Failed to get music database!";
-    return;
-  }
+  auto& mdb = musicdb::get();
+  auto flat = mdb.get_flat_database();
   std::ostringstream oss;
   oss << static_cast<uint64_t>(Shared::SocketMsg::MusicDBUpdate) << ";"
-      << to_json(*db).dump();
+      << to_json(flat).dump();
 
   conn.send_text(oss.str());
 }

@@ -429,7 +429,7 @@ export type Album = {
   title: string;
   vatype: VAType;
   primaryArtists: ArtistKey[];
-  songs: SongKey[];
+  songs: Map<number, SongKey>;
   diskNames: string[];
 };
 export const chkAlbum: TC.typecheck<Album> = TC.chkObjectOfType(
@@ -439,7 +439,7 @@ export const chkAlbum: TC.typecheck<Album> = TC.chkObjectOfType(
     title: TC.isString,
     vatype: chkVAType,
     primaryArtists: TC.chkArrayOf(chkArtistKey),
-    songs: TC.chkArrayOf(chkSongKey),
+    songs: TC.chkMapOf(chkIdlI16, chkSongKey),
     diskNames: TC.chkArrayOf(TC.isString),
   },
   {},

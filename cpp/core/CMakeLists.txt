@@ -32,6 +32,7 @@ target_link_libraries(
     ${BOOST_LIB}
     ${CROW_LIB}
     ${PFD_LIB}
+    ${PLATFORMFOLDERS_LIB}
     ${REPROC_LIB}
     ${WEBVIEW_LIB}
 )

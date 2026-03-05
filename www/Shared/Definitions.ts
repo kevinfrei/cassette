@@ -288,7 +288,7 @@ const AlbumObj = obj({
   year: i16(),
   vatype: ref('VAType'),
   primaryArtists: arr(ref('ArtistObj')), // ptr
-  songs: arr(ref('SongObj')), // ptr
+  songs: map(i16(), ref('SongObj')), // ptr
   diskNames: arr(str()),
 });
 
@@ -305,7 +305,7 @@ const Album = obj({
   title: str(),
   vatype: ref('VAType'),
   primaryArtists: arr(ref('ArtistKey')),
-  songs: arr(ref('SongKey')),
+  songs: map(i16(), ref('SongKey')),
   diskNames: arr(str()),
 });
 

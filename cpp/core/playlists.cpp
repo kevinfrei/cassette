@@ -1,7 +1,10 @@
+#include <cstddef>
 #include <optional>
+#include <sstream>
 #include <string>
 #include <vector>
 
+#include "CommonTypes.hpp"
 #include "config.hpp"
 #include "files.hpp"
 #include "musicdb.hpp"
@@ -17,13 +20,95 @@ std::optional<Shared::SongKey> song_key_for_playlist_entry(
     std::string_view song_data) {
   // Get the music database and look up this particular song.
   // musicdb::MusicDatabase& db = musicdb::get_music_database();
-  return std::nullopt;
+  musicdb::MusicDatabase& mdb = musicdb::get();
+
+  size_t end_of_track = song_data.find('\t');
+  if (end_of_track == song_data.npos) {
+    return std::nullopt;
+  }
+  size_t end_of_album_title = song_data.find('\t', end_of_track + 1);
+  if (end_of_album_title == song_data.npos) {
+    return std::nullopt;
+  }
+  size_t end_of_album_year = song_data.find('\t', end_of_album_title + 1);
+  if (end_of_album_year == song_data.npos) {
+    return std::nullopt;
+  }
+
+  std::string_view track_str = song_data.substr(0, end_of_track);
+  std::optional<std::uint16_t> mtrack_num =
+      text::to_integer<std::uint16_t>(track_str);
+  if (!mtrack_num) {
+    return std::nullopt;
+  }
+  std::uint16_t track_num = *mtrack_num;
+  std::string album_title{
+      song_data.substr(end_of_track + 1, end_of_album_title)};
+  std::string_view album_year_str =
+      song_data.substr(end_of_album_title + 1, end_of_album_year);
+  std::optional<std::uint16_t> malbum_year =
+      text::to_integer<std::uint16_t>(album_year_str);
+  std::uint16_t album_year = !malbum_year ? 0 : *malbum_year;
+  std::string_view artists_or_va = song_data.substr(end_of_album_year + 1);
+
+  Shared::VAType vaType;
+  std::vector<std::string> artists;
+  // TODO: This stuff probably belongs in the music db code, since the encoding
+  // happens in there.
+  if (*artists_or_va.rbegin() == '*') {
+    // It's a VA album
+    std::optional<Shared::VAType> maybe_va =
+        Shared::from_string<Shared::VAType>(
+            artists_or_va.substr(0, artists_or_va.length() - 1));
+    if (!maybe_va) {
+      return std::nullopt;
+    }
+    vaType = *maybe_va;
+  } else {
+    vaType = Shared::VAType::none;
+    // Split this up using all the "|"
+    size_t start = 0, end;
+    for (end = artists_or_va.find('|', start + 1); end != artists_or_va.npos;
+         end = artists_or_va.find('|', start)) {
+      artists.push_back(std::string{artists_or_va.substr(start, end)});
+      start = end + 1;
+    }
+  }
+  std::optional<Shared::AlbumKey> alb =
+      mdb.get_album(album_title, album_year, artists, vaType);
+  if (!alb) {
+    return std::nullopt;
+  }
+  auto malbum = mdb.get_album_from_key(*alb);
+  if (!malbum) {
+    return std::nullopt;
+  }
+  auto song = malbum->songs.find(track_num);
+  if (song == malbum->songs.end()) {
+    return std::nullopt;
+  }
+  return song->second;
 }
 
 std::optional<std::string> playlist_entry_for_song_key(std::string_view key) {
   // For now, let's just return the key as the song data. In the future, we
   // should look up the song data for the given key.
-  return std::string(key);
+  musicdb::MusicDatabase& mdb = musicdb::get();
+  const auto maybe_song = mdb.get_song(Shared::SongKey(key));
+  if (!maybe_song)
+    return std::nullopt;
+  const Shared::SongWithPath& song = *maybe_song;
+  const auto album = mdb.get_album_from_key(song.albumId);
+  if (!album) {
+    CROW_LOG_ERROR << "Invalid album from song ID " << key;
+    return std::nullopt;
+  }
+  auto triple = mdb.make_album_triple(
+      album->title, album->year, album->primaryArtists, album->vatype);
+  std::ostringstream oss;
+  oss << song.track << "\t" << std::get<0>(triple) << "\t"
+      << std::get<1>(triple) << "\t" << std::get<2>(triple);
+  return oss.str();
 }
 
 } // namespace
