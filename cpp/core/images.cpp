@@ -2,6 +2,7 @@
 #include <string>
 
 #include "config.hpp"
+#include "files.hpp"
 
 #include "images.hpp"
 
@@ -16,12 +17,11 @@ std::filesystem::path get_image_path(const std::string& query_path) {
     std::string key = query_path.substr(slash + 1);
     // If there's a slash, we should check if the first part is "album" or
     // "artist", and if so, we can return a path to the corresponding image.
-    return std::filesystem::path(config::get_home_path() / "src" / "cassette" /
-                                 "www" / "img" / (type + ".svg"));
+    return std::filesystem::path(files::get_web_dir() / "img" /
+                                 (type + ".svg"));
   }
   // For now, this is clearly bad & wrong, but I don't care right now.
-  return std::filesystem::path(config::get_home_path() / "src" / "cassette" /
-                               "www" / "img" / "icon.svg");
+  return std::filesystem::path(files::get_web_dir() / "img" / "icon.svg");
 }
 
 } // namespace image
