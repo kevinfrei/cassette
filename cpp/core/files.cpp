@@ -23,7 +23,10 @@ void set_program_location() {
 
 fs::path get_web_dir() {
   if (web_dir.empty()) {
-    fs::path cur = program_location.parent_path().parent_path();
+    fs::path cur = program_location;
+    while (!fs::exists(cur / "www" / "index.html")) {
+      cur = cur.parent_path();
+    }
     web_dir = cur / "www";
   }
   return web_dir;
