@@ -5,8 +5,9 @@
 #include <crow.h>
 #include <gtest/gtest.h>
 
-#include "config.hpp"
 #include "files.hpp"
+
+#include "config.hpp"
 
 TEST(Config, TheBasics) {
   files::set_program_location();

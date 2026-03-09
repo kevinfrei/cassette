@@ -1,5 +1,3 @@
-#if !defined(TUPLE_HASH_HPP)
-#define TUPLE_HASH_HPP
 #pragma once
 
 #include <functional>
@@ -26,5 +24,3 @@ struct TupleHash {
     return seed;
   }
 };
-
-#endif // TUPLE_HASH_HPP

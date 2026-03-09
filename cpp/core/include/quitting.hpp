@@ -1,4 +1,4 @@
-#include <atomic>
+#pragma once
 
 namespace quitting {
 

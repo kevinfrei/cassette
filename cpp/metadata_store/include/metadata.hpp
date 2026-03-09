@@ -1,5 +1,3 @@
-#if !defined(METADATA_HPP)
-#define METADATA_HPP
 #pragma once
 
 #include <filesystem>
@@ -79,5 +77,3 @@ class store {
 };
 
 } // namespace metadata
-
-#endif // METADATA_HPP

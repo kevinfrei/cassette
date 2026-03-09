@@ -1,6 +1,3 @@
-#if !defined(SETUP_HPP)
-#define SETUP_HPP
-
 #pragma once
 
 #include <cstdint>
@@ -12,5 +9,3 @@ void init();
 void run();
 
 } // namespace setup
-
-#endif // SETUP_HPP

@@ -1,3 +1,5 @@
+#include <atomic>
+
 #include "quitting.hpp"
 
 namespace quitting {

@@ -1,5 +1,3 @@
-#if !defined(__TUNES_H__)
-#define __TUNES_H__
 #pragma once
 
 #include <filesystem>
@@ -17,5 +15,3 @@ const Shared::MusicDatabase& get_music_db();
 void send_music_db(crow::websocket::connection& conn);
 
 } // namespace tunes
-
-#endif // __TUNES_H__

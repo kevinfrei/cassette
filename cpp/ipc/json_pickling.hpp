@@ -1,7 +1,6 @@
-#include <type_traits>
+#pragma once
 #if !defined(__JSON_PICKLING_HPP__)
 #define __JSON_PICKLING_HPP__
-#pragma once
 
 #include <cstdint>
 #include <iomanip>
@@ -12,6 +11,7 @@
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
