@@ -6,14 +6,14 @@
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
 
-// Initial implementation: Just read all the files in the directory
-// and produce the music-db map.
-
 #include "CommonTypes.hpp"
+
 #include "metadata.hpp"
 
 namespace fs = std::filesystem;
 
+// Initial implementation: Just read all the files in the directory
+// and produce the music-db map.
 namespace metadata {
 
 // File-local stuff here:

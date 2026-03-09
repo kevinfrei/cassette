@@ -4,11 +4,11 @@
 #include <crow/http_response.h>
 #include <crow/json.h>
 
-#include "api.hpp"
 #include "config.hpp"
 #include "json_pickling.hpp"
 #include "playlists.hpp"
-// #include "tools.hpp"
+
+#include "api.hpp"
 
 namespace api {
 

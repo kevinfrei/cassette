@@ -6,6 +6,7 @@
 #include <shared_mutex>
 
 #include "CommonTypes.hpp"
+
 #include "musicdb.hpp"
 
 namespace fs = std::filesystem;

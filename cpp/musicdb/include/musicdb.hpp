@@ -1,5 +1,3 @@
-#if !defined(MUSICDB_HPP)
-#define MUSICDB_HPP
 #pragma once
 
 #include <cctype>
@@ -148,5 +146,3 @@ inline MusicDatabase& get() {
 }
 
 } // namespace musicdb
-
-#endif // MUSICDB_HPP

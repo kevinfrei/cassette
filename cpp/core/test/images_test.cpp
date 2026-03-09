@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "files.hpp"
+
 #include "images.hpp"
 
 TEST(Images, JustTheOne) {

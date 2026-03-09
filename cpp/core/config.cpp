@@ -9,8 +9,9 @@
 #include <string_view>
 #include <unordered_map>
 
-#include "config.hpp"
 #include "files.hpp"
+
+#include "config.hpp"
 
 namespace fs = std::filesystem;
 
