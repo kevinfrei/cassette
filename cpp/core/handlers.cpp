@@ -183,57 +183,55 @@ crow::response api(const crow::request&, const std::string& path) {
   auto maybeCall = text::to_integer<Shared::IpcCall>(
       std::string_view{path.c_str(), slashPos});
   if (!maybeCall) {
-    CROW_LOG_ERROR << "Error 404: Invalid API arguments for path: " << path;
-    tools::e404(resp, "Invalid API arguments");
+    tools::e404(resp, "Invalid API arguments for path " + path);
     return resp;
   }
   if (!Shared::is_valid(*maybeCall)) {
-    CROW_LOG_ERROR << "Error 404: Unknown API for path: " << path;
-    tools::e404(resp, "Unknown API");
+    tools::e404(resp, "Unknown API for path " + path);
     return resp;
   }
   auto ValidateAndCall =
-      [&](std::function<void(crow::response&, std::string_view)> handle_call)
-      -> void {
+      [&](std::function<void(crow::response&, std::string_view)> handle_call,
+          bool decode) -> void {
     if (slashPos == path.size()) {
-      CROW_LOG_ERROR << "Error 404: No data provided for API: " << path;
-      tools::e404(resp, "No data provided for API");
+      tools::e404(resp, "No data provided for API" + path);
     } else {
-      const std::string_view data{path.c_str() + slashPos + 1,
-                                  path.size() - slashPos - 1};
-      auto maybeDecoded = tools::url_decode(data);
-      if (!maybeDecoded) {
-        CROW_LOG_ERROR << "Error 404: Invalid URL encoding for API: " << path;
-        tools::e404(resp, "Invalid URL encoding for API");
-        return;
+      const std::string_view data{path.c_str() + slashPos + 1};
+      if (decode) {
+        auto maybeDecoded = tools::url_decode(data);
+        if (!maybeDecoded) {
+          tools::e404(resp, "Invalid URL encoding for API " + path + ":");
+          CROW_LOG_ERROR << data;
+        } else {
+          resp.code = 200;
+          handle_call(resp, *maybeDecoded);
+        }
+      } else {
+        handle_call(resp, data);
       }
-      resp.code = 200;
-      handle_call(resp, *maybeDecoded);
     }
   };
   switch (*maybeCall) {
     case Shared::IpcCall::WriteToStorage:
-      ValidateAndCall(api::write_to_storage);
+      ValidateAndCall(api::write_to_storage, false);
       break;
     case Shared::IpcCall::ReadFromStorage:
-      ValidateAndCall(api::read_from_storage);
+      ValidateAndCall(api::read_from_storage, true);
       break;
     case Shared::IpcCall::DeleteFromStorage:
-      ValidateAndCall(api::delete_from_storage);
+      ValidateAndCall(api::delete_from_storage, true);
       break;
     case Shared::IpcCall::ShowOpenDialog:
-      files::folder_picker(resp,
-                           std::string_view{path.c_str() + slashPos + 1,
-                                            path.size() - slashPos - 1});
+      ValidateAndCall(files::folder_picker, true);
       break;
     case Shared::IpcCall::GetPlaylists:
       api::get_playlists(resp);
       break;
     case Shared::IpcCall::LoadPlaylist:
-      ValidateAndCall(api::load_playlist);
+      ValidateAndCall(api::load_playlist, true);
       break;
     case Shared::IpcCall::SavePlaylist:
-      ValidateAndCall(api::save_playlist);
+      ValidateAndCall(api::save_playlist, true);
       break;
     default:
       if (Shared::is_valid(*maybeCall)) {
