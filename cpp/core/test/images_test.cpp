@@ -11,7 +11,7 @@
 TEST(Images, JustTheOne) {
   files::set_program_location();
   auto path1 = image::get_image_path("somethin");
-  EXPECT_TRUE(path1.string().ends_with("/img/icon.svg"));
+  EXPECT_TRUE(path1.generic_string().ends_with("/img/icon.svg"));
   auto path2 = image::get_image_path("somethin/else");
-  EXPECT_TRUE(path2.string().ends_with("/img/somethin.svg"));
+  EXPECT_TRUE(path2.generic_string().ends_with("/img/somethin.svg"));
 }

@@ -19,14 +19,14 @@ TEST(Files, Miscellany) {
 }
 
 TEST(Files, Name_encoding) {
-  std::string bad_chars = "\n\t\r\\/:?*\"<>|. ";
-  std::string bonkers = "c:\\AbC?*t";
+  const std::string bad_chars = "\n\t\r\\/:?*\"<>|. ";
+  const std::string bonkers = "c:\\AbC?*t";
   auto encoded = files::file_name_encode(bonkers);
   std::cout << encoded << std::endl;
   EXPECT_TRUE(bonkers.length() < encoded.string().length());
   auto decoded = files::file_name_decode(encoded.string());
   EXPECT_STREQ(bonkers.c_str(), decoded->c_str());
-  for (const auto& c : encoded) {
+  for (const char c : encoded.string()) {
     EXPECT_TRUE(bad_chars.find(c) == bad_chars.npos);
   }
   encoded = files::file_name_encode(bad_chars);
