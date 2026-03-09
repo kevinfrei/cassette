@@ -1,3 +1,6 @@
+add_subdirectory(fileindex)
+add_subdirectory(metadata_store)
+
 add_library(musicdb_lib STATIC musicdb.cpp)
 target_include_directories(musicdb_lib PUBLIC include)
 # target_include_directories(musicdb_lib PRIVATE impl)
