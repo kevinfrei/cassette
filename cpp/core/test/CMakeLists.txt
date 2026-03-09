@@ -1,4 +1,10 @@
-add_executable(cassette_testing config_test.cpp files_test.cpp images_test.cpp)
+add_executable(
+  cassette_testing
+  config_test.cpp
+  files_test.cpp
+  images_test.cpp
+  tools_test.cpp
+)
 target_link_libraries(
   cassette_testing
   PUBLIC

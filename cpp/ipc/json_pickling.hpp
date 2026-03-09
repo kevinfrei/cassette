@@ -1,3 +1,4 @@
+#include <type_traits>
 #if !defined(__JSON_PICKLING_HPP__)
 #define __JSON_PICKLING_HPP__
 #pragma once
@@ -28,8 +29,16 @@ struct is_enum_class {
   static constexpr bool value =
       std::is_enum_v<T> && !std::is_convertible_v<T, int>;
 };
+
 template <typename T>
 inline constexpr bool is_enum_class_v = is_enum_class<T>::value;
+
+template <typename T>
+constexpr auto underlying_cast(T e) noexcept {
+  static_assert(std::is_enum_v<T>,
+                "underlying_cast can only be used with enum types.");
+  return static_cast<std::underlying_type_t<T>>(e);
+}
 
 /****
 Conversion to JSON stuff
