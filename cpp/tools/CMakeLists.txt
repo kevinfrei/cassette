@@ -5,6 +5,6 @@ target_include_directories(tools_lib PUBLIC include)
 # target_include_directories(tools_lib PRIVATE impl)
 
 # Link the dependencies with our binary
-# target_link_libraries(tools_lib PUBLIC ...)
+target_link_libraries(tools_lib PUBLIC ipc_lib ${CROW_LIB})
 
 add_subdirectory(test)

@@ -14,6 +14,7 @@
 #include "images.hpp"
 #include "quitting.hpp"
 #include "setup.hpp"
+#include "text_tools.hpp"
 #include "tools.hpp"
 #include "tunes.hpp"
 
@@ -179,15 +180,14 @@ crow::response api(const crow::request&, const std::string& path) {
   crow::response resp;
   size_t slashPos = path.find('/');
   slashPos = (slashPos == path.npos) ? path.size() : slashPos;
-  auto maybeNum =
-      tools::read_uint64_t(std::string_view{path.c_str(), slashPos});
-  if (!maybeNum) {
+  auto maybeCall = text::to_integer<Shared::IpcCall>(
+      std::string_view{path.c_str(), slashPos});
+  if (!maybeCall) {
     CROW_LOG_ERROR << "Error 404: Invalid API arguments for path: " << path;
     tools::e404(resp, "Invalid API arguments");
     return resp;
   }
-  Shared::IpcCall call = static_cast<Shared::IpcCall>(*maybeNum);
-  if (!Shared::is_valid(call)) {
+  if (!Shared::is_valid(*maybeCall)) {
     CROW_LOG_ERROR << "Error 404: Unknown API for path: " << path;
     tools::e404(resp, "Unknown API");
     return resp;
@@ -211,7 +211,7 @@ crow::response api(const crow::request&, const std::string& path) {
       handle_call(resp, *maybeDecoded);
     }
   };
-  switch (call) {
+  switch (*maybeCall) {
     case Shared::IpcCall::WriteToStorage:
       ValidateAndCall(api::write_to_storage);
       break;
@@ -236,23 +236,20 @@ crow::response api(const crow::request&, const std::string& path) {
       ValidateAndCall(api::save_playlist);
       break;
     default:
-      if (Shared::is_valid(call)) {
-        CROW_LOG_ERROR
-            << "Unimplemented API call received: " << Shared::to_string(call)
-            << " ("
-            << static_cast<std::underlying_type_t<Shared::IpcCall>>(call)
-            << ") [" << path << "]";
+      if (Shared::is_valid(*maybeCall)) {
+        CROW_LOG_ERROR << "Unimplemented API call received: "
+                       << Shared::to_string(*maybeCall) << " ("
+                       << underlying_cast(*maybeCall) << ") [" << path << "]";
       } else {
-        CROW_LOG_ERROR
-            << "Unknown API call received: " << static_cast<std::uint64_t>(call)
-            << " [" << path << "]";
+        CROW_LOG_ERROR << "Unknown API call received: "
+                       << underlying_cast(*maybeCall) << " [" << path << "]";
       }
       std::string error_message =
-          Shared::is_valid(call)
+          Shared::is_valid(*maybeCall)
               ? "Unimplemented API call: " +
-                    std::string(Shared::to_string(call))
+                    std::string(Shared::to_string(*maybeCall))
               : "Unknown API call: " +
-                    std::to_string(static_cast<std::uint64_t>(call));
+                    std::to_string(underlying_cast(*maybeCall));
       tools::e404(resp, error_message);
       return resp;
   }
@@ -284,12 +281,13 @@ void socket_message(crow::websocket::connection& conn,
     CROW_LOG_ERROR << "Invalid websocket message received: " << data;
     return;
   }
-  auto maybeMsg = tools::read_uint64_t(std::string_view{data.c_str(), pos});
+  auto maybeMsg =
+      text::to_integer<Shared::SocketMsg>(std::string_view{data.c_str(), pos});
   if (!maybeMsg) {
     CROW_LOG_ERROR << "Invalid websocket message received: " << data;
     return;
   }
-  Shared::SocketMsg msg = static_cast<Shared::SocketMsg>(*maybeMsg);
+  Shared::SocketMsg msg = *maybeMsg;
   if (!Shared::is_valid(msg)) {
     CROW_LOG_ERROR << "Invalid Socket message received: " << data;
     return;
@@ -308,8 +306,7 @@ void socket_message(crow::websocket::connection& conn,
     default: // Unsupported message
       CROW_LOG_ERROR
           << "Unsupported message received: " << Shared::to_string(msg) << " ("
-          << static_cast<std::underlying_type_t<Shared::SocketMsg>>(msg)
-          << ") [" << data << "]";
+          << underlying_cast(msg) << ") [" << data << "]";
   }
 }
 
