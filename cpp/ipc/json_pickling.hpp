@@ -1,6 +1,4 @@
 #pragma once
-#if !defined(__JSON_PICKLING_HPP__)
-#define __JSON_PICKLING_HPP__
 
 #include <cstdint>
 #include <iomanip>
@@ -576,5 +574,3 @@ struct impl_from_json<std::optional<T>> {
   }
 };
 */
-
-#endif
