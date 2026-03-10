@@ -70,11 +70,11 @@ std::vector<RegexPattern> patterns{
     make(Shared::VAType::none,
          "^(.*\\/)?(?<artist>[^/]+)\\/(?<year>\\d{4}) - (?<album>[^/]+)"
          "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
-         "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$"),
+         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
     // artist/year - albumTitle/## - trackTitle
     make(Shared::VAType::none,
          "^(.*\\/)?(?<artist>[^/]+)\\/(?<year>\\d{4}) - (?<album>[^/]+)"
-         "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$"),
+         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
     // artist - album/CD # name/## - trackTitle
     make(Shared::VAType::none,
          "^(.*\\/)?(?<artist>[^/]+) - (?<album>[^/]+)"
@@ -84,7 +84,7 @@ std::vector<RegexPattern> patterns{
     make(Shared::VAType::none,
          "^(.*\\/)?(?<artist>[^/]+)\\/(?<album>[^/]+)"
          "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
-         "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$"),
+         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
     // artist - album/## - trackTitle
     make(Shared::VAType::none,
          "^(.*\\/)?(?<artist>[^/]+) - (?<album>[^/]+)"
@@ -92,7 +92,7 @@ std::vector<RegexPattern> patterns{
     // artist/albumTitle/## - trackTitle
     make(Shared::VAType::none,
          "^(.*\\/)?(?<artist>[^/]+)\\/(?<album>[^/]+)"
-         "\\/(?<track>\\d+)[-. ]+ (?<title>[^/]+)$")};
+         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$")};
 
 } // namespace
 
