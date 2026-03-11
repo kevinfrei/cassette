@@ -92,7 +92,7 @@ function AggregateSearchResults(
   function MakeAlbumSongEntries(albumKey: AlbumKey): SearchSongData[] {
     const album = albums.get(albumKey);
     if (!album) return [];
-    return album.songs.map((sk, idx) =>
+    return [...album.songs.values()].map((sk, idx) =>
       MakeSongSearchEntry(songs.get(sk)!, idx, MakeAlbumGroupKey(album.key)),
     );
   }

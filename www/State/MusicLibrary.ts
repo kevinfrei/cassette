@@ -20,7 +20,6 @@ const emptyLibrary: MusicDatabase = {
   artists: new Map<ArtistKey, Artist>(),
   albums: new Map<AlbumKey, Album>(),
   songs: new Map<SongKey, Song>(),
-  playlists: new Map<string, Playlist>(),
 };
 
 export const musicLibraryState = atomWithStorage(

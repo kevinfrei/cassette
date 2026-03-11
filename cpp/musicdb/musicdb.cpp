@@ -75,7 +75,7 @@ bool MusicDatabase::add_file_location(const std::filesystem::path& root) {
     return false;
   }
   audio_index.push_back(file_index{root, true});
-  auto& ai = *audio_index.rend();
+  auto& ai = *audio_index.begin();
   ai.foreach_file([this](const fs::path& p) {
     std::string ext = p.extension().string();
     for (const auto& validExt : audio_ext) {
@@ -210,8 +210,17 @@ Shared::AlbumKey MusicDatabase::get_or_create_album(
   return newKey;
 }
 
+void MusicDatabase::init_md_store() {
+  // TODO: make this handle multiple file caches
+  if (!metadata_cache) {
+    // TODO: Double-checked locking
+    metadata_cache = new metadata::store(audio_index.begin()->get_location());
+  }
+}
+
 void MusicDatabase::add_song_to_db(const fs::path& song) {
   // First, get the metadata for the song
+  init_md_store();
   auto md = metadata_cache->read(song);
   if (!md) {
     std::cerr << "Failed to get metadata for song: " << song.string()

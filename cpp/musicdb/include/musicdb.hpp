@@ -25,6 +25,7 @@ class MusicDatabase {
   // locations, or different types of media).
   std::vector<file_index> audio_index;
   metadata::store* metadata_cache;
+  void init_md_store();
 
   std::hash<std::string> hasher;
 

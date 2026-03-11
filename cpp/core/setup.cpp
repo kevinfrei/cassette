@@ -1,12 +1,18 @@
 
 #include <cstdint>
+#include <iterator>
 #include <random>
 #include <string>
 
 #include <crow.h>
 
+#include "CommonTypes.hpp"
+#include "api.hpp"
+#include "config.hpp"
 #include "files.hpp"
 #include "handlers.hpp"
+#include "json_pickling.hpp"
+#include "musicdb.hpp"
 #include "quitting.hpp"
 #include "websocket.hpp"
 #include "window.hpp"
@@ -58,9 +64,25 @@ uint16_t get_random_port() {
   return port;
 }
 
+// TODO: Run this in a separate thread:
+void launch_music() {
+  auto res = config::read_from_storage(
+      Shared::to_string(Shared::StorageId::Locations));
+  if (res) {
+    auto loc_json = crow::json::load(*res);
+    auto vals = from_json<std::vector<std::string>>(loc_json);
+    if (vals) {
+      std::vector<std::filesystem::path> paths;
+      std::copy(vals->begin(), vals->end(), std::back_inserter(paths));
+      musicdb::MusicDatabase::set_locations(paths);
+    }
+  }
+}
+
 void init() {
   setlocale(LC_ALL, ".UTF8");
   files::set_program_location();
+  launch_music();
   std::string url = GetRootUrl();
   CROW_LOG_INFO << "Starting server at " << url;
 
