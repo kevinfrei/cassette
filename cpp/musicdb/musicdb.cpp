@@ -109,17 +109,17 @@ std::optional<Shared::SongWithPath> MusicDatabase::get_song(
 std::optional<Shared::AlbumKey> MusicDatabase::get_album(
     const std::string& title,
     std::int16_t year,
-    const std::vector<std::string>& artists,
+    const std::vector<std::string>& arts,
     Shared::VAType vaType) {
-  return get_album_helper(title, year, artists, vaType).first;
+  return get_album_helper(title, year, arts, vaType).first;
 }
 
 std::pair<std::optional<Shared::AlbumKey>, AlbumTriple>
 MusicDatabase::get_album_helper(const std::string& title,
                                 std::int16_t year,
-                                const std::vector<std::string>& artists,
+                                const std::vector<std::string>& arts,
                                 Shared::VAType vaType) {
-  AlbumTriple keyTuple = make_album_triple(title, year, artists, vaType);
+  AlbumTriple keyTuple = make_album_triple(title, year, arts, vaType);
   auto it = album_year_artist_to_key.find(keyTuple);
   if (it != album_year_artist_to_key.end()) {
     return std::make_pair(it->second, keyTuple);
@@ -165,7 +165,7 @@ Shared::ArtistKey MusicDatabase::get_or_create_artist(
 AlbumTriple MusicDatabase::make_album_triple(
     const std::string& title,
     std::int16_t year,
-    const std::vector<std::string>& artists,
+    const std::vector<std::string>& arts,
     Shared::VAType vaType) {
   std::string artistHashValue;
   if (vaType != Shared::VAType::none) {
@@ -174,7 +174,7 @@ AlbumTriple MusicDatabase::make_album_triple(
     artistHashValue.push_back('*');
   } else {
     // TODO: Make this case-insensitive
-    for (const auto& artist : artists) {
+    for (const auto& artist : arts) {
       artistHashValue += artist + "|";
     }
   }
@@ -184,10 +184,9 @@ AlbumTriple MusicDatabase::make_album_triple(
 Shared::AlbumKey MusicDatabase::get_or_create_album(
     const std::string& title,
     std::int16_t year,
-    const std::vector<std::string>& artists,
+    const std::vector<std::string>& arts,
     Shared::VAType vaType) {
-  auto [existing_album, keyTuple] =
-      get_album_helper(title, year, artists, vaType);
+  auto [existing_album, keyTuple] = get_album_helper(title, year, arts, vaType);
   if (existing_album) {
     return *existing_album;
   }
@@ -199,7 +198,7 @@ Shared::AlbumKey MusicDatabase::get_or_create_album(
   albumEntry.year = year;
   albumEntry.title = title;
   albumEntry.vatype = vaType;
-  for (const auto& artist : artists) {
+  for (const auto& artist : arts) {
     Shared::ArtistKey artistKey = get_or_create_artist(artist);
     albumEntry.primaryArtists.push_back(artistKey);
     // Now, add this album to the artist's list of albums:

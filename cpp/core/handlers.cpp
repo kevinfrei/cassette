@@ -129,16 +129,18 @@ crow::response tune(const crow::request& req, const std::string& path) {
   */
   const auto& range = req.headers.find("Range");
   range_header rh;
-  if (range != req.headers.end()) {
-    CROW_LOG_INFO << "Range header: " << range->second;
-    auto maybe_range = validate_range_header(range->second);
-    if (!maybe_range.has_value()) {
-      // TODO: Handle weirder ranges?
-      resp.code = 416;
-      return resp;
-    } else {
-      rh = maybe_range.value();
-    }
+  if (range == req.headers.end()) {
+    resp.code = 416;
+    return resp;
+  }
+  CROW_LOG_INFO << "Range header: " << range->second;
+  auto maybe_range = validate_range_header(range->second);
+  if (!maybe_range.has_value()) {
+    // TODO: Handle weirder ranges?
+    resp.code = 416;
+    return resp;
+  } else {
+    rh = maybe_range.value();
   }
   const auto& song = maybe_song.value();
   // TODO: Get the file size, check to see we can send the amount requested.
