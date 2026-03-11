@@ -301,7 +301,7 @@ export function MakeSortKey(
       ],
       [
         'Q', // Track Quantity
-        (a, b) => a.songs.length - b.songs.length,
+        (a, b) => a.songs.size - b.songs.size,
       ],
       [
         'D', // Disk Count
@@ -456,7 +456,7 @@ export function SortSongsFromAlbums(
   const comparator = sortOrder.makeSongAlbumComparator(artists, articles);
   // Count the # of songs
   const total = albums.reduce(
-    (prv: number, curAlb: Album) => prv + curAlb.songs.length,
+    (prv: number, curAlb: Album) => prv + curAlb.songs.size,
     0,
   );
   const songs: Song[] = new Array<Song>(total);
@@ -471,7 +471,9 @@ export function SortSongsFromAlbums(
   // Sort each group
   for (const album of albums) {
     const songSortTmp = SortItems(
-      album.songs.map((sk) => songMap.get(sk) as Song).filter(isDefined),
+      [...album.songs.values()]
+        .map((sk) => songMap.get(sk) as Song)
+        .filter(isDefined),
       comparator,
     );
     groups[groupIndex].startIndex = songIndex;

@@ -35,7 +35,7 @@ export const songListFromKey = atomFamily<MediaKey, Atom<Promise<SongKey[]>>>(
       } else if (isAlbumKey(key)) {
         const alb = await get(albumByKey(key));
         if (alb) {
-          return alb.songs;
+          return [...alb.songs.values()];
         } else {
           return [];
         }

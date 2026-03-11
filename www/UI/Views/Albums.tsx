@@ -16,11 +16,14 @@ import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
 import { ReactElement, Suspense, useCallback, useState } from 'react';
 import { AlbumKey, CurrentView, Song } from 'www/Shared/CommonTypes';
+import { albumByKey, allAlbumsState } from 'www/State/Albums';
 import { AddSongs, dataForAlbumByKey } from 'www/State/API';
+import { allArtistsState } from 'www/State/Artists';
 import { useJotaiCallback } from 'www/State/Helpers';
 import { MakeSetAtomFamily } from 'www/State/Hooks';
 import { focusedKeysFuncFam } from 'www/State/KeyBuffer';
 import { ignoreArticlesState } from 'www/State/SimpleSettings';
+import { allSongsState, songListFromKey } from 'www/State/Songs';
 import {
   AlbumForSongRender,
   ArtistsForSongRender,
@@ -39,10 +42,6 @@ import {
   SortSongsFromAlbums,
 } from 'www/Tools/Sorting';
 import { getAlbumImageUrl, GetIndexOf } from 'www/Utils';
-
-import { albumByKey, allAlbumsState } from 'www/State/Albums';
-import { allArtistsState } from 'www/State/Artists';
-import { allSongsState, songListFromKey } from 'www/State/Songs';
 import './styles/Albums.css';
 
 const { wrn } = MakeLog('EMP:render:Albums');
@@ -68,7 +67,7 @@ function AlbumHeaderDisplay({ group }: AHDProps): ReactElement {
   const albumData = useAtomValue(dataForAlbumByKey(group.key));
   const picurl = getAlbumImageUrl(group.key);
   const onAddSongsClick = useCallback(() => {
-    AddSongs(album.songs).catch(wrn);
+    AddSongs(album.songs.values()).catch(wrn);
   }, [album.songs]);
   const thisSetSetter = albumIsExpandedState(group.key);
   const onHeaderExpanderClick = useJotaiCallback(
@@ -103,9 +102,7 @@ function AlbumHeaderDisplay({ group }: AHDProps): ReactElement {
         <Text style={{ margin: '4px' }}>
           {`${albumData.album}: ${albumData.artist} ` +
             (album.year > 0 ? `[${albumData.year}] ` : '') +
-            (album.songs.length === 1
-              ? '1 song'
-              : `${album.songs.length} songs`)}
+            (album.songs.size === 1 ? '1 song' : `${album.songs.size} songs`)}
         </Text>
       </div>
     </div>
