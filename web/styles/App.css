@@ -1,0 +1,67 @@
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  /* This makes it so stuff won't be selectable
+   * Might need to update it in the future...
+   */
+  -webkit-user-select: none;
+}
+@media (min-width: 500px) {
+  #app {
+    display: grid;
+    height: 100vh;
+    grid-template-columns: 140px 135px auto 135px;
+    grid-template-rows: 44px auto 1fr;
+    overflow: hidden;
+  }
+  #left-column {
+    grid-column: 1;
+    grid-row: 1 / 4;
+    background-color: rgba(0, 0, 0, 0.04);
+    border-right-color: rgb(222, 222, 222);
+    border-right-width: 1px;
+    border-right-style: solid;
+  }
+  #top-row {
+    grid-column: 2 / 5;
+    grid-row: 1;
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+  #menu-button {
+    width: 30px;
+    color: #888;
+    margin-left: 1px;
+    padding: 0px;
+    float: right;
+  }
+  #menu-button:hover {
+    color: #444;
+    background-color: lightgray;
+  }
+}
+
+@media (max-width: 499px) {
+  #root {
+    display: grid;
+    height: 100vh;
+    grid-template-columns: 0px 135px auto 135px;
+    grid-template-rows: 250px auto 1fr;
+    overflow: hidden;
+  }
+  #left-column {
+    visibility: collapse;
+  }
+  #top-row {
+    grid-column: 1 / 5;
+    grid-row: 1;
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+  #grabber {
+    grid-row: 1;
+    grid-column: 1 / 5;
+    -webkit-app-region: drag;
+  }
+}
