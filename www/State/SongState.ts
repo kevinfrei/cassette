@@ -21,11 +21,11 @@ export type SongDescription = {
 } & AlbumDescription;
 
 const defSongDescr: SongDescription = {
-  title: `title`,
+  title: '',
   track: 1,
-  artist: `artist`,
-  album: `album`,
-  year: '2023',
+  artist: '',
+  album: '',
+  year: '',
 };
 
 export const songDescriptionForSongState = atomFamily((songKey: SongKey) =>
