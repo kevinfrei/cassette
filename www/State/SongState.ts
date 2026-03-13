@@ -1,6 +1,9 @@
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai-family';
 import { SongKey } from 'www/Shared/CommonTypes';
+import { albumByKey } from './Albums';
+import { artistStringStateFamily } from './Artists';
+import { songByKey } from './Songs';
 
 export type AlbumDescription = {
   artist: string;
@@ -25,8 +28,23 @@ const defSongDescr: SongDescription = {
   year: '2023',
 };
 
-export const songDescriptionForSongState = atomFamily((songKey: string) =>
-  atom<SongDescription>(defSongDescr),
+export const songDescriptionForSongState = atomFamily((songKey: SongKey) =>
+  atom(async (get): Promise<SongDescription> => {
+    try {
+      const song = await get(songByKey(songKey));
+      const title = song.title;
+      const track = song.track;
+      const [artist, albumObj] = await Promise.all([
+        get(artistStringStateFamily(song.artistIds)),
+        get(albumByKey(song.albumId)),
+      ]);
+      const album = albumObj.title;
+      const year = albumObj.year === 0 ? '' : albumObj.year.toString();
+      return { track, title, album, artist, year };
+    } catch {
+      return defSongDescr;
+    }
+  }),
 );
 
 export const songDescriptionsForSongList = atomFamily((sks: SongKey[]) =>
