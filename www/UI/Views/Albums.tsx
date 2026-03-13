@@ -93,12 +93,14 @@ function AlbumHeaderDisplay({ group }: AHDProps): ReactElement {
         className="album-header-info"
         onDoubleClick={onAddSongsClick}
         style={{ padding: '2px 0px', cursor: 'pointer' }}>
-        <Image
-          imageFit={ImageFit.centerContain}
-          height={50}
-          width={50}
-          src={picurl}
-        />
+        <Suspense fallback={<div className="loading-view">Loading...</div>}>
+          <Image
+            imageFit={ImageFit.centerContain}
+            height={50}
+            width={50}
+            src={picurl}
+          />
+        </Suspense>
         <Text style={{ margin: '4px' }}>
           {`${albumData.album}: ${albumData.artist} ` +
             (album.year > 0 ? `[${albumData.year}] ` : '') +
