@@ -9,9 +9,10 @@ import { BuildType, GetBuildType } from './buildtype';
 async function parallelBuild(buildType: BuildType): Promise<void> {
   const res = await Promise.all([WebBuild(buildType), CppBuild(buildType)]);
   let success = true;
-  if (!res[0].success) {
+  if (!res[0][0].success || res[0][1].exitCode) {
     console.error('WWW Build failed');
-    console.error(res[0].logs);
+    console.error(res[0][0].logs);
+    console.error(res[0][1].text());
     success = false;
   }
   if (res[1].exitCode !== 0) {
