@@ -1,10 +1,20 @@
-import { BuildOutput } from 'bun';
+import { $, BuildOutput } from 'bun';
 
 import { BuildType, GetBuildType } from './buildtype';
 
-export function WebBuild(buildType: BuildType): Promise<BuildOutput> {
+export async function WebBuild(
+  buildType: BuildType,
+): Promise<[BuildOutput, $.ShellOutput]> {
   const isDebug = buildType === 'Debug';
-  return Bun.build({
+  try {
+    const rmdir = await $`rm -r build/${buildType}/www`;
+    console.log(rmdir.exitCode, rmdir.text());
+  } catch {}
+  try {
+    const mkdir = await $`mkdir -p build/${buildType}/www/img`;
+    console.log(mkdir.exitCode, mkdir.text());
+  } catch {}
+  const bunBuild = await Bun.build({
     entrypoints: ['www/index.html'],
     outdir: `build/${buildType}/www`,
     minify: !isDebug,
@@ -18,6 +28,11 @@ export function WebBuild(buildType: BuildType): Promise<BuildOutput> {
     // packages: isDebug ? 'external' : 'bundle',
     //external: isDebug ? ['*']: [],
   });
+  const copy = $`cp www/img/* build/${buildType}/www/img`;
+  const res = await copy;
+  console.log(res.exitCode, res.text());
+  // Copy all the www/img files to build/${buildType}/www/img:
+  return [bunBuild, res];
 }
 
 if (import.meta.main) {
