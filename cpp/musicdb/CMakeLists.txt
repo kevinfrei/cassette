@@ -11,3 +11,5 @@ target_link_libraries(
   PUBLIC
     ipc_lib tools_lib fileindex_lib metadata_store_lib
 )
+
+add_subdirectory(test)
