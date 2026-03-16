@@ -23,7 +23,7 @@ import {
   Unsubscribe,
   WriteToStorage,
 } from '../Tools/Ipc';
-import { WritableAtomType } from './Hooks';
+import { WritableAtomType } from './StateTypes';
 
 const theStore = createStore();
 

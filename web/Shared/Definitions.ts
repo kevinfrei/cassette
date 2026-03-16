@@ -408,7 +408,7 @@ export const TypesToGenerate: Record<string, Types> = {
   Song,
   SongWithPath,
   VAType,
-  /* 
+  /*
   SongObj,
   ArtistObj,
   AlbumObj,

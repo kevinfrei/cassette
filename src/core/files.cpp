@@ -4,6 +4,7 @@
 
 #include <boost/dll/runtime_symbol_info.hpp>
 #include <crow/http_response.h>
+#include <crow/logging.h>
 #include <portable-file-dialogs.h>
 
 #include "CommonTypes.hpp"

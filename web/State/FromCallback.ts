@@ -1,21 +1,10 @@
 import { isFunction, isPromise } from '@freik/typechk';
 import { WritableAtom, atom } from 'jotai';
 import { AsyncStorage, SyncStorage } from 'jotai/vanilla/utils/atomWithStorage';
-import { IpcCall, SocketMsg } from '../Shared/CommonTypes';
-
-type Unsubscribe = () => void;
+import { IpcCall } from '../Shared/CommonTypes';
+import { AsyncCallback, SyncCallback, Unsubscribe } from './StateTypes';
 
 type SetStateAction<Value> = Value | ((prev: Value) => Value);
-
-export interface AsyncCallback<Value> {
-  getItem: (key: string) => PromiseLike<Value>;
-  subscribe?: (key: string, callback: (value: Value) => void) => Unsubscribe;
-}
-
-export interface SyncCallback<Value> {
-  getItem: (key: string) => Value;
-  subscribe?: (key: string, callback: (value: Value) => void) => Unsubscribe;
-}
 
 export function atomFromCallback<Value>(
   key: IpcCall,

@@ -21,7 +21,6 @@ import {
   useEffect,
 } from 'react';
 import { IpcCall, OpenDialogOptions } from '../Shared/CommonTypes';
-import { WritableAtomType } from '../State/Hooks';
 import { keyBufferState } from '../State/KeyBuffer';
 import { saveableState } from '../State/PlaylistControl';
 import { isMiniplayerState } from '../State/SongPlayback';

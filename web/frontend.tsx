@@ -13,7 +13,6 @@ import { SendMessage } from './Tools/Ipc';
 import { App } from './UI/App';
 
 const elem = document.getElementById('root')!;
-// const theActualApp = <App />;
 
 const app = (
   <StrictMode>
@@ -26,7 +25,7 @@ if (import.meta.hot) {
   const root = (import.meta.hot.data.root ??= createRoot(elem));
   root.render(app);
   // console.log(theActualApp);
-  // TODO: Make HMR work with Crow?
+  // TODO: Make HMR work with Crow
 } else {
   FluentInitIcons();
   // The hot module reloading API is not available in production.

@@ -1,8 +1,7 @@
 import { Expandable } from '@freik/fluentui-tools';
-import { TranscoderConfiguration } from './Tools/Transcoder';
-
 import { ReactElement } from 'react';
 import './styles/Tools.css';
+import { TranscoderConfiguration } from './Tools/Transcoder';
 
 export function ToolsView(): ReactElement {
   return (

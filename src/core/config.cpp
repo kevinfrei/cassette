@@ -9,10 +9,13 @@
 #include <string_view>
 #include <unordered_map>
 
+#include <sago/platform_folders.h>
+
 #include "files.hpp"
 
 #include "config.hpp"
 
+// Cuz I'm lazy:
 namespace fs = std::filesystem;
 
 namespace config {
@@ -37,15 +40,16 @@ void init() {
     if (inited) {
       return; // Another thread initialized it while we were waiting
     }
+    cfg_path = sago::getStateDir();
 #if defined(_WIN32)
     home_path = fs::canonical(getenv("USERPROFILE"));
-    cfg_path = fs::canonical(getenv("LOCALAPPDATA"));
+    // cfg_path = fs::canonical(getenv("LOCALAPPDATA"));
 #elif defined(__APPLE__)
     home_path = fs::canonical(getenv("HOME"));
-    cfg_path = fs::canonical(home_path / "Library" / "Application Support");
+    // cfg_path = fs::canonical(home_path / "Library" / "Application Support");
 #elif defined(__linux__)
     home_path = fs::canonical(getenv("HOME"));
-    cfg_path = fs::canonical(home_path / ".config");
+    // cfg_path = fs::canonical(home_path / ".config");
 #else
 #error Unsupported platform: I only grok Windows, macOS, and Linux.
 #endif

@@ -10,8 +10,8 @@ import {
   SongKey,
 } from '../Shared/CommonTypes';
 import { CallMain, PostMain } from '../Tools/Ipc';
-import { SetStateActionWithReset, WritableAtomType } from './Hooks';
 import { activePlaylistState } from './SongPlayback';
+import { SetStateActionWithReset, WritableAtomType } from './StateTypes';
 import { getStore, MyStore } from './Storage';
 
 // const { wrn } = MakeLog('EMP:UI:PlaylistControl');

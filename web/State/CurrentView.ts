@@ -1,5 +1,3 @@
-// The currently selected item from the left bar
-
 import { atom } from 'jotai';
 import { chkCurrentView, CurrentView, StorageId } from '../Shared/CommonTypes';
 import { isMiniplayerState } from './SongPlayback';

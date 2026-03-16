@@ -6,6 +6,7 @@
 #include <string>
 
 #include <crow.h>
+#include <crow/logging.h>
 
 #include "CommonTypes.hpp"
 #include "api.hpp"
@@ -54,14 +55,16 @@ crow::response www_path(const crow::request&, const std::string& path) {
       resp.body = content;
       resp.code = 200;
       resp.set_header("Content-Type", "text/html");
+      CROW_LOG_INFO << "Sending transformed index.html";
     } else {
-      CROW_LOG_ERROR << "Placeholder not found in index.html file: "
-                     << p.generic_string();
+      CROW_LOG_INFO << "Placeholder not found in index.html file: "
+                    << p.generic_string();
       resp.code = 500;
       resp.body = "Internal Server Error";
       resp.set_header("Content-Type", "text/plain");
     }
   } else {
+    CROW_LOG_INFO << "Sending raw file " << p.generic_string();
     resp.set_static_file_info_unsafe(p.generic_string());
     resp.set_header("Content-type", files::path_to_mime_type(p));
   }
@@ -72,6 +75,7 @@ crow::response images(const crow::request&, const std::string& query) {
   quitting::keep_alive();
   crow::response resp;
   std::filesystem::path p = image::get_image_path(query);
+  CROW_LOG_INFO << "Images " << p.generic_string();
   resp.set_static_file_info_unsafe(p.generic_string());
   resp.set_header("Content-type", files::path_to_mime_type(p));
   return resp;

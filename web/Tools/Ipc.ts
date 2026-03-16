@@ -1,6 +1,7 @@
 import { MakeLog } from '@freik/logger';
 import MakeSeqNum from '@freik/seqnum';
 import {
+  hasFieldType,
   isDefined,
   isFunction,
   isNumberOrString,
@@ -150,7 +151,7 @@ export function WireUpIpc(): void {
     ipcAttempts++;
     setTimeout(WireUpIpc, 100);
     if (ipcAttempts % 10 === 0) {
-      console.error(
+      err(
         `Failed to wire up IPC after ${ipcAttempts} attempts. Please ensure the ReactWebScoket module is loaded.`,
       );
     }
@@ -284,8 +285,8 @@ export async function RawGetAsText(
     if (response.ok) {
       return await response.text();
     }
-  } catch (err) {
-    console.error(`Failed to fetch ${endpoint}:`, err);
+  } catch (e) {
+    err(`Failed to fetch ${endpoint}:`, e);
   }
   return undefined;
 }
@@ -300,8 +301,8 @@ export async function RawGetAsJSON(
     if (response.ok) {
       return await response.json();
     }
-  } catch (err) {
-    console.error(`Failed to fetch ${endpoint}:`, err);
+  } catch (e) {
+    err(`Failed to fetch ${endpoint}:`, e);
   }
   return undefined;
 }
@@ -336,7 +337,7 @@ async function Get(endpoint: IpcCall, ...args: unknown[]): Promise<unknown> {
       }
       return txt;
     } else {
-      // console.log(
+      // log(
       //   `Received non-JSON/text response from ${endpoint}, contentType: ${contentType}`,
       // );
       return await response.blob();
@@ -361,22 +362,29 @@ async function GetAs<T>(
         args.length === 1 &&
         args[0] === 'locations'
       ) {
-        console.error(`ReadFromStorage("locations") returned: "${res}"`);
+        err(`ReadFromStorage("locations") returned: "${res}"`);
       }
       return SafelyUnpickle(res, validator);
     } catch (e) {
-      console.error(
+      err(
         `Failed to unpickle response from Get(${endpoint}, ${args.join(', ')}):`,
         e,
       );
-      console.error(validator);
+      err(validator);
       return undefined;
     }
   }
-  console.log(
+  wrn(
     `GetAs failed to validate result from Get(${endpoint}, ${args.join(', ')}):`,
   );
-  console.log(res);
+  if (hasFieldType(res, 'text', isFunction)) {
+    try {
+      const val = await res.text();
+      wrn('result.text(): "', val, '"');
+      return undefined;
+    } catch {}
+  }
+  wrn(res);
   return undefined;
 }
 
@@ -384,7 +392,7 @@ async function Post(endpoint: IpcCall, ...args: unknown[]): Promise<void> {
   try {
     await Get(endpoint, ...args);
   } catch (e) {
-    console.error(`Post failed for (${endpoint}, ${args.join(', ')}):`, e);
+    err(`Post failed for (${endpoint}, ${args.join(', ')}):`, e);
   }
 }
 

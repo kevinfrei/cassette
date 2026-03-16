@@ -1,4 +1,4 @@
-# The core library of cassette, implementing the main logic.
+# The core library of the app, implementing the main logic.
 # This is basically everything except the main entry point and the tests.
 
 add_library(
@@ -20,7 +20,8 @@ add_library(
     window.cpp
 )
 target_include_directories(core_lib PUBLIC include)
-target_include_directories(core_lib PRIVATE impl)
+# This would be for core-specific header files:
+# target_include_directories(core_lib PRIVATE impl)
 
 # Link the dependencies with our binary
 target_link_libraries(

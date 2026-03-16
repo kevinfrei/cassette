@@ -12,7 +12,7 @@ TEST(Files, Miscellany) {
   auto web_dir = files::get_web_dir();
   std::filesystem::path index = web_dir / "index.html";
   EXPECT_TRUE(std::filesystem::exists(index));
-  EXPECT_STREQ(files::get_app_name().string().c_str(), "cassette_testing");
+  EXPECT_STREQ(files::get_app_name().string().c_str(), "core_testing");
   auto contents = files::read_file(index);
   EXPECT_TRUE(contents);
   EXPECT_FALSE(contents->find("window.wsport = 42;") == contents->npos);

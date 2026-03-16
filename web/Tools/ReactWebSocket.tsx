@@ -6,7 +6,7 @@ import { WireUpIpc } from './Ipc';
 
 declare const window: MyWindow;
 
-const { con, log, err } = MakeLog('Tools:RealTimeUpdates');
+const { con, err } = MakeLog('Tools:RealTimeUpdates');
 
 export function WebSocketRegistrar(): ReactElement {
   useEffect(() => {
