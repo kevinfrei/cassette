@@ -16,6 +16,6 @@
     "noImplicitAny": true,
     "noImplicitThis": true
   },
-  "include": ["www/**/*.ts", "www/**/*.tsx"],
+  "include": ["web/**/*.ts", "web/**/*.tsx"],
   "exclude": ["dist", "node_modules"]
 }

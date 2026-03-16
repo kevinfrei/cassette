@@ -65,4 +65,4 @@ FetchContent_MakeAvailable(webview)
 set(WEBVIEW_LIB webview::core)
 
 # The actual C++ project lives in the cpp/ subdirectory
-add_subdirectory(cpp)
+add_subdirectory(src)
