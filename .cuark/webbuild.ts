@@ -7,12 +7,7 @@ export async function WebBuild(
 ): Promise<[BuildOutput, $.ShellOutput]> {
   const isDebug = buildType === 'Debug';
   try {
-    const rmdir = await $`rm -r build/${buildType}/web`;
-    console.log(rmdir.exitCode, rmdir.text());
-  } catch {}
-  try {
-    const mkdir = await $`mkdir -p build/${buildType}/web/img`;
-    console.log(mkdir.exitCode, mkdir.text());
+    await $`mkdir -p build/${buildType}/web/img`;
   } catch {}
   const bunBuild = await Bun.build({
     entrypoints: ['web/index.html'],
@@ -21,17 +16,17 @@ export async function WebBuild(
     sourcemap: isDebug ? 'inline' : 'none',
     target: 'browser',
     define: {
-      'process.env.NODE_ENV': isDebug ? '"debug"' : '"production"',
+      // There's a bug when you set this to production...
+      'process.env.NODE_ENV': '"debug"', //isDebug ? '"debug"' : '"production"',
     },
     env: 'BUN_PUBLIC_*',
     splitting: isDebug,
     // packages: isDebug ? 'external' : 'bundle',
-    //external: isDebug ? ['*']: [],
+    // external: isDebug ? ['*']: [],
   });
   const copy = $`cp web/img/* build/${buildType}/web/img`;
   const res = await copy;
-  console.log(res.exitCode, res.text());
-  // Copy all the web/img files to build/${buildType}/web/img:
+  // Copy all the www/img files to build/${buildType}/www/img:
   return [bunBuild, res];
 }
 
