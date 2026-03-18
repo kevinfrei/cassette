@@ -69,12 +69,15 @@ void launch_music() {
   auto res = config::read_from_storage(
       Shared::to_string(Shared::StorageId::Locations));
   if (res) {
-    auto loc_json = crow::json::load(*res);
-    auto vals = from_json<std::vector<std::string>>(loc_json);
-    if (vals) {
-      std::vector<std::filesystem::path> paths;
-      std::copy(vals->begin(), vals->end(), std::back_inserter(paths));
-      musicdb::MusicDatabase::set_locations(paths);
+    try {
+      auto loc_json = crow::json::load(*res);
+      auto vals = from_json<std::vector<std::string>>(loc_json);
+      if (vals) {
+        std::vector<std::filesystem::path> paths;
+        std::copy(vals->begin(), vals->end(), std::back_inserter(paths));
+        musicdb::MusicDatabase::set_locations(paths);
+      }
+    } catch (...) {
     }
   }
 }

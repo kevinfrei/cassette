@@ -348,6 +348,7 @@ void folder_picker(crow::response& resp, std::string_view data) {
     CROW_LOG_INFO << "Folder picker selected: " << result;
     resp.code = 200; // OK
     resp.set_header("Content-Type", "text/plain");
+    auto path = (fs::path{result}).generic_string();
     resp.body = to_json(std::vector<std::string>{result}).dump();
   }
   /*
