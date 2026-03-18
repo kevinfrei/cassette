@@ -1,9 +1,12 @@
+#include <array>
 #include <cctype>
 #include <filesystem>
 #include <iostream>
 #include <optional>
+#include <ranges>
 #include <sstream>
 #include <string>
+#include <tuple>
 
 #include <crow.h>
 #include <crow/logging.h>
@@ -13,7 +16,9 @@
 #include "config.hpp"
 #include "files.hpp"
 #include "images.hpp"
+#include "json_pickling.hpp"
 #include "quitting.hpp"
+#include "range_tools.hpp"
 #include "setup.hpp"
 #include "text_tools.hpp"
 #include "tools.hpp"
@@ -79,6 +84,20 @@ crow::response images(const crow::request&, const std::string& query) {
   resp.set_static_file_info_unsafe(p.generic_string());
   resp.set_header("Content-type", files::path_to_mime_type(p));
   return resp;
+}
+
+crow::response keepalive() {
+  quitting::keep_alive();
+  crow::response resp;
+  resp.code = 200;
+  resp.body = "OK";
+  resp.set_header("Content-Type", "text/plain");
+  return resp;
+}
+
+crow::response quit() {
+  quitting::really_quit();
+  return crow::response(200);
 }
 
 // TODO: Make this actually validate the Range header
@@ -179,72 +198,159 @@ crow::response tune(const crow::request& req, const std::string& path) {
   return resp;
 }
 
-crow::response api(const crow::request&, const std::string& path) {
-  quitting::keep_alive();
-
-  CROW_LOG_DEBUG << "API Path: " << path;
-  crow::response resp;
-  size_t slashPos = path.find('/');
-  slashPos = (slashPos == path.npos) ? path.size() : slashPos;
-  auto maybeCall = text::to_integer<Shared::IpcCall>(
-      std::string_view{path.c_str(), slashPos});
-  if (!maybeCall) {
-    tools::e404(resp, "Invalid API arguments for path " + path);
-    return resp;
-  }
-  if (!Shared::is_valid(*maybeCall)) {
-    tools::e404(resp, "Unknown API for path " + path);
-    return resp;
-  }
-  auto ValidateAndCall =
-      [&](std::function<void(crow::response&, std::string_view)> handle_call,
-          bool decode) -> void {
-    if (slashPos == path.size()) {
-      tools::e404(resp, "No data provided for API" + path);
+// Internal worker that deduces arg types
+template <typename... Args, typename Func>
+void Execute(crow::response& resp, std::string_view path, Func&& handle_call) {
+  constexpr size_t ArgCount = sizeof...(Args);
+  std::array<std::string, ArgCount> segments;
+  auto pos = segments.begin();
+  auto path_chunks = path | views::split_string_view('/');
+  size_t count = 0;
+  for (auto const segment : path_chunks) {
+    if (pos == segments.end()) {
+      tools::e404(resp, "Too many parameters: " + std::string(path));
+      return;
+    }
+    if (auto decoded = tools::url_decode(segment)) {
+      *pos++ = std::move(*decoded);
     } else {
-      const std::string_view data{path.c_str() + slashPos + 1};
-      if (decode) {
-        auto maybeDecoded = tools::url_decode(data);
-        if (!maybeDecoded) {
-          tools::e404(resp, "Invalid URL encoding for API " + path + ":");
-          CROW_LOG_ERROR << data;
-        } else {
-          resp.code = 200;
-          handle_call(resp, *maybeDecoded);
-        }
+      tools::e404(resp, "URL Decode Failed for " + std::string(segment));
+      return;
+    }
+    count++;
+  }
+  if (count != ArgCount) {
+    tools::e404(resp, "Missing parameters from " + std::string(path));
+    return;
+  }
+
+  // Unpack and Call
+  auto call_and_respond = [&]<size_t... Is>(std::index_sequence<Is...>) {
+    using ReturnType = std::invoke_result_t<Func, std::decay_t<Args>...>;
+
+    try {
+      // Returning function: Execute and encode result
+      auto result =
+          handle_call(text::from_string<std::decay_t<Args>>(segments[Is])...);
+      if constexpr (std::is_void_v<ReturnType>) {
+        // Void function: Just execute and return 204 (No Content) or 200
+      } else if constexpr (std::is_integral_v<ReturnType>) {
+        resp.set_header("Content-Type", "application/text");
+        resp.body = std::to_string(result);
+      } else if constexpr (std::is_same_v<ReturnType, std::string> ||
+                           std::is_same_v<ReturnType, std::string_view> ||
+                           std::is_same_v<ReturnType, char*>) {
+        resp.set_header("Content-Type", "application/text");
+        resp.body = std::string(result);
       } else {
-        handle_call(resp, data);
+        // Assuming Crow's wvalue or similar JSON lib
+        // crow::json::wvalue json_out;
+        // json_out["result"] = result;
+
+        resp.set_header("Content-Type", "application/json");
+        resp.body = to_json(result).dump();
       }
+      resp.code = 200;
+      resp.end();
+    } catch (const std::exception& e) {
+      // This should be a 500
+      tools::e404(resp, std::string("Internal Error: ") + e.what());
     }
   };
-  switch (*maybeCall) {
+
+  call_and_respond(std::make_index_sequence<ArgCount>{});
+}
+
+// 3. Overload A: For regular functions (e.g., bool myFunc(string_view,
+// string_view))
+template <typename R, typename... Args>
+void InternalCall(crow::response& resp,
+                  std::string_view remaining,
+                  R (*func)(Args...),
+                  R (*)(Args...)) {
+  Execute<Args...>(resp, remaining, func);
+}
+
+// 4. Overload B: For lambdas/functors (has an operator())
+template <typename Func, typename R, typename... Args>
+void InternalCall(crow::response& resp,
+                  std::string_view remaining,
+                  Func&& handle_call,
+                  R (std::remove_reference_t<Func>::*)(Args...) const) {
+  Execute<Args...>(resp, remaining, std::forward<Func>(handle_call));
+}
+
+// "Public" API to use
+template <typename Func>
+void ValidateAndCall(crow::response& resp,
+                     std::string_view path,
+                     Func&& handle_call) {
+  // Pass the pointer to the lambda's operator() to trigger deduction
+  // Use constexpr if to decide which pointer to pass for deduction
+  if constexpr (std::is_function_v<
+                    std::remove_pointer_t<std::remove_reference_t<Func>>>) {
+    InternalCall(resp, path, handle_call, handle_call);
+  } else {
+    InternalCall(resp,
+                 path,
+                 std::forward<Func>(handle_call),
+                 &std::remove_reference_t<Func>::operator());
+  }
+}
+
+// The URL comes in looking like this:
+// https://.../api/<call-id>{/arg1/arg2/etc...} so the_path is
+crow::response api(const crow::request&, const std::string& the_path) {
+  quitting::keep_alive();
+  std::string_view path(the_path);
+  CROW_LOG_DEBUG << "API Path: " << path;
+  crow::response resp;
+  size_t slash = path.find('/');
+  if (slash == std::string_view::npos) {
+    slash = path.length();
+  }
+  Shared::IpcCall callId =
+      text::from_string<Shared::IpcCall>(path.substr(0, slash));
+  if (!Shared::is_valid(callId)) {
+    tools::e404(resp, "Unknown API for path " + std::string(path));
+    return resp;
+  }
+  // TODO: Finish stuff from here:
+  path = path.substr(slash + 1, path.length() - (slash + 1));
+  switch (callId) {
     case Shared::IpcCall::WriteToStorage:
-      ValidateAndCall(api::write_to_storage, false);
+      ValidateAndCall(resp, path, config::write_to_storage);
       break;
     case Shared::IpcCall::ReadFromStorage:
-      ValidateAndCall(api::read_from_storage, true);
+      ValidateAndCall(resp, path, config::read_from_storage);
       break;
     case Shared::IpcCall::DeleteFromStorage:
-      ValidateAndCall(api::delete_from_storage, true);
+      ValidateAndCall(resp, path, config::delete_from_storage);
       break;
     case Shared::IpcCall::ShowOpenDialog:
-      ValidateAndCall(files::folder_picker, true);
+      ValidateAndCall(resp, path, files::new_folder_picker);
       break;
+    case Shared::IpcCall::AsyncData:
+    case Shared::IpcCall::IsDev:
+    case Shared::IpcCall::MenuAction:
+    case Shared::IpcCall::MinimizeWindow:
+    case Shared::IpcCall::MaximizeWindow:
+    case Shared::IpcCall::RestoreWindow:
+    case Shared::IpcCall::CloseWindow:
+      CROW_LOG_ERROR
+          << "Unimplemented API call received: " << Shared::to_string(callId)
+          << " (" << underlying_cast(callId) << ") [" << path << "]";
+      break;
+
+    case Shared::IpcCall::Unknown:
     default:
-      if (Shared::is_valid(*maybeCall)) {
-        CROW_LOG_ERROR << "Unimplemented API call received: "
-                       << Shared::to_string(*maybeCall) << " ("
-                       << underlying_cast(*maybeCall) << ") [" << path << "]";
-      } else {
-        CROW_LOG_ERROR << "Unknown API call received: "
-                       << underlying_cast(*maybeCall) << " [" << path << "]";
-      }
+      CROW_LOG_ERROR << "Unknown API call received: " << underlying_cast(callId)
+                     << " [" << path << "]";
       std::string error_message =
-          Shared::is_valid(*maybeCall)
+          Shared::is_valid(callId)
               ? "Unimplemented API call: " +
-                    std::string(Shared::to_string(*maybeCall))
-              : "Unknown API call: " +
-                    std::to_string(underlying_cast(*maybeCall));
+                    std::string(Shared::to_string(callId))
+              : "Unknown API call: " + std::to_string(underlying_cast(callId));
       tools::e404(resp, error_message);
       return resp;
   }
@@ -252,21 +358,7 @@ crow::response api(const crow::request&, const std::string& path) {
   return resp;
 }
 
-crow::response keepalive() {
-  quitting::keep_alive();
-  crow::response resp;
-  resp.code = 200;
-  resp.body = "OK";
-  resp.set_header("Content-Type", "text/plain");
-  return resp;
-}
-
-crow::response quit() {
-  quitting::really_quit();
-  return crow::response(200);
-}
-
-void socket_message(crow::websocket::connection& /*conn*/,
+void socket_message(crow::websocket::connection& conn,
                     const std::string& data,
                     bool /* is_binary */) {
   CROW_LOG_INFO << "Got a message from the client:" << data;

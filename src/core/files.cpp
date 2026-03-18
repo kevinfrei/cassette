@@ -313,6 +313,31 @@ void show_opt(std::string_view name, const std::optional<T>& opt) {
   }
 }
 
+std::string new_folder_picker(
+    const std::optional<Shared::OpenDialogOptions>& options) {
+  if (options) {
+    CROW_LOG_INFO << "Options: ";
+    show_opt("folder", options->folder);
+    show_opt("title", options->title);
+    show_opt("defaultPath", options->defaultPath);
+    show_opt("buttonLabel", options->buttonLabel);
+    show_opt("multiSelections", options->multiSelections);
+    if (options->filters) {
+      CROW_LOG_INFO << "  filters: ";
+      for (const auto& filter : *options->filters) {
+        CROW_LOG_INFO << "    name: " << filter.name;
+        CROW_LOG_INFO << "    extensions: ";
+        for (const auto& ext : filter.extensions) {
+          CROW_LOG_INFO << "      " << ext;
+        }
+      }
+    }
+  }
+  auto result =
+      pfd::select_folder("Select a folder", "", pfd::opt::none).result();
+  return result;
+}
+
 void folder_picker(crow::response& resp, std::string_view data) {
   // TODO: Allow data to specify a title, default path or a platform path.
   // Use the sago::platform_folders thing, as it's started working in Conan
@@ -348,7 +373,8 @@ void folder_picker(crow::response& resp, std::string_view data) {
     CROW_LOG_INFO << "Folder picker selected: " << result;
     resp.code = 200; // OK
     resp.set_header("Content-Type", "text/plain");
-    resp.body = to_json(std::vector<std::string>{result}).dump();
+    auto path = (fs::path{result}).generic_string();
+    resp.body = to_json(std::string{result}).dump();
   }
   /*
   auto json = crow::json::load(*maybe_value);
