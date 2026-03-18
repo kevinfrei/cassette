@@ -10,7 +10,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(MSVC)
   # For windows/VC++, run normal exception handling & windows 10 APIs
   # And for the love of god, turn of the CRT security warnings.
-  # Deploying those things across Microsoft in 2005 triggers my PTSD...
+  # Having deployed those things across all of Microsoft in 2005, let's
+  # just say "LKG666" wasn't very fun.
   add_compile_options(/EHsc /W4)
   add_compile_definitions(
     _WIN32_WINNT=0x0A00
@@ -30,7 +31,7 @@ if(MSVC)
     set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT ProgramDatabase)
     set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded)
 
-    # Enable WPO explicitly, instead of relying on CMake's specific support
+    # Enable WPO explicitly, instead of relying on CMake's custom support
     add_compile_options(/GL /O2 /FS)
     add_link_options(/LTCG /OPT:REF /OPT:ICF)
   endif()
