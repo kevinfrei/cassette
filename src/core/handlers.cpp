@@ -310,12 +310,8 @@ crow::response api(const crow::request&, const std::string& the_path) {
   if (slash == std::string_view::npos) {
     slash = path.length();
   }
-  auto maybeCall = text::to_integer<Shared::IpcCall>(path.substr(0, slash));
-  if (!maybeCall) {
-    tools::e404(resp, "Invalid API arguments for path " + the_path);
-    return resp;
-  }
-  Shared::IpcCall callId = *maybeCall;
+  Shared::IpcCall callId =
+      text::from_string<Shared::IpcCall>(path.substr(0, slash));
   if (!Shared::is_valid(callId)) {
     tools::e404(resp, "Unknown API for path " + std::string(path));
     return resp;
@@ -347,6 +343,7 @@ crow::response api(const crow::request&, const std::string& the_path) {
     case Shared::IpcCall::SavePlaylist:
     case Shared::IpcCall::AsyncData:
     case Shared::IpcCall::IsDev:
+    case Shared::IpcCall::MenuAction:
     case Shared::IpcCall::GetPlaylists:
     case Shared::IpcCall::RenamePlaylist:
     case Shared::IpcCall::DeletePlaylist:
@@ -360,7 +357,6 @@ crow::response api(const crow::request&, const std::string& the_path) {
     case Shared::IpcCall::GetLikes:
     case Shared::IpcCall::GetMediaInfo:
     case Shared::IpcCall::GetMusicDatabase:
-    case Shared::IpcCall::MenuAction:
     case Shared::IpcCall::Search:
     case Shared::IpcCall::SetHates:
     case Shared::IpcCall::SetLikes:
