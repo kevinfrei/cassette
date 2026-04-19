@@ -4,11 +4,13 @@ cmake_minimum_required(VERSION 3.28)
 # Name of the project
 project(cuark)
 
+# Compiler setup, OS-specific configuration, etc...
 include(.cuark/TheBasics.cmake)
 
 # Find Conan2 generated libraries
 include(.cuark/ConanLibImports.cmake)
 
+# Stuff that doesn't play nice with Conan
 include(.cuark/Extras.cmake)
 
 # The actual C++ project lives in the cpp/ subdirectory

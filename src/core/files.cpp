@@ -2,7 +2,6 @@
 #include <fstream>
 #include <iostream>
 
-#include <boost/dll/runtime_symbol_info.hpp>
 #include <crow/http_response.h>
 #include <crow/logging.h>
 #include <portable-file-dialogs.h>
@@ -19,8 +18,20 @@ namespace files {
 fs::path program_location;
 fs::path web_dir;
 
-void set_program_location() {
-  program_location = boost::dll::program_location().string();
+void set_program_location(const char* argv0) {
+  if (argv0 == nullptr || argv0[0] == '\0') {
+    CROW_LOG_ERROR << "argv[0] is empty, falling back to just 'cuark'";
+    program_location = fs::canonical(fs::current_path() / "cuark");
+    return;
+  }
+  fs::path potential_location(argv0);
+  if (potential_location.is_absolute()) {
+    program_location = fs::canonical(potential_location);
+  } else if (potential_location.is_relative()) {
+    program_location = fs::canonical(potential_location);
+  } else {
+    program_location = fs::canonical(fs::current_path() / argv0);
+  }
 }
 
 fs::path get_web_dir() {
@@ -74,7 +85,7 @@ std::string path_to_mime_type(const fs::path& file_path) {
 fs::path file_name_encode(std::string_view filename);
 std::optional<std::string> file_name_decode(std::string_view filename);
 
-#if 0
+/*
 std::string LoadFileWithMimeType(const fs::path& path,
                                  std::string& mime_type) {
   std::ifstream input_file(path, std::ifstream::binary);
@@ -93,7 +104,7 @@ std::string LoadFileWithMimeType(const fs::path& path,
 
   return ret;
 }
-#endif
+*/
 
 // Mac and Linux can't have colons or slashes in filenames.
 // Windows can't have a whole range of characters in filenames,
@@ -313,6 +324,31 @@ void show_opt(std::string_view name, const std::optional<T>& opt) {
   }
 }
 
+std::string new_folder_picker(
+    const std::optional<Shared::OpenDialogOptions>& options) {
+  if (options) {
+    CROW_LOG_INFO << "Options: ";
+    show_opt("folder", options->folder);
+    show_opt("title", options->title);
+    show_opt("defaultPath", options->defaultPath);
+    show_opt("buttonLabel", options->buttonLabel);
+    show_opt("multiSelections", options->multiSelections);
+    if (options->filters) {
+      CROW_LOG_INFO << "  filters: ";
+      for (const auto& filter : *options->filters) {
+        CROW_LOG_INFO << "    name: " << filter.name;
+        CROW_LOG_INFO << "    extensions: ";
+        for (const auto& ext : filter.extensions) {
+          CROW_LOG_INFO << "      " << ext;
+        }
+      }
+    }
+  }
+  auto result =
+      pfd::select_folder("Select a folder", "", pfd::opt::none).result();
+  return result;
+}
+
 void folder_picker(crow::response& resp, std::string_view data) {
   // TODO: Allow data to specify a title, default path or a platform path.
   // Use the sago::platform_folders thing, as it's started working in Conan
@@ -348,7 +384,8 @@ void folder_picker(crow::response& resp, std::string_view data) {
     CROW_LOG_INFO << "Folder picker selected: " << result;
     resp.code = 200; // OK
     resp.set_header("Content-Type", "text/plain");
-    resp.body = to_json(std::vector<std::string>{result}).dump();
+    auto path = (fs::path{result}).generic_string();
+    resp.body = to_json(std::string{result}).dump();
   }
   /*
   auto json = crow::json::load(*maybe_value);

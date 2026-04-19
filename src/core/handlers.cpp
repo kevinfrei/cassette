@@ -1,9 +1,12 @@
+#include <array>
 #include <cctype>
 #include <filesystem>
 #include <iostream>
 #include <optional>
+#include <ranges>
 #include <sstream>
 #include <string>
+#include <tuple>
 
 #include <crow.h>
 #include <crow/logging.h>
@@ -13,7 +16,9 @@
 #include "config.hpp"
 #include "files.hpp"
 #include "images.hpp"
+#include "json_pickling.hpp"
 #include "quitting.hpp"
+#include "range_tools.hpp"
 #include "setup.hpp"
 #include "text_tools.hpp"
 #include "tools.hpp"
@@ -79,6 +84,20 @@ crow::response images(const crow::request&, const std::string& query) {
   resp.set_static_file_info_unsafe(p.generic_string());
   resp.set_header("Content-type", files::path_to_mime_type(p));
   return resp;
+}
+
+crow::response keepalive() {
+  quitting::keep_alive();
+  crow::response resp;
+  resp.code = 200;
+  resp.body = "OK";
+  resp.set_header("Content-Type", "text/plain");
+  return resp;
+}
+
+crow::response quit() {
+  quitting::really_quit();
+  return crow::response(200);
 }
 
 // TODO: Make this actually validate the Range header
@@ -179,94 +198,85 @@ crow::response tune(const crow::request& req, const std::string& path) {
   return resp;
 }
 
-crow::response api(const crow::request&, const std::string& path) {
-  quitting::keep_alive();
+std::unordered_map<Shared::IpcCall, RouteHandler> RouteTable;
 
+void initialize_default_apis() {
+  register_route(Shared::IpcCall::WriteToStorage, config::write_to_storage);
+  register_route(Shared::IpcCall::ReadFromStorage, config::read_from_storage);
+  register_route(Shared::IpcCall::DeleteFromStorage,
+                 config::delete_from_storage);
+  register_route(Shared::IpcCall::ShowOpenDialog, files::new_folder_picker);
+}
+
+// The URL comes in looking like this:
+// https://.../api/<call-id>{/arg1/arg2/etc...} so the_path is
+crow::response api(const crow::request&, const std::string& the_path) {
+  quitting::keep_alive();
+  std::string_view path(the_path);
   CROW_LOG_DEBUG << "API Path: " << path;
   crow::response resp;
-  size_t slashPos = path.find('/');
-  slashPos = (slashPos == path.npos) ? path.size() : slashPos;
-  auto maybeCall = text::to_integer<Shared::IpcCall>(
-      std::string_view{path.c_str(), slashPos});
-  if (!maybeCall) {
-    tools::e404(resp, "Invalid API arguments for path " + path);
+  size_t slash = path.find('/');
+  if (slash == std::string_view::npos) {
+    slash = path.length();
+  }
+  Shared::IpcCall callId =
+      text::from_string<Shared::IpcCall>(path.substr(0, slash));
+  if (!Shared::is_valid(callId)) {
+    tools::e404(resp, "Unknown API for path " + std::string(path));
     return resp;
   }
-  if (!Shared::is_valid(*maybeCall)) {
-    tools::e404(resp, "Unknown API for path " + path);
-    return resp;
+  // TODO: Finish stuff from here:
+  path = path.substr(slash + 1, path.length() - (slash + 1));
+  auto api_route = RouteTable.find(callId);
+  if (api_route != RouteTable.end()) {
+    // Run the template magic via the table
+    api_route->second(resp, path);
+  } else {
+    tools::e404(resp, "Route not found");
   }
-  auto ValidateAndCall =
-      [&](std::function<void(crow::response&, std::string_view)> handle_call,
-          bool decode) -> void {
-    if (slashPos == path.size()) {
-      tools::e404(resp, "No data provided for API" + path);
-    } else {
-      const std::string_view data{path.c_str() + slashPos + 1};
-      if (decode) {
-        auto maybeDecoded = tools::url_decode(data);
-        if (!maybeDecoded) {
-          tools::e404(resp, "Invalid URL encoding for API " + path + ":");
-          CROW_LOG_ERROR << data;
-        } else {
-          resp.code = 200;
-          handle_call(resp, *maybeDecoded);
-        }
-      } else {
-        handle_call(resp, data);
-      }
-    }
-  };
-  switch (*maybeCall) {
+  /*
+  switch (callId) {
     case Shared::IpcCall::WriteToStorage:
-      ValidateAndCall(api::write_to_storage, false);
+      ValidateAndCall(resp, path, config::write_to_storage);
       break;
     case Shared::IpcCall::ReadFromStorage:
-      ValidateAndCall(api::read_from_storage, true);
+      ValidateAndCall(resp, path, config::read_from_storage);
       break;
     case Shared::IpcCall::DeleteFromStorage:
-      ValidateAndCall(api::delete_from_storage, true);
+      ValidateAndCall(resp, path, config::delete_from_storage);
       break;
     case Shared::IpcCall::ShowOpenDialog:
-      ValidateAndCall(files::folder_picker, true);
+      ValidateAndCall(resp, path, files::new_folder_picker);
       break;
+    case Shared::IpcCall::AsyncData:
+    case Shared::IpcCall::IsDev:
+    case Shared::IpcCall::MenuAction:
+    case Shared::IpcCall::MinimizeWindow:
+    case Shared::IpcCall::MaximizeWindow:
+    case Shared::IpcCall::RestoreWindow:
+    case Shared::IpcCall::CloseWindow:
+      CROW_LOG_ERROR
+          << "Unimplemented API call received: " << Shared::to_string(callId)
+          << " (" << underlying_cast(callId) << ") [" << path << "]";
+      break;
+
+    case Shared::IpcCall::Unknown:
     default:
-      if (Shared::is_valid(*maybeCall)) {
-        CROW_LOG_ERROR << "Unimplemented API call received: "
-                       << Shared::to_string(*maybeCall) << " ("
-                       << underlying_cast(*maybeCall) << ") [" << path << "]";
-      } else {
-        CROW_LOG_ERROR << "Unknown API call received: "
-                       << underlying_cast(*maybeCall) << " [" << path << "]";
-      }
+      CROW_LOG_ERROR << "Unknown API call received: " << underlying_cast(callId)
+                      << " [" << path << "]";
       std::string error_message =
-          Shared::is_valid(*maybeCall)
+          Shared::is_valid(callId)
               ? "Unimplemented API call: " +
-                    std::string(Shared::to_string(*maybeCall))
-              : "Unknown API call: " +
-                    std::to_string(underlying_cast(*maybeCall));
+                    std::string(Shared::to_string(callId))
+              : "Unknown API call: " + std::to_string(underlying_cast(callId));
       tools::e404(resp, error_message);
       return resp;
   }
-
+  */
   return resp;
 }
 
-crow::response keepalive() {
-  quitting::keep_alive();
-  crow::response resp;
-  resp.code = 200;
-  resp.body = "OK";
-  resp.set_header("Content-Type", "text/plain");
-  return resp;
-}
-
-crow::response quit() {
-  quitting::really_quit();
-  return crow::response(200);
-}
-
-void socket_message(crow::websocket::connection& /*conn*/,
+void socket_message(crow::websocket::connection& /* conn */,
                     const std::string& data,
                     bool /* is_binary */) {
   CROW_LOG_INFO << "Got a message from the client:" << data;
