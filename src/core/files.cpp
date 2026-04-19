@@ -2,7 +2,6 @@
 #include <fstream>
 #include <iostream>
 
-#include <boost/dll/runtime_symbol_info.hpp>
 #include <crow/http_response.h>
 #include <crow/logging.h>
 #include <portable-file-dialogs.h>
@@ -19,8 +18,20 @@ namespace files {
 fs::path program_location;
 fs::path web_dir;
 
-void set_program_location() {
-  program_location = boost::dll::program_location().string();
+void set_program_location(const char* argv0) {
+  if (argv0 == nullptr || argv0[0] == '\0') {
+    CROW_LOG_ERROR << "argv[0] is empty, falling back to just 'cuark'";
+    program_location = fs::canonical(fs::current_path() / "cuark");
+    return;
+  }
+  fs::path potential_location(argv0);
+  if (potential_location.is_absolute()) {
+    program_location = fs::canonical(potential_location);
+  } else if (potential_location.is_relative()) {
+    program_location = fs::canonical(potential_location);
+  } else {
+    program_location = fs::canonical(fs::current_path() / argv0);
+  }
 }
 
 fs::path get_web_dir() {
@@ -74,7 +85,7 @@ std::string path_to_mime_type(const fs::path& file_path) {
 fs::path file_name_encode(std::string_view filename);
 std::optional<std::string> file_name_decode(std::string_view filename);
 
-#if 0
+/*
 std::string LoadFileWithMimeType(const fs::path& path,
                                  std::string& mime_type) {
   std::ifstream input_file(path, std::ifstream::binary);
@@ -93,7 +104,7 @@ std::string LoadFileWithMimeType(const fs::path& path,
 
   return ret;
 }
-#endif
+*/
 
 // Mac and Linux can't have colons or slashes in filenames.
 // Windows can't have a whole range of characters in filenames,

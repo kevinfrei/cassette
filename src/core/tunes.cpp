@@ -6,7 +6,6 @@
 #include <crow/json.h>
 #include <sago/platform_folders.h>
 
-#include "config.hpp"
 #include "musicdb.hpp"
 #include "tunes.hpp"
 
@@ -20,7 +19,7 @@ std::shared_mutex get_db_mutex;
 
 namespace tunes {
 
-std::optional<std::filesystem::path> get_tune(const std::string& song_key) {
+std::optional<fs::path> get_tune(const std::string& song_key) {
   // This function should return the path to the tune file if it exists.
   // For now, we will just simulate it.
   if (song_key.empty()) {
