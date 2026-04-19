@@ -23,7 +23,7 @@ in the [conanfile.py](conanfile.py) python (in the 'Libraries' list).
 
 - ⚙️ C++ Core:
 
-  I write all complex, back-end logic in [C++20](https://cppstd20.com/), built
+  I write all complex, back-end logic in [C++23](https://cppstd23.com/), built
   with [CMake](https://cmake.org), [Conan](https://conan.io/center), and
   [GTest](https://google.github.io/googletest/).
 
