@@ -1,8 +1,10 @@
-#include <boost/regex.hpp>
 #include <charconv>
 #include <filesystem>
+#include <map>
 #include <optional>
+#include <regex>
 #include <string>
+
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
 
@@ -19,14 +21,20 @@ namespace metadata {
 // File-local stuff here:
 namespace {
 
+enum class Capture { artist, album, year, track, title, discNum, discName };
+
 struct RegexPattern {
   Shared::VAType va;
-  boost::regex rgx;
+  std::regex rgx;
+  std::map<Capture, int> captureGroups;
 };
 
-RegexPattern make(Shared::VAType va, const char* pattern) {
+RegexPattern make(Shared::VAType va,
+                  const char* pattern,
+                  std::map<Capture, int> captureGroups) {
   return {va,
-          boost::regex(pattern, boost::regex::icase | boost::regex::optimize)};
+          std::regex(pattern, std::regex::icase | std::regex::optimize),
+          captureGroups};
 }
 
 // Remove the suffix from a path
@@ -39,42 +47,90 @@ std::string get_no_suffix(const fs::path& p) {
 std::vector<RegexPattern> patterns{
     // va - (year - )albumTitle/(disc #- disc name/)## - artist - trackTitle
     make(Shared::VAType::va,
-         "^(.*\\/)?((va(rious artists)?)|(compilation)) - "
-         "((?<year>\\d{4}) - )?(?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"),
+         "^(?:.*\\/)?(?:(?:va(?:rious artists)?)|(?:compilation)) - "
+         "(?:(\\d{4}) - )?([^/]+)" // year & album
+         "(?:\\/(?:cd|dis[ck]) *(\\d+)(?:-? +([^ /][^/]+))?)?" // disk #, name
+         "\\/(\\d+)[-. ]+([^/]+) - ([^/]+)$", // track, artist, title
+         {{Capture::year, 1},
+          {Capture::album, 2},
+          {Capture::discNum, 3},
+          {Capture::discName, 4},
+          {Capture::track, 5},
+          {Capture::artist, 6},
+          {Capture::title, 7}}),
     // ost - (year - )albumTitle/(disc #- disc name/)## - artist - trackTitle
     make(Shared::VAType::ost,
-         "^(.*\\/)?((ost)|(soundtrack)) - "
-         "((?<year>\\d{4}) - )?(?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"),
+         "^(?:.*\\/)?(?:(?:ost)|(?:soundtrack)) - "
+         "(?:(\\d{4}) - )?([^/]+)" // year & album
+         "(?:\\/(?:cd|dis[ck]) *(\\d+)(?:-? +([^ /][^/]+))?)?" // disk #, name
+         "\\/(\\d+)[-. ]+([^/]+) - ([^/]+)$", // track, artist, title
+         {{Capture::year, 1},
+          {Capture::album, 2},
+          {Capture::discNum, 3},
+          {Capture::discName, 4},
+          {Capture::track, 5},
+          {Capture::artist, 6},
+          {Capture::title, 7}}),
     // artist - year - album/(disc #- disc name/)## - trackTitle
     make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+) - (?<year>\\d{4}) - (?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
+         "^(?:.*\\/)?"
+         "([^/]+) - (\\d{4}) - ([^/]+)" // artist, year, album
+         "(?:\\/(?:cd|dis[ck]) *(\\d+)(-? +([^ /][^/]+))?)?" // disk #, name
+         "\\/(\\d+)[-. ]+([^/]+)$", // track, title
+         {{Capture::artist, 1},
+          {Capture::year, 2},
+          {Capture::album, 3},
+          {Capture::discNum, 4},
+          {Capture::discName, 5},
+          {Capture::track, 6},
+          {Capture::title, 7}}),
     // va/(year - )albumTitle/(CD # name/)## - artist - trackTitle
     make(Shared::VAType::va,
-         "^(.*\\/)?((va(rious artists)?)|(compilation))"
-         "\\/((?<year>\\d{4}) - )?(?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"),
+         "^(?:.*\\/)?((?:va(?:rious artists)?)|(?:compilation))"
+         "\\/(?:(\\d{4}) - )?([^/]+)" // year, album
+         "(?:\\/(?:cd|dis[ck]) *(\\d+)(?:-? +([^ /][^/]+))?)?" // disk #, name
+         "\\/(\\d+)[-. ]+([^/]+) - ([^/]+)$", // track, artist, title
+         {{Capture::year, 1},
+          {Capture::album, 2},
+          {Capture::discNum, 3},
+          {Capture::discName, 4},
+          {Capture::track, 5},
+          {Capture::artist, 6},
+          {Capture::title, 7}}),
     // ost/(year - )albumTitle/(CD # name/)## - artist - trackTitle
     make(Shared::VAType::ost,
-         "^(.*\\/)?((ost)|(soundtrack))"
-         "\\/((?<year>\\d{4}) - )?(?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"),
+         "^(?:.*\\/)?(?:(?:ost)|(?:soundtrack))"
+         "\\/(?:(\\d{4}) - )?([^/]+)" // year, album
+         "(?:\\/(?:cd|dis[ck]) *(\\d+)(?:-? +([^ /][^/]+))?)?" // disk #, name
+         "\\/(\\d+)[-. ]+([^/]+) - ([^/]+)$", // track, artist, title
+         {{Capture::year, 1},
+          {Capture::album, 2},
+          {Capture::discNum, 3},
+          {Capture::discName, 4},
+          {Capture::track, 5},
+          {Capture::artist, 6},
+          {Capture::title, 7}}),
     // artist/year - albumTitle/CD # name/## - trackTitle
     make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+)\\/(?<year>\\d{4}) - (?<album>[^/]+)"
-         "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
-         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
+         "^(?:.*\\/)?([^/]+)\\/(\\d{4}) - ([^/]+)" // artist, year, album
+         "\\/(?:cd|dis[ck]) *(\\d+)(?:-? +([^ /][^/]+))?" // disk #, name
+         "\\/(\\d+)[-. ]+([^/]+)$", // track, title
+         {{Capture::artist, 1},
+          {Capture::year, 2},
+          {Capture::album, 3},
+          {Capture::discNum, 4},
+          {Capture::discName, 5},
+          {Capture::track, 6},
+          {Capture::title, 7}}),
     // artist/year - albumTitle/## - trackTitle
     make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+)\\/(?<year>\\d{4}) - (?<album>[^/]+)"
-         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
+         "^(.*\\/)?([^/]+)\\/(\\d{4}) - ([^/]+)" // artist, year, album
+         "\\/(\\d+)[-. ]+([^/]+)$", // track, title
+         {{Capture::artist, 1},
+          {Capture::year, 2},
+          {Capture::album, 3},
+          {Capture::track, 4},
+          {Capture::title, 5}}),
     // artist - album/CD # name/## - trackTitle
     make(Shared::VAType::none,
          "^(.*\\/)?(?<artist>[^/]+) - (?<album>[^/]+)"
