@@ -11,7 +11,6 @@ import {
 import { getStore } from '../State/Storage';
 import { MediaTime, mediaTimeState } from '../State/TimeState';
 import { MusicDbListener } from '../Tools/MusicDbListener';
-import { WebSocketRegistrar } from '../Tools/ReactWebSocket';
 import { isValidRefObject } from '../Utils';
 import { MaybePlayNext, PlaybackControls } from './PlaybackControls';
 import { Sidebar } from './Sidebar';
@@ -95,7 +94,6 @@ export function App(): ReactElement {
   const store = getStore();
   return (
     <Provider store={store}>
-      <WebSocketRegistrar />
       <MusicDbListener />
       <KeepAlive />
       <TheActualApp />
