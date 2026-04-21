@@ -1,9 +1,9 @@
-import { IpcCall, SocketMsg } from './Shared/CommonTypes';
+import { SocketMsg } from './Shared/CommonTypes';
 
 export type ListenKey = { ipcId: SocketMsg; id: string };
 
 export type Ipc = {
-  post: (id: IpcCall, ...args: unknown[]) => void;
+  post: (id: SocketMsg, ...args: unknown[]) => void;
 };
 
 export interface MyWindow extends Window {

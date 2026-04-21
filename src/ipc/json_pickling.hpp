@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <iomanip>
 #include <map>
@@ -255,7 +256,7 @@ struct impl_to_json<std::optional<T>> {
     if (value.has_value()) {
       return to_json(*value);
     } else {
-      return crow::json::wvalue();
+      return crow::json::wvalue(nullptr);
     }
   }
 };
