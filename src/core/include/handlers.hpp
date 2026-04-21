@@ -1,7 +1,9 @@
 #pragma once
 
 #include <functional>
+#include <optional>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 
 #include <crow/http_request.h>
@@ -27,8 +29,46 @@ namespace _internal_glue {
 
 #pragma region Template Magic for API Calls
 
-// Helper to index a parameter-pack of argument types. Takes the index and
+// Trait to detect std::optional
+template <typename T>
+struct is_optional : std::false_type {};
+
+template <typename T>
+struct is_optional<std::optional<T>> : std::true_type {};
+
+template <typename T>
+inline constexpr bool is_optional_v = is_optional<T>::value;
+
+// Helper stuff to index a parameter-pack of argument types. Takes the index and
 // the parameter-pack so it can be used at namespace scope.
+
+template <typename T>
+void marshall_response(crow::response& resp, T&& result) {
+  using RawT = std::decay_t<T>;
+  if constexpr (is_optional_v<RawT>) {
+    if (!result) {
+      resp.set_header("Content-Type", "application/json");
+      resp.body = "null";
+    } else {
+      // Recursively unwrap the value inside the optional
+      return marshall_response(resp, std::move(*result));
+    }
+  } else if constexpr (std::is_same_v<RawT, Shared::MimeData>) {
+    resp.set_header("Content-Type", result.mime);
+    resp.body = std::move(result.data);
+  } else if constexpr (std::is_convertible_v<RawT, std::string_view>) {
+    resp.set_header("Content-Type", "text/plain");
+    resp.body = std::string(std::forward<T>(result));
+  } else if constexpr (std::is_integral_v<RawT>) {
+    resp.set_header("Content-Type", "text/plain");
+    resp.body = std::to_string(result);
+  } else {
+    resp.set_header("Content-Type", "application/json");
+    // Ensure to_json is available in the scope for the specific type
+    resp.body = to_json(std::forward<T>(result)).dump();
+  }
+  resp.code = 200;
+}
 template <size_t ArgIndex, typename... Args>
 using ArgT = std::tuple_element_t<ArgIndex, std::tuple<std::decay_t<Args>...>>;
 
@@ -73,25 +113,13 @@ void Execute(crow::response& resp, std::string_view path, Func&& handle_call) {
         // Void function: Just execute and return 204 (No Content) or 200
         handle_call(
             text::from_string<ArgT<ArgIndex, Args...>>(segments[ArgIndex])...);
+        resp.code = 204;
       } else {
         auto result = handle_call(
             text::from_string<ArgT<ArgIndex, Args...>>(segments[ArgIndex])...);
-        if constexpr (std::is_integral_v<ReturnType>) {
-          resp.set_header("Content-Type", "application/text");
-          resp.body = std::to_string(result);
-        } else if constexpr (std::is_same_v<ReturnType, std::string> ||
-                             std::is_same_v<ReturnType, std::string_view> ||
-                             std::is_same_v<ReturnType, char*>) {
-          resp.set_header("Content-Type", "application/text");
-          resp.body = std::string(result);
-        } else {
-          // Assuming Crow's wvalue or similar JSON lib
-          resp.set_header("Content-Type", "application/json");
-          resp.body = to_json(result).dump();
-        }
+        marshall_response(resp, result);
+        resp.code = 200;
       }
-      resp.code = 200;
-      resp.end();
     } catch (const std::exception& e) {
       // This should be a 500
       tools::e404(resp, std::string("Internal Error: ") + e.what());

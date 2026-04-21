@@ -16,7 +16,11 @@ import {
 import { chkSocketMsg, IpcCall, SocketMsg } from '../Shared/CommonTypes';
 import { ListenKey, MyWindow } from '../Types';
 
-const { con, log, wrn, err } = MakeLog('tools:ipc');
+// const { con, log, wrn, err } = MakeLog('tools:ipc');
+const con = console.error;
+const log = console.error;
+const wrn = console.error;
+const err = console.error;
 
 declare const window: MyWindow;
 
@@ -31,7 +35,10 @@ export async function ReadFromStorage<T>(
   key: string,
   typechk: typecheck<T>,
 ): Promise<T | undefined> {
-  return CallMain(IpcCall.ReadFromStorage, typechk, key);
+  err(`Reading ${key} from Storage`);
+  const res = await CallMain(IpcCall.ReadFromStorage, typechk, key);
+  err(`Result from ${key}`, res);
+  return res;
 }
 
 /**
@@ -158,7 +165,7 @@ export function WireUpIpc(): void {
     }
     return;
   }
-  con(`Wiring up IPC with WebSocket: ${ws.url}`);
+  err(`Wiring up IPC with WebSocket: ${ws.url}`);
   ws.onmessage = (evt: MessageEvent) => {
     const message = evt.data;
     if (!isString(message)) {
@@ -169,7 +176,7 @@ export function WireUpIpc(): void {
     HandleMessage(message);
   };
   window.ipc = {
-    post: (channel: IpcCall, ...args: unknown[]) => {
+    post: (channel: SocketMsg, ...args: unknown[]) => {
       if (!isObjectNonNull(window.ws)) {
         err('IPC connector is not wired up, cannot invoke');
         throw Error('IPC connector is not wired up');
@@ -325,28 +332,38 @@ function encodeForCall(arg: unknown): string {
 }
 
 async function Get(endpoint: IpcCall, ...args: unknown[]): Promise<unknown> {
-  const response = await fetch(
-    ['/api', endpoint.toString(10), ...args.map(encodeForCall)].join('/'),
-    {
-      method: 'GET',
-    },
-  );
-  if (response.ok) {
-    const contentType = response.headers.get('Content-Type');
-    const isJson = contentType && contentType.includes('json');
-    const isText = contentType && contentType.includes('text');
-    if (isJson || isText) {
-      const txt = await response.text();
-      if (txt.length === 0) {
-        return undefined;
+  const path = [endpoint.toString(10), ...args.map(encodeForCall)].join('/');
+  log(`Fetching from /api/${path}`);
+  let response: Response | undefined;
+  try {
+    response = await fetch('/api/' + path, { method: 'GET' });
+    err('response from /api/${path}', response);
+    if (response.ok) {
+      const contentType = response.headers.get('Content-Type');
+      const isJson = contentType && contentType.includes('json');
+      const isText = contentType && contentType.includes('text');
+      if (isJson || isText) {
+        const txt = await response.text();
+        if (txt.length === 0) {
+          return undefined;
+        }
+        return txt;
+      } else {
+        // log(
+        //   `Received non-JSON/text response from ${endpoint}, contentType: ${contentType}`,
+        // );
+        return await response.blob();
       }
-      return txt;
-    } else {
-      // log(
-      //   `Received non-JSON/text response from ${endpoint}, contentType: ${contentType}`,
-      // );
-      return await response.blob();
     }
+  } catch (e) {
+    err(
+      `Exception: Failed to fetch ${endpoint} with args: ${args.join(', ')}:`,
+      e,
+    );
+    return {
+      error: `Exception: Failed to fetch ${endpoint} with args: ${args.join(', ')}`,
+      exception: e,
+    };
   }
   return {
     error: `Failed to fetch ${endpoint} with args: ${args.join(', ')}`,
