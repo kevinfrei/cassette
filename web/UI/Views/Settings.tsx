@@ -305,6 +305,7 @@ function ArtworkSettings(): ReactElement {
 }
 
 export function SettingsView(): ReactElement {
+  const [Data, setData] = useState<string>('<uninitialized>');
   return (
     <div className="settings-view">
       <Expandable separator label="Music Locations" defaultShow={true}>
@@ -338,6 +339,31 @@ export function SettingsView(): ReactElement {
             style={btnWidth}
             onClick={() => PostMain(IpcCall.ClearLocalOverrides)}
           />
+          <DefaultButton
+            text="Show Open File Dialog"
+            style={btnWidth}
+            onClick={() => {
+              const odo: OpenDialogOptions = {
+                folder: true,
+                title: 'This is the title',
+              };
+              ShowOpenDialog(odo).then((val) => {
+                if (isUndefined(val)) {
+                  setData('Undefined result');
+                } else if (isArrayOfString(val)) {
+                  setData(val.join('; '));
+                } else if (isString(val)) {
+                  setData(val);
+                } else {
+                  setData(
+                    'non-string result from OFD:' +
+                      JSON.stringify(val).toString(),
+                  );
+                }
+              });
+            }}
+          />
+          <div>{Data}</div>
         </>
       </Expandable>
     </div>

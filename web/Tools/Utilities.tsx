@@ -9,7 +9,13 @@ import {
 import { MakeLog } from '@freik/logger';
 import { BoolState, Catch } from '@freik/react-tools';
 import { DebouncedDelay } from '@freik/sync';
-import { isArrayOfString, isNumber, isUndefined } from '@freik/typechk';
+import {
+  chkAnyOf,
+  isArrayOfString,
+  isNumber,
+  isString,
+  isUndefined,
+} from '@freik/typechk';
 import { Atom, WritableAtom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
   CSSProperties,
@@ -261,13 +267,17 @@ export class ErrorBoundary extends Component<EBProps, EBState> {
 export async function ShowOpenDialog(
   options: OpenDialogOptions,
 ): Promise<string[] | void> {
-  const res = await CallMain(IpcCall.ShowOpenDialog, isArrayOfString, options);
+  const res = await CallMain(
+    IpcCall.ShowOpenDialog,
+    chkAnyOf(isString, isArrayOfString),
+    options,
+  );
   if (res) {
     console.log('ShowOpenDialog result:', res);
   } else {
     console.log('ShowOpenDialog cancelled or failed');
   }
-  return res;
+  return isString(res) ? [res] : res;
 }
 
 export const useEffectOnce = (effect: () => void | (() => void)) => {
