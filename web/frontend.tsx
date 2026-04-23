@@ -8,8 +8,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { FluentInitIcons } from './FluentInit';
-import { SocketMsg } from './Shared/CommonTypes';
-import { SendMessage } from './Tools/Ipc';
+import { Ready, WebSocketRegistrar } from './Tools/ReactWebSocket';
 import { App } from './UI/App';
 
 const elem = document.getElementById('root')!;
@@ -20,14 +19,15 @@ const app = (
   </StrictMode>
 );
 
-if (import.meta.hot) {
+if (false /* import.meta.hot */) {
   // With hot module reloading, `import.meta.hot.data` is persisted.
-  const root = (import.meta.hot.data.root ??= createRoot(elem));
-  root.render(app);
+  //.. const root = (import.meta.hot.data.root ??= createRoot(elem));
+  //..  root.render(app);
   // console.log(theActualApp);
   // TODO: Make HMR work with Crow
 } else {
   FluentInitIcons();
+  WebSocketRegistrar();
   // The hot module reloading API is not available in production.
   createRoot(elem).render(app);
 }
@@ -36,6 +36,5 @@ if (import.meta.hot) {
 // window.addEventListener('beforeunload', () => {}); void RawGet('/quit'));
 
 window.addEventListener('DOMContentLoaded', () => {
-  // This is the thing to tell the server everything's loaded
-  SendMessage(SocketMsg.ContentLoaded);
+  Ready('content');
 });

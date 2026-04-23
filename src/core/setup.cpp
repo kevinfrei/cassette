@@ -23,32 +23,36 @@ namespace {
 
 uint16_t port = 0;
 
-std::string GetRootUrl() {
+std::string get_root_url() {
   return "http://localhost:" + std::to_string(setup::get_random_port()) +
          "/www/index.html";
 }
 
-void ConfigureRoutes(crow::SimpleApp& app, const std::string& /*url*/) {
+void configure_routes(crow::SimpleApp& app, const std::string& /*url*/) {
   // Define the routes:
   // Try a websocket route:
   websocket::configure(app);
   CROW_ROUTE(app, "/www/<path>")(handlers::www_path);
   CROW_ROUTE(app, "/api/<path>")(handlers::api);
-  CROW_ROUTE(app, "/tune/<path>")(handlers::tune);
   CROW_ROUTE(app, "/images/<path>")(handlers::images);
   CROW_ROUTE(app, "/keepalive")
       .methods(crow::HTTPMethod::GET,
                crow::HTTPMethod::POST,
                crow::HTTPMethod::PUT)(handlers::keepalive);
   CROW_ROUTE(app, "/quit")(handlers::quit);
+
+  // App-specific routes down here. I should probably delete /tune from Cuark,
+  // but it's helpful as an example, right? Right?
+  CROW_ROUTE(app, "/tune/<path>")(handlers::tune);
+  handlers::initialize_default_apis();
 }
 
-crow::SimpleApp* theApp = nullptr;
+crow::SimpleApp* the_app = nullptr;
 
 std::thread* server_thread = nullptr;
 
 void server_thread_func() {
-  theApp->port(setup::get_random_port()).multithreaded().run();
+  the_app->port(setup::get_random_port()).multithreaded().run();
 }
 
 } // namespace
@@ -69,27 +73,30 @@ void launch_music() {
   auto res = config::read_from_storage(
       Shared::to_string(Shared::StorageId::Locations));
   if (res) {
-    auto loc_json = crow::json::load(*res);
-    auto vals = from_json<std::vector<std::string>>(loc_json);
-    if (vals) {
-      std::vector<std::filesystem::path> paths;
-      std::copy(vals->begin(), vals->end(), std::back_inserter(paths));
-      musicdb::MusicDatabase::set_locations(paths);
+    try {
+      auto loc_json = crow::json::load(*res);
+      auto vals = from_json<std::vector<std::string>>(loc_json);
+      if (vals) {
+        std::vector<std::filesystem::path> paths;
+        std::copy(vals->begin(), vals->end(), std::back_inserter(paths));
+        musicdb::MusicDatabase::set_locations(paths);
+      }
+    } catch (...) {
     }
   }
 }
 
-void init() {
+void init(int, const char* argv[]) {
   setlocale(LC_ALL, ".UTF8");
-  files::set_program_location();
+  files::set_program_location(argv[0]);
   launch_music();
-  std::string url = GetRootUrl();
+  std::string url = get_root_url();
   CROW_LOG_INFO << "Starting server at " << url;
 
   // Configure the server in a separate thread
-  theApp = new crow::SimpleApp();
-  theApp->loglevel(crow::LogLevel::Warning);
-  ConfigureRoutes(*theApp, url);
+  the_app = new crow::SimpleApp();
+  the_app->loglevel(crow::LogLevel::Debug);
+  configure_routes(*the_app, url);
   server_thread = new std::thread(server_thread_func);
   server_thread->detach(); // Allow it to run independently
 }
@@ -100,14 +107,15 @@ void run() {
   // is ready, but this is good enough for now.
   std::this_thread::sleep_for(std::chrono::milliseconds(500));
   // Block until the page is closed
-  CROW_LOG_INFO << "*** Launching the browser:" << GetRootUrl();
-  window::open(GetRootUrl());
+  std::string root = get_root_url();
+  CROW_LOG_INFO << "*** Launching the browser:" << root;
+  window::open(root);
   CROW_LOG_INFO << "******************** Shutting down server...";
-  theApp->stop();
+  the_app->stop();
   if (server_thread->joinable()) {
     server_thread->join();
   }
   delete server_thread;
-  delete theApp;
+  delete the_app;
 }
 } // namespace setup

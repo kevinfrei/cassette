@@ -75,7 +75,7 @@ void get_playlists(crow::response& resp) {
     CROW_LOG_INFO << "Got playlists from storage: <" << resp.body << ">";
   }
 }
-
+/*
 void load_playlist(crow::response& resp, std::string_view name) {
   CROW_LOG_INFO << "Loading playlist " << name;
   auto result = playlist::load(name);
@@ -93,7 +93,7 @@ void load_playlist(crow::response& resp, std::string_view name) {
                   << resp.body << ">";
   }
 }
-
+*/
 void save_playlist(crow::response& resp, std::string_view name_and_keys) {
   CROW_LOG_INFO << "TODO: Saving playlist " << name_and_keys;
   std::vector<std::string_view> items;

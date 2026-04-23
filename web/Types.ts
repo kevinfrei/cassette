@@ -1,7 +1,6 @@
 import {
   Album,
   AlbumKey,
-  IpcCall,
   SocketMsg,
   Song,
   SongKey,
@@ -11,7 +10,7 @@ import {
 export type ListenKey = { ipcId: SocketMsg; id: string };
 
 export type Ipc = {
-  post: (id: IpcCall, ...args: unknown[]) => void;
+  post: (id: SocketMsg, ...args: unknown[]) => void;
 };
 
 export interface MyWindow extends Window {

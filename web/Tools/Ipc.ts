@@ -2,6 +2,7 @@ import { MakeLog } from '@freik/logger';
 import MakeSeqNum from '@freik/seqnum';
 import {
   hasFieldType,
+  isBoolean,
   isDefined,
   isFunction,
   isNumberOrString,
@@ -15,7 +16,11 @@ import {
 import { chkSocketMsg, IpcCall, SocketMsg } from '../Shared/CommonTypes';
 import { ListenKey, MyWindow } from '../Types';
 
-const { con, log, wrn, err } = MakeLog('tools:ipc');
+// const { con, log, wrn, err } = MakeLog('tools:ipc');
+const con = console.error;
+const log = console.error;
+const wrn = console.error;
+const err = console.error;
 
 declare const window: MyWindow;
 
@@ -30,7 +35,10 @@ export async function ReadFromStorage<T>(
   key: string,
   typechk: typecheck<T>,
 ): Promise<T | undefined> {
-  return CallMain(IpcCall.ReadFromStorage, typechk, key);
+  err(`Reading ${key} from Storage`);
+  const res = await CallMain(IpcCall.ReadFromStorage, typechk, key);
+  err(`Result from ${key}`, res);
+  return res;
 }
 
 /**
@@ -157,7 +165,7 @@ export function WireUpIpc(): void {
     }
     return;
   }
-  con(`Wiring up IPC with WebSocket: ${ws.url}`);
+  err(`Wiring up IPC with WebSocket: ${ws.url}`);
   ws.onmessage = (evt: MessageEvent) => {
     const message = evt.data;
     if (!isString(message)) {
@@ -168,7 +176,7 @@ export function WireUpIpc(): void {
     HandleMessage(message);
   };
   window.ipc = {
-    post: (channel: IpcCall, ...args: unknown[]) => {
+    post: (channel: SocketMsg, ...args: unknown[]) => {
       if (!isObjectNonNull(window.ws)) {
         err('IPC connector is not wired up, cannot invoke');
         throw Error('IPC connector is not wired up');
@@ -307,41 +315,55 @@ export async function RawGetAsJSON(
   return undefined;
 }
 
+// This is designed to be handled on the C++ side automatically,
+// so changing stuff here could cause problems. Be careful!
 function encodeForCall(arg: unknown): string {
-  if (isNumberOrString(arg)) {
+  if (isNumberOrString(arg) || isBoolean(arg)) {
+    // Simple stuff goes across as-is, but we still need to encode it for the URL.
     return encodeURIComponent(arg);
   } else if (isObjectNonNull(arg) || Array.isArray(arg)) {
+    // Complex stuff gets pickled (mostly just JSON'ed) then encoded for the URL. This allows us to send complex data structures as arguments to IPC calls.
     return encodeURIComponent(Pickle(arg));
-  } else if (isDefined(arg)) {
-    return encodeURIComponent(String(arg));
   } else {
-    return '';
+    throw new Error(
+      `Cannot encode argument of type ${typeof arg} for IPC call: ${arg}`,
+    );
   }
 }
 
 async function Get(endpoint: IpcCall, ...args: unknown[]): Promise<unknown> {
-  const response = await fetch(
-    ['/api', endpoint.toString(10), ...args.map(encodeForCall)].join('/'),
-    {
-      method: 'GET',
-    },
-  );
-  if (response.ok) {
-    const contentType = response.headers.get('Content-Type');
-    const isJson = contentType && contentType.includes('json');
-    const isText = contentType && contentType.includes('text');
-    if (isJson || isText) {
-      const txt = await response.text();
-      if (txt.length === 0) {
-        return undefined;
+  const path = [endpoint.toString(10), ...args.map(encodeForCall)].join('/');
+  log(`Fetching from /api/${path}`);
+  let response: Response | undefined;
+  try {
+    response = await fetch('/api/' + path, { method: 'GET' });
+    err('response from /api/${path}', response);
+    if (response.ok) {
+      const contentType = response.headers.get('Content-Type');
+      const isJson = contentType && contentType.includes('json');
+      const isText = contentType && contentType.includes('text');
+      if (isJson || isText) {
+        const txt = await response.text();
+        if (txt.length === 0) {
+          return undefined;
+        }
+        return txt;
+      } else {
+        // log(
+        //   `Received non-JSON/text response from ${endpoint}, contentType: ${contentType}`,
+        // );
+        return await response.blob();
       }
-      return txt;
-    } else {
-      // log(
-      //   `Received non-JSON/text response from ${endpoint}, contentType: ${contentType}`,
-      // );
-      return await response.blob();
     }
+  } catch (e) {
+    err(
+      `Exception: Failed to fetch ${endpoint} with args: ${args.join(', ')}:`,
+      e,
+    );
+    return {
+      error: `Exception: Failed to fetch ${endpoint} with args: ${args.join(', ')}`,
+      exception: e,
+    };
   }
   return {
     error: `Failed to fetch ${endpoint} with args: ${args.join(', ')}`,
@@ -356,14 +378,10 @@ async function GetAs<T>(
 ): Promise<T | undefined> {
   const res = await Get(endpoint, ...args);
   if (isString(res)) {
+    if (validator(res)) {
+      return res;
+    }
     try {
-      if (
-        endpoint === IpcCall.ReadFromStorage &&
-        args.length === 1 &&
-        args[0] === 'locations'
-      ) {
-        err(`ReadFromStorage("locations") returned: "${res}"`);
-      }
       return SafelyUnpickle(res, validator);
     } catch (e) {
       err(
@@ -374,9 +392,7 @@ async function GetAs<T>(
       return undefined;
     }
   }
-  wrn(
-    `GetAs failed to validate result from Get(${endpoint}, ${args.join(', ')}):`,
-  );
+  wrn(`GetAs failed validation from Get(${endpoint}, ${args.join(', ')}):`);
   if (hasFieldType(res, 'text', isFunction)) {
     try {
       const val = await res.text();

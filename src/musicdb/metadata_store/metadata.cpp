@@ -1,12 +1,15 @@
-#include <boost/regex.hpp>
 #include <charconv>
 #include <filesystem>
+#include <map>
 #include <optional>
+#include <regex>
 #include <string>
+
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
 
 #include "CommonTypes.hpp"
+#include "text_tools.hpp"
 
 #include "metadata.hpp"
 
@@ -19,14 +22,20 @@ namespace metadata {
 // File-local stuff here:
 namespace {
 
+enum class Capture { artist, album, year, track, title, discNum, discName };
+
 struct RegexPattern {
   Shared::VAType va;
-  boost::regex rgx;
+  std::regex rgx;
+  std::map<Capture, int> captureGroups;
 };
 
-RegexPattern make(Shared::VAType va, const char* pattern) {
+RegexPattern make(Shared::VAType va,
+                  const char* pattern,
+                  std::map<Capture, int> captureGroups) {
   return {va,
-          boost::regex(pattern, boost::regex::icase | boost::regex::optimize)};
+          std::regex(pattern, std::regex::icase | std::regex::optimize),
+          captureGroups};
 }
 
 // Remove the suffix from a path
@@ -39,60 +48,128 @@ std::string get_no_suffix(const fs::path& p) {
 std::vector<RegexPattern> patterns{
     // va - (year - )albumTitle/(disc #- disc name/)## - artist - trackTitle
     make(Shared::VAType::va,
-         "^(.*\\/)?((va(rious artists)?)|(compilation)) - "
-         "((?<year>\\d{4}) - )?(?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"),
+         "^(?:.*\\/)?(?:(?:va(?:rious artists)?)|(?:compilation)) - "
+         "(?:(\\d{4}) - )?([^/]+)" // year & album
+         "(?:\\/(?:cd|dis[ck]) *(\\d+)(?:-? +([^ /][^/]+))?)?" // disk #, name
+         "\\/(\\d+)[-. ]+([^/]+) - ([^/]+)$", // track, artist, title
+         {{Capture::year, 1},
+          {Capture::album, 2},
+          {Capture::discNum, 3},
+          {Capture::discName, 4},
+          {Capture::track, 5},
+          {Capture::artist, 6},
+          {Capture::title, 7}}),
     // ost - (year - )albumTitle/(disc #- disc name/)## - artist - trackTitle
     make(Shared::VAType::ost,
-         "^(.*\\/)?((ost)|(soundtrack)) - "
-         "((?<year>\\d{4}) - )?(?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"),
+         "^(?:.*\\/)?(?:(?:ost)|(?:soundtrack)) - "
+         "(?:(\\d{4}) - )?([^/]+)" // year & album
+         "(?:\\/(?:cd|dis[ck]) *(\\d+)(?:-? +([^ /][^/]+))?)?" // disk #, name
+         "\\/(\\d+)[-. ]+([^/]+) - ([^/]+)$", // track, artist, title
+         {{Capture::year, 1},
+          {Capture::album, 2},
+          {Capture::discNum, 3},
+          {Capture::discName, 4},
+          {Capture::track, 5},
+          {Capture::artist, 6},
+          {Capture::title, 7}}),
     // artist - year - album/(disc #- disc name/)## - trackTitle
     make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+) - (?<year>\\d{4}) - (?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
+         "^(?:.*\\/)?"
+         "([^/]+) - (\\d{4}) - ([^/]+)" // artist, year, album
+         "(?:\\/(?:cd|dis[ck]) *(\\d+)(-? +([^ /][^/]+))?)?" // disk #, name
+         "\\/(\\d+)[-. ]+([^/]+)$", // track, title
+         {{Capture::artist, 1},
+          {Capture::year, 2},
+          {Capture::album, 3},
+          {Capture::discNum, 4},
+          {Capture::discName, 5},
+          {Capture::track, 6},
+          {Capture::title, 7}}),
     // va/(year - )albumTitle/(CD # name/)## - artist - trackTitle
     make(Shared::VAType::va,
-         "^(.*\\/)?((va(rious artists)?)|(compilation))"
-         "\\/((?<year>\\d{4}) - )?(?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"),
+         "^(?:.*\\/)?((?:va(?:rious artists)?)|(?:compilation))"
+         "\\/(?:(\\d{4}) - )?([^/]+)" // year, album
+         "(?:\\/(?:cd|dis[ck]) *(\\d+)(?:-? +([^ /][^/]+))?)?" // disk #, name
+         "\\/(\\d+)[-. ]+([^/]+) - ([^/]+)$", // track, artist, title
+         {{Capture::year, 1},
+          {Capture::album, 2},
+          {Capture::discNum, 3},
+          {Capture::discName, 4},
+          {Capture::track, 5},
+          {Capture::artist, 6},
+          {Capture::title, 7}}),
     // ost/(year - )albumTitle/(CD # name/)## - artist - trackTitle
     make(Shared::VAType::ost,
-         "^(.*\\/)?((ost)|(soundtrack))"
-         "\\/((?<year>\\d{4}) - )?(?<album>[^/]+)"
-         "(\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?)?"
-         "\\/(?<track>\\d+)[-. ]+(?<artist>[^/]+) - (?<title>[^/]+)$"),
+         "^(?:.*\\/)?(?:(?:ost)|(?:soundtrack))"
+         "\\/(?:(\\d{4}) - )?([^/]+)" // year, album
+         "(?:\\/(?:cd|dis[ck]) *(\\d+)(?:-? +([^ /][^/]+))?)?" // disk #, name
+         "\\/(\\d+)[-. ]+([^/]+) - ([^/]+)$", // track, artist, title
+         {{Capture::year, 1},
+          {Capture::album, 2},
+          {Capture::discNum, 3},
+          {Capture::discName, 4},
+          {Capture::track, 5},
+          {Capture::artist, 6},
+          {Capture::title, 7}}),
     // artist/year - albumTitle/CD # name/## - trackTitle
     make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+)\\/(?<year>\\d{4}) - (?<album>[^/]+)"
-         "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
-         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
+         "^(?:.*\\/)?([^/]+)\\/(\\d{4}) - ([^/]+)" // artist, year, album
+         "\\/(?:cd|dis[ck]) *(\\d+)(?:-? +([^ /][^/]+))?" // disk #, name
+         "\\/(\\d+)[-. ]+([^/]+)$", // track, title
+         {{Capture::artist, 1},
+          {Capture::year, 2},
+          {Capture::album, 3},
+          {Capture::discNum, 4},
+          {Capture::discName, 5},
+          {Capture::track, 6},
+          {Capture::title, 7}}),
     // artist/year - albumTitle/## - trackTitle
     make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+)\\/(?<year>\\d{4}) - (?<album>[^/]+)"
-         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
+         "^(.*\\/)?([^/]+)\\/(\\d{4}) - ([^/]+)" // artist, year, album
+         "\\/(\\d+)[-. ]+([^/]+)$", // track, title
+         {{Capture::artist, 1},
+          {Capture::year, 2},
+          {Capture::album, 3},
+          {Capture::track, 4},
+          {Capture::title, 5}}),
     // artist - album/CD # name/## - trackTitle
     make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+) - (?<album>[^/]+)"
-         "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
-         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
+         "^(?:.*\\/)?([^/]+) - ([^/]+)" // artist, album
+         "\\/(?:cd|dis[ck]) *(\\d+)(?:-? +([^ /][^/]+))?" // disk #, name
+         "\\/(\\d+)[-. ]+([^/]+)$", // track, title
+         {{Capture::artist, 1},
+          {Capture::album, 2},
+          {Capture::discNum, 3},
+          {Capture::discName, 4},
+          {Capture::track, 5},
+          {Capture::title, 6}}),
     // artist/albumTitle/CD # name/## - trackTitle
     make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+)\\/(?<album>[^/]+)"
-         "\\/(cd|dis[ck]) *(?<discNum>\\d+)(-? +(?<discName>[^ /][^/]+))?"
-         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
+         "^(?:.*\\/)?([^/]+)\\/([^/]+)" // artist, album
+         "\\/(?:cd|dis[ck]) *(\\d+)(?:-? +([^ /][^/]+))?" // disk #, name
+         "\\/(\\d+)[-. ]+([^/]+)$", // track, title
+         {{Capture::artist, 1},
+          {Capture::album, 2},
+          {Capture::discNum, 4},
+          {Capture::discName, 6},
+          {Capture::track, 7},
+          {Capture::title, 8}}),
     // artist - album/## - trackTitle
     make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+) - (?<album>[^/]+)"
-         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$"),
+         "^(?:.*\\/)?([^/]+) - ([^/]+)" // artist, album
+         "\\/(\\d+)[-. ]+([^/]+)$", // track, title
+         {{Capture::artist, 1},
+          {Capture::album, 2},
+          {Capture::track, 3},
+          {Capture::title, 4}}),
     // artist/albumTitle/## - trackTitle
     make(Shared::VAType::none,
-         "^(.*\\/)?(?<artist>[^/]+)\\/(?<album>[^/]+)"
-         "\\/(?<track>\\d+)[-. ]+(?<title>[^/]+)$")};
+         "^(?:.*\\/)?([^/]+)\\/([^/]+)" // artist, album
+         "\\/(\\d+)[-. ]+([^/]+)$", // track, title
+         {{Capture::artist, 1},
+          {Capture::album, 2},
+          {Capture::track, 3},
+          {Capture::title, 4}})};
 
 } // namespace
 
@@ -121,50 +198,60 @@ std::optional<Shared::FullMetadata> store::read(const fs::path& item) {
   return read_content(item);
 }
 
+std::optional<std::string> get_capture(
+    const std::smatch& match,
+    Capture capture,
+    const std::map<Capture, int>& captureGroups) {
+  auto it = captureGroups.find(capture);
+  if (it != captureGroups.end() && match[it->second].matched &&
+      match[it->second].length() > 0) {
+    return match[it->second].str();
+  }
+  return std::nullopt;
+}
+
 // Get the metadata for a song from the file path only.
 std::optional<Shared::FullMetadata> store::read_path(const fs::path& item) {
   std::string noSuffix{get_no_suffix(item)};
   for (const RegexPattern& pattern : patterns) {
     // Match the pattern against the relPath.
     // If it matches, extract the metadata and return it.
-    boost::cmatch match;
-    if (!boost::regex_match(noSuffix.c_str(), match, pattern.rgx)) {
+    std::smatch match;
+    if (!std::regex_search(noSuffix, match, pattern.rgx)) {
       continue;
     }
     Shared::FullMetadata metadata;
     metadata.originalPath = item.generic_string();
     // Extract the metadata based on the pattern.
-    auto artist = match["artist"];
-    if (artist.matched) {
+    auto artist = get_capture(match, Capture::artist, pattern.captureGroups);
+    if (artist.has_value()) {
       // TODO: Split artist names up.
-      metadata.artist.push_back(artist.str());
+      metadata.artist.push_back(*artist);
     }
-    auto album = match["album"];
-    if (album.matched) {
-      metadata.album = album.str();
+    auto album = get_capture(match, Capture::album, pattern.captureGroups);
+    if (album.has_value()) {
+      metadata.album = *album;
     }
-    auto year = match["year"];
-    if (year.matched) {
-      std::from_chars(year.first, year.second, metadata.year);
+    auto year = get_capture(match, Capture::year, pattern.captureGroups);
+    if (year.has_value()) {
+      metadata.year = text::from_string<std::int16_t>(*year);
     }
-    auto track = match["track"];
-    if (track.matched) {
-      std::from_chars(track.first, track.second, metadata.track);
+    auto track = get_capture(match, Capture::track, pattern.captureGroups);
+    if (track.has_value()) {
+      metadata.track = text::from_string<std::int16_t>(*track);
     }
-    auto title = match["title"];
-    if (title.matched) {
+    auto title = get_capture(match, Capture::title, pattern.captureGroups);
+    if (title.has_value()) {
       // TODO: Split title into additional artists & variations.
-      metadata.title = title.str();
+      metadata.title = *title;
     }
-    auto discNum = match["discNum"];
-    if (discNum.matched) {
-      std::from_chars(discNum.first, discNum.second, metadata.disk);
-    } else {
-      metadata.disk = 0; // Default to 0 if not matched.
-    }
-    auto discName = match["discName"];
-    if (discName.matched) {
-      metadata.diskName = discName.str();
+    auto discNum = get_capture(match, Capture::discNum, pattern.captureGroups);
+    metadata.disk =
+        discNum.has_value() ? text::from_string<std::int16_t>(*discNum) : 0;
+    auto discName =
+        get_capture(match, Capture::discName, pattern.captureGroups);
+    if (discName.has_value()) {
+      metadata.diskName = *discName;
     }
     metadata.vaType = pattern.va;
     return metadata; // Return the extracted metadata.
