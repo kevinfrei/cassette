@@ -12,7 +12,6 @@
 #include <crow/logging.h>
 
 #include "CommonTypes.hpp"
-#include "api.hpp"
 #include "config.hpp"
 #include "files.hpp"
 #include "images.hpp"

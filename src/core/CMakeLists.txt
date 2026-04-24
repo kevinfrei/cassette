@@ -4,7 +4,6 @@
 add_library(
   core_lib
   STATIC
-    api.cpp
     config.cpp
     files.cpp
     from_json.cpp
