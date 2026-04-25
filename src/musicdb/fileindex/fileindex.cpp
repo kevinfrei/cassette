@@ -21,8 +21,11 @@
 
 namespace fs = std::filesystem;
 
-file_index::file_index(const fs::path& _loc, bool update_index)
+file_index::file_index(const fs::path& _loc,
+                       bool update_index,
+                       std::optional<fs::path> index_loc)
     : loc(std::filesystem::canonical(_loc)),
+      index_file_path(index_loc),
       last_scan(std::chrono::system_clock::time_point::min()) {
 
   /*

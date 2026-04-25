@@ -50,10 +50,19 @@ class file_index {
   // Write the in-memory structures to the index file on disk.
   void write_index_file() const;
 
+  file_index(const std::filesystem::path& loc,
+             bool update_index,
+             std::optional<std::filesystem::path> index_loc);
+
  public:
   // Constructs a file index at the given location.
   // Update the index, even if it already exists, if update_index is true.
-  file_index(const std::filesystem::path& loc, bool update_index = false);
+  file_index(const std::filesystem::path& loc, bool update_index = false)
+      : file_index(loc, update_index, std::nullopt) {}
+  file_index(const std::filesystem::path& loc,
+             const std::filesystem::path& index_loc,
+             bool update_index = false)
+      : file_index(loc, update_index, index_loc) {}
 
   // No copying!
   file_index(const file_index&) = delete;
