@@ -27,7 +27,6 @@ file_index::file_index(const fs::path& _loc,
     : loc(std::filesystem::canonical(_loc)),
       index_file_path(index_loc),
       last_scan(std::chrono::system_clock::time_point::min()) {
-
   /*
   if (hash == 0) {
     // Compute hash based on the location, if not provided.
@@ -41,7 +40,7 @@ file_index::file_index(const fs::path& _loc,
   */
 
   // If there's already an index, read it first, then run a rescan.
-  // Maybe rescan on a background thread?
+  // TODO: Maybe rescan on a background thread?
   if (read_index_file() && !update_index) {
     return;
   }
@@ -113,20 +112,22 @@ bool file_index::read_index_file() {
     // std::cerr << "Index location does not exist: " << loc << "\n";
     return false;
   }
-  fs::path indexDir = loc / ".afi";
-  if (!fs::exists(indexDir) || !fs::is_directory(indexDir)) {
-    // std::cerr << "Index directory does not exist: " << indexDir << "\n";
-    return false;
+  if (!index_file_path.has_value()) {
+    fs::path indexDir = loc / ".afi";
+    if (!fs::exists(indexDir) || !fs::is_directory(indexDir)) {
+      // std::cerr << "Index directory does not exist: " << indexDir << "\n";
+      return false;
+    }
+    fs::path indexFile = indexDir / "index.txt";
+    if (!fs::exists(indexFile) || !fs::is_regular_file(indexFile)) {
+      // std::cerr << "Index file does not exist: " << indexFile << "\n";
+      return false;
+    }
+    index_file_path = indexFile;
   }
-  fs::path indexFile = indexDir / "index.txt";
-  if (!fs::exists(indexFile) || !fs::is_regular_file(indexFile)) {
-    // std::cerr << "Index file does not exist: " << indexFile << "\n";
-    return false;
-  }
-
   // For simplicity, we will just read the index file line by line.
   // Each line is expected to be a file path relative to loc.
-  files::foreach_line_in_file(indexFile, [&](const std::string& line) {
+  files::foreach_line_in_file(*index_file_path, [&](const std::string& line) {
     if (!line.empty()) {
       // The text file is UTF-8, so we can safely reinterpret it as char8_t.
       const std::u8string_view sv =

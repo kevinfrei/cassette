@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <string_view>
 
 #include <gtest/gtest.h>
 
@@ -9,6 +10,7 @@
 namespace fs = std::filesystem;
 const char* dir_name = "fileindex";
 const char* large_dir_name = "NotActuallyFiles";
+const std::string only_index = "noFilesOnlyIndex";
 const char* idx_dir = ".afi";
 
 fs::path self{__FILE__};
@@ -215,4 +217,12 @@ TEST_F(FileIndex, LargeFileIndex) {
   EXPECT_EQ(mp3delta, 0);
   EXPECT_EQ(jpgdelta, 0);
   EXPECT_EQ(otherdelta, 0);
+}
+
+TEST_F(FileIndex, AllMyFilesJustText) {
+  file_index index{self.parent_path() / only_index,
+                   self.parent_path() / (only_index + ".txt")};
+  std::size_t count = 0;
+  index.foreach_file([&](const fs::path& /*p*/) { count++; });
+  EXPECT_EQ(count, 83056);
 }
