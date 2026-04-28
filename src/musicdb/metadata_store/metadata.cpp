@@ -138,6 +138,17 @@ bool is_st(std::string_view sv) {
          (sv.length() == 10 && is_at(sv, "soundtrack"));
 }
 
+// ^va|ost - (year - )album$
+std::optional<std::tuple<Shared::VAType, std::string_view, std::string_view>>
+vatype_year_album(std::string_view sv) {
+  size_t first_sep = sv.find(" - ");
+  if (first_sep == 0 || first_sep == sv.npos) {
+    return std::nullopt;
+  }
+  // TODO: Continue here, too
+  return std::nullopt;
+}
+
 // ^(.+) - (\d{4}) - (.]+)$ => [artist, year, album]
 std::optional<std::array<std::string_view, 3>> artist_year_album(
     std::string_view sv) {
@@ -174,6 +185,43 @@ std::optional<std::array<std::string_view, 2>> track_title(
   // Got all both pieces:
   return std::array<std::string_view, 2>{
       {sv.substr(0, not_number), sv.substr(not_separator)}};
+}
+
+// Here are the 4 patterns I'm looking for (in priority order):
+// va|ost/(year - )albumTitle/(CD #- name/)## - artist - trackTitle
+// va|ost - (year - )albumTitle/(CD #- name/)## - artist - trackTitle
+// artist/(year - )albumTitle/(CD #- name/)## - trackTitle
+// artist - (year - )album/(CD #- name/)## - trackTitle
+
+// First, split the path (and remove the suffix), then check for a CD/Disc
+// section Then check for a VA/OST marker, then check for artist/VA subfolder or
+// not.
+
+std::optional<Shared::FullMetadata> from_path(const fs::path& item) {
+  std::string fileName = item.filename().string();
+  std::vector<std::string> dirs;
+  fs::path dir = fs::canonical(item);
+  while (dir.has_parent_path() && dirs.size() < 3) {
+    dir = dir.parent_path();
+    dirs.push_back(dir.filename().string());
+  }
+  // I now have the filename, plus no more than 3 containing paths
+  if (dirs.empty()) {
+    return std::nullopt;
+  }
+  auto disk_name = disc_num_and_name(dirs[0]);
+  size_t pos = !!disk_name.has_value();
+  Shared::VAType va = Shared::VAType::none;
+  if (dirs.size() > pos + 1) {
+    if (is_st(dirs[pos + 2])) {
+      va = Shared::VAType::ost;
+    } else if (is_va(dirs[pos + 2])) {
+      va = Shared::VAType::va;
+    }
+    // TODO: Continue here
+  } else {
+  }
+  return std::nullopt;
 }
 
 std::vector<RegexPattern> patterns{
