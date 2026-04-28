@@ -8,11 +8,7 @@
 
 #include "images.hpp"
 
-#if defined(_WIN32)
-static const char* argv0 = "core_testing.exe";
-#else
-static const char* argv0 = "core_testing";
-#endif
+extern char* argv0;
 
 TEST(Images, JustTheOne) {
   files::set_program_location(argv0);

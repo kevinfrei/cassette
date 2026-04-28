@@ -9,11 +9,7 @@
 
 #include "config.hpp"
 
-#if defined(_WIN32)
-static const char* argv0 = "core_testing.exe";
-#else
-static const char* argv0 = "core_testing";
-#endif
+char* argv0;
 
 TEST(Config, TheBasics) {
   files::set_program_location(argv0);
@@ -151,3 +147,9 @@ TEST(File, FilePicker) {
   files::folder_picker(resp, "Test data");
 }
 */
+
+int main(int argc, char** argv) {
+  argv0 = argv[0];
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

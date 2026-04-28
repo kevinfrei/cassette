@@ -38,14 +38,14 @@ RegexPattern make(Shared::VAType va,
           captureGroups};
 }
 
-std::string_view digits{"0123456789"};
-
 // Remove the suffix from a path
 std::string get_no_suffix(const fs::path& p) {
   std::string s = p.generic_string();
   auto pos = s.find_last_of('.');
   return (pos == std::string_view::npos) ? s : s.substr(0, pos);
 }
+
+std::string_view digits{"0123456789"};
 
 // Case-insensitive "check for this string" function:
 bool is_at(std::string_view sv, std::string_view substr, size_t offset = 0) {
@@ -61,7 +61,7 @@ bool is_at(std::string_view sv, std::string_view substr, size_t offset = 0) {
 }
 
 // This is a custom implementation of this regex:
-// ^(\d+)[-. ]+(.+) - (.+)
+// ^(\d+)[-. ]+(.+) - (.+)$ => [track, artist, title]
 std::optional<std::array<std::string_view, 3>> track_artist_title(
     std::string_view sv) {
   // First, scan forward for numbers: We should get at least 1 number
@@ -86,8 +86,7 @@ std::optional<std::array<std::string_view, 3>> track_artist_title(
        sv.substr(hyphen + 3)}};
 }
 
-// This is a custom implementation of this regex:
-// ^(cd|dis[ck]) *(\d+)([-. ]+(.+))?$
+// ^(cd|dis[ck]) *(\d+)([-. ]+(.+))?$ => [disc #, <name>]
 std::optional<std::array<std::string_view, 2>> disc_num_and_name(
     std::string_view sv) {
   size_t num_start = sv.npos;
@@ -119,7 +118,7 @@ std::optional<std::array<std::string_view, 2>> disc_num_and_name(
   return std::nullopt;
 }
 
-// ^((\\d{4}) - )?(.+)$"
+// ^((\\d{4}) - )?(.+)$" => [<year>, album]
 std::array<std::string_view, 2> year_and_album(std::string_view sv) {
   size_t not_digit = sv.find_first_not_of(digits);
   if (not_digit != 4 || sv.find(" - ") != 4) {
@@ -132,6 +131,49 @@ bool is_va(std::string_view sv) {
   return (sv.length() == 11 && is_at(sv, "compilation")) ||
          (sv.length() == 2 && is_at(sv, "va")) ||
          (sv.length() == 14 && is_at(sv, "various artists"));
+}
+
+bool is_st(std::string_view sv) {
+  return (sv.length() == 3 && is_at(sv, "ost")) ||
+         (sv.length() == 10 && is_at(sv, "soundtrack"));
+}
+
+// ^(.+) - (\d{4}) - (.]+)$ => [artist, year, album]
+std::optional<std::array<std::string_view, 3>> artist_year_album(
+    std::string_view sv) {
+  size_t first_sep = sv.find(" - ");
+  if (first_sep == 0 || first_sep == sv.npos) {
+    return std::nullopt;
+  }
+  size_t second_sep = sv.find(" - ", first_sep + 1);
+  if (second_sep == sv.npos) {
+    return std::nullopt;
+  }
+  size_t year_end = sv.find_first_not_of(digits, first_sep + 3);
+  if (year_end != second_sep || year_end - first_sep != 7) {
+    return std::nullopt;
+  }
+  return std::array<std::string_view, 3>{{sv.substr(0, first_sep),
+                                          sv.substr(first_sep + 3, 4),
+                                          sv.substr(second_sep + 3)}};
+}
+
+// ^(\d+)[-. ]+(.+)$ => [track, title]
+std::optional<std::array<std::string_view, 2>> track_title(
+    std::string_view sv) {
+  // First, scan forward for numbers: We should get at least 1 number
+  size_t not_number = sv.find_last_not_of(digits);
+  if (not_number == 0 || not_number == sv.npos) {
+    return std::nullopt;
+  }
+  // Okay, now skip whitespace, '.' and '-''s
+  size_t not_separator = sv.find_first_not_of(" .-", not_number);
+  if (not_separator == not_number) {
+    return std::nullopt;
+  }
+  // Got all both pieces:
+  return std::array<std::string_view, 2>{
+      {sv.substr(0, not_number), sv.substr(not_separator)}};
 }
 
 std::vector<RegexPattern> patterns{
