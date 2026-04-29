@@ -74,8 +74,7 @@ bool MusicDatabase::add_file_location(const std::filesystem::path& root) {
           }) != audio_index.cend()) {
     return false;
   }
-  audio_index.push_back(file_index{root, true});
-  auto& ai = *audio_index.begin();
+  auto ai = file_index{root, true};
   ai.foreach_file([this](const fs::path& p) {
     std::string ext = p.extension().string();
     for (const auto& validExt : audio_ext) {
@@ -85,6 +84,7 @@ bool MusicDatabase::add_file_location(const std::filesystem::path& root) {
       }
     }
   });
+  audio_index.push_back(std::move(ai));
   return true;
 }
 

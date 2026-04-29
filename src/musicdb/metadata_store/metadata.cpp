@@ -45,6 +45,89 @@ std::string get_no_suffix(const fs::path& p) {
   return (pos == std::string_view::npos) ? s : s.substr(0, pos);
 }
 
+std::optional<Shared::FullMetadata> make_metadata(
+    const fs::path& path,
+    Shared::VAType va,
+    std::string_view year,
+    std::string_view album,
+    std::optional<std::array<std::string_view, 3>> maybe_track_artist_title,
+    std::optional<std::array<std::string_view, 2>> maybe_disc_num_name) {
+  if (!maybe_track_artist_title.has_value()) {
+    return std::nullopt;
+  }
+  Shared::FullMetadata res;
+  /*struct FullMetadata {
+    std::string originalPath;
+    std::vector<std::string> artist;
+    std::string album;
+    std::int16_t year;
+    std::int16_t track;
+    std::string title;
+    VAType vaType;
+    std::vector<std::string> moreArtists;
+    std::vector<std::string> variations;
+    std::int16_t disk;
+    std::string diskName;
+  };*/
+  auto [track, artist, title] = *maybe_track_artist_title;
+  res.originalPath = path.generic_string();
+  res.artist = std::vector<std::string>{{std::string{artist}}};
+  res.album = album;
+  res.year = year.empty() ? 0 : text::from_string<int16_t>(year);
+  res.track = text::from_string<int16_t>(track);
+  res.title = title;
+  res.vaType = va;
+  if (maybe_disc_num_name.has_value()) {
+    auto [num, name] = *maybe_disc_num_name;
+    res.disk = text::from_string<int16_t>(num);
+    res.diskName = name;
+  }
+  return res;
+}
+
+std::optional<Shared::FullMetadata> make_metadata(
+    const fs::path& path,
+    std::string_view artist,
+    std::string_view year,
+    std::string_view album,
+    std::optional<std::array<std::string_view, 2>> maybe_track_title,
+    std::optional<std::array<std::string_view, 2>> maybe_disc_num_name) {
+  if (!maybe_track_title.has_value()) {
+    return std::nullopt;
+  }
+  Shared::FullMetadata res;
+  /*struct FullMetadata {
+    std::string originalPath;
+    std::vector<std::string> artist;
+    std::string album;
+    std::int16_t year;
+    std::int16_t track;
+    std::string title;
+    VAType vaType;
+    std::vector<std::string> moreArtists;
+    std::vector<std::string> variations;
+    std::int16_t disk;
+    std::string diskName;
+  };*/
+  auto [track, title] = *maybe_track_title;
+  res.originalPath = path.generic_string();
+  res.artist = std::vector<std::string>{{std::string{artist}}};
+  res.album = album;
+  res.year = year.empty() ? 0 : text::from_string<int16_t>(year);
+  res.track = text::from_string<int16_t>(track);
+  res.title = title;
+  res.vaType = Shared::VAType::none;
+  if (maybe_disc_num_name.has_value()) {
+    auto [num, name] = *maybe_disc_num_name;
+    res.disk = text::from_string<int16_t>(num);
+    res.diskName = name;
+  } else {
+    res.disk = 0;
+    res.diskName = "";
+  }
+  return res;
+}
+
 std::string_view digits{"0123456789"};
 std::string_view sep{" - "};
 
@@ -139,25 +222,14 @@ bool is_st(std::string_view sv) {
          (sv.length() == 10 && is_at(sv, "soundtrack"));
 }
 
-Shared::VAType va_st(bool isVa) {
-  return isVa ? Shared::VAType::va : Shared::VAType::ost;
+bool has_va(Shared::VAType va) {
+  return va != Shared::VAType::none;
 }
 
-// ^va|ost - (year - )album$
-std::optional<std::tuple<Shared::VAType, std::string_view, std::string_view>>
-vatype_year_album(std::string_view sv) {
-  size_t first_sep = sv.find(sep);
-  if (first_sep == 0 || first_sep == sv.npos) {
-    return std::nullopt;
-  }
-  std::string_view ost_va = sv.substr(0, first_sep);
-  bool va = is_va(ost_va);
-  bool ost = va ? false : is_st(ost_va);
-  if (!va && !ost) {
-    return std::nullopt;
-  }
-  auto year_album = year_and_album(sv.substr(first_sep + 3));
-  return std::make_tuple(va_st(va), year_album[0], year_album[1]);
+Shared::VAType get_va_st(std::string_view artist) {
+  return is_va(artist)   ? Shared::VAType::va
+         : is_st(artist) ? Shared::VAType::ost
+                         : Shared::VAType::none;
 }
 
 // ^(.+) - (\d{4} - )?(.]+)$ => [artist, <year>, album]
@@ -176,7 +248,7 @@ std::optional<std::array<std::string_view, 3>> artist_year_album(
 std::optional<std::array<std::string_view, 2>> track_title(
     std::string_view sv) {
   // First, scan forward for numbers: We should get at least 1 number
-  size_t not_number = sv.find_last_not_of(digits);
+  size_t not_number = sv.find_first_not_of(digits);
   if (not_number == 0 || not_number == sv.npos) {
     return std::nullopt;
   }
@@ -188,98 +260,6 @@ std::optional<std::array<std::string_view, 2>> track_title(
   // Got all both pieces:
   return std::array<std::string_view, 2>{
       {sv.substr(0, not_number), sv.substr(not_separator)}};
-}
-
-// Here are the 4 patterns I'm looking for (in priority order):
-// va|ost/(year - )albumTitle/(CD #- name/)## - artist - trackTitle
-// va|ost - (year - )albumTitle/(CD #- name/)## - artist - trackTitle
-// artist/(year - )albumTitle/(CD #- name/)## - trackTitle
-// artist - (year - )album/(CD #- name/)## - trackTitle
-
-// First, split the path (and remove the suffix), then check for a CD/Disc
-// section Then check for a VA/OST marker, then check for artist/VA subfolder or
-// not.
-
-std::optional<Shared::FullMetadata> from_path(const fs::path& item) {
-  std::string fileName = item.filename().string();
-  std::vector<std::string> dirs;
-  fs::path dir = fs::canonical(item);
-  while (dir.has_parent_path() && dirs.size() < 3) {
-    dir = dir.parent_path();
-    dirs.push_back(dir.filename().string());
-  }
-  // I now have the filename, plus no more than 3 containing paths
-  if (dirs.empty()) {
-    return std::nullopt;
-  }
-  auto maybe_disc_name = disc_num_and_name(dirs[0]);
-  size_t pos = !!maybe_disc_name.has_value();
-  // Okay, check for a "year - album" folder parent:
-  auto year_album = year_and_album(dirs[pos]);
-  if (year_album[0].empty()) {
-    // We didn't get a year, so there's a good change this is
-    // "{artist|ost} - (year - )?album" or "{ost|artist}/album"
-    // Let's first check the first one:
-    auto maybe_artist_year_album = artist_year_album(dirs[pos]);
-    if (maybe_artist_year_album.has_value()) {
-      std::string_view artist = (*maybe_artist_year_album)[0];
-      bool va = is_va(artist);
-      bool st = va ? false : is_st(artist);
-      if (va || st) {
-        auto maybe_track_artist_title = track_artist_title(fileName);
-        if (maybe_track_artist_title.has_value()) {
-          return make_metadata(va_st(va),
-                               *maybe_artist_year_album,
-                               *maybe_track_artist_title,
-                               maybe_disc_name);
-        }
-        return std::nullopt;
-      }
-      auto maybe_track_title = track_title(fileName);
-      if (maybe_track_title.has_value()) {
-        return make_metadata(
-            *maybe_artist_year_album, *maybe_track_title, maybe_disc_name);
-      }
-      return std::nullopt;
-    }
-    // We've got a 'year' field:
-    if (dirs.size() == pos) {
-      // No containing folder: No match
-      return std::nullopt;
-    }
-
-    // last chance: {ost|artist}/album
-    if (dirs.size() > pos) {
-      bool va = is_va(dirs[pos + 1]);
-      bool st = va ? false : is_st(dirs[pos + 1]);
-      if (va || st) {
-        auto maybe_track_artist_title = track_artist_title(fileName);
-        if (maybe_track_artist_title.has_value()) {
-          return make_metadata(
-              va_st(va), dirs[pos], *maybe_track_artist_title, maybe_disc_name);
-        }
-        return std::nullopt;
-      }
-      auto maybe_track_title = track_title(fileName);
-      if (maybe_track_title.has_value()) {
-        return make_metadata(
-            *maybe_artist_year_album, maybe_disc_name, maybe_track_title);
-      }
-      return std::nullopt;
-    }
-  } else {
-  }
-  Shared::VAType va = Shared::VAType::none;
-  if (dirs.size() > pos + 1) {
-    if (is_st(dirs[pos + 2])) {
-      va = Shared::VAType::ost;
-    } else if (is_va(dirs[pos + 2])) {
-      va = Shared::VAType::va;
-    }
-    // TODO: Continue here
-  } else {
-  }
-  return std::nullopt;
 }
 
 std::vector<RegexPattern> patterns{
@@ -435,6 +415,103 @@ std::optional<Shared::FullMetadata> store::read(const fs::path& item) {
   return read_content(item);
 }
 
+// Here are the 4 patterns I'm looking for (in priority order):
+// va|ost/(year - )albumTitle/(CD #- name/)## - artist - trackTitle
+// va|ost - (year - )albumTitle/(CD #- name/)## - artist - trackTitle
+// artist/(year - )albumTitle/(CD #- name/)## - trackTitle
+// artist - (year - )album/(CD #- name/)## - trackTitle
+
+// First, split the path (and remove the suffix), then check for a CD/Disc
+// section Then check for a VA/OST marker, then check for artist/VA subfolder or
+// not.
+
+std::optional<Shared::FullMetadata> store::read_path(const fs::path& item) {
+  std::string fileName = get_no_suffix(item.filename());
+  std::vector<std::string> dirs;
+  fs::path dir = fs::canonical(item);
+  while (dir.has_parent_path() && dirs.size() < 3) {
+    dir = dir.parent_path();
+    dirs.push_back(dir.filename().string());
+  }
+  // I now have the filename, plus no more than 3 containing paths
+  if (dirs.empty()) {
+    return std::nullopt;
+  }
+  auto maybe_disc_name = disc_num_and_name(dirs[0]);
+  size_t pos = !!maybe_disc_name.has_value();
+  // First, look for a "year - album" folder parent:
+  auto year_album = year_and_album(dirs[pos]);
+  if (year_album[0].empty()) {
+    // We didn't get a year, so this could be either:
+    // "{artist|ost} - (year - )?album"
+    //   OR
+    // "{ost|artist}/album"
+    // Let's first check the first one:
+    auto maybe_artist_year_album = artist_year_album(dirs[pos]);
+    if (maybe_artist_year_album.has_value()) {
+      auto [artist, year, album] = (*maybe_artist_year_album);
+      auto va = get_va_st(artist);
+      if (has_va(va)) {
+        // This fails if track_artist_title is empty
+        return make_metadata(item,
+                             va,
+                             year,
+                             album,
+                             track_artist_title(fileName),
+                             maybe_disc_name);
+      } // else:
+      return make_metadata(
+          item, artist, year, album, track_title(fileName), maybe_disc_name);
+    }
+    // last chance: {ost|artist}/album
+    if (dirs.size() == pos) {
+      // No containing folder: No match
+      return std::nullopt;
+    }
+    if (dirs.size() > pos) {
+      auto va_st = get_va_st(dirs[pos + 1]);
+      if (has_va(va_st)) {
+        return make_metadata(item,
+                             va_st,
+                             year_album[0],
+                             year_album[1],
+                             track_artist_title(fileName),
+                             maybe_disc_name);
+      } // else:
+      return make_metadata(item,
+                           dirs[pos + 1],
+                           year_album[0],
+                           year_album[1],
+                           track_title(fileName),
+                           maybe_disc_name);
+    }
+    // If we get here, we either don't have a containing folder name,
+    // or the file name was malformed: Fail.
+    return std::nullopt;
+  }
+  // At this point, we have a year - album match. Go from there:
+  if (dirs.size() == pos) {
+    // No containing folder: Fail
+    return std::nullopt;
+  }
+  auto va = get_va_st(dirs[pos + 1]);
+  if (has_va(va)) {
+    // Look for a track - artist - title match:
+    return make_metadata(item,
+                         va,
+                         year_album[0],
+                         year_album[1],
+                         track_artist_title(fileName),
+                         maybe_disc_name);
+  } // else:
+  return make_metadata(item,
+                       dirs[pos + 1],
+                       year_album[0],
+                       year_album[1],
+                       track_title(fileName),
+                       maybe_disc_name);
+}
+
 std::optional<std::string> get_capture(
     const std::smatch& match,
     Capture capture,
@@ -448,7 +525,7 @@ std::optional<std::string> get_capture(
 }
 
 // Get the metadata for a song from the file path only.
-std::optional<Shared::FullMetadata> store::read_path(const fs::path& item) {
+std::optional<Shared::FullMetadata> store__read_path(const fs::path& item) {
   std::string noSuffix{get_no_suffix(item)};
   for (const RegexPattern& pattern : patterns) {
     // Match the pattern against the relPath.
