@@ -18,14 +18,18 @@ namespace musicdb {
 using AlbumTriple = std::tuple<std::string, std::int16_t, std::string>;
 
 class MusicDatabase {
+  struct FileIndexCache {
+    file_index fi;
+    metadata::store cache;
+  };
+
   // To start with, the MusicDB will just be a wrapper around a single
   // file_index class, maintaining the full database in memory.
   // The metadata store will be used for metadata overrides and caching.
   // Later, we can expand this to multiple indexes (e.g., for different
   // locations, or different types of media).
-  std::vector<file_index> audio_index;
-  metadata::store* metadata_cache;
-  void init_md_store();
+  std::vector<FileIndexCache> audio_index;
+  FileIndexCache* get_index_for_path(const std::filesystem::path& p);
 
   std::hash<std::string> hasher;
 

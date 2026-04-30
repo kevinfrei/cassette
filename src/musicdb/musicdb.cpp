@@ -48,12 +48,7 @@ void MusicDatabase::set_locations(const std::vector<fs::path>& locations) {
 
 MusicDatabase::MusicDatabase() {}
 
-MusicDatabase::~MusicDatabase() {
-  if (metadata_cache) {
-    delete metadata_cache;
-    metadata_cache = nullptr;
-  }
-}
+MusicDatabase::~MusicDatabase() {}
 
 std::string MusicDatabase::get_new_song_key() {
   return "S" + std::to_string(song_key_counter++);
@@ -68,14 +63,15 @@ std::string MusicDatabase::get_new_album_key() {
 }
 
 bool MusicDatabase::add_file_location(const std::filesystem::path& root) {
-  if (std::find_if(
-          audio_index.cbegin(), audio_index.cend(), [&](const file_index& i) {
-            return i.get_location() == root;
-          }) != audio_index.cend()) {
+  if (std::find_if(audio_index.cbegin(),
+                   audio_index.cend(),
+                   [&](const FileIndexCache& fic) {
+                     return fic.fi.get_location() == root;
+                   }) != audio_index.cend()) {
     return false;
   }
-  auto ai = file_index{root, true};
-  ai.foreach_file([this](const fs::path& p) {
+  FileIndexCache fic{file_index{root, true}, metadata::store{root}};
+  fic.fi.foreach_file([this](const fs::path& p) {
     std::string ext = p.extension().string();
     for (const auto& validExt : audio_ext) {
       if (ext == validExt) {
@@ -84,7 +80,7 @@ bool MusicDatabase::add_file_location(const std::filesystem::path& root) {
       }
     }
   });
-  audio_index.push_back(std::move(ai));
+  audio_index.emplace_back(std::move(fic));
   return true;
 }
 
@@ -136,7 +132,7 @@ std::vector<std::filesystem::path> MusicDatabase::get_locations() const {
   std::vector<std::filesystem::path> locations;
   locations.reserve(audio_index.size());
   for (const auto& value : audio_index) {
-    locations.push_back(value.get_location());
+    locations.push_back(value.fi.get_location());
   }
   return locations;
 }
@@ -209,18 +205,13 @@ Shared::AlbumKey MusicDatabase::get_or_create_album(
   return newKey;
 }
 
-void MusicDatabase::init_md_store() {
-  // TODO: make this handle multiple file caches
-  if (!metadata_cache) {
-    // TODO: Double-checked locking
-    metadata_cache = new metadata::store(audio_index.begin()->get_location());
-  }
-}
-
 void MusicDatabase::add_song_to_db(const fs::path& song) {
   // First, get the metadata for the song
-  init_md_store();
-  auto md = metadata_cache->read(song);
+  FileIndexCache* fic = get_index_for_path(song);
+  if (fic == nullptr) {
+    return;
+  }
+  auto md = fic->cache.read(song);
   if (!md) {
     std::cerr << "Failed to get metadata for song: " << song.string()
               << std::endl;
