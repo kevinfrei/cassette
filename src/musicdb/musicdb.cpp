@@ -84,6 +84,22 @@ bool MusicDatabase::add_file_location(const std::filesystem::path& root) {
   return true;
 }
 
+bool is_subpath(const fs::path& path, const fs::path& base) {
+  auto rel = fs::relative(path, base);
+  // Returns true if relative path is valid and does not escape base
+  return !rel.empty() && rel.native().find("..") == std::string::npos;
+}
+
+MusicDatabase::FileIndexCache* MusicDatabase::get_index_for_path(
+    const fs::path& p) {
+  for (auto& fic : audio_index) {
+    if (is_subpath(p, fic.fi.get_location())) {
+      return &fic;
+    }
+  }
+  return nullptr;
+}
+
 std::optional<Shared::Album> MusicDatabase::get_album_from_key(
     const Shared::AlbumKey& key) {
   auto maybe = albums.find(key);
