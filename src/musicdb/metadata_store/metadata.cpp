@@ -137,19 +137,26 @@ bool is_at(std::string_view sv, std::string_view substr, size_t offset = 0) {
     return false;
   }
   for (size_t i = 0; i < substr.length(); i++) {
-    if (std::tolower(sv.at(0 + offset)) != substr.at(i)) {
+    if (std::tolower(sv.at(i + offset)) != substr.at(i)) {
       return false;
     }
   }
   return true;
 }
 
+bool is_at_sub(std::string_view sv, std::string_view substr, size_t offset = 0) {
+  if (sv.length() - offset >= substr.length()) {
+    return is_at(sv.substr(offset, substr.length()), substr);
+  } else {
+    return false;
+  }
+}
 // This is a custom implementation of this regex:
 // ^(\d+)[-. ]+(.+) - (.+)$ => [track, artist, title]
 std::optional<std::array<std::string_view, 3>> track_artist_title(
     std::string_view sv) {
   // First, scan forward for numbers: We should get at least 1 number
-  size_t not_number = sv.find_last_not_of(digits);
+  size_t not_number = sv.find_first_not_of(digits);
   if (not_number == 0 || not_number == sv.npos) {
     return std::nullopt;
   }
@@ -160,7 +167,7 @@ std::optional<std::array<std::string_view, 3>> track_artist_title(
   }
   // Next, search for " - ":
   size_t hyphen = sv.find(sep, not_separator);
-  if (hyphen == sv.npos || hyphen + 3 != sv.length()) {
+  if (hyphen == sv.npos || hyphen + 3 >= sv.length()) {
     return std::nullopt;
   }
   // Got all 3 pieces:
@@ -174,9 +181,9 @@ std::optional<std::array<std::string_view, 3>> track_artist_title(
 std::optional<std::array<std::string_view, 2>> disc_num_and_name(
     std::string_view sv) {
   size_t num_start = sv.npos;
-  if (is_at(sv, "cd")) {
+  if (is_at_sub(sv, "cd")) {
     num_start = 2;
-  } else if (is_at(sv, "dis") && (is_at(sv, "k", 3) || is_at(sv, "c", 3))) {
+  } else if (is_at_sub(sv, "dis") && (is_at_sub(sv, "k", 3) || is_at_sub(sv, "c", 3))) {
     num_start = 4;
   } else {
     return std::nullopt;
@@ -185,11 +192,11 @@ std::optional<std::array<std::string_view, 2>> disc_num_and_name(
   num_start = sv.find_first_not_of(" ", num_start);
   // Now get the disk number
   size_t num_end = sv.find_first_not_of(digits, num_start);
-  if (num_end == sv.npos || num_end == num_start) {
+  if (num_end == num_start) {
     return std::nullopt;
   }
   std::string_view disk_num = sv.substr(num_start, num_end - num_start);
-  if (num_end == sv.length()) {
+  if (num_end == sv.length() || num_end == sv.npos) {
     // Just a disc #, no name:
     return std::array<std::string_view, 2>{{disk_num, ""}};
   }
@@ -425,7 +432,7 @@ std::optional<Shared::FullMetadata> store::read(const fs::path& item) {
 // section Then check for a VA/OST marker, then check for artist/VA subfolder or
 // not.
 
-std::optional<Shared::FullMetadata> store::read_path(const fs::path& item) {
+std::optional<Shared::FullMetadata> store__read_path(const fs::path& item) {
   std::string fileName = get_no_suffix(item.filename());
   std::vector<std::string> dirs;
   fs::path dir = fs::canonical(item);
@@ -433,6 +440,7 @@ std::optional<Shared::FullMetadata> store::read_path(const fs::path& item) {
     dir = dir.parent_path();
     dirs.push_back(dir.filename().string());
   }
+  auto dirname = item.string();
   // I now have the filename, plus no more than 3 containing paths
   if (dirs.empty()) {
     return std::nullopt;
@@ -525,7 +533,7 @@ std::optional<std::string> get_capture(
 }
 
 // Get the metadata for a song from the file path only.
-std::optional<Shared::FullMetadata> store__read_path(const fs::path& item) {
+std::optional<Shared::FullMetadata> store::read_path(const fs::path& item) {
   std::string noSuffix{get_no_suffix(item)};
   for (const RegexPattern& pattern : patterns) {
     // Match the pattern against the relPath.

@@ -95,9 +95,15 @@ TEST_F(MDBTest, FullDatabase) {
   auto testDir = getFilesPath() / large_dir_name;
   db.add_file_location(testDir);
   auto flat = db.get_flat_database();
+  for (auto& art : flat.artists) {
+    std::cout << art.second.name << std::endl;
+  }
+  for (auto& song: flat.songs) {
+    std::cout << song.second.track << " - " << song.second.title << std::endl;
+  }
   EXPECT_EQ(flat.artists.size(), 269); // 273);
   EXPECT_EQ(flat.albums.size(), 189);
-  EXPECT_EQ(flat.songs.size(), 742);
+  EXPECT_EQ(flat.songs.size(), 742); // Only 740?
 }
 
 int main(int argc, char** argv) {
