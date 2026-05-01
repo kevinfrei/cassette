@@ -137,7 +137,7 @@ bool is_at(std::string_view sv, std::string_view substr, size_t offset = 0) {
     return false;
   }
   for (size_t i = 0; i < substr.length(); i++) {
-    if (std::toupper(sv.at(0 + offset)) != substr.at(i)) {
+    if (std::tolower(sv.at(0 + offset)) != substr.at(i)) {
       return false;
     }
   }

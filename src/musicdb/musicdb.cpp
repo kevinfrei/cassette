@@ -34,15 +34,20 @@ MusicDatabase& MusicDatabase::get() {
 void MusicDatabase::set_locations(const std::vector<fs::path>& locations) {
   // Remove any current locations that aren't in the list, just to be safe
   MusicDatabase& mdb = get();
-  std::set<fs::path> loc_set{locations.cbegin(), locations.cend()};
-  for (const auto& cur_loc : mdb.get_locations()) {
-    if (loc_set.find(cur_loc) != loc_set.end()) {
-      mdb.remove_file_location(cur_loc);
+  auto cur_locs = mdb.get_locations();
+  std::set<fs::path> loc_new{locations.cbegin(), locations.cend()};
+  std::set<fs::path> loc_cur{cur_locs.cbegin(), cur_locs.cend()};
+
+  for (auto& to_del : loc_cur) {
+    if (!loc_new.contains(to_del)) {
+      mdb.remove_file_location(to_del);
     }
   }
   // Add all the locations. The API should be resilient to duplicate locations.
-  for (const auto& loc : locations) {
-    mdb.add_file_location(loc);
+  for (auto& to_add : loc_new) {
+    if (!loc_cur.contains(to_add)) {
+      mdb.add_file_location(to_add);
+    }
   }
 }
 
@@ -71,7 +76,9 @@ bool MusicDatabase::add_file_location(const std::filesystem::path& root) {
     return false;
   }
   FileIndexCache fic{file_index{root, true}, metadata::store{root}};
-  fic.fi.foreach_file([this](const fs::path& p) {
+  audio_index.emplace_back(std::move(fic));
+  FileIndexCache* ficp = get_index_for_path(root);
+  ficp->fi.foreach_file([this](const fs::path& p) {
     std::string ext = p.extension().string();
     for (const auto& validExt : audio_ext) {
       if (ext == validExt) {
@@ -80,7 +87,6 @@ bool MusicDatabase::add_file_location(const std::filesystem::path& root) {
       }
     }
   });
-  audio_index.emplace_back(std::move(fic));
   return true;
 }
 
@@ -139,9 +145,24 @@ MusicDatabase::get_album_helper(const std::string& title,
   return std::make_pair(std::nullopt, keyTuple);
 }
 
-bool MusicDatabase::remove_file_location(const std::filesystem::path&) {
-  // NYI
-  return false;
+bool MusicDatabase::remove_file_location(const std::filesystem::path& dir) {
+  // Remove the audio index associated:
+  size_t item = audio_index.size();
+  for (size_t i = 0; i < item; i++) {
+    if (is_subpath(dir, audio_index[i].fi.get_location())) {
+      item = i;
+    }
+  }
+  if (item == audio_index.size()) {
+    return false;
+  }
+  FileIndexCache& fic = audio_index.at(item);
+  fic.fi.foreach_file([&](const fs::path&) -> void {
+    // TODO: Remove the file from the database
+    return;
+  });
+  audio_index.erase(audio_index.begin() + item);
+  return true;
 }
 
 std::vector<std::filesystem::path> MusicDatabase::get_locations() const {
