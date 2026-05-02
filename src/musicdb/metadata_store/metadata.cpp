@@ -45,6 +45,25 @@ std::string get_no_suffix(const fs::path& p) {
   return (pos == std::string_view::npos) ? s : s.substr(0, pos);
 }
 
+std::vector<std::string> split_artist(std::string_view artists) {
+  std::vector<std::string> res;
+  size_t ampersand = artists.find(" & ");
+  if (ampersand == artists.npos) {
+    res.emplace_back(std::string{artists});
+  } else {
+    size_t start = 0;
+    for (size_t comma = artists.find(", ", start);
+         comma != artists.npos && comma < ampersand && start < artists.length();
+         comma = artists.find(", ", start)) {
+      res.emplace_back(std::string{artists.substr(start, comma - start)});
+      start = comma + 2;
+    }
+    res.emplace_back(std::string{artists.substr(start, ampersand - start)});
+    res.emplace_back(std::string{artists.substr(ampersand + 3)});
+  }
+  return res;
+}
+
 std::optional<Shared::FullMetadata> make_metadata(
     const fs::path& path,
     Shared::VAType va,
@@ -71,7 +90,7 @@ std::optional<Shared::FullMetadata> make_metadata(
   };*/
   auto [track, artist, title] = *maybe_track_artist_title;
   res.originalPath = path.generic_string();
-  res.artist = std::vector<std::string>{{std::string{artist}}};
+  res.artist = split_artist(artist);
   res.album = album;
   res.year = year.empty() ? 0 : text::from_string<int16_t>(year);
   res.track = text::from_string<int16_t>(track);
@@ -131,9 +150,9 @@ std::optional<Shared::FullMetadata> make_metadata(
 std::string_view digits{"0123456789"};
 std::string_view sep{" - "};
 
-// Case-insensitive "check for this string" function:
-bool is_at(std::string_view sv, std::string_view substr, size_t offset = 0) {
-  if (sv.length() - offset < substr.length()) {
+// Case-insensitive string-equality function, with an offset capability
+bool is_ieq(std::string_view sv, std::string_view substr, size_t offset = 0) {
+  if (sv.length() - offset != substr.length()) {
     return false;
   }
   for (size_t i = 0; i < substr.length(); i++) {
@@ -144,9 +163,12 @@ bool is_at(std::string_view sv, std::string_view substr, size_t offset = 0) {
   return true;
 }
 
-bool is_at_sub(std::string_view sv, std::string_view substr, size_t offset = 0) {
+// Case-insensitive substring equality function with offset
+bool is_sub_ieq(std::string_view sv,
+                std::string_view substr,
+                size_t offset = 0) {
   if (sv.length() - offset >= substr.length()) {
-    return is_at(sv.substr(offset, substr.length()), substr);
+    return is_ieq(sv.substr(offset, substr.length()), substr);
   } else {
     return false;
   }
@@ -181,9 +203,10 @@ std::optional<std::array<std::string_view, 3>> track_artist_title(
 std::optional<std::array<std::string_view, 2>> disc_num_and_name(
     std::string_view sv) {
   size_t num_start = sv.npos;
-  if (is_at_sub(sv, "cd")) {
+  if (is_sub_ieq(sv, "cd")) {
     num_start = 2;
-  } else if (is_at_sub(sv, "dis") && (is_at_sub(sv, "k", 3) || is_at_sub(sv, "c", 3))) {
+  } else if (is_sub_ieq(sv, "dis") &&
+             (is_sub_ieq(sv, "k", 3) || is_sub_ieq(sv, "c", 3))) {
     num_start = 4;
   } else {
     return std::nullopt;
@@ -219,14 +242,14 @@ std::array<std::string_view, 2> year_and_album(std::string_view sv) {
 }
 
 bool is_va(std::string_view sv) {
-  return (sv.length() == 11 && is_at(sv, "compilation")) ||
-         (sv.length() == 2 && is_at(sv, "va")) ||
-         (sv.length() == 14 && is_at(sv, "various artists"));
+  return (sv.length() == 11 && is_ieq(sv, "compilation")) ||
+         (sv.length() == 2 && is_ieq(sv, "va")) ||
+         (sv.length() == 14 && is_ieq(sv, "various artists"));
 }
 
 bool is_st(std::string_view sv) {
-  return (sv.length() == 3 && is_at(sv, "ost")) ||
-         (sv.length() == 10 && is_at(sv, "soundtrack"));
+  return (sv.length() == 3 && is_ieq(sv, "ost")) ||
+         (sv.length() == 10 && is_ieq(sv, "soundtrack"));
 }
 
 bool has_va(Shared::VAType va) {
@@ -432,13 +455,13 @@ std::optional<Shared::FullMetadata> store::read(const fs::path& item) {
 // section Then check for a VA/OST marker, then check for artist/VA subfolder or
 // not.
 
-std::optional<Shared::FullMetadata> store__read_path(const fs::path& item) {
+std::optional<Shared::FullMetadata> store::read_path(const fs::path& item) {
   std::string fileName = get_no_suffix(item.filename());
   std::vector<std::string> dirs;
   fs::path dir = fs::canonical(item);
   while (dir.has_parent_path() && dirs.size() < 3) {
     dir = dir.parent_path();
-    dirs.push_back(dir.filename().string());
+    dirs.emplace_back(dir.filename().string());
   }
   auto dirname = item.string();
   // I now have the filename, plus no more than 3 containing paths
@@ -533,7 +556,7 @@ std::optional<std::string> get_capture(
 }
 
 // Get the metadata for a song from the file path only.
-std::optional<Shared::FullMetadata> store::read_path(const fs::path& item) {
+std::optional<Shared::FullMetadata> store__read_path(const fs::path& item) {
   std::string noSuffix{get_no_suffix(item)};
   for (const RegexPattern& pattern : patterns) {
     // Match the pattern against the relPath.
