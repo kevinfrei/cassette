@@ -67,7 +67,7 @@ std::string MusicDatabase::get_new_album_key() {
   return "L" + std::to_string(album_key_counter++);
 }
 
-bool MusicDatabase::add_file_location(const std::filesystem::path& root) {
+bool MusicDatabase::add_file_location(const fs::path& root) {
   if (std::find_if(audio_index.cbegin(),
                    audio_index.cend(),
                    [&](const FileIndexCache& fic) {
@@ -78,11 +78,11 @@ bool MusicDatabase::add_file_location(const std::filesystem::path& root) {
   FileIndexCache fic{file_index{root, true}, metadata::store{root}};
   audio_index.emplace_back(std::move(fic));
   FileIndexCache* ficp = get_index_for_path(root);
-  ficp->fi.foreach_file([this](const fs::path& p) {
+  ficp->fi.foreach_file([&](const fs::path& p) {
     std::string ext = p.extension().string();
     for (const auto& validExt : audio_ext) {
       if (ext == validExt) {
-        add_song_to_db(p);
+        add_song_to_db(p, ficp);
         break;
       }
     }
@@ -145,7 +145,7 @@ MusicDatabase::get_album_helper(const std::string& title,
   return std::make_pair(std::nullopt, keyTuple);
 }
 
-bool MusicDatabase::remove_file_location(const std::filesystem::path& dir) {
+bool MusicDatabase::remove_file_location(const fs::path& dir) {
   // Remove the audio index associated:
   size_t item = audio_index.size();
   for (size_t i = 0; i < item; i++) {
@@ -165,8 +165,8 @@ bool MusicDatabase::remove_file_location(const std::filesystem::path& dir) {
   return true;
 }
 
-std::vector<std::filesystem::path> MusicDatabase::get_locations() const {
-  std::vector<std::filesystem::path> locations;
+std::vector<fs::path> MusicDatabase::get_locations() const {
+  std::vector<fs::path> locations;
   locations.reserve(audio_index.size());
   for (const auto& value : audio_index) {
     locations.push_back(value.fi.get_location());
@@ -174,8 +174,8 @@ std::vector<std::filesystem::path> MusicDatabase::get_locations() const {
   return locations;
 }
 
-std::string MusicDatabase::normalized_path(const std::filesystem::path& p) {
-  return std::filesystem::weakly_canonical(p).generic_string();
+std::string MusicDatabase::normalized_path(const fs::path& p) {
+  return fs::weakly_canonical(p).generic_string();
 }
 
 Shared::ArtistKey MusicDatabase::get_or_create_artist(
@@ -242,9 +242,9 @@ Shared::AlbumKey MusicDatabase::get_or_create_album(
   return newKey;
 }
 
-void MusicDatabase::add_song_to_db(const fs::path& song) {
+void MusicDatabase::add_song_to_db(const fs::path& song, FileIndexCache* fic) {
   // First, get the metadata for the song
-  FileIndexCache* fic = get_index_for_path(song);
+  fic = fic == nullptr ? get_index_for_path(song) : fic;
   if (fic == nullptr) {
     return;
   }
@@ -298,7 +298,7 @@ void MusicDatabase::add_song_to_db(const fs::path& song) {
   }
 }
 
-std::optional<std::filesystem::path> MusicDatabase::get_song_path(
+std::optional<fs::path> MusicDatabase::get_song_path(
     const Shared::SongKey& key) {
   auto it = songs.find(key);
   if (it == songs.end()) {

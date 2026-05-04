@@ -59,6 +59,7 @@ bool file_index::belongs_here(const fs::path& path) const {
   // Check if the path has a valid suffix, and is located within the location
   // of the index. We use proximate here to get a path relative to the index
   // location,
+  // TODO: proximate is really slow
   auto prox = fs::proximate(path, loc);
   files::lowercase_extension(prox);
   return prox.is_relative() &&
@@ -96,6 +97,7 @@ bool file_index::remove_file(const fs::path& path) {
 
 // Get a normalized relative path from the root of the index.
 std::string file_index::get_relative_path(const fs::path& path) const {
+  // TODO: proximate is really slow.
   auto prox = fs::proximate(path, loc);
   // Normalize to UTF-8 NFC:
   auto str = prox.generic_u8string();

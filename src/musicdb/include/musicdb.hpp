@@ -53,7 +53,8 @@ class MusicDatabase {
   static std::string normalized_path(const std::filesystem::path& p);
 
   // Helpers for adding items to the DB
-  void add_song_to_db(const std::filesystem::path& item);
+  void add_song_to_db(const std::filesystem::path& item,
+                      FileIndexCache* fic = nullptr);
   Shared::ArtistKey get_or_create_artist(const std::string& artistName);
   std::optional<Shared::ArtistKey> get_artist(const std::string& artistName);
   Shared::AlbumKey get_or_create_album(const std::string& title,
