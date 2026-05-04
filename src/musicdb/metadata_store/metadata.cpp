@@ -458,7 +458,7 @@ std::optional<Shared::FullMetadata> store::read(const fs::path& item) {
 std::optional<Shared::FullMetadata> store::read_path(const fs::path& item) {
   std::string fileName = get_no_suffix(item.filename());
   std::vector<std::string> dirs;
-  fs::path dir = fs::canonical(item);
+  fs::path dir = fs::path{item};
   while (dir.has_parent_path() && dirs.size() < 3) {
     dir = dir.parent_path();
     dirs.emplace_back(dir.filename().string());
