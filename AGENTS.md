@@ -7,7 +7,7 @@ React/FluentUI frontend.
 
 ## Project Structure
 
-- cpp/ - C++ backend source code
+- src/ - C++ backend source code
 - www/ - React frontend
 - build/ - Build outputs
 
@@ -23,11 +23,13 @@ React/FluentUI frontend.
 
 ## Coding Style & Naming Conventions
 
+- Core conventions enforced by Prettier and Clang-Format
+
 **C++:**
 
+- Standard: C++23 without modules (yet...)
 - 2-space indentation
 - Max 80 characters per line
-- Standard: C++20
 
 **TypeScript/JavaScript:**
 
@@ -37,7 +39,8 @@ React/FluentUI frontend.
 ## Testing Guidelines
 
 - Run CMake tests with: bun run test
-- Tests use GoogleTest framework
+- C++ tests use GoogleTest framework
+- Web tests use the bun test runner
 
 ## Commit & Pull Request Guidelines
 
