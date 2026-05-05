@@ -151,7 +151,6 @@ crow::response tune(const crow::request& req, const std::string& path) {
   Send only the requested slice of the file
   */
   const auto& range = req.headers.find("Range");
-  range_header rh;
   if (range == req.headers.end()) {
     resp.code = 416;
     return resp;
@@ -162,9 +161,8 @@ crow::response tune(const crow::request& req, const std::string& path) {
     // TODO: Handle weirder ranges?
     resp.code = 416;
     return resp;
-  } else {
-    rh = maybe_range.value();
   }
+  range_header rh = maybe_range.value();
   const auto& song = maybe_song.value();
   // TODO: Get the file size, check to see we can send the amount requested.
   // If we can, go ahead & send it.
@@ -186,6 +184,7 @@ crow::response tune(const crow::request& req, const std::string& path) {
       return resp;
     }
   }
+  // _unsafe allows a file to be located anywhere. Be careful...
   resp.set_static_file_info_unsafe(song.generic_string());
   resp.set_header("Content-type", files::path_to_mime_type(song));
   resp.set_header("Accept-Ranges", "bytes");
@@ -234,84 +233,10 @@ crow::response api(const crow::request&, const std::string& the_path) {
   } else {
     tools::e404(resp, "API Handler not found: " + the_path);
   }
-  /*
-  switch (callId) {
-    case Shared::IpcCall::WriteToStorage:
-      ValidateAndCall(resp, path, config::write_to_storage);
-      break;
-    case Shared::IpcCall::ReadFromStorage:
-      ValidateAndCall(resp, path, config::read_from_storage);
-      break;
-    case Shared::IpcCall::DeleteFromStorage:
-      ValidateAndCall(resp, path, config::delete_from_storage);
-      break;
-    case Shared::IpcCall::ShowOpenDialog:
-      ValidateAndCall(resp, path, files::new_folder_picker);
-      break;
-    case Shared::IpcCall::LoadPlaylist:
-      ValidateAndCall(resp, path, playlist::load); // api::load_playlist);
-      break;
-      // ValidateAndCall(resp, path, api::save_playlist);
-    case Shared::IpcCall::SavePlaylist:
-    case Shared::IpcCall::AsyncData:
-    case Shared::IpcCall::IsDev:
-    case Shared::IpcCall::MenuAction:
-    case Shared::IpcCall::GetPlaylists:
-    case Shared::IpcCall::RenamePlaylist:
-    case Shared::IpcCall::DeletePlaylist:
-    case Shared::IpcCall::SetPlaylists:
-    case Shared::IpcCall::ClearHates:
-    case Shared::IpcCall::ClearLikes:
-    case Shared::IpcCall::ClearLocalOverrides:
-    case Shared::IpcCall::FlushImageCache:
-    case Shared::IpcCall::FlushMetadataCache:
-    case Shared::IpcCall::GetHates:
-    case Shared::IpcCall::GetLikes:
-    case Shared::IpcCall::GetMediaInfo:
-    case Shared::IpcCall::GetMusicDatabase:
-    case Shared::IpcCall::Search:
-    case Shared::IpcCall::SetHates:
-    case Shared::IpcCall::SetLikes:
-    case Shared::IpcCall::SetMediaInfo:
-    case Shared::IpcCall::SetSaveMenu:
-    case Shared::IpcCall::ShowFile:
-    case Shared::IpcCall::ShowLocFromKey:
-    case Shared::IpcCall::ShowMenu:
-    case Shared::IpcCall::SubstrSearch:
-    case Shared::IpcCall::TranscodingBegin:
-    case Shared::IpcCall::UploadImage:
-    case Shared::IpcCall::MinimizeWindow:
-    case Shared::IpcCall::MaximizeWindow:
-    case Shared::IpcCall::RestoreWindow:
-    case Shared::IpcCall::CloseWindow:
-    case Shared::IpcCall::GetPicUri:
-    case Shared::IpcCall::GetIgnoreList:
-    case Shared::IpcCall::AddIgnoreItem:
-    case Shared::IpcCall::RemoveIgnoreItem:
-    case Shared::IpcCall::PushIgnoreList:
-    case Shared::IpcCall::IgnoreListId:
-
-      CROW_LOG_ERROR
-          << "Unimplemented API call received: " << Shared::to_string(callId)
-          << " (" << underlying_cast(callId) << ") [" << path << "]";
-      break;
-
-    case Shared::IpcCall::Unknown:
-    default:
-      CROW_LOG_ERROR << "Unknown API call received: " << underlying_cast(callId)
-                     << " [" << path << "]";
-      std::string error_message =
-          Shared::is_valid(callId)
-              ? "Unimplemented API call: " +
-                    std::string(Shared::to_string(callId))
-              : "Unknown API call: " + std::to_string(underlying_cast(callId));
-      tools::e404(resp, error_message);
-      return resp;
-  }
-  */
   return resp;
 }
 
+// TODO: Switch this over to the register_route mechanism, too.
 void socket_message(crow::websocket::connection& conn,
                     const std::string& data,
                     bool /* is_binary */) {
