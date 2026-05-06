@@ -12,7 +12,7 @@
 #xcode-options {
   display: grid;
   column-gap: 10pt;
-  grid-template-columns: repeat(3, 3fr) 2fr;
+  grid-template-columns: 1fr 2fr 2fr 1fr;
   align-items: anchor-top;
 }
 
