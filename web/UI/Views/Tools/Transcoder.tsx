@@ -3,6 +3,7 @@ import {
   Dropdown,
   IComboBoxOption,
   IDropdownOption,
+  Position,
   Text,
   TextField,
 } from '@fluentui/react';
@@ -134,7 +135,6 @@ export function TranscoderConfiguration(): ReactElement {
       <Text variant="mediumPlus">
         Transcode (downsample) audio files into a particular directory.
       </Text>
-      <br />
       <div id="xcode-source-area">
         <Dropdown
           label="Music Source"
@@ -152,7 +152,6 @@ export function TranscoderConfiguration(): ReactElement {
         onClick={() => getDir(setDstLoc, setError)}
         iconProps={{ iconName: 'More' }}
       />
-      <br />
       <div id="xcode-options">
         <StringSpinButton
           label="Target Bit Rate"
@@ -166,6 +165,7 @@ export function TranscoderConfiguration(): ReactElement {
           min={64}
           max={320}
           step={4}
+          labelPosition={Position.top}
         />
         <StateToggle label="Copy artwork (NYI) " state={copyArtwork} />
         <StateToggle
@@ -173,6 +173,7 @@ export function TranscoderConfiguration(): ReactElement {
           state={mirror}
         />
         <DefaultButton
+          id="transcode-button"
           text="Transcode"
           disabled={!validSource || dstLoc.length === 0}
           onClick={() => {

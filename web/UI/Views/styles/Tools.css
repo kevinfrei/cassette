@@ -12,6 +12,10 @@
 #xcode-options {
   display: grid;
   column-gap: 10pt;
-  grid-template-columns: repeat(4, 1fr);
-  align-items: baseline;
+  grid-template-columns: repeat(3, 3fr) 2fr;
+  align-items: anchor-top;
+}
+
+#transcode-button {
+  align-self: end;
 }
