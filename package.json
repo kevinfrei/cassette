@@ -42,7 +42,8 @@
     "***": "Generate the TypeScript & C++ types from the Crow IDL definitions",
     "gen": "crow-idl web/Shared/CuarkDefs.ts -c:src/ipc/CommonTypes.hpp -t:web/Shared/CommonTypes.ts",
     "*-*": "Helper to do OS-specific things",
-    "os": "bun run .cuark/os.ts"
+    "os": "bun run .cuark/os.ts",
+    "prepare": "bunx simple-git-hooks"
   },
   "simple-git-hooks": {
     "pre-commit": "bunx lint-staged",
