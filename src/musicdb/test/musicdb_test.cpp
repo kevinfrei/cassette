@@ -92,6 +92,10 @@ TEST_F(MDBTest, GetFlatDatabase) {
 TEST_F(MDBTest, FullDatabase) {
   musicdb::MusicDatabase::set_locations({});
   auto& db = musicdb::MusicDatabase::get();
+  auto before = db.get_flat_database();
+  EXPECT_EQ(before.artists.size(), 0);
+  EXPECT_EQ(before.albums.size(), 0);
+  EXPECT_EQ(before.songs.size(), 0);
   auto testDir = getFilesPath() / large_dir_name;
   db.add_file_location(testDir);
   auto flat = db.get_flat_database();

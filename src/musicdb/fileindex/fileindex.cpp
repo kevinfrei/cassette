@@ -65,7 +65,7 @@ bool file_index::belongs_here(const fs::path& path, bool just_extension) const {
     files::lowercase_extension(ext);
     return suffixes.find(ext.extension().string()) != suffixes.end();
   }
-  auto prox = fs::proximate(path, loc);
+  auto prox = path.lexically_proximate(loc);
   files::lowercase_extension(prox);
   return prox.is_relative() &&
          suffixes.find(prox.extension().string()) != suffixes.end();
@@ -102,8 +102,8 @@ bool file_index::remove_file(const fs::path& path) {
 
 // Get a normalized relative path from the root of the index.
 std::string file_index::get_relative_path(const fs::path& path) const {
-  // TODO: proximate is really slow.
-  auto prox = fs::proximate(path, loc);
+  // fs::proximate is really slow, so use lexically_proximate instead.
+  auto prox = path.lexically_proximate(loc);
   // Normalize to UTF-8 NFC:
   auto str = prox.generic_u8string();
   // if (str.find("onnor") != std::string::npos) {
