@@ -21,7 +21,7 @@ import {
   Types,
   u16,
   u8,
-} from './IDL';
+} from '@freik/ts-cpp-tooling/IDL';
 
 const CurrentView: NEnum = enum_num(num(), {
   disabled: -1,
