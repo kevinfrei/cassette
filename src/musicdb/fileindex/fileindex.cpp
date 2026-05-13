@@ -55,11 +55,16 @@ file_index::file_index(const fs::path& _loc,
 std::unordered_set<std::string> suffixes = {
     ".mp3", ".flac", ".wav", ".m4a", ".aac", ".wma", ".png", ".jpg"};
 
-bool file_index::belongs_here(const fs::path& path) const {
+bool file_index::belongs_here(const fs::path& path, bool just_extension) const {
   // Check if the path has a valid suffix, and is located within the location
   // of the index. We use proximate here to get a path relative to the index
   // location,
-  // TODO: proximate is really slow
+  // TODO: proximate is ***really*** slow
+  if (just_extension) {
+    auto ext = fs::path{path};
+    files::lowercase_extension(ext);
+    return suffixes.find(ext.extension().string()) != suffixes.end();
+  }
   auto prox = fs::proximate(path, loc);
   files::lowercase_extension(prox);
   return prox.is_relative() &&
@@ -69,7 +74,7 @@ bool file_index::belongs_here(const fs::path& path) const {
 // Adds a new file to the index (if it doesn't already exist). Don't save
 // anything, just update the in-memory structures.
 bool file_index::add_new_file(const fs::path& path) {
-  if (!belongs_here(path)) {
+  if (!belongs_here(path, true)) {
     return false;
   }
   std::string relPath = get_relative_path(path);
@@ -195,7 +200,7 @@ void file_index::rescan_files(path_handler add_file, path_handler del_file) {
       if (thePath.filename().string().starts_with('.')) {
         it.disable_recursion_pending();
       }
-    } else if (belongs_here(thePath)) {
+    } else if (belongs_here(thePath, true)) {
       const auto relativePath = get_relative_path(thePath);
       existingFiles.erase(relativePath);
       if (file_to_key.find(relativePath) != file_to_key.end()) {

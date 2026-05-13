@@ -31,7 +31,8 @@ class file_index {
   std::set<Shared::IgnoreItemPair> ignore_items;
 
   // This indicates if the file extension of the path is to be tracked.
-  bool belongs_here(const std::filesystem::path& path) const;
+  bool belongs_here(const std::filesystem::path& path,
+                    bool just_extension = false) const;
 
   // Adds a new file to the index (if it doesn't already exist). Don't save
   // anything, just update the in-memory structures.
