@@ -100,8 +100,8 @@ TEST_F(MDBTest, FullDatabase) {
   db.add_file_location(testDir);
   auto flat = db.get_flat_database();
   EXPECT_EQ(flat.artists.size(), 273);
-  EXPECT_EQ(flat.albums.size(), 188);
-  EXPECT_EQ(flat.songs.size(), 740);
+  EXPECT_EQ(flat.albums.size(), 189);
+  EXPECT_EQ(flat.songs.size(), 742);
 }
 
 int main(int argc, char** argv) {
