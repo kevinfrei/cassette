@@ -66,7 +66,6 @@ uint16_t get_random_port() {
   return port;
 }
 
-// TODO: Run this in a separate thread:
 void launch_music() {
   auto res = config::read_from_storage(
       Shared::to_string(Shared::StorageId::Locations));
@@ -74,7 +73,7 @@ void launch_music() {
     try {
       auto loc_json = crow::json::load(*res);
       auto vals = from_json<std::vector<std::string>>(loc_json);
-      if (vals) {
+      if (vals.has_value()) {
         std::vector<std::filesystem::path> paths;
         std::copy(vals->begin(), vals->end(), std::back_inserter(paths));
         musicdb::MusicDatabase::set_locations(paths);
@@ -87,7 +86,8 @@ void launch_music() {
 void init(int, const char* argv[]) {
   setlocale(LC_ALL, ".UTF8");
   files::set_program_location(argv[0]);
-  launch_music();
+  auto scan_thread = new std::thread(launch_music);
+  scan_thread->detach();
   std::string url = get_root_url();
   CROW_LOG_INFO << "Starting server at " << url;
 
