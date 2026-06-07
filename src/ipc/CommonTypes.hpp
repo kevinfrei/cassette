@@ -77,51 +77,6 @@ inline std::enable_if_t<is_enum_class_v<T>, crow::json::wvalue> to_json(
   return crow::json::wvalue(static_cast<std::underlying_type_t<T>>(value));
 }
 
-// A little extra work for string constants:
-
-// Function to manually escape a string for JSON
-inline std::string escape_json_string(std::string_view sv) {
-  std::ostringstream o;
-  for (char c : sv) {
-    if (c == '"') {
-      o << "\\\"";
-    } else if (c == '\\') {
-      o << "\\\\";
-    } else if (c == '\b') {
-      o << "\\b";
-    } else if (c == '\f') {
-      o << "\\f";
-    } else if (c == '\n') {
-      o << "\\n";
-    } else if (c == '\r') {
-      o << "\\r";
-    } else if (c == '\t') {
-      o << "\\t";
-    } else if (static_cast<unsigned char>(c) < 0x20 ||
-               static_cast<unsigned char>(c) > 0x7e) {
-      // Escape other control characters and non-ASCII characters as \uXXXX
-      o << "\\u" << std::hex << std::setw(4) << std::setfill('0')
-        << static_cast<int>(static_cast<unsigned char>(c));
-    } else {
-      o << c;
-    }
-  }
-  return o.str();
-}
-
-template <>
-struct impl_to_json<std::string> {
-  static inline crow::json::wvalue process(const std::string& value) {
-    return crow::json::wvalue(escape_json_string(value));
-  }
-};
-template <>
-struct impl_to_json<char*> {
-  static inline crow::json::wvalue process(const char* value) {
-    return crow::json::wvalue(escape_json_string(value));
-  }
-};
-
 template <>
 struct impl_to_json<uint64_t> {
   static inline crow::json::wvalue process(const uint64_t& value) {
@@ -142,10 +97,11 @@ struct impl_to_json<int64_t> {
   }
 };
 
+// A little extra work for string_view's:
 template <>
 struct impl_to_json<std::string_view> {
   static inline crow::json::wvalue process(std::string_view value) {
-    return crow::json::wvalue(escape_json_string(value));
+    return crow::json::wvalue(std::string{value});
   }
 };
 
@@ -1143,51 +1099,54 @@ inline constexpr std::optional<CurrentView> from_string<CurrentView>(
 #pragma endregion linear enum CurrentView
 
 #pragma region linear enum IpcCall
-enum class IpcCall : std::uint8_t {
+enum class IpcCall : std::uint16_t {
   Unknown = 0,
   ReadFromStorage = 1,
   WriteToStorage = 2,
   DeleteFromStorage = 3,
-  AsyncData = 4,
-  IsDev = 5,
-  GetPlaylists = 6,
-  LoadPlaylist = 7,
-  RenamePlaylist = 8,
-  SavePlaylist = 9,
-  DeletePlaylist = 10,
-  SetPlaylists = 11,
-  ClearHates = 12,
-  ClearLikes = 13,
-  ClearLocalOverrides = 14,
-  FlushImageCache = 15,
-  FlushMetadataCache = 16,
-  GetHates = 17,
-  GetLikes = 18,
-  GetMediaInfo = 19,
-  GetMusicDatabase = 20,
-  MenuAction = 21,
-  Search = 22,
-  SetHates = 23,
-  SetLikes = 24,
-  SetMediaInfo = 25,
-  SetSaveMenu = 26,
-  ShowFile = 27,
-  ShowLocFromKey = 28,
-  ShowMenu = 29,
-  SubstrSearch = 30,
-  TranscodingBegin = 31,
-  UploadImage = 32,
-  MinimizeWindow = 33,
-  MaximizeWindow = 34,
-  RestoreWindow = 35,
-  CloseWindow = 36,
-  GetPicUri = 37,
-  GetIgnoreList = 38,
-  AddIgnoreItem = 39,
-  RemoveIgnoreItem = 40,
-  PushIgnoreList = 41,
-  IgnoreListId = 42,
-  ShowOpenDialog = 43,
+  MinimizeWindow = 4,
+  MaximizeWindow = 5,
+  RestoreWindow = 6,
+  CloseWindow = 7,
+  IsDev = 8,
+  AsyncData = 9,
+  MenuAction = 10,
+  ShowOpenDialog = 11,
+  GetFileSystemRoots = 12,
+  GetNamedLocations = 13,
+  GetFolderContents = 14,
+  GetPlaylists = 1001,
+  LoadPlaylist = 1002,
+  RenamePlaylist = 1003,
+  SavePlaylist = 1004,
+  DeletePlaylist = 1005,
+  SetPlaylists = 1006,
+  ClearHates = 1007,
+  ClearLikes = 1008,
+  ClearLocalOverrides = 1009,
+  FlushImageCache = 1010,
+  FlushMetadataCache = 1011,
+  GetHates = 1012,
+  GetLikes = 1013,
+  GetMediaInfo = 1014,
+  GetMusicDatabase = 1015,
+  Search = 1016,
+  SetHates = 1017,
+  SetLikes = 1018,
+  SetMediaInfo = 1019,
+  SetSaveMenu = 1020,
+  ShowFile = 1021,
+  ShowLocFromKey = 1022,
+  ShowMenu = 1023,
+  SubstrSearch = 1024,
+  TranscodingBegin = 1025,
+  UploadImage = 1026,
+  GetPicUri = 1027,
+  GetIgnoreList = 1028,
+  AddIgnoreItem = 1029,
+  RemoveIgnoreItem = 1030,
+  PushIgnoreList = 1031,
+  IgnoreListId = 1032,
 };
 
 inline constexpr bool is_valid(IpcCall _value) {
@@ -1196,8 +1155,17 @@ inline constexpr bool is_valid(IpcCall _value) {
     case IpcCall::ReadFromStorage:
     case IpcCall::WriteToStorage:
     case IpcCall::DeleteFromStorage:
-    case IpcCall::AsyncData:
+    case IpcCall::MinimizeWindow:
+    case IpcCall::MaximizeWindow:
+    case IpcCall::RestoreWindow:
+    case IpcCall::CloseWindow:
     case IpcCall::IsDev:
+    case IpcCall::AsyncData:
+    case IpcCall::MenuAction:
+    case IpcCall::ShowOpenDialog:
+    case IpcCall::GetFileSystemRoots:
+    case IpcCall::GetNamedLocations:
+    case IpcCall::GetFolderContents:
     case IpcCall::GetPlaylists:
     case IpcCall::LoadPlaylist:
     case IpcCall::RenamePlaylist:
@@ -1213,7 +1181,6 @@ inline constexpr bool is_valid(IpcCall _value) {
     case IpcCall::GetLikes:
     case IpcCall::GetMediaInfo:
     case IpcCall::GetMusicDatabase:
-    case IpcCall::MenuAction:
     case IpcCall::Search:
     case IpcCall::SetHates:
     case IpcCall::SetLikes:
@@ -1225,17 +1192,12 @@ inline constexpr bool is_valid(IpcCall _value) {
     case IpcCall::SubstrSearch:
     case IpcCall::TranscodingBegin:
     case IpcCall::UploadImage:
-    case IpcCall::MinimizeWindow:
-    case IpcCall::MaximizeWindow:
-    case IpcCall::RestoreWindow:
-    case IpcCall::CloseWindow:
     case IpcCall::GetPicUri:
     case IpcCall::GetIgnoreList:
     case IpcCall::AddIgnoreItem:
     case IpcCall::RemoveIgnoreItem:
     case IpcCall::PushIgnoreList:
     case IpcCall::IgnoreListId:
-    case IpcCall::ShowOpenDialog:
       return true;
     default:
       return false;
@@ -1252,10 +1214,28 @@ inline constexpr std::string_view to_name(IpcCall _value) {
       return "WriteToStorage";
     case IpcCall::DeleteFromStorage:
       return "DeleteFromStorage";
-    case IpcCall::AsyncData:
-      return "AsyncData";
+    case IpcCall::MinimizeWindow:
+      return "MinimizeWindow";
+    case IpcCall::MaximizeWindow:
+      return "MaximizeWindow";
+    case IpcCall::RestoreWindow:
+      return "RestoreWindow";
+    case IpcCall::CloseWindow:
+      return "CloseWindow";
     case IpcCall::IsDev:
       return "IsDev";
+    case IpcCall::AsyncData:
+      return "AsyncData";
+    case IpcCall::MenuAction:
+      return "MenuAction";
+    case IpcCall::ShowOpenDialog:
+      return "ShowOpenDialog";
+    case IpcCall::GetFileSystemRoots:
+      return "GetFileSystemRoots";
+    case IpcCall::GetNamedLocations:
+      return "GetNamedLocations";
+    case IpcCall::GetFolderContents:
+      return "GetFolderContents";
     case IpcCall::GetPlaylists:
       return "GetPlaylists";
     case IpcCall::LoadPlaylist:
@@ -1286,8 +1266,6 @@ inline constexpr std::string_view to_name(IpcCall _value) {
       return "GetMediaInfo";
     case IpcCall::GetMusicDatabase:
       return "GetMusicDatabase";
-    case IpcCall::MenuAction:
-      return "MenuAction";
     case IpcCall::Search:
       return "Search";
     case IpcCall::SetHates:
@@ -1310,14 +1288,6 @@ inline constexpr std::string_view to_name(IpcCall _value) {
       return "TranscodingBegin";
     case IpcCall::UploadImage:
       return "UploadImage";
-    case IpcCall::MinimizeWindow:
-      return "MinimizeWindow";
-    case IpcCall::MaximizeWindow:
-      return "MaximizeWindow";
-    case IpcCall::RestoreWindow:
-      return "RestoreWindow";
-    case IpcCall::CloseWindow:
-      return "CloseWindow";
     case IpcCall::GetPicUri:
       return "GetPicUri";
     case IpcCall::GetIgnoreList:
@@ -1330,8 +1300,6 @@ inline constexpr std::string_view to_name(IpcCall _value) {
       return "PushIgnoreList";
     case IpcCall::IgnoreListId:
       return "IgnoreListId";
-    case IpcCall::ShowOpenDialog:
-      return "ShowOpenDialog";
     default:
       return "<unknown>";
   }
@@ -1347,86 +1315,92 @@ inline constexpr std::string_view to_string(IpcCall _value) {
       return "2";
     case IpcCall::DeleteFromStorage:
       return "3";
-    case IpcCall::AsyncData:
-      return "4";
-    case IpcCall::IsDev:
-      return "5";
-    case IpcCall::GetPlaylists:
-      return "6";
-    case IpcCall::LoadPlaylist:
-      return "7";
-    case IpcCall::RenamePlaylist:
-      return "8";
-    case IpcCall::SavePlaylist:
-      return "9";
-    case IpcCall::DeletePlaylist:
-      return "10";
-    case IpcCall::SetPlaylists:
-      return "11";
-    case IpcCall::ClearHates:
-      return "12";
-    case IpcCall::ClearLikes:
-      return "13";
-    case IpcCall::ClearLocalOverrides:
-      return "14";
-    case IpcCall::FlushImageCache:
-      return "15";
-    case IpcCall::FlushMetadataCache:
-      return "16";
-    case IpcCall::GetHates:
-      return "17";
-    case IpcCall::GetLikes:
-      return "18";
-    case IpcCall::GetMediaInfo:
-      return "19";
-    case IpcCall::GetMusicDatabase:
-      return "20";
-    case IpcCall::MenuAction:
-      return "21";
-    case IpcCall::Search:
-      return "22";
-    case IpcCall::SetHates:
-      return "23";
-    case IpcCall::SetLikes:
-      return "24";
-    case IpcCall::SetMediaInfo:
-      return "25";
-    case IpcCall::SetSaveMenu:
-      return "26";
-    case IpcCall::ShowFile:
-      return "27";
-    case IpcCall::ShowLocFromKey:
-      return "28";
-    case IpcCall::ShowMenu:
-      return "29";
-    case IpcCall::SubstrSearch:
-      return "30";
-    case IpcCall::TranscodingBegin:
-      return "31";
-    case IpcCall::UploadImage:
-      return "32";
     case IpcCall::MinimizeWindow:
-      return "33";
+      return "4";
     case IpcCall::MaximizeWindow:
-      return "34";
+      return "5";
     case IpcCall::RestoreWindow:
-      return "35";
+      return "6";
     case IpcCall::CloseWindow:
-      return "36";
-    case IpcCall::GetPicUri:
-      return "37";
-    case IpcCall::GetIgnoreList:
-      return "38";
-    case IpcCall::AddIgnoreItem:
-      return "39";
-    case IpcCall::RemoveIgnoreItem:
-      return "40";
-    case IpcCall::PushIgnoreList:
-      return "41";
-    case IpcCall::IgnoreListId:
-      return "42";
+      return "7";
+    case IpcCall::IsDev:
+      return "8";
+    case IpcCall::AsyncData:
+      return "9";
+    case IpcCall::MenuAction:
+      return "10";
     case IpcCall::ShowOpenDialog:
-      return "43";
+      return "11";
+    case IpcCall::GetFileSystemRoots:
+      return "12";
+    case IpcCall::GetNamedLocations:
+      return "13";
+    case IpcCall::GetFolderContents:
+      return "14";
+    case IpcCall::GetPlaylists:
+      return "1001";
+    case IpcCall::LoadPlaylist:
+      return "1002";
+    case IpcCall::RenamePlaylist:
+      return "1003";
+    case IpcCall::SavePlaylist:
+      return "1004";
+    case IpcCall::DeletePlaylist:
+      return "1005";
+    case IpcCall::SetPlaylists:
+      return "1006";
+    case IpcCall::ClearHates:
+      return "1007";
+    case IpcCall::ClearLikes:
+      return "1008";
+    case IpcCall::ClearLocalOverrides:
+      return "1009";
+    case IpcCall::FlushImageCache:
+      return "1010";
+    case IpcCall::FlushMetadataCache:
+      return "1011";
+    case IpcCall::GetHates:
+      return "1012";
+    case IpcCall::GetLikes:
+      return "1013";
+    case IpcCall::GetMediaInfo:
+      return "1014";
+    case IpcCall::GetMusicDatabase:
+      return "1015";
+    case IpcCall::Search:
+      return "1016";
+    case IpcCall::SetHates:
+      return "1017";
+    case IpcCall::SetLikes:
+      return "1018";
+    case IpcCall::SetMediaInfo:
+      return "1019";
+    case IpcCall::SetSaveMenu:
+      return "1020";
+    case IpcCall::ShowFile:
+      return "1021";
+    case IpcCall::ShowLocFromKey:
+      return "1022";
+    case IpcCall::ShowMenu:
+      return "1023";
+    case IpcCall::SubstrSearch:
+      return "1024";
+    case IpcCall::TranscodingBegin:
+      return "1025";
+    case IpcCall::UploadImage:
+      return "1026";
+    case IpcCall::GetPicUri:
+      return "1027";
+    case IpcCall::GetIgnoreList:
+      return "1028";
+    case IpcCall::AddIgnoreItem:
+      return "1029";
+    case IpcCall::RemoveIgnoreItem:
+      return "1030";
+    case IpcCall::PushIgnoreList:
+      return "1031";
+    case IpcCall::IgnoreListId:
+      return "1032";
     default:
       return "<unknown>";
   }
@@ -1435,7 +1409,7 @@ inline constexpr std::string_view to_string(IpcCall _value) {
 template <>
 inline constexpr std::optional<IpcCall> from_string<IpcCall>(
     std::string_view _str) {
-  std::uint8_t _val;
+  std::uint16_t _val;
   auto [ptr, ec] =
       std::from_chars(_str.data(), _str.data() + _str.size(), _val);
   if (ec != std::errc{}) {
@@ -2056,6 +2030,15 @@ struct OpenDialogOptions {
   std::optional<bool> multiSelections;
   std::optional<std::vector<FileFilterItem>> filters;
 };
+using NamedLocations = std::map<std::string, std::string>;
+
+struct FileSystemItem {
+  std::string file;
+  double date;
+  std::uint64_t size;
+  std::string type;
+};
+using FolderContents = std::vector<FileSystemItem>;
 
 struct SearchResults {
   std::vector<SongKey> songs;
@@ -3192,6 +3175,60 @@ from_json<Shared::OpenDialogOptions>(const crow::json::rvalue& _value) {
   return _res;
 }
 #pragma endregion JSON serialization for object OpenDialogOptions
+
+#pragma region JSON serialization for object FileSystemItem
+template <>
+struct impl_to_json<Shared::FileSystemItem> {
+  static inline crow::json::wvalue process(
+      const Shared::FileSystemItem& _value) {
+    crow::json::wvalue _res;
+    _res["file"] = to_json(_value.file);
+    _res["date"] = to_json(_value.date);
+    _res["size"] = to_json(_value.size);
+    _res["type"] = to_json(_value.type);
+
+    return _res;
+  }
+};
+
+template <>
+inline std::optional<Shared::FileSystemItem> from_json<Shared::FileSystemItem>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::FileSystemItem _res;
+
+  if (!_value.has("file"))
+    return std::nullopt;
+  auto _file_opt_ = from_json<std::string>(_value["file"]);
+  if (!_file_opt_.has_value())
+    return std::nullopt;
+  _res.file = std::move(*_file_opt_);
+
+  if (!_value.has("date"))
+    return std::nullopt;
+  auto _date_opt_ = from_json<double>(_value["date"]);
+  if (!_date_opt_.has_value())
+    return std::nullopt;
+  _res.date = std::move(*_date_opt_);
+
+  if (!_value.has("size"))
+    return std::nullopt;
+  auto _size_opt_ = from_json<std::uint64_t>(_value["size"]);
+  if (!_size_opt_.has_value())
+    return std::nullopt;
+  _res.size = std::move(*_size_opt_);
+
+  if (!_value.has("type"))
+    return std::nullopt;
+  auto _type_opt_ = from_json<std::string>(_value["type"]);
+  if (!_type_opt_.has_value())
+    return std::nullopt;
+  _res.type = std::move(*_type_opt_);
+
+  return _res;
+}
+#pragma endregion JSON serialization for object FileSystemItem
 
 #pragma region JSON serialization for object SearchResults
 template <>

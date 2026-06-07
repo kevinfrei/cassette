@@ -1,3 +1,4 @@
+import { FluentProvider, webLightTheme } from '@fluentui/react-components';
 import { Provider, useAtomValue, useSetAtom } from 'jotai';
 import { ReactElement, SyntheticEvent, useCallback, useRef } from 'react';
 import { KeepAlive } from '../KeepAlive';
@@ -94,9 +95,11 @@ export function App(): ReactElement {
   const store = getStore();
   return (
     <Provider store={store}>
-      <MusicDbListener />
-      <KeepAlive />
-      <TheActualApp />
+      <FluentProvider theme={webLightTheme}>
+        <MusicDbListener />
+        <KeepAlive />
+        <TheActualApp />
+      </FluentProvider>
     </Provider>
   );
 }

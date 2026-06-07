@@ -19,6 +19,17 @@ const chkIdlI16 = (v: unknown): v is number =>
 const chkIdlI32 = (v: unknown): v is number =>
   TC.isNumber(v) && v >= -2147483648 && v <= 2147483647 && Number.isInteger(v);
 
+function chkIdlU64(v: unknown): v is number {
+  if (TC.isNumber(v)) {
+    return Number.isInteger(v) && chkIdlU64(BigInt(v));
+  }
+  return TC.isBigInt(v) && BigInt.asUintN(64, v) === v;
+}
+
+function chkIdlDouble(v: unknown): v is number {
+  return TC.isNumber(v) && !Number.isNaN(v) && Number.isFinite(v);
+}
+
 function chkOptional<T>(chk: TC.typecheck<T>): TC.typecheck<T | undefined> {
   return (v: unknown): v is T | undefined => v === undefined || chk(v);
 }
@@ -120,46 +131,49 @@ export const IpcCall = Object.freeze({
   ReadFromStorage: 1,
   WriteToStorage: 2,
   DeleteFromStorage: 3,
-  AsyncData: 4,
-  IsDev: 5,
-  GetPlaylists: 6,
-  LoadPlaylist: 7,
-  RenamePlaylist: 8,
-  SavePlaylist: 9,
-  DeletePlaylist: 10,
-  SetPlaylists: 11,
-  ClearHates: 12,
-  ClearLikes: 13,
-  ClearLocalOverrides: 14,
-  FlushImageCache: 15,
-  FlushMetadataCache: 16,
-  GetHates: 17,
-  GetLikes: 18,
-  GetMediaInfo: 19,
-  GetMusicDatabase: 20,
-  MenuAction: 21,
-  Search: 22,
-  SetHates: 23,
-  SetLikes: 24,
-  SetMediaInfo: 25,
-  SetSaveMenu: 26,
-  ShowFile: 27,
-  ShowLocFromKey: 28,
-  ShowMenu: 29,
-  SubstrSearch: 30,
-  TranscodingBegin: 31,
-  UploadImage: 32,
-  MinimizeWindow: 33,
-  MaximizeWindow: 34,
-  RestoreWindow: 35,
-  CloseWindow: 36,
-  GetPicUri: 37,
-  GetIgnoreList: 38,
-  AddIgnoreItem: 39,
-  RemoveIgnoreItem: 40,
-  PushIgnoreList: 41,
-  IgnoreListId: 42,
-  ShowOpenDialog: 43,
+  MinimizeWindow: 4,
+  MaximizeWindow: 5,
+  RestoreWindow: 6,
+  CloseWindow: 7,
+  IsDev: 8,
+  AsyncData: 9,
+  MenuAction: 10,
+  ShowOpenDialog: 11,
+  GetFileSystemRoots: 12,
+  GetNamedLocations: 13,
+  GetFolderContents: 14,
+  GetPlaylists: 1001,
+  LoadPlaylist: 1002,
+  RenamePlaylist: 1003,
+  SavePlaylist: 1004,
+  DeletePlaylist: 1005,
+  SetPlaylists: 1006,
+  ClearHates: 1007,
+  ClearLikes: 1008,
+  ClearLocalOverrides: 1009,
+  FlushImageCache: 1010,
+  FlushMetadataCache: 1011,
+  GetHates: 1012,
+  GetLikes: 1013,
+  GetMediaInfo: 1014,
+  GetMusicDatabase: 1015,
+  Search: 1016,
+  SetHates: 1017,
+  SetLikes: 1018,
+  SetMediaInfo: 1019,
+  SetSaveMenu: 1020,
+  ShowFile: 1021,
+  ShowLocFromKey: 1022,
+  ShowMenu: 1023,
+  SubstrSearch: 1024,
+  TranscodingBegin: 1025,
+  UploadImage: 1026,
+  GetPicUri: 1027,
+  GetIgnoreList: 1028,
+  AddIgnoreItem: 1029,
+  RemoveIgnoreItem: 1030,
+  PushIgnoreList: 1031,
+  IgnoreListId: 1032,
 });
 export type IpcCall = (typeof IpcCall)[keyof typeof IpcCall];
 export function chkIpcCall(val: unknown): val is IpcCall {
@@ -584,6 +598,29 @@ export const chkOpenDialogOptions: TC.typecheck<OpenDialogOptions> =
       filters: chkOptional(TC.chkArrayOf(chkFileFilterItem)),
     },
   );
+
+export type NamedLocations = Map<string, string>;
+export const chkNamedLocations = TC.chkMapOf(TC.isString, TC.isString);
+
+export type FileSystemItem = {
+  file: string;
+  date: number;
+  size: bigint;
+  type: string;
+};
+export const chkFileSystemItem: TC.typecheck<FileSystemItem> =
+  TC.chkObjectOfType(
+    {
+      file: TC.isString,
+      date: chkIdlDouble,
+      size: chkIdlU64,
+      type: TC.isString,
+    },
+    {},
+  );
+
+export type FolderContents = FileSystemItem[];
+export const chkFolderContents = TC.chkArrayOf(chkFileSystemItem);
 
 export type SearchResults = {
   songs: SongKey[];

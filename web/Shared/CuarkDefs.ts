@@ -1,6 +1,7 @@
 import {
   arr,
   bool,
+  dbl,
   Enum,
   enum_lst,
   enum_num,
@@ -20,8 +21,9 @@ import {
   sub,
   Types,
   u16,
+  u64,
   u8,
-} from '@freik/ts-cpp-tooling/IDL';
+} from 'crow-idl/IDL';
 
 const CurrentView: NEnum = enum_num(num(), {
   disabled: -1,
@@ -101,51 +103,54 @@ const Keys: SEnum = enum_str({
   Tools: 'L',
 });
 
-const IpcCall: NEnum = enum_num(u8(), {
+const IpcCall: NEnum = enum_num(u16(), {
   Unknown: 0,
   ReadFromStorage: 1,
   WriteToStorage: 2,
   DeleteFromStorage: 3,
-  AsyncData: 4,
-  IsDev: 5,
-  GetPlaylists: 6,
-  LoadPlaylist: 7,
-  RenamePlaylist: 8,
-  SavePlaylist: 9,
-  DeletePlaylist: 10,
-  SetPlaylists: 11,
-  ClearHates: 12,
-  ClearLikes: 13,
-  ClearLocalOverrides: 14,
-  FlushImageCache: 15,
-  FlushMetadataCache: 16,
-  GetHates: 17,
-  GetLikes: 18,
-  GetMediaInfo: 19,
-  GetMusicDatabase: 20,
-  MenuAction: 21,
-  Search: 22,
-  SetHates: 23,
-  SetLikes: 24,
-  SetMediaInfo: 25,
-  SetSaveMenu: 26,
-  ShowFile: 27,
-  ShowLocFromKey: 28,
-  ShowMenu: 29,
-  SubstrSearch: 30,
-  TranscodingBegin: 31,
-  UploadImage: 32,
-  MinimizeWindow: 33,
-  MaximizeWindow: 34,
-  RestoreWindow: 35,
-  CloseWindow: 36,
-  GetPicUri: 37,
-  GetIgnoreList: 38,
-  AddIgnoreItem: 39,
-  RemoveIgnoreItem: 40,
-  PushIgnoreList: 41,
-  IgnoreListId: 42,
-  ShowOpenDialog: 43,
+  MinimizeWindow: 4,
+  MaximizeWindow: 5,
+  RestoreWindow: 6,
+  CloseWindow: 7,
+  IsDev: 8,
+  AsyncData: 9,
+  MenuAction: 10,
+  ShowOpenDialog: 11,
+  GetFileSystemRoots: 12,
+  GetNamedLocations: 13,
+  GetFolderContents: 14,
+  GetPlaylists: 1001,
+  LoadPlaylist: 1002,
+  RenamePlaylist: 1003,
+  SavePlaylist: 1004,
+  DeletePlaylist: 1005,
+  SetPlaylists: 1006,
+  ClearHates: 1007,
+  ClearLikes: 1008,
+  ClearLocalOverrides: 1009,
+  FlushImageCache: 1010,
+  FlushMetadataCache: 1011,
+  GetHates: 1012,
+  GetLikes: 1013,
+  GetMediaInfo: 1014,
+  GetMusicDatabase: 1015,
+  Search: 1016,
+  SetHates: 1017,
+  SetLikes: 1018,
+  SetMediaInfo: 1019,
+  SetSaveMenu: 1020,
+  ShowFile: 1021,
+  ShowLocFromKey: 1022,
+  ShowMenu: 1023,
+  SubstrSearch: 1024,
+  TranscodingBegin: 1025,
+  UploadImage: 1026,
+  GetPicUri: 1027,
+  GetIgnoreList: 1028,
+  AddIgnoreItem: 1029,
+  RemoveIgnoreItem: 1030,
+  PushIgnoreList: 1031,
+  IgnoreListId: 1032,
 });
 
 const SocketMsg: Enum = enum_lst(u8(), [
@@ -376,6 +381,19 @@ const OpenDialogOptions = obj({
   filters: opt(arr(ref('FileFilterItem'))),
 });
 
+const NamedLocations = map(str(), str());
+
+const FileSystemItem = obj({
+  file: str(),
+  date: dbl(),
+  size: u64(),
+  type: str(),
+});
+
+const FolderContents = arr(ref('FileSystemItem'));
+
+// Begin additional types here
+
 const SearchResults = obj({
   songs: arr(ref('SongKey')),
   artists: arr(ref('ArtistKey')),
@@ -421,6 +439,10 @@ export const TypesToGenerate: Record<string, Types> = {
   MusicDatabase,
   FileFilterItem,
   OpenDialogOptions,
+  NamedLocations,
+  FileSystemItem,
+  FolderContents,
+  // Being additional stuff here
   SearchResults,
 };
 
