@@ -28,33 +28,39 @@ import {
 const CurrentView: NEnum = enum_num(num(), {
   disabled: -1,
   none: 0,
-  recent: 1,
-  albums: 2,
-  artists: 3,
-  songs: 4,
-  playlists: 5,
-  now_playing: 6,
-  settings: 7,
-  search: 8,
-  tools: 9,
+  settings: 1,
+  tools: 2,
+  search: 3,
+  // Additional entries after this one:
+  __last_cuark_view: 100,
+  recent: 101,
+  albums: 102,
+  artists: 103,
+  songs: 104,
+  playlists: 105,
+  now_playing: 106,
 });
 
 const StrId: SEnum = enum_str({
+  FilePath: 'File Path',
+  FilesSelected: 'Files Selected',
+  ErrNotSingleAndNotMultiple: 'Not Single and not Multiple (This is a bug!)',
+  ErrSingleAndMultiple: 'Both Single and Multiple (This is a bug!)',
+  ViewSettings: 'Settings',
+  ViewTools: 'Tools',
+  // Other strings after this one:
+  __last_cuark_StrId: '',
   Mono: 'mono',
   Stereo: 'stereo',
   Quadrophonic: 'quadrophonic',
   Channels: ' channels',
   BitDepth: 'bit',
-  FilePath: 'File Path',
   Duration: 'Duration:',
   MDHeaderField: 'Field',
   MDHeaderValue: 'Value',
-  FilesSelected: 'Files Selected',
   RawMetadata: 'Raw Metadata',
   ChooseCoverArt: 'Select Cover Art Image',
   ImageName: 'Images',
-  ErrNotSingleAndNotMultiple: 'Not Single and not Multiple (This is a bug!)',
-  ErrSingleAndMultiple: 'Both Single and Multiple (This is a bug!)',
   Title: 'Title',
   ArtistTooltip:
     "Multiple artists are specified like this: 'Artist 1, Artist 2 & Artist 3'",
@@ -77,17 +83,20 @@ const StrId: SEnum = enum_str({
   ViewArtists: 'Artists',
   ViewSongs: 'All Songs',
   ViewPlaylists: 'Playlists',
-  ViewSettings: 'Settings',
-  ViewTools: 'Tools',
-  ImportFiles: 'Import Files...',
 });
 
 const Keys: SEnum = enum_str({
+  Find: 'F',
+  Settings: ',',
+  Next: 'Right',
+  Prev: 'Left',
+  Tools: 'L',
+  // Other Keys after this one:
+  __last_cuark_Key: '',
   AddFileLocation: 'O',
   Albums: '2',
   Artists: '3',
   Backward10s: '[',
-  Find: 'F',
   Forward10s: ']',
   NextTrack: 'Right',
   NowPlaying: '1',
@@ -96,11 +105,9 @@ const Keys: SEnum = enum_str({
   PreviousTrack: 'Left',
   Repeat: 'T',
   SavePlaylist: 'S',
-  Settings: ',',
   Shuffle: 'R',
   Songs: '4',
   ToggleMiniPlayer: '9',
-  Tools: 'L',
 });
 
 const IpcCall: NEnum = enum_num(u16(), {
@@ -119,6 +126,8 @@ const IpcCall: NEnum = enum_num(u16(), {
   GetFileSystemRoots: 12,
   GetNamedLocations: 13,
   GetFolderContents: 14,
+  // Other IpcCall's after this one:
+  __last_cuark_IpcCall: 1000,
   GetPlaylists: 1001,
   LoadPlaylist: 1002,
   RenamePlaylist: 1003,
@@ -155,28 +164,22 @@ const IpcCall: NEnum = enum_num(u16(), {
 
 const SocketMsg: Enum = enum_lst(u8(), [
   'Unknown',
+  'ContentLoaded',
+  'KeepAlive',
+  // Other SocketMsg strings after this one:
+  '__last_cuark_SocketMsg',
   'TranscodingUpdate',
   'ManualRescan',
   'RescanInProgress',
   'RescanComplete',
   'MusicDBUpdate',
-  'ContentLoaded',
-  'KeepAlive',
 ]);
-
-const IgnoreItemType: SEnum = enum_str({
-  PathRoot: 'path-root',
-  PathKeyword: 'path-keyword',
-  DirName: 'dir-name',
-});
-
-const IgnoreItemPair: ObjType = obj({
-  type: ref('IgnoreItemType'),
-  value: str(),
-});
 
 const StorageId: SEnum = enum_str({
   CurrentView: 'currentView',
+  SettingValue: 'someSetting',
+  // Other StorageID's after this one:
+  __last_cuark_StorageId: '',
   Shuffle: 'shuffle',
   Repeat: 'repeat',
   CurrentIndex: 'currentIndex',
@@ -205,6 +208,46 @@ const StorageId: SEnum = enum_str({
   TranscodeSrcLocAlbum: 'transcodeSrcLocAlbum',
   TranscodeDestLoc: 'transcodeDestLoc',
   TranscodeBitRate: 'transcodeBitRate',
+});
+
+const MimeData = obj({
+  type: str(),
+  data: str(),
+});
+
+const FileFilterItem = obj({ name: str(), extensions: arr(str()) });
+
+const OpenDialogOptions = obj({
+  folder: opt(bool()),
+  title: opt(str()),
+  defaultPath: opt(str()),
+  buttonLabel: opt(str()),
+  multiSelections: opt(bool()),
+  filters: opt(arr(ref('FileFilterItem'))),
+});
+
+const NamedLocations = map(str(), str());
+
+const FileSystemItem = obj({
+  file: str(),
+  date: dbl(),
+  size: u64(),
+  type: str(),
+});
+
+const FolderContents = arr(ref('FileSystemItem'));
+
+// Additional types go *below* this point:
+
+const IgnoreItemType: SEnum = enum_str({
+  PathRoot: 'path-root',
+  PathKeyword: 'path-keyword',
+  DirName: 'dir-name',
+});
+
+const IgnoreItemPair: ObjType = obj({
+  type: ref('IgnoreItemType'),
+  value: str(),
 });
 
 const TranscodeFormatTargetName: SEnum = enum_str({
@@ -365,40 +408,13 @@ const AudioFileRegexPattern = obj({
   rgx: str(),
 });
 
-const MimeData = obj({
-  type: str(),
-  data: str(),
-});
-
-const FileFilterItem = obj({ name: str(), extensions: arr(str()) });
-
-const OpenDialogOptions = obj({
-  folder: opt(bool()),
-  title: opt(str()),
-  defaultPath: opt(str()),
-  buttonLabel: opt(str()),
-  multiSelections: opt(bool()),
-  filters: opt(arr(ref('FileFilterItem'))),
-});
-
-const NamedLocations = map(str(), str());
-
-const FileSystemItem = obj({
-  file: str(),
-  date: dbl(),
-  size: u64(),
-  type: str(),
-});
-
-const FolderContents = arr(ref('FileSystemItem'));
-
-// Begin additional types here
-
 const SearchResults = obj({
   songs: arr(ref('SongKey')),
   artists: arr(ref('ArtistKey')),
   albums: arr(ref('AlbumKey')),
 });
+
+// Additional types go *above* this point:
 
 export const TypesToGenerate: Record<string, Types> = {
   Keys,
@@ -406,9 +422,16 @@ export const TypesToGenerate: Record<string, Types> = {
   CurrentView,
   IpcCall,
   SocketMsg,
+  StorageId,
+  MimeData,
+  FileFilterItem,
+  OpenDialogOptions,
+  NamedLocations,
+  FileSystemItem,
+  FolderContents,
+  // Other TypesToGenerate below this comment:
   IgnoreItemType,
   IgnoreItemPair,
-  StorageId,
   TranscodeFormatTargetName,
   TranscodeSource,
   TranscodeSourceLocation,
@@ -435,14 +458,7 @@ export const TypesToGenerate: Record<string, Types> = {
   SimpleMetadata,
   FullMetadata,
   AudioFileRegexPattern,
-  MimeData,
   MusicDatabase,
-  FileFilterItem,
-  OpenDialogOptions,
-  NamedLocations,
-  FileSystemItem,
-  FolderContents,
-  // Being additional stuff here
   SearchResults,
 };
 

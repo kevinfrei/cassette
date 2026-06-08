@@ -589,11 +589,15 @@ constexpr std::optional<T> from_string(std::string_view str);
 #pragma region string enum Keys
 
 enum class Keys {
+  Find,
+  Settings,
+  Next,
+  Prev,
+  Tools,
   AddFileLocation,
   Albums,
   Artists,
   Backward10s,
-  Find,
   Forward10s,
   NextTrack,
   NowPlaying,
@@ -602,20 +606,22 @@ enum class Keys {
   PreviousTrack,
   Repeat,
   SavePlaylist,
-  Settings,
   Shuffle,
   Songs,
-  ToggleMiniPlayer,
-  Tools
+  ToggleMiniPlayer
 };
 
 inline constexpr bool is_valid(Keys _value) {
   switch (_value) {
+    case Keys::Find:
+    case Keys::Settings:
+    case Keys::Next:
+    case Keys::Prev:
+    case Keys::Tools:
     case Keys::AddFileLocation:
     case Keys::Albums:
     case Keys::Artists:
     case Keys::Backward10s:
-    case Keys::Find:
     case Keys::Forward10s:
     case Keys::NextTrack:
     case Keys::NowPlaying:
@@ -624,11 +630,9 @@ inline constexpr bool is_valid(Keys _value) {
     case Keys::PreviousTrack:
     case Keys::Repeat:
     case Keys::SavePlaylist:
-    case Keys::Settings:
     case Keys::Shuffle:
     case Keys::Songs:
     case Keys::ToggleMiniPlayer:
-    case Keys::Tools:
       return true;
     default:
       return false;
@@ -637,6 +641,16 @@ inline constexpr bool is_valid(Keys _value) {
 
 inline constexpr std::string_view to_string(Keys _value) {
   switch (_value) {
+    case Keys::Find:
+      return "F";
+    case Keys::Settings:
+      return ",";
+    case Keys::Next:
+      return "Right";
+    case Keys::Prev:
+      return "Left";
+    case Keys::Tools:
+      return "L";
     case Keys::AddFileLocation:
       return "O";
     case Keys::Albums:
@@ -645,8 +659,6 @@ inline constexpr std::string_view to_string(Keys _value) {
       return "3";
     case Keys::Backward10s:
       return "[";
-    case Keys::Find:
-      return "F";
     case Keys::Forward10s:
       return "]";
     case Keys::NextTrack:
@@ -663,16 +675,12 @@ inline constexpr std::string_view to_string(Keys _value) {
       return "T";
     case Keys::SavePlaylist:
       return "S";
-    case Keys::Settings:
-      return ",";
     case Keys::Shuffle:
       return "R";
     case Keys::Songs:
       return "4";
     case Keys::ToggleMiniPlayer:
       return "9";
-    case Keys::Tools:
-      return "L";
     default:
       return "<unknown>";
   }
@@ -682,6 +690,16 @@ inline constexpr std::string_view to_string(Keys _value) {
 // A deeply nested switch statement would be pretty fun to generate...
 template <>
 inline constexpr std::optional<Keys> from_string<Keys>(std::string_view str) {
+  if (str == "F")
+    return Keys::Find;
+  if (str == ",")
+    return Keys::Settings;
+  if (str == "Right")
+    return Keys::Next;
+  if (str == "Left")
+    return Keys::Prev;
+  if (str == "L")
+    return Keys::Tools;
   if (str == "O")
     return Keys::AddFileLocation;
   if (str == "2")
@@ -690,8 +708,6 @@ inline constexpr std::optional<Keys> from_string<Keys>(std::string_view str) {
     return Keys::Artists;
   if (str == "[")
     return Keys::Backward10s;
-  if (str == "F")
-    return Keys::Find;
   if (str == "]")
     return Keys::Forward10s;
   if (str == "Right")
@@ -708,16 +724,12 @@ inline constexpr std::optional<Keys> from_string<Keys>(std::string_view str) {
     return Keys::Repeat;
   if (str == "S")
     return Keys::SavePlaylist;
-  if (str == ",")
-    return Keys::Settings;
   if (str == "R")
     return Keys::Shuffle;
   if (str == "4")
     return Keys::Songs;
   if (str == "9")
     return Keys::ToggleMiniPlayer;
-  if (str == "L")
-    return Keys::Tools;
   return std::nullopt;
 }
 
@@ -726,21 +738,23 @@ inline constexpr std::optional<Keys> from_string<Keys>(std::string_view str) {
 #pragma region string enum StrId
 
 enum class StrId {
+  FilePath,
+  FilesSelected,
+  ErrNotSingleAndNotMultiple,
+  ErrSingleAndMultiple,
+  ViewSettings,
+  ViewTools,
   Mono,
   Stereo,
   Quadrophonic,
   Channels,
   BitDepth,
-  FilePath,
   Duration,
   MDHeaderField,
   MDHeaderValue,
-  FilesSelected,
   RawMetadata,
   ChooseCoverArt,
   ImageName,
-  ErrNotSingleAndNotMultiple,
-  ErrSingleAndMultiple,
   Title,
   ArtistTooltip,
   Artists,
@@ -761,29 +775,28 @@ enum class StrId {
   ViewAlbums,
   ViewArtists,
   ViewSongs,
-  ViewPlaylists,
-  ViewSettings,
-  ViewTools,
-  ImportFiles
+  ViewPlaylists
 };
 
 inline constexpr bool is_valid(StrId _value) {
   switch (_value) {
+    case StrId::FilePath:
+    case StrId::FilesSelected:
+    case StrId::ErrNotSingleAndNotMultiple:
+    case StrId::ErrSingleAndMultiple:
+    case StrId::ViewSettings:
+    case StrId::ViewTools:
     case StrId::Mono:
     case StrId::Stereo:
     case StrId::Quadrophonic:
     case StrId::Channels:
     case StrId::BitDepth:
-    case StrId::FilePath:
     case StrId::Duration:
     case StrId::MDHeaderField:
     case StrId::MDHeaderValue:
-    case StrId::FilesSelected:
     case StrId::RawMetadata:
     case StrId::ChooseCoverArt:
     case StrId::ImageName:
-    case StrId::ErrNotSingleAndNotMultiple:
-    case StrId::ErrSingleAndMultiple:
     case StrId::Title:
     case StrId::ArtistTooltip:
     case StrId::Artists:
@@ -805,9 +818,6 @@ inline constexpr bool is_valid(StrId _value) {
     case StrId::ViewArtists:
     case StrId::ViewSongs:
     case StrId::ViewPlaylists:
-    case StrId::ViewSettings:
-    case StrId::ViewTools:
-    case StrId::ImportFiles:
       return true;
     default:
       return false;
@@ -816,6 +826,18 @@ inline constexpr bool is_valid(StrId _value) {
 
 inline constexpr std::string_view to_string(StrId _value) {
   switch (_value) {
+    case StrId::FilePath:
+      return "File Path";
+    case StrId::FilesSelected:
+      return "Files Selected";
+    case StrId::ErrNotSingleAndNotMultiple:
+      return "Not Single and not Multiple (This is a bug!)";
+    case StrId::ErrSingleAndMultiple:
+      return "Both Single and Multiple (This is a bug!)";
+    case StrId::ViewSettings:
+      return "Settings";
+    case StrId::ViewTools:
+      return "Tools";
     case StrId::Mono:
       return "mono";
     case StrId::Stereo:
@@ -826,26 +848,18 @@ inline constexpr std::string_view to_string(StrId _value) {
       return " channels";
     case StrId::BitDepth:
       return "bit";
-    case StrId::FilePath:
-      return "File Path";
     case StrId::Duration:
       return "Duration:";
     case StrId::MDHeaderField:
       return "Field";
     case StrId::MDHeaderValue:
       return "Value";
-    case StrId::FilesSelected:
-      return "Files Selected";
     case StrId::RawMetadata:
       return "Raw Metadata";
     case StrId::ChooseCoverArt:
       return "Select Cover Art Image";
     case StrId::ImageName:
       return "Images";
-    case StrId::ErrNotSingleAndNotMultiple:
-      return "Not Single and not Multiple (This is a bug!)";
-    case StrId::ErrSingleAndMultiple:
-      return "Both Single and Multiple (This is a bug!)";
     case StrId::Title:
       return "Title";
     case StrId::ArtistTooltip:
@@ -889,12 +903,6 @@ inline constexpr std::string_view to_string(StrId _value) {
       return "All Songs";
     case StrId::ViewPlaylists:
       return "Playlists";
-    case StrId::ViewSettings:
-      return "Settings";
-    case StrId::ViewTools:
-      return "Tools";
-    case StrId::ImportFiles:
-      return "Import Files...";
     default:
       return "<unknown>";
   }
@@ -904,6 +912,18 @@ inline constexpr std::string_view to_string(StrId _value) {
 // A deeply nested switch statement would be pretty fun to generate...
 template <>
 inline constexpr std::optional<StrId> from_string<StrId>(std::string_view str) {
+  if (str == "File Path")
+    return StrId::FilePath;
+  if (str == "Files Selected")
+    return StrId::FilesSelected;
+  if (str == "Not Single and not Multiple (This is a bug!)")
+    return StrId::ErrNotSingleAndNotMultiple;
+  if (str == "Both Single and Multiple (This is a bug!)")
+    return StrId::ErrSingleAndMultiple;
+  if (str == "Settings")
+    return StrId::ViewSettings;
+  if (str == "Tools")
+    return StrId::ViewTools;
   if (str == "mono")
     return StrId::Mono;
   if (str == "stereo")
@@ -914,26 +934,18 @@ inline constexpr std::optional<StrId> from_string<StrId>(std::string_view str) {
     return StrId::Channels;
   if (str == "bit")
     return StrId::BitDepth;
-  if (str == "File Path")
-    return StrId::FilePath;
   if (str == "Duration:")
     return StrId::Duration;
   if (str == "Field")
     return StrId::MDHeaderField;
   if (str == "Value")
     return StrId::MDHeaderValue;
-  if (str == "Files Selected")
-    return StrId::FilesSelected;
   if (str == "Raw Metadata")
     return StrId::RawMetadata;
   if (str == "Select Cover Art Image")
     return StrId::ChooseCoverArt;
   if (str == "Images")
     return StrId::ImageName;
-  if (str == "Not Single and not Multiple (This is a bug!)")
-    return StrId::ErrNotSingleAndNotMultiple;
-  if (str == "Both Single and Multiple (This is a bug!)")
-    return StrId::ErrSingleAndMultiple;
   if (str == "Title")
     return StrId::Title;
   if (str ==
@@ -978,12 +990,6 @@ inline constexpr std::optional<StrId> from_string<StrId>(std::string_view str) {
     return StrId::ViewSongs;
   if (str == "Playlists")
     return StrId::ViewPlaylists;
-  if (str == "Settings")
-    return StrId::ViewSettings;
-  if (str == "Tools")
-    return StrId::ViewTools;
-  if (str == "Import Files...")
-    return StrId::ImportFiles;
   return std::nullopt;
 }
 
@@ -993,30 +999,30 @@ inline constexpr std::optional<StrId> from_string<StrId>(std::string_view str) {
 enum class CurrentView {
   disabled = -1,
   none = 0,
-  recent = 1,
-  albums = 2,
-  artists = 3,
-  songs = 4,
-  playlists = 5,
-  now_playing = 6,
-  settings = 7,
-  search = 8,
-  tools = 9,
+  settings = 1,
+  tools = 2,
+  search = 3,
+  recent = 101,
+  albums = 102,
+  artists = 103,
+  songs = 104,
+  playlists = 105,
+  now_playing = 106,
 };
 
 inline constexpr bool is_valid(CurrentView _value) {
   switch (_value) {
     case CurrentView::disabled:
     case CurrentView::none:
+    case CurrentView::settings:
+    case CurrentView::tools:
+    case CurrentView::search:
     case CurrentView::recent:
     case CurrentView::albums:
     case CurrentView::artists:
     case CurrentView::songs:
     case CurrentView::playlists:
     case CurrentView::now_playing:
-    case CurrentView::settings:
-    case CurrentView::search:
-    case CurrentView::tools:
       return true;
     default:
       return false;
@@ -1029,6 +1035,12 @@ inline constexpr std::string_view to_name(CurrentView _value) {
       return "disabled";
     case CurrentView::none:
       return "none";
+    case CurrentView::settings:
+      return "settings";
+    case CurrentView::tools:
+      return "tools";
+    case CurrentView::search:
+      return "search";
     case CurrentView::recent:
       return "recent";
     case CurrentView::albums:
@@ -1041,12 +1053,6 @@ inline constexpr std::string_view to_name(CurrentView _value) {
       return "playlists";
     case CurrentView::now_playing:
       return "now_playing";
-    case CurrentView::settings:
-      return "settings";
-    case CurrentView::search:
-      return "search";
-    case CurrentView::tools:
-      return "tools";
     default:
       return "<unknown>";
   }
@@ -1058,24 +1064,24 @@ inline constexpr std::string_view to_string(CurrentView _value) {
       return "-1";
     case CurrentView::none:
       return "0";
-    case CurrentView::recent:
-      return "1";
-    case CurrentView::albums:
-      return "2";
-    case CurrentView::artists:
-      return "3";
-    case CurrentView::songs:
-      return "4";
-    case CurrentView::playlists:
-      return "5";
-    case CurrentView::now_playing:
-      return "6";
     case CurrentView::settings:
-      return "7";
-    case CurrentView::search:
-      return "8";
+      return "1";
     case CurrentView::tools:
-      return "9";
+      return "2";
+    case CurrentView::search:
+      return "3";
+    case CurrentView::recent:
+      return "101";
+    case CurrentView::albums:
+      return "102";
+    case CurrentView::artists:
+      return "103";
+    case CurrentView::songs:
+      return "104";
+    case CurrentView::playlists:
+      return "105";
+    case CurrentView::now_playing:
+      return "106";
     default:
       return "<unknown>";
   }
@@ -1426,25 +1432,25 @@ inline constexpr std::optional<IpcCall> from_string<IpcCall>(
 #pragma region numeric enum SocketMsg
 enum class SocketMsg : std::uint8_t {
   Unknown,
+  ContentLoaded,
+  KeepAlive,
   TranscodingUpdate,
   ManualRescan,
   RescanInProgress,
   RescanComplete,
-  MusicDBUpdate,
-  ContentLoaded,
-  KeepAlive
+  MusicDBUpdate
 };
 
 inline constexpr bool is_valid(SocketMsg _value) {
   switch (_value) {
     case SocketMsg::Unknown:
+    case SocketMsg::ContentLoaded:
+    case SocketMsg::KeepAlive:
     case SocketMsg::TranscodingUpdate:
     case SocketMsg::ManualRescan:
     case SocketMsg::RescanInProgress:
     case SocketMsg::RescanComplete:
     case SocketMsg::MusicDBUpdate:
-    case SocketMsg::ContentLoaded:
-    case SocketMsg::KeepAlive:
       return true;
     default:
       return false;
@@ -1455,6 +1461,10 @@ inline constexpr std::string_view to_name(SocketMsg _value) {
   switch (_value) {
     case SocketMsg::Unknown:
       return "Unknown";
+    case SocketMsg::ContentLoaded:
+      return "ContentLoaded";
+    case SocketMsg::KeepAlive:
+      return "KeepAlive";
     case SocketMsg::TranscodingUpdate:
       return "TranscodingUpdate";
     case SocketMsg::ManualRescan:
@@ -1465,10 +1475,6 @@ inline constexpr std::string_view to_name(SocketMsg _value) {
       return "RescanComplete";
     case SocketMsg::MusicDBUpdate:
       return "MusicDBUpdate";
-    case SocketMsg::ContentLoaded:
-      return "ContentLoaded";
-    case SocketMsg::KeepAlive:
-      return "KeepAlive";
     default:
       return "<unknown>";
   }
@@ -1479,19 +1485,19 @@ inline constexpr std::string_view to_string(SocketMsg _value) {
   switch (_value) {
     case SocketMsg::Unknown:
       return "0";
-    case SocketMsg::TranscodingUpdate:
-      return "1";
-    case SocketMsg::ManualRescan:
-      return "2";
-    case SocketMsg::RescanInProgress:
-      return "3";
-    case SocketMsg::RescanComplete:
-      return "4";
-    case SocketMsg::MusicDBUpdate:
-      return "5";
     case SocketMsg::ContentLoaded:
-      return "6";
+      return "1";
     case SocketMsg::KeepAlive:
+      return "2";
+    case SocketMsg::TranscodingUpdate:
+      return "3";
+    case SocketMsg::ManualRescan:
+      return "4";
+    case SocketMsg::RescanInProgress:
+      return "5";
+    case SocketMsg::RescanComplete:
+      return "6";
+    case SocketMsg::MusicDBUpdate:
       return "7";
     default:
       return "<unknown>";
@@ -1515,59 +1521,11 @@ inline constexpr std::optional<SocketMsg> from_string<SocketMsg>(
 
 #pragma endregion numeric enum SocketMsg
 
-#pragma region string enum IgnoreItemType
-
-enum class IgnoreItemType { PathRoot, PathKeyword, DirName };
-
-inline constexpr bool is_valid(IgnoreItemType _value) {
-  switch (_value) {
-    case IgnoreItemType::PathRoot:
-    case IgnoreItemType::PathKeyword:
-    case IgnoreItemType::DirName:
-      return true;
-    default:
-      return false;
-  }
-}
-
-inline constexpr std::string_view to_string(IgnoreItemType _value) {
-  switch (_value) {
-    case IgnoreItemType::PathRoot:
-      return "path-root";
-    case IgnoreItemType::PathKeyword:
-      return "path-keyword";
-    case IgnoreItemType::DirName:
-      return "dir-name";
-    default:
-      return "<unknown>";
-  }
-}
-
-// This is *super* simplistic, and should be optimized, cuz this is bad.
-// A deeply nested switch statement would be pretty fun to generate...
-template <>
-inline constexpr std::optional<IgnoreItemType> from_string<IgnoreItemType>(
-    std::string_view str) {
-  if (str == "path-root")
-    return IgnoreItemType::PathRoot;
-  if (str == "path-keyword")
-    return IgnoreItemType::PathKeyword;
-  if (str == "dir-name")
-    return IgnoreItemType::DirName;
-  return std::nullopt;
-}
-
-#pragma endregion string enum IgnoreItemType
-
-struct IgnoreItemPair {
-  IgnoreItemType type;
-  std::string value;
-};
-
 #pragma region string enum StorageId
 
 enum class StorageId {
   CurrentView,
+  SettingValue,
   Shuffle,
   Repeat,
   CurrentIndex,
@@ -1601,6 +1559,7 @@ enum class StorageId {
 inline constexpr bool is_valid(StorageId _value) {
   switch (_value) {
     case StorageId::CurrentView:
+    case StorageId::SettingValue:
     case StorageId::Shuffle:
     case StorageId::Repeat:
     case StorageId::CurrentIndex:
@@ -1639,6 +1598,8 @@ inline constexpr std::string_view to_string(StorageId _value) {
   switch (_value) {
     case StorageId::CurrentView:
       return "currentView";
+    case StorageId::SettingValue:
+      return "someSetting";
     case StorageId::Shuffle:
       return "shuffle";
     case StorageId::Repeat:
@@ -1707,6 +1668,8 @@ inline constexpr std::optional<StorageId> from_string<StorageId>(
     std::string_view str) {
   if (str == "currentView")
     return StorageId::CurrentView;
+  if (str == "someSetting")
+    return StorageId::SettingValue;
   if (str == "shuffle")
     return StorageId::Shuffle;
   if (str == "repeat")
@@ -1767,6 +1730,83 @@ inline constexpr std::optional<StorageId> from_string<StorageId>(
 }
 
 #pragma endregion string enum StorageId
+
+struct MimeData {
+  std::string type;
+  std::string data;
+};
+
+struct FileFilterItem {
+  std::string name;
+  std::vector<std::string> extensions;
+};
+
+struct OpenDialogOptions {
+  std::optional<bool> folder;
+  std::optional<std::string> title;
+  std::optional<std::string> defaultPath;
+  std::optional<std::string> buttonLabel;
+  std::optional<bool> multiSelections;
+  std::optional<std::vector<FileFilterItem>> filters;
+};
+using NamedLocations = std::map<std::string, std::string>;
+
+struct FileSystemItem {
+  std::string file;
+  double date;
+  std::uint64_t size;
+  std::string type;
+};
+using FolderContents = std::vector<FileSystemItem>;
+
+#pragma region string enum IgnoreItemType
+
+enum class IgnoreItemType { PathRoot, PathKeyword, DirName };
+
+inline constexpr bool is_valid(IgnoreItemType _value) {
+  switch (_value) {
+    case IgnoreItemType::PathRoot:
+    case IgnoreItemType::PathKeyword:
+    case IgnoreItemType::DirName:
+      return true;
+    default:
+      return false;
+  }
+}
+
+inline constexpr std::string_view to_string(IgnoreItemType _value) {
+  switch (_value) {
+    case IgnoreItemType::PathRoot:
+      return "path-root";
+    case IgnoreItemType::PathKeyword:
+      return "path-keyword";
+    case IgnoreItemType::DirName:
+      return "dir-name";
+    default:
+      return "<unknown>";
+  }
+}
+
+// This is *super* simplistic, and should be optimized, cuz this is bad.
+// A deeply nested switch statement would be pretty fun to generate...
+template <>
+inline constexpr std::optional<IgnoreItemType> from_string<IgnoreItemType>(
+    std::string_view str) {
+  if (str == "path-root")
+    return IgnoreItemType::PathRoot;
+  if (str == "path-keyword")
+    return IgnoreItemType::PathKeyword;
+  if (str == "dir-name")
+    return IgnoreItemType::DirName;
+  return std::nullopt;
+}
+
+#pragma endregion string enum IgnoreItemType
+
+struct IgnoreItemPair {
+  IgnoreItemType type;
+  std::string value;
+};
 
 #pragma region string enum TranscodeFormatTargetName
 
@@ -2006,39 +2046,11 @@ struct AudioFileRegexPattern {
   std::string rgx;
 };
 
-struct MimeData {
-  std::string type;
-  std::string data;
-};
-
 struct MusicDatabase {
   std::unordered_map<ArtistKey, Artist> artists;
   std::unordered_map<AlbumKey, Album> albums;
   std::unordered_map<SongKey, Song> songs;
 };
-
-struct FileFilterItem {
-  std::string name;
-  std::vector<std::string> extensions;
-};
-
-struct OpenDialogOptions {
-  std::optional<bool> folder;
-  std::optional<std::string> title;
-  std::optional<std::string> defaultPath;
-  std::optional<std::string> buttonLabel;
-  std::optional<bool> multiSelections;
-  std::optional<std::vector<FileFilterItem>> filters;
-};
-using NamedLocations = std::map<std::string, std::string>;
-
-struct FileSystemItem {
-  std::string file;
-  double date;
-  std::uint64_t size;
-  std::string type;
-};
-using FolderContents = std::vector<FileSystemItem>;
 
 struct SearchResults {
   std::vector<SongKey> songs;
@@ -2081,6 +2093,247 @@ struct impl_from_json<Shared::StrId> {
   }
 };
 #pragma endregion JSON serialization for string enum StrId
+#pragma region JSON serialization for string enum StorageId
+template <>
+inline crow::json::wvalue to_json<Shared::StorageId>(Shared::StorageId _value) {
+  return to_json(to_string(_value));
+}
+template <>
+struct impl_from_json<Shared::StorageId> {
+  static inline std::optional<Shared::StorageId> process(
+      const crow::json::rvalue& _value) {
+    if (_value.t() != crow::json::type::String)
+      return std::nullopt;
+    auto _str = _value.s();
+    return Shared::from_string<Shared::StorageId>(
+        std::string_view{_str.begin(), _str.size()});
+  }
+};
+#pragma endregion JSON serialization for string enum StorageId
+
+#pragma region JSON serialization for object MimeData
+template <>
+struct impl_to_json<Shared::MimeData> {
+  static inline crow::json::wvalue process(const Shared::MimeData& _value) {
+    crow::json::wvalue _res;
+    _res["type"] = to_json(_value.type);
+    _res["data"] = to_json(_value.data);
+
+    return _res;
+  }
+};
+
+template <>
+inline std::optional<Shared::MimeData> from_json<Shared::MimeData>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::MimeData _res;
+
+  if (!_value.has("type"))
+    return std::nullopt;
+  auto _type_opt_ = from_json<std::string>(_value["type"]);
+  if (!_type_opt_.has_value())
+    return std::nullopt;
+  _res.type = std::move(*_type_opt_);
+
+  if (!_value.has("data"))
+    return std::nullopt;
+  auto _data_opt_ = from_json<std::string>(_value["data"]);
+  if (!_data_opt_.has_value())
+    return std::nullopt;
+  _res.data = std::move(*_data_opt_);
+
+  return _res;
+}
+#pragma endregion JSON serialization for object MimeData
+
+#pragma region JSON serialization for object FileFilterItem
+template <>
+struct impl_to_json<Shared::FileFilterItem> {
+  static inline crow::json::wvalue process(
+      const Shared::FileFilterItem& _value) {
+    crow::json::wvalue _res;
+    _res["name"] = to_json(_value.name);
+    _res["extensions"] = to_json(_value.extensions);
+
+    return _res;
+  }
+};
+
+template <>
+inline std::optional<Shared::FileFilterItem> from_json<Shared::FileFilterItem>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::FileFilterItem _res;
+
+  if (!_value.has("name"))
+    return std::nullopt;
+  auto _name_opt_ = from_json<std::string>(_value["name"]);
+  if (!_name_opt_.has_value())
+    return std::nullopt;
+  _res.name = std::move(*_name_opt_);
+
+  if (!_value.has("extensions"))
+    return std::nullopt;
+  auto _extensions_opt_ =
+      from_json<std::vector<std::string>>(_value["extensions"]);
+  if (!_extensions_opt_.has_value())
+    return std::nullopt;
+  _res.extensions = std::move(*_extensions_opt_);
+
+  return _res;
+}
+#pragma endregion JSON serialization for object FileFilterItem
+
+#pragma region JSON serialization for object OpenDialogOptions
+template <>
+struct impl_to_json<Shared::OpenDialogOptions> {
+  static inline crow::json::wvalue process(
+      const Shared::OpenDialogOptions& _value) {
+    crow::json::wvalue _res;
+
+    if (_value.folder) {
+      _res["folder"] = to_json(*_value.folder);
+    }
+    if (_value.title) {
+      _res["title"] = to_json(*_value.title);
+    }
+    if (_value.defaultPath) {
+      _res["defaultPath"] = to_json(*_value.defaultPath);
+    }
+    if (_value.buttonLabel) {
+      _res["buttonLabel"] = to_json(*_value.buttonLabel);
+    }
+    if (_value.multiSelections) {
+      _res["multiSelections"] = to_json(*_value.multiSelections);
+    }
+    if (_value.filters) {
+      _res["filters"] = to_json(*_value.filters);
+    }
+    return _res;
+  }
+};
+
+template <>
+inline std::optional<Shared::OpenDialogOptions>
+from_json<Shared::OpenDialogOptions>(const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::OpenDialogOptions _res;
+
+  if (_value.has("folder")) {
+    auto _folder_opt_ = from_json<bool>(_value["folder"]);
+    if (!_folder_opt_.has_value())
+      return std::nullopt;
+    _res.folder = std::move(*_folder_opt_);
+  } else {
+    _res.folder = std::nullopt;
+  }
+
+  if (_value.has("title")) {
+    auto _title_opt_ = from_json<std::string>(_value["title"]);
+    if (!_title_opt_.has_value())
+      return std::nullopt;
+    _res.title = std::move(*_title_opt_);
+  } else {
+    _res.title = std::nullopt;
+  }
+
+  if (_value.has("defaultPath")) {
+    auto _defaultPath_opt_ = from_json<std::string>(_value["defaultPath"]);
+    if (!_defaultPath_opt_.has_value())
+      return std::nullopt;
+    _res.defaultPath = std::move(*_defaultPath_opt_);
+  } else {
+    _res.defaultPath = std::nullopt;
+  }
+
+  if (_value.has("buttonLabel")) {
+    auto _buttonLabel_opt_ = from_json<std::string>(_value["buttonLabel"]);
+    if (!_buttonLabel_opt_.has_value())
+      return std::nullopt;
+    _res.buttonLabel = std::move(*_buttonLabel_opt_);
+  } else {
+    _res.buttonLabel = std::nullopt;
+  }
+
+  if (_value.has("multiSelections")) {
+    auto _multiSelections_opt_ = from_json<bool>(_value["multiSelections"]);
+    if (!_multiSelections_opt_.has_value())
+      return std::nullopt;
+    _res.multiSelections = std::move(*_multiSelections_opt_);
+  } else {
+    _res.multiSelections = std::nullopt;
+  }
+
+  if (_value.has("filters")) {
+    auto _filters_opt_ =
+        from_json<std::vector<Shared::FileFilterItem>>(_value["filters"]);
+    if (!_filters_opt_.has_value())
+      return std::nullopt;
+    _res.filters = std::move(*_filters_opt_);
+  } else {
+    _res.filters = std::nullopt;
+  }
+  return _res;
+}
+#pragma endregion JSON serialization for object OpenDialogOptions
+
+#pragma region JSON serialization for object FileSystemItem
+template <>
+struct impl_to_json<Shared::FileSystemItem> {
+  static inline crow::json::wvalue process(
+      const Shared::FileSystemItem& _value) {
+    crow::json::wvalue _res;
+    _res["file"] = to_json(_value.file);
+    _res["date"] = to_json(_value.date);
+    _res["size"] = to_json(_value.size);
+    _res["type"] = to_json(_value.type);
+
+    return _res;
+  }
+};
+
+template <>
+inline std::optional<Shared::FileSystemItem> from_json<Shared::FileSystemItem>(
+    const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::FileSystemItem _res;
+
+  if (!_value.has("file"))
+    return std::nullopt;
+  auto _file_opt_ = from_json<std::string>(_value["file"]);
+  if (!_file_opt_.has_value())
+    return std::nullopt;
+  _res.file = std::move(*_file_opt_);
+
+  if (!_value.has("date"))
+    return std::nullopt;
+  auto _date_opt_ = from_json<double>(_value["date"]);
+  if (!_date_opt_.has_value())
+    return std::nullopt;
+  _res.date = std::move(*_date_opt_);
+
+  if (!_value.has("size"))
+    return std::nullopt;
+  auto _size_opt_ = from_json<std::uint64_t>(_value["size"]);
+  if (!_size_opt_.has_value())
+    return std::nullopt;
+  _res.size = std::move(*_size_opt_);
+
+  if (!_value.has("type"))
+    return std::nullopt;
+  auto _type_opt_ = from_json<std::string>(_value["type"]);
+  if (!_type_opt_.has_value())
+    return std::nullopt;
+  _res.type = std::move(*_type_opt_);
+
+  return _res;
+}
+#pragma endregion JSON serialization for object FileSystemItem
 #pragma region JSON serialization for string enum IgnoreItemType
 template <>
 inline crow::json::wvalue to_json<Shared::IgnoreItemType>(
@@ -2137,23 +2390,6 @@ inline std::optional<Shared::IgnoreItemPair> from_json<Shared::IgnoreItemPair>(
   return _res;
 }
 #pragma endregion JSON serialization for object IgnoreItemPair
-#pragma region JSON serialization for string enum StorageId
-template <>
-inline crow::json::wvalue to_json<Shared::StorageId>(Shared::StorageId _value) {
-  return to_json(to_string(_value));
-}
-template <>
-struct impl_from_json<Shared::StorageId> {
-  static inline std::optional<Shared::StorageId> process(
-      const crow::json::rvalue& _value) {
-    if (_value.t() != crow::json::type::String)
-      return std::nullopt;
-    auto _str = _value.s();
-    return Shared::from_string<Shared::StorageId>(
-        std::string_view{_str.begin(), _str.size()});
-  }
-};
-#pragma endregion JSON serialization for string enum StorageId
 #pragma region JSON serialization for string enum TranscodeFormatTargetName
 template <>
 inline crow::json::wvalue to_json<Shared::TranscodeFormatTargetName>(
@@ -2954,43 +3190,6 @@ from_json<Shared::AudioFileRegexPattern>(const crow::json::rvalue& _value) {
 }
 #pragma endregion JSON serialization for object AudioFileRegexPattern
 
-#pragma region JSON serialization for object MimeData
-template <>
-struct impl_to_json<Shared::MimeData> {
-  static inline crow::json::wvalue process(const Shared::MimeData& _value) {
-    crow::json::wvalue _res;
-    _res["type"] = to_json(_value.type);
-    _res["data"] = to_json(_value.data);
-
-    return _res;
-  }
-};
-
-template <>
-inline std::optional<Shared::MimeData> from_json<Shared::MimeData>(
-    const crow::json::rvalue& _value) {
-  if (_value.t() != crow::json::type::Object)
-    return std::nullopt;
-  Shared::MimeData _res;
-
-  if (!_value.has("type"))
-    return std::nullopt;
-  auto _type_opt_ = from_json<std::string>(_value["type"]);
-  if (!_type_opt_.has_value())
-    return std::nullopt;
-  _res.type = std::move(*_type_opt_);
-
-  if (!_value.has("data"))
-    return std::nullopt;
-  auto _data_opt_ = from_json<std::string>(_value["data"]);
-  if (!_data_opt_.has_value())
-    return std::nullopt;
-  _res.data = std::move(*_data_opt_);
-
-  return _res;
-}
-#pragma endregion JSON serialization for object MimeData
-
 #pragma region JSON serialization for object MusicDatabase
 template <>
 struct impl_to_json<Shared::MusicDatabase> {
@@ -3042,193 +3241,6 @@ inline std::optional<Shared::MusicDatabase> from_json<Shared::MusicDatabase>(
   return _res;
 }
 #pragma endregion JSON serialization for object MusicDatabase
-
-#pragma region JSON serialization for object FileFilterItem
-template <>
-struct impl_to_json<Shared::FileFilterItem> {
-  static inline crow::json::wvalue process(
-      const Shared::FileFilterItem& _value) {
-    crow::json::wvalue _res;
-    _res["name"] = to_json(_value.name);
-    _res["extensions"] = to_json(_value.extensions);
-
-    return _res;
-  }
-};
-
-template <>
-inline std::optional<Shared::FileFilterItem> from_json<Shared::FileFilterItem>(
-    const crow::json::rvalue& _value) {
-  if (_value.t() != crow::json::type::Object)
-    return std::nullopt;
-  Shared::FileFilterItem _res;
-
-  if (!_value.has("name"))
-    return std::nullopt;
-  auto _name_opt_ = from_json<std::string>(_value["name"]);
-  if (!_name_opt_.has_value())
-    return std::nullopt;
-  _res.name = std::move(*_name_opt_);
-
-  if (!_value.has("extensions"))
-    return std::nullopt;
-  auto _extensions_opt_ =
-      from_json<std::vector<std::string>>(_value["extensions"]);
-  if (!_extensions_opt_.has_value())
-    return std::nullopt;
-  _res.extensions = std::move(*_extensions_opt_);
-
-  return _res;
-}
-#pragma endregion JSON serialization for object FileFilterItem
-
-#pragma region JSON serialization for object OpenDialogOptions
-template <>
-struct impl_to_json<Shared::OpenDialogOptions> {
-  static inline crow::json::wvalue process(
-      const Shared::OpenDialogOptions& _value) {
-    crow::json::wvalue _res;
-
-    if (_value.folder) {
-      _res["folder"] = to_json(*_value.folder);
-    }
-    if (_value.title) {
-      _res["title"] = to_json(*_value.title);
-    }
-    if (_value.defaultPath) {
-      _res["defaultPath"] = to_json(*_value.defaultPath);
-    }
-    if (_value.buttonLabel) {
-      _res["buttonLabel"] = to_json(*_value.buttonLabel);
-    }
-    if (_value.multiSelections) {
-      _res["multiSelections"] = to_json(*_value.multiSelections);
-    }
-    if (_value.filters) {
-      _res["filters"] = to_json(*_value.filters);
-    }
-    return _res;
-  }
-};
-
-template <>
-inline std::optional<Shared::OpenDialogOptions>
-from_json<Shared::OpenDialogOptions>(const crow::json::rvalue& _value) {
-  if (_value.t() != crow::json::type::Object)
-    return std::nullopt;
-  Shared::OpenDialogOptions _res;
-
-  if (_value.has("folder")) {
-    auto _folder_opt_ = from_json<bool>(_value["folder"]);
-    if (!_folder_opt_.has_value())
-      return std::nullopt;
-    _res.folder = std::move(*_folder_opt_);
-  } else {
-    _res.folder = std::nullopt;
-  }
-
-  if (_value.has("title")) {
-    auto _title_opt_ = from_json<std::string>(_value["title"]);
-    if (!_title_opt_.has_value())
-      return std::nullopt;
-    _res.title = std::move(*_title_opt_);
-  } else {
-    _res.title = std::nullopt;
-  }
-
-  if (_value.has("defaultPath")) {
-    auto _defaultPath_opt_ = from_json<std::string>(_value["defaultPath"]);
-    if (!_defaultPath_opt_.has_value())
-      return std::nullopt;
-    _res.defaultPath = std::move(*_defaultPath_opt_);
-  } else {
-    _res.defaultPath = std::nullopt;
-  }
-
-  if (_value.has("buttonLabel")) {
-    auto _buttonLabel_opt_ = from_json<std::string>(_value["buttonLabel"]);
-    if (!_buttonLabel_opt_.has_value())
-      return std::nullopt;
-    _res.buttonLabel = std::move(*_buttonLabel_opt_);
-  } else {
-    _res.buttonLabel = std::nullopt;
-  }
-
-  if (_value.has("multiSelections")) {
-    auto _multiSelections_opt_ = from_json<bool>(_value["multiSelections"]);
-    if (!_multiSelections_opt_.has_value())
-      return std::nullopt;
-    _res.multiSelections = std::move(*_multiSelections_opt_);
-  } else {
-    _res.multiSelections = std::nullopt;
-  }
-
-  if (_value.has("filters")) {
-    auto _filters_opt_ =
-        from_json<std::vector<Shared::FileFilterItem>>(_value["filters"]);
-    if (!_filters_opt_.has_value())
-      return std::nullopt;
-    _res.filters = std::move(*_filters_opt_);
-  } else {
-    _res.filters = std::nullopt;
-  }
-  return _res;
-}
-#pragma endregion JSON serialization for object OpenDialogOptions
-
-#pragma region JSON serialization for object FileSystemItem
-template <>
-struct impl_to_json<Shared::FileSystemItem> {
-  static inline crow::json::wvalue process(
-      const Shared::FileSystemItem& _value) {
-    crow::json::wvalue _res;
-    _res["file"] = to_json(_value.file);
-    _res["date"] = to_json(_value.date);
-    _res["size"] = to_json(_value.size);
-    _res["type"] = to_json(_value.type);
-
-    return _res;
-  }
-};
-
-template <>
-inline std::optional<Shared::FileSystemItem> from_json<Shared::FileSystemItem>(
-    const crow::json::rvalue& _value) {
-  if (_value.t() != crow::json::type::Object)
-    return std::nullopt;
-  Shared::FileSystemItem _res;
-
-  if (!_value.has("file"))
-    return std::nullopt;
-  auto _file_opt_ = from_json<std::string>(_value["file"]);
-  if (!_file_opt_.has_value())
-    return std::nullopt;
-  _res.file = std::move(*_file_opt_);
-
-  if (!_value.has("date"))
-    return std::nullopt;
-  auto _date_opt_ = from_json<double>(_value["date"]);
-  if (!_date_opt_.has_value())
-    return std::nullopt;
-  _res.date = std::move(*_date_opt_);
-
-  if (!_value.has("size"))
-    return std::nullopt;
-  auto _size_opt_ = from_json<std::uint64_t>(_value["size"]);
-  if (!_size_opt_.has_value())
-    return std::nullopt;
-  _res.size = std::move(*_size_opt_);
-
-  if (!_value.has("type"))
-    return std::nullopt;
-  auto _type_opt_ = from_json<std::string>(_value["type"]);
-  if (!_type_opt_.has_value())
-    return std::nullopt;
-  _res.type = std::move(*_type_opt_);
-
-  return _res;
-}
-#pragma endregion JSON serialization for object FileSystemItem
 
 #pragma region JSON serialization for object SearchResults
 template <>

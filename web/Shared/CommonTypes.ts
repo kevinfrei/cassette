@@ -35,11 +35,15 @@ function chkOptional<T>(chk: TC.typecheck<T>): TC.typecheck<T | undefined> {
 }
 
 export const Keys = Object.freeze({
+  Find: 'F',
+  Settings: ',',
+  Next: 'Right',
+  Prev: 'Left',
+  Tools: 'L',
   AddFileLocation: 'O',
   Albums: '2',
   Artists: '3',
   Backward10s: '[',
-  Find: 'F',
   Forward10s: ']',
   NextTrack: 'Right',
   NowPlaying: '1',
@@ -48,11 +52,9 @@ export const Keys = Object.freeze({
   PreviousTrack: 'Left',
   Repeat: 'T',
   SavePlaylist: 'S',
-  Settings: ',',
   Shuffle: 'R',
   Songs: '4',
   ToggleMiniPlayer: '9',
-  Tools: 'L',
 });
 export type Keys = (typeof Keys)[keyof typeof Keys];
 export function chkKeys(val: unknown): val is Keys {
@@ -60,21 +62,23 @@ export function chkKeys(val: unknown): val is Keys {
 }
 
 export const StrId = Object.freeze({
+  FilePath: 'File Path',
+  FilesSelected: 'Files Selected',
+  ErrNotSingleAndNotMultiple: 'Not Single and not Multiple (This is a bug!)',
+  ErrSingleAndMultiple: 'Both Single and Multiple (This is a bug!)',
+  ViewSettings: 'Settings',
+  ViewTools: 'Tools',
   Mono: 'mono',
   Stereo: 'stereo',
   Quadrophonic: 'quadrophonic',
   Channels: ' channels',
   BitDepth: 'bit',
-  FilePath: 'File Path',
   Duration: 'Duration:',
   MDHeaderField: 'Field',
   MDHeaderValue: 'Value',
-  FilesSelected: 'Files Selected',
   RawMetadata: 'Raw Metadata',
   ChooseCoverArt: 'Select Cover Art Image',
   ImageName: 'Images',
-  ErrNotSingleAndNotMultiple: 'Not Single and not Multiple (This is a bug!)',
-  ErrSingleAndMultiple: 'Both Single and Multiple (This is a bug!)',
   Title: 'Title',
   ArtistTooltip:
     "Multiple artists are specified like this: 'Artist 1, Artist 2 & Artist 3'",
@@ -97,9 +101,6 @@ export const StrId = Object.freeze({
   ViewArtists: 'Artists',
   ViewSongs: 'All Songs',
   ViewPlaylists: 'Playlists',
-  ViewSettings: 'Settings',
-  ViewTools: 'Tools',
-  ImportFiles: 'Import Files...',
 });
 export type StrId = (typeof StrId)[keyof typeof StrId];
 export function chkStrId(val: unknown): val is StrId {
@@ -109,15 +110,15 @@ export function chkStrId(val: unknown): val is StrId {
 export const CurrentView = Object.freeze({
   disabled: -1,
   none: 0,
-  recent: 1,
-  albums: 2,
-  artists: 3,
-  songs: 4,
-  playlists: 5,
-  now_playing: 6,
-  settings: 7,
-  search: 8,
-  tools: 9,
+  settings: 1,
+  tools: 2,
+  search: 3,
+  recent: 101,
+  albums: 102,
+  artists: 103,
+  songs: 104,
+  playlists: 105,
+  now_playing: 106,
 });
 export type CurrentView = (typeof CurrentView)[keyof typeof CurrentView];
 export function chkCurrentView(val: unknown): val is CurrentView {
@@ -182,13 +183,13 @@ export function chkIpcCall(val: unknown): val is IpcCall {
 
 export const SocketMsg = Object.freeze({
   Unknown: 0,
-  TranscodingUpdate: 1,
-  ManualRescan: 2,
-  RescanInProgress: 3,
-  RescanComplete: 4,
-  MusicDBUpdate: 5,
-  ContentLoaded: 6,
-  KeepAlive: 7,
+  ContentLoaded: 1,
+  KeepAlive: 2,
+  TranscodingUpdate: 3,
+  ManualRescan: 4,
+  RescanInProgress: 5,
+  RescanComplete: 6,
+  MusicDBUpdate: 7,
 });
 export type SocketMsg = (typeof SocketMsg)[keyof typeof SocketMsg];
 export function chkSocketMsg(val: unknown): val is SocketMsg {
@@ -197,35 +198,9 @@ export function chkSocketMsg(val: unknown): val is SocketMsg {
   );
 }
 
-export const IgnoreItemType = Object.freeze({
-  PathRoot: 'path-root',
-  PathKeyword: 'path-keyword',
-  DirName: 'dir-name',
-});
-export type IgnoreItemType =
-  (typeof IgnoreItemType)[keyof typeof IgnoreItemType];
-export function chkIgnoreItemType(val: unknown): val is IgnoreItemType {
-  return (
-    TC.isString(val) &&
-    Object.values(IgnoreItemType).includes(val as IgnoreItemType)
-  );
-}
-
-export type IgnoreItemPair = {
-  type: IgnoreItemType;
-  value: string;
-};
-export const chkIgnoreItemPair: TC.typecheck<IgnoreItemPair> =
-  TC.chkObjectOfType(
-    {
-      type: chkIgnoreItemType,
-      value: TC.isString,
-    },
-    {},
-  );
-
 export const StorageId = Object.freeze({
   CurrentView: 'currentView',
+  SettingValue: 'someSetting',
   Shuffle: 'shuffle',
   Repeat: 'repeat',
   CurrentIndex: 'currentIndex',
@@ -261,6 +236,102 @@ export function chkStorageId(val: unknown): val is StorageId {
     TC.isString(val) && Object.values(StorageId).includes(val as StorageId)
   );
 }
+
+export type MimeData = {
+  type: string;
+  data: string;
+};
+export const chkMimeData: TC.typecheck<MimeData> = TC.chkObjectOfType(
+  {
+    type: TC.isString,
+    data: TC.isString,
+  },
+  {},
+);
+
+export type FileFilterItem = {
+  name: string;
+  extensions: string[];
+};
+export const chkFileFilterItem: TC.typecheck<FileFilterItem> =
+  TC.chkObjectOfType(
+    {
+      name: TC.isString,
+      extensions: TC.chkArrayOf(TC.isString),
+    },
+    {},
+  );
+
+export type OpenDialogOptions = {
+  folder?: boolean;
+  title?: string;
+  defaultPath?: string;
+  buttonLabel?: string;
+  multiSelections?: boolean;
+  filters?: FileFilterItem[];
+};
+export const chkOpenDialogOptions: TC.typecheck<OpenDialogOptions> =
+  TC.chkObjectOfType(
+    {},
+    {
+      folder: chkOptional(TC.isBoolean),
+      title: chkOptional(TC.isString),
+      defaultPath: chkOptional(TC.isString),
+      buttonLabel: chkOptional(TC.isString),
+      multiSelections: chkOptional(TC.isBoolean),
+      filters: chkOptional(TC.chkArrayOf(chkFileFilterItem)),
+    },
+  );
+
+export type NamedLocations = Map<string, string>;
+export const chkNamedLocations = TC.chkMapOf(TC.isString, TC.isString);
+
+export type FileSystemItem = {
+  file: string;
+  date: number;
+  size: bigint;
+  type: string;
+};
+export const chkFileSystemItem: TC.typecheck<FileSystemItem> =
+  TC.chkObjectOfType(
+    {
+      file: TC.isString,
+      date: chkIdlDouble,
+      size: chkIdlU64,
+      type: TC.isString,
+    },
+    {},
+  );
+
+export type FolderContents = FileSystemItem[];
+export const chkFolderContents = TC.chkArrayOf(chkFileSystemItem);
+
+export const IgnoreItemType = Object.freeze({
+  PathRoot: 'path-root',
+  PathKeyword: 'path-keyword',
+  DirName: 'dir-name',
+});
+export type IgnoreItemType =
+  (typeof IgnoreItemType)[keyof typeof IgnoreItemType];
+export function chkIgnoreItemType(val: unknown): val is IgnoreItemType {
+  return (
+    TC.isString(val) &&
+    Object.values(IgnoreItemType).includes(val as IgnoreItemType)
+  );
+}
+
+export type IgnoreItemPair = {
+  type: IgnoreItemType;
+  value: string;
+};
+export const chkIgnoreItemPair: TC.typecheck<IgnoreItemPair> =
+  TC.chkObjectOfType(
+    {
+      type: chkIgnoreItemType,
+      value: TC.isString,
+    },
+    {},
+  );
 
 export const TranscodeFormatTargetName = Object.freeze({
   m4a: 'm4a',
@@ -539,18 +610,6 @@ export const chkAudioFileRegexPattern: TC.typecheck<AudioFileRegexPattern> =
     {},
   );
 
-export type MimeData = {
-  type: string;
-  data: string;
-};
-export const chkMimeData: TC.typecheck<MimeData> = TC.chkObjectOfType(
-  {
-    type: TC.isString,
-    data: TC.isString,
-  },
-  {},
-);
-
 export type MusicDatabase = {
   artists: Map<ArtistKey, Artist>;
   albums: Map<AlbumKey, Album>;
@@ -564,63 +623,6 @@ export const chkMusicDatabase: TC.typecheck<MusicDatabase> = TC.chkObjectOfType(
   },
   {},
 );
-
-export type FileFilterItem = {
-  name: string;
-  extensions: string[];
-};
-export const chkFileFilterItem: TC.typecheck<FileFilterItem> =
-  TC.chkObjectOfType(
-    {
-      name: TC.isString,
-      extensions: TC.chkArrayOf(TC.isString),
-    },
-    {},
-  );
-
-export type OpenDialogOptions = {
-  folder?: boolean;
-  title?: string;
-  defaultPath?: string;
-  buttonLabel?: string;
-  multiSelections?: boolean;
-  filters?: FileFilterItem[];
-};
-export const chkOpenDialogOptions: TC.typecheck<OpenDialogOptions> =
-  TC.chkObjectOfType(
-    {},
-    {
-      folder: chkOptional(TC.isBoolean),
-      title: chkOptional(TC.isString),
-      defaultPath: chkOptional(TC.isString),
-      buttonLabel: chkOptional(TC.isString),
-      multiSelections: chkOptional(TC.isBoolean),
-      filters: chkOptional(TC.chkArrayOf(chkFileFilterItem)),
-    },
-  );
-
-export type NamedLocations = Map<string, string>;
-export const chkNamedLocations = TC.chkMapOf(TC.isString, TC.isString);
-
-export type FileSystemItem = {
-  file: string;
-  date: number;
-  size: bigint;
-  type: string;
-};
-export const chkFileSystemItem: TC.typecheck<FileSystemItem> =
-  TC.chkObjectOfType(
-    {
-      file: TC.isString,
-      date: chkIdlDouble,
-      size: chkIdlU64,
-      type: TC.isString,
-    },
-    {},
-  );
-
-export type FolderContents = FileSystemItem[];
-export const chkFolderContents = TC.chkArrayOf(chkFileSystemItem);
 
 export type SearchResults = {
   songs: SongKey[];
