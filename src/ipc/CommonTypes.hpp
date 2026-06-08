@@ -775,7 +775,8 @@ enum class StrId {
   ViewAlbums,
   ViewArtists,
   ViewSongs,
-  ViewPlaylists
+  ViewPlaylists,
+  ImportFiles
 };
 
 inline constexpr bool is_valid(StrId _value) {
@@ -818,6 +819,7 @@ inline constexpr bool is_valid(StrId _value) {
     case StrId::ViewArtists:
     case StrId::ViewSongs:
     case StrId::ViewPlaylists:
+    case StrId::ImportFiles:
       return true;
     default:
       return false;
@@ -903,6 +905,8 @@ inline constexpr std::string_view to_string(StrId _value) {
       return "All Songs";
     case StrId::ViewPlaylists:
       return "Playlists";
+    case StrId::ImportFiles:
+      return "Import Files...";
     default:
       return "<unknown>";
   }
@@ -990,6 +994,8 @@ inline constexpr std::optional<StrId> from_string<StrId>(std::string_view str) {
     return StrId::ViewSongs;
   if (str == "Playlists")
     return StrId::ViewPlaylists;
+  if (str == "Import Files...")
+    return StrId::ImportFiles;
   return std::nullopt;
 }
 

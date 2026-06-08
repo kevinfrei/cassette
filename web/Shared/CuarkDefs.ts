@@ -83,6 +83,7 @@ const StrId: SEnum = enum_str({
   ViewArtists: 'Artists',
   ViewSongs: 'All Songs',
   ViewPlaylists: 'Playlists',
+  ImportFiles: 'Import Files...',
 });
 
 const Keys: SEnum = enum_str({

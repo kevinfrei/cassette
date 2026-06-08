@@ -10,8 +10,12 @@ import {
 } from '@freik/typechk';
 import { atom } from 'jotai';
 import { atomWithReset } from 'jotai/utils';
-import { IgnoreItem } from '../Constants';
-import { Song, SongKey, StorageId } from '../Shared/CommonTypes';
+import {
+  IgnoreItemPair,
+  Song,
+  SongKey,
+  StorageId,
+} from '../Shared/CommonTypes';
 import { MakeSortKey } from '../Tools/Sorting';
 import { songByKey } from './Songs';
 import { atomWithMainStorage } from './Storage';
@@ -64,7 +68,7 @@ export function NextRepeat(current: RepeatType): RepeatType {
 }
 
 export const searchTermState = atom<string>('');
-export const ignoreItemsState = atom<IgnoreItem[]>([]);
+export const ignoreItemsState = atom<IgnoreItemPair[]>([]);
 
 // The position in the active playlist of the current song
 // For 'ordered' playback, it's the index in the songList

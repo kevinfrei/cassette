@@ -2,7 +2,6 @@ import { ComboBox, IComboBox, IComboBoxOption } from '@fluentui/react';
 import { isDefined, isString } from '@freik/typechk';
 import { useAtom, useAtomValue } from 'jotai';
 import { ReactElement } from 'react';
-import { WritableAtomType } from 'web/State/StateTypes';
 import {
   AlbumKey,
   Artist,
@@ -15,6 +14,7 @@ import { allAlbumDescriptionsState } from '../../../State/DisplayData';
 import { useJotaiCallback } from '../../../State/Helpers';
 import { playlistNamesState } from '../../../State/PlaylistControl';
 import { AlbumDescriptionWithKey } from '../../../State/SongState';
+import { WritableAtomType } from '../../../State/StateTypes';
 
 export function PlaylistSelector({
   value,

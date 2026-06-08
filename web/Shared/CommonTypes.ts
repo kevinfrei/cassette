@@ -101,6 +101,7 @@ export const StrId = Object.freeze({
   ViewArtists: 'Artists',
   ViewSongs: 'All Songs',
   ViewPlaylists: 'Playlists',
+  ImportFiles: 'Import Files...',
 });
 export type StrId = (typeof StrId)[keyof typeof StrId];
 export function chkStrId(val: unknown): val is StrId {

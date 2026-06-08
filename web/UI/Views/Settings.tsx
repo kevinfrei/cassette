@@ -11,7 +11,12 @@ import {
   TooltipHost,
 } from '@fluentui/react';
 import { Expandable, StateToggle } from '@freik/fluentui-tools';
-import { isDefined } from '@freik/typechk';
+import {
+  isArrayOfString,
+  isDefined,
+  isString,
+  isUndefined,
+} from '@freik/typechk';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { ReactElement, useCallback, useState } from 'react';
 import { st } from '../../Constants';
@@ -19,6 +24,7 @@ import {
   IgnoreItemType,
   IpcCall,
   Keys,
+  OpenDialogOptions,
   SocketMsg,
   StrId,
 } from '../../Shared/CommonTypes';
