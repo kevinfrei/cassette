@@ -7,8 +7,6 @@ import {
   Text,
   TextField,
 } from '@fluentui/react';
-import { StateToggle } from '@freik/fluentui-tools';
-import { useBoolState } from '@freik/react-tools';
 import { isArrayOfString, isDefined } from '@freik/typechk';
 import { useAtom, useAtomValue } from 'jotai';
 import { ReactElement, useState } from 'react';
@@ -29,7 +27,7 @@ import {
   validSourceState,
   xcodeBitRateState,
 } from '../../../State/Transcode';
-import { PostMain, SendMain } from '../../../Tools/Ipc';
+import { SendMain } from '../../../Tools/Ipc';
 import { ShowOpenDialog, StringSpinButton } from '../../../Tools/Utilities';
 import { Setter } from '../../../Types';
 import {
@@ -40,6 +38,7 @@ import {
 import { TranscodeStatus } from './TranscodeStatus';
 
 import '../styles/Tools.css';
+import { ToggleSwitch } from '../Tools';
 
 /*
 const targetFormats: IDropdownOption[] = [
@@ -69,8 +68,8 @@ function getDir(setter: Setter<string>, setError: Setter<string>) {
 }
 
 export function TranscoderConfiguration(): ReactElement {
-  const copyArtwork = useBoolState(false);
-  const mirror = useBoolState(false);
+  const copyArtwork = useState(false);
+  const mirror = useState(false);
   const [srcLocType, setSrcLocType] = useAtom(sourceLocationTypeState);
   const [srcDirLoc, setSrcDirLoc] = useAtom(sourceLocationDirState);
   const [dstLoc, setDstLoc] = useAtom(destLocationState);
@@ -167,10 +166,10 @@ export function TranscoderConfiguration(): ReactElement {
           step={4}
           labelPosition={Position.top}
         />
-        <StateToggle label="Copy artwork (NYI) " state={copyArtwork} />
-        <StateToggle
+        <ToggleSwitch label="Copy artwork (NYI) " use={copyArtwork} />
+        <ToggleSwitch
           label={'Mirror Source WARNING: May delete files!'}
-          state={mirror}
+          use={mirror}
         />
         <DefaultButton
           id="transcode-button"

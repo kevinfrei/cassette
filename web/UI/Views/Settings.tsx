@@ -10,7 +10,7 @@ import {
   TextField,
   TooltipHost,
 } from '@fluentui/react';
-import { Expandable, StateToggle } from '@freik/fluentui-tools';
+import { Expandable } from '@freik/fluentui-tools';
 import {
   isArrayOfString,
   isDefined,
@@ -31,7 +31,6 @@ import {
 import { allAlbumsState } from '../../State/Albums';
 import { allArtistsState } from '../../State/Artists';
 import { useJotaiAsyncCallback } from '../../State/Helpers';
-import { useJotaiBoolState } from '../../State/Hooks';
 import {
   neverPlayHatesState,
   onlyPlayLikesState,
@@ -53,6 +52,7 @@ import { allSongsState } from '../../State/Songs';
 import { PostMain, SendMessage } from '../../Tools/Ipc';
 import { ShowOpenDialog } from '../../Tools/Utilities';
 import { GetHelperText } from '../../Utils';
+import { ToggleSwitch } from './Tools';
 
 import './styles/Settings.css';
 
@@ -231,12 +231,13 @@ function IgnoreList(): ReactElement {
 }
 
 function ArticleSorting(): ReactElement {
-  const articles = useJotaiBoolState(ignoreArticlesState);
-  return <StateToggle label="Ignore articles when sorting" state={articles} />;
+  //const articles = useJotaiBoolState(ignoreArticlesState);
+  const articles = useAtom(ignoreArticlesState);
+  return <ToggleSwitch use={articles} label={'Ignore articles when sorting'} />;
 }
 
 function ArtistFiltering(): ReactElement {
-  const onlyAlbumArtists = useJotaiBoolState(showArtistsWithFullAlbumsState);
+  const onlyAlbumArtists = useAtom(showArtistsWithFullAlbumsState);
   const [songCount, setSongCount] = useAtom(minSongCountForArtistListState);
   const onIncrement = useCallback(
     () => void setSongCount(Math.min(100, songCount + 1)),
@@ -248,10 +249,11 @@ function ArtistFiltering(): ReactElement {
   );
   return (
     <>
-      <StateToggle
+      <ToggleSwitch
         label="Only show artists with full albums (JODO)"
-        state={onlyAlbumArtists}
+        use={onlyAlbumArtists}
       />
+      <br />
       <SpinButton
         label="Only show artists with at least this many songs (JODO)"
         disabled={onlyAlbumArtists[0]}
@@ -265,32 +267,34 @@ function ArtistFiltering(): ReactElement {
 }
 
 function LikeFiltering(): ReactElement {
-  const neverPlayHates = useJotaiBoolState(neverPlayHatesState);
-  const onlyPlayLikes = useJotaiBoolState(onlyPlayLikesState);
+  const neverPlayHates = useAtom(neverPlayHatesState);
+  const onlyPlayLikes = useAtom(onlyPlayLikesState);
   return (
     <>
-      <StateToggle
+      <ToggleSwitch
         label="Never queue up songs you dislike"
-        state={neverPlayHates}
+        use={neverPlayHates}
       />
-      <StateToggle label="Only queue up songs you like" state={onlyPlayLikes} />
+      <br />
+      <ToggleSwitch label="Only queue up songs you like" use={onlyPlayLikes} />
     </>
   );
 }
 
 function ArtworkSettings(): ReactElement {
-  const dlAlbumArtwork = useJotaiBoolState(downloadAlbumArtworkState);
-  const dlArtistArtwork = useJotaiBoolState(downloadArtistArtworkState);
-  const saveAlbumArtwork = useJotaiBoolState(saveAlbumArtworkWithMusicState);
+  const dlAlbumArtwork = useAtom(downloadAlbumArtworkState);
+  const dlArtistArtwork = useAtom(downloadArtistArtworkState);
+  const saveAlbumArtwork = useAtom(saveAlbumArtworkWithMusicState);
   const [coverArtName, setCoverArtName] = useAtom(albumCoverNameState);
   return (
     <>
-      <StateToggle label="Download Album Artwork" state={dlAlbumArtwork} />
+      <ToggleSwitch label="Download Album Artwork" use={dlAlbumArtwork} />
+      <br />
       <div className="artwork-settings">
-        <StateToggle
+        <ToggleSwitch
           disabled={!dlAlbumArtwork[0]}
           label="Try to save Album Artwork with audio files:"
-          state={saveAlbumArtwork}
+          use={saveAlbumArtwork}
         />
         &nbsp;
         <TextField
@@ -300,7 +304,8 @@ function ArtworkSettings(): ReactElement {
           onChange={(_ev, nv) => nv && void setCoverArtName(nv)}
         />
       </div>
-      <StateToggle label="Download Artist Artwork" state={dlArtistArtwork} />
+      <ToggleSwitch label="Download Artist Artwork" use={dlArtistArtwork} />
+      <br />
       <DefaultButton
         text="Flush Image Cache"
         style={{ ...btnWidth, gridRow: 4 }}
@@ -326,7 +331,9 @@ export function SettingsView(): ReactElement {
       </Expandable>
       <Expandable separator label="Sorting & Filtering" defaultShow={true}>
         <LikeFiltering />
+        <br />
         <ArticleSorting />
+        <br />
         <ArtistFiltering />
       </Expandable>
       <Expandable separator label="Artwork" defaultShow={true}>
