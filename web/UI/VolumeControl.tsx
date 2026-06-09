@@ -1,11 +1,24 @@
-import { FontIcon, ISliderStyles, Slider } from '@fluentui/react';
+// import { Slider } from '@fluentui/react';
+import { Button, Slider, SliderProps } from '@fluentui/react-components';
+import {
+  Speaker024Filled,
+  Speaker124Filled,
+  Speaker224Filled,
+  SpeakerMute24Filled,
+} from '@fluentui/react-icons';
 import { useAtom } from 'jotai';
-import { ReactElement, useEffect } from 'react';
+import { ReactElement, useCallback, useEffect } from 'react';
 import { mutedState, volumeState } from '../State/SongPlayback';
-import { mySliderStyles } from '../Tools/Utilities';
 import { isValidRefObject } from '../Utils';
 
 import '../styles/VolumeControl.css';
+
+const volumeIcons = [
+  <SpeakerMute24Filled />,
+  <Speaker024Filled />,
+  <Speaker124Filled />,
+  <Speaker224Filled />,
+];
 
 export function VolumeControl({
   audioRef,
@@ -15,34 +28,33 @@ export function VolumeControl({
   const [muted, setMuted] = useAtom(mutedState);
   const [volume, setVolume] = useAtom(volumeState);
   // Make the icon reflect approximate volume
-  const iconNum = Math.min(3, Math.floor(4 * (volume + 0.1))).toString();
-  const cls = 'volume-container-win-linux'; // Yoinked Mac, cuz I have a title bar
+  const iconNum = muted ? 0 : 1 + Math.min(2, Math.floor(3 * volume));
   useEffect(() => {
     if (isValidRefObject<HTMLAudioElement>(audioRef)) {
       audioRef.current.muted = muted;
       audioRef.current.volume = volume;
     }
   }, [audioRef, muted, volume]);
+  const onSliderChange: SliderProps['onChange'] = useCallback((_, data) => {
+    void setVolume(data.value);
+    if (muted) void setMuted(false);
+  }, []);
   return (
-    <span className={cls} id="volume-container">
-      <FontIcon
+    <span className="volume-container-win-linux" id="volume-container">
+      <Button
+        appearance="transparent"
         id={muted ? 'mute' : 'volIcon'}
-        iconName={muted ? 'VolumeDisabled' : `Volume${iconNum}`}
+        icon={volumeIcons[iconNum]}
         onClick={() => void setMuted(!muted)}
         style={{ cursor: 'pointer' }}
       />
       <Slider
         className="volume-slider"
-        styles={mySliderStyles}
         min={0}
         max={1}
         value={volume}
         step={0.01}
-        showValue={false}
-        onChange={(value: number) => {
-          void setVolume(value);
-          if (muted) void setMuted(false);
-        }}
+        onChange={onSliderChange}
       />
     </span>
   );
