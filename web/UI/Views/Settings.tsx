@@ -1,7 +1,5 @@
 import {
-  DefaultButton,
   Dropdown,
-  Icon,
   IconButton,
   IDropdownOption,
   Label,
@@ -10,6 +8,13 @@ import {
   TextField,
   TooltipHost,
 } from '@fluentui/react';
+import { Button, Switch, Tooltip } from '@fluentui/react-components';
+import {
+  Add20Regular,
+  ArrowDownload20Regular,
+  SaveImage20Filled,
+  Search20Regular,
+} from '@fluentui/react-icons';
 import { Expandable } from '@freik/fluentui-tools';
 import {
   isArrayOfString,
@@ -52,9 +57,8 @@ import { allSongsState } from '../../State/Songs';
 import { PostMain, SendMessage } from '../../Tools/Ipc';
 import { ShowOpenDialog } from '../../Tools/Utilities';
 import { GetHelperText } from '../../Utils';
-import { ToggleSwitch } from './Tools';
-
 import './styles/Settings.css';
+import { ToggleSwitch } from './Tools';
 
 const btnWidth: React.CSSProperties = { width: '155px', padding: 0 };
 
@@ -110,43 +114,42 @@ function MusicLocations(): ReactElement {
           {defLoc === elem ? (
             <Text variant="small">Default "Save" (NYI)</Text>
           ) : (
-            <DefaultButton
-              styles={setSaveStyle}
-              iconProps={{ iconName: 'Save' }}
-              onClick={() => void setDefLoc(elem)}
-              text="NYI: Set as Default"
-            />
+            <Button
+              icon={<SaveImage20Filled />}
+              onClick={() => void setDefLoc(elem)}>
+              NYI: Set as Default
+            </Button>
           )}
         </span>
       ))}
       <div>
-        <DefaultButton
-          text="Add Location"
+        <Button
           onClick={onAddLocation}
-          iconProps={{ iconName: 'Add' }}
+          icon={<Add20Regular />}
           title={GetHelperText(Keys.AddFileLocation)}
-          style={btnWidth}
-        />
+          style={btnWidth}>
+          Add Location
+        </Button>
         &nbsp;
-        <TooltipHost
-          id="RescanLocationsHelp"
+        <Tooltip
+          relationship="description"
           content="Necessary if you moved files around since launching the app">
-          <DefaultButton
-            text="Rescan Locations"
-            iconProps={{ iconName: 'SearchData' }}
+          <Button
+            icon={<Search20Regular />}
             disabled={rescanInProgress}
             onClick={() => SendMessage(SocketMsg.ManualRescan)}
-            style={btnWidth}
-          />
-        </TooltipHost>
+            style={btnWidth}>
+            Rescan Locations
+          </Button>
+        </Tooltip>
         &nbsp;
-        <DefaultButton
-          text="Import Files (NYI)"
+        <Button
           /* onClick={() => {}} */
-          iconProps={{ iconName: 'DownloadDocument' }}
+          icon={<ArrowDownload20Regular />}
           title={st(StrId.ImportFiles)}
-          style={btnWidth}
-        />
+          style={btnWidth}>
+          Import Files (NYI)
+        </Button>
       </div>
       <Text>{`${artists.size} Artists, ${albums.size} Albums, ${songs.size} Songs`}</Text>
     </>
@@ -231,7 +234,6 @@ function IgnoreList(): ReactElement {
 }
 
 function ArticleSorting(): ReactElement {
-  //const articles = useJotaiBoolState(ignoreArticlesState);
   const articles = useAtom(ignoreArticlesState);
   return <ToggleSwitch use={articles} label={'Ignore articles when sorting'} />;
 }
@@ -306,11 +308,11 @@ function ArtworkSettings(): ReactElement {
       </div>
       <ToggleSwitch label="Download Artist Artwork" use={dlArtistArtwork} />
       <br />
-      <DefaultButton
-        text="Flush Image Cache"
+      <Button
         style={{ ...btnWidth, gridRow: 4 }}
-        onClick={() => PostMain(IpcCall.FlushImageCache)}
-      />
+        onClick={() => PostMain(IpcCall.FlushImageCache)}>
+        Flush Image Cache
+      </Button>
     </>
   );
 }
@@ -341,19 +343,18 @@ export function SettingsView(): ReactElement {
       </Expandable>
       <Expandable separator label="Metadata" defaultShow={true}>
         <>
-          <DefaultButton
-            text="Flush Metadata Cache"
+          <Button
             style={btnWidth}
-            onClick={() => PostMain(IpcCall.FlushMetadataCache)}
-          />
+            onClick={() => PostMain(IpcCall.FlushMetadataCache)}>
+            Flush Metadata Cache
+          </Button>
           &nbsp;
-          <DefaultButton
-            text="Clear Local Overrides"
+          <Button
             style={btnWidth}
-            onClick={() => PostMain(IpcCall.ClearLocalOverrides)}
-          />
-          <DefaultButton
-            text="Show Open File Dialog"
+            onClick={() => PostMain(IpcCall.ClearLocalOverrides)}>
+            Clear Local Overrides
+          </Button>
+          <Button
             style={btnWidth}
             onClick={() => {
               const odo: OpenDialogOptions = {
@@ -374,8 +375,9 @@ export function SettingsView(): ReactElement {
                   );
                 }
               });
-            }}
-          />
+            }}>
+            Show Open File Dialog
+          </Button>
           <div>{Data}</div>
         </>
       </Expandable>

@@ -7,7 +7,6 @@ import {
   SpinButton,
 } from '@fluentui/react';
 import { MakeLog } from '@freik/logger';
-import { BoolState, Catch } from '@freik/react-tools';
 import { DebouncedDelay } from '@freik/sync';
 import {
   chkAnyOf,
@@ -16,10 +15,10 @@ import {
   isString,
   isUndefined,
 } from '@freik/typechk';
-import { Atom, WritableAtom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import {
-  CSSProperties,
   Component,
+  CSSProperties,
   ForwardedRef,
   ReactElement,
   SyntheticEvent,
@@ -34,6 +33,19 @@ import { isMiniplayerState } from '../State/SongPlayback';
 import { isSearchBox } from '../UI/Sidebar';
 import { CallMain, SendMain } from './Ipc';
 import { useMediaEffect } from './MediaEffect';
+
+export const mySliderStyles: Partial<ISliderStyles> = {
+  thumb: {
+    borderWidth: 1,
+    width: 6,
+    height: 10,
+    top: -3,
+    zIndex: 100,
+  },
+  line: {
+    zIndex: 100,
+  },
+};
 
 // import { MenuHandler } from './MenuHandler';
 
@@ -139,92 +151,6 @@ export function Utilities(props: {
   );
 }
 
-export const mySliderStyles: Partial<ISliderStyles> = {
-  thumb: {
-    borderWidth: 1,
-    width: 6,
-    height: 10,
-    top: -3,
-    zIndex: 100,
-  },
-  line: {
-    zIndex: 100,
-  },
-};
-
-export type StringSpinButtonProps = {
-  id?: string;
-  className?: string;
-  label?: string;
-  value: number;
-  filter: (val: string) => number | undefined;
-  format: (val: number) => string;
-  min: number;
-  max: number;
-  step: number;
-  onChange: (newValue?: number) => void;
-  style?: CSSProperties;
-  labelPosition?: Position;
-  styles?: IStyleFunctionOrObject<ISpinButtonStyleProps, ISpinButtonStyles>;
-};
-
-export function StringSpinButton({
-  id,
-  className,
-  label,
-  value,
-  filter,
-  format,
-  min,
-  max,
-  step,
-  onChange,
-  style,
-  styles,
-  labelPosition,
-}: StringSpinButtonProps): ReactElement {
-  const onIncrement = (val: string): string | void => {
-    const num = filter(val);
-    if (isNumber(num)) {
-      return format(Math.min(num + step, max));
-    }
-  };
-  const onDecrement = (val: string): string | void => {
-    const num = filter(val);
-    if (isNumber(num)) {
-      return format(Math.max(num - step, min));
-    }
-  };
-  const onValidate = (val: string): string | void => {
-    const num = filter(val);
-    if (isNumber(num)) {
-      return format(Math.max(Math.min(num, max), min));
-    }
-  };
-  const internalChange = (
-    event: SyntheticEvent<HTMLElement>,
-    newValue?: string,
-  ) => {
-    const numVal = isUndefined(newValue) ? newValue : filter(newValue);
-    onChange(numVal);
-  };
-  return (
-    <SpinButton
-      id={id}
-      className={className}
-      label={label}
-      value={format(value)}
-      style={style}
-      styles={styles}
-      labelPosition={labelPosition}
-      onChange={internalChange}
-      onValidate={onValidate}
-      onIncrement={onIncrement}
-      onDecrement={onDecrement}
-    />
-  );
-}
-
 type EBProps = { children: React.ReactNode };
 type EBState = { hasError: boolean };
 export class ErrorBoundary extends Component<EBProps, EBState> {
@@ -312,3 +238,76 @@ export const useEffectOnce = (effect: () => void | (() => void)) => {
     };
   }, []);
 };
+
+export type StringSpinButtonProps = {
+  id?: string;
+  className?: string;
+  label?: string;
+  value: number;
+  filter: (val: string) => number | undefined;
+  format: (val: number) => string;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (newValue?: number) => void;
+  style?: CSSProperties;
+  labelPosition?: Position;
+  styles?: IStyleFunctionOrObject<ISpinButtonStyleProps, ISpinButtonStyles>;
+};
+
+export function StringSpinButton({
+  id,
+  className,
+  label,
+  value,
+  filter,
+  format,
+  min,
+  max,
+  step,
+  onChange,
+  style,
+  styles,
+  labelPosition,
+}: StringSpinButtonProps): ReactElement {
+  const onIncrement = (val: string): string | void => {
+    const num = filter(val);
+    if (isNumber(num)) {
+      return format(Math.min(num + step, max));
+    }
+  };
+  const onDecrement = (val: string): string | void => {
+    const num = filter(val);
+    if (isNumber(num)) {
+      return format(Math.max(num - step, min));
+    }
+  };
+  const onValidate = (val: string): string | void => {
+    const num = filter(val);
+    if (isNumber(num)) {
+      return format(Math.max(Math.min(num, max), min));
+    }
+  };
+  const internalChange = (
+    event: SyntheticEvent<HTMLElement>,
+    newValue?: string,
+  ) => {
+    const numVal = isUndefined(newValue) ? newValue : filter(newValue);
+    onChange(numVal);
+  };
+  return (
+    <SpinButton
+      id={id}
+      className={className}
+      label={label}
+      value={format(value)}
+      style={style}
+      styles={styles}
+      labelPosition={labelPosition}
+      onChange={internalChange}
+      onValidate={onValidate}
+      onIncrement={onIncrement}
+      onDecrement={onDecrement}
+    />
+  );
+}
