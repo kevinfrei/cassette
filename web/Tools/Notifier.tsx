@@ -1,4 +1,3 @@
-import { MessageBar, MessageBarType } from '@fluentui/react';
 import { useAtom } from 'jotai';
 import { ReactElement, useEffect } from 'react';
 import {
@@ -6,6 +5,7 @@ import {
   recentlyQueuedState,
 } from '../State/SongPlayback';
 
+import { MessageBar } from '@fluentui/react-components';
 import './styles/Notifier.css';
 
 // This is a little self-contained notification doohickey
@@ -25,10 +25,7 @@ export function Notifier(): ReactElement {
     };
   }, [addedSongs, clearIt, startFade, displayed]);
   return addedSongs > 0 ? (
-    <MessageBar
-      className={displayed ? '' : 'fade-out'}
-      messageBarType={MessageBarType.success}
-      isMultiline={true}>
+    <MessageBar intent="info" className={displayed ? '' : 'fade-out'}>
       Added {addedSongs} songs to the Now Playing queue
     </MessageBar>
   ) : (
