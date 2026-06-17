@@ -1,5 +1,4 @@
-import { Slider, Text } from '@fluentui/react';
-import { ListIcon } from '@fluentui/react-icons-mdl2';
+import { Button, Slider, SliderProps, Text } from '@fluentui/react-components';
 import { MakeLog } from '@freik/logger';
 import { useAtom, useAtomValue } from 'jotai';
 import {
@@ -40,6 +39,7 @@ import { onClickPlayPause } from './PlaybackControls';
 import { mySliderStyles } from './Utilities';
 */
 
+import { ListRegular } from '@fluentui/react-icons';
 import '../styles/SongPlaying.css';
 
 const { log } = MakeLog('EMP:render:SongPlayback');
@@ -62,11 +62,7 @@ function CoverArt(): ReactElement {
 function MediaTimePosition(): ReactElement {
   const mediaTimePosition = useAtomValue(mediaTimePositionState);
   return (
-    <Text
-      id="now-playing-current-time"
-      variant="tiny"
-      block={true}
-      nowrap={true}>
+    <Text id="now-playing-current-time" size={200} block={true} wrap={false}>
       {mediaTimePosition}
     </Text>
   );
@@ -75,11 +71,7 @@ function MediaTimePosition(): ReactElement {
 function MediaTimeRemaining(): ReactElement {
   const mediaTimeRemaining = useAtomValue(mediaTimeRemainingState);
   return (
-    <Text
-      id="now-playing-remaining-time"
-      variant="tiny"
-      block={true}
-      nowrap={true}>
+    <Text id="now-playing-remaining-time" size={200} block={true} wrap={false}>
       {mediaTimeRemaining}
     </Text>
   );
@@ -94,8 +86,9 @@ function MediaTimeSlider({
   const [mediaTimePercent, setMediaTimePercent] = useAtom(
     mediaTimePercentState,
   );
-  const onChange = useCallback(
-    (value: number) => {
+  const onChange: SliderProps['onChange'] = useCallback(
+    (ev, { value }) => {
+      const val = value;
       // This is only called when the user moves the slider.
       // Super handy!
       setMediaTimePercent(value);
@@ -136,9 +129,9 @@ function MediaTimeSlider({
       max={1}
       // disabled={songKey.length === 0}
       step={1e-7}
-      styles={mySliderStyles}
+      // styles={mySliderStyles}
       onChange={onChange}
-      showValue={false}
+      // showValue={false}
     />
   );
 }
@@ -149,7 +142,7 @@ function SongName(): ReactElement {
     songDescriptionForSongState(songKey),
   );
   return (
-    <Text id="song-name" variant="tiny" block={true} nowrap={true}>
+    <Text id="song-name" size={200} block={true} wrap={false}>
       {title}
     </Text>
   );
@@ -165,9 +158,9 @@ function ArtistAlbum(): ReactElement {
     return (
       <Text
         id="artist-album"
-        variant="tiny"
+        size={200}
         block={true}
-        nowrap={true}>{`${artist}${split}${album}`}</Text>
+        wrap={false}>{`${artist}${split}${album}`}</Text>
     );
   } else {
     return <span id="artist-album" />;
@@ -278,7 +271,8 @@ export function SongPlaying({
       <MediaTimePosition />
       <MediaTimeSlider audioRef={audioRef} />
       <MediaTimeRemaining />
-      <ListIcon
+      <Button
+        icon={<ListRegular />}
         id="showPlayOrder"
         onClick={flipDisplay}
         style={{
