@@ -1,4 +1,3 @@
-// import { Slider } from '@fluentui/react';
 import { Button, Slider, SliderProps } from '@fluentui/react-components';
 import {
   Speaker024Filled,

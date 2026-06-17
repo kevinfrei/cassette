@@ -1,4 +1,5 @@
 import { Button, Slider, SliderProps, Text } from '@fluentui/react-components';
+import { ListRegular } from '@fluentui/react-icons';
 import { MakeLog } from '@freik/logger';
 import { useAtom, useAtomValue } from 'jotai';
 import {
@@ -39,7 +40,6 @@ import { onClickPlayPause } from './PlaybackControls';
 import { mySliderStyles } from './Utilities';
 */
 
-import { ListRegular } from '@fluentui/react-icons';
 import '../styles/SongPlaying.css';
 
 const { log } = MakeLog('EMP:render:SongPlayback');
@@ -275,8 +275,9 @@ export function SongPlaying({
         icon={<ListRegular />}
         id="showPlayOrder"
         onClick={flipDisplay}
+        appearance="primary"
         style={{
-          width: '12px',
+          width: '24px',
           display: isShuffle ? 'block' : 'none',
           cursor: 'pointer',
         }}
