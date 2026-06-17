@@ -66,11 +66,10 @@
   "dependencies": {
     "@fluentui/react-components": "^9.74.1",
     "@fluentui/react-icons": "^2.0.328",
-    "@fluentui/react-icons-mdl2": "^1.4.6",
     "@freik/containers": "^0.4.10",
     "@freik/media-core": "^0.16.10",
     "@freik/sync": "^0.4.10",
-    "@freik/fluentui-tools": "^1.2.10",
+    "@freik/fluent9-tools": "^0.1.0",
     "@freik/logger": "^0.4.10",
     "@freik/react-tools": "^0.3.10",
     "@freik/seqnum": "^1.3.10",

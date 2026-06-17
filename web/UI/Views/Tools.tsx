@@ -1,11 +1,8 @@
-import { Expandable } from '@freik/fluentui-tools';
-import { ReactElement, Suspense, useCallback, useMemo, useState } from 'react';
-
 import { Switch } from '@fluentui/react-components';
-import { ErrorBoundary } from '../../Tools/Utilities';
-import { FolderChooser } from '../Dialogs/FolderChooser';
-import './styles/Tools.css';
+import { Expandable } from '@freik/fluent9-tools';
+import { ReactElement, useCallback, useState } from 'react';
 import { TranscoderConfiguration } from './Tools/Transcoder';
+import './styles/Tools.css';
 
 export function ToolsView(): ReactElement {
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
@@ -29,7 +26,7 @@ export function ToggleSwitch({
   disabled,
 }: ToggleSwitchProps): ReactElement {
   const [checked, setChecked] = use;
-  const fn = useCallback(() => setChecked(!checked), [checked, setChecked]);
+  const fn = useCallback(() => setChecked(!checked), [use]);
   return (
     <Switch
       disabled={!!disabled}

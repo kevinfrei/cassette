@@ -15,7 +15,7 @@ import {
   SaveImage20Filled,
   Search20Regular,
 } from '@fluentui/react-icons';
-import { Expandable } from '@freik/fluentui-tools';
+import { Expandable } from '@freik/fluent9-tools';
 import {
   isArrayOfString,
   isDefined,
@@ -23,7 +23,7 @@ import {
   isUndefined,
 } from '@freik/typechk';
 import { useAtom, useAtomValue } from 'jotai';
-import React, { ReactElement, useCallback, useState } from 'react';
+import { CSSProperties, ReactElement, useCallback, useState } from 'react';
 import { st } from '../../Constants';
 import {
   IgnoreItemType,
@@ -57,10 +57,10 @@ import { allSongsState } from '../../State/Songs';
 import { PostMain, SendMessage } from '../../Tools/Ipc';
 import { ShowOpenDialog } from '../../Tools/Utilities';
 import { GetHelperText } from '../../Utils';
-import './styles/Settings.css';
 import { ToggleSwitch } from './Tools';
+import './styles/Settings.css';
 
-const btnWidth: React.CSSProperties = { width: '155px', padding: 0 };
+const btnWidth: CSSProperties = { width: '155px', padding: 0 };
 
 const removeFromSet = (set: string[], val: string): string[] => {
   const newSet = new Set(set);
