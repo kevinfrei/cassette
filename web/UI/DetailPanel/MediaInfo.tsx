@@ -4,7 +4,7 @@ import {
   SelectionMode,
   TextField,
 } from '@fluentui/react';
-import { Expandable } from '@freik/fluentui-tools';
+import { Expandable } from '@freik/fluent9-tools';
 import { SongKey } from '@freik/media-core';
 import { isArray, isString } from '@freik/typechk';
 import { useAtom, useAtomValue } from 'jotai';

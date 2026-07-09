@@ -5,6 +5,7 @@ import {
   hasField,
   hasFieldOf,
   isArrayOfString,
+  isDefined,
   isObjectNonNull,
   isString,
 } from '@freik/typechk';

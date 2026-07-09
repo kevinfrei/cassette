@@ -1,5 +1,5 @@
 import { Text } from '@fluentui/react';
-import { Expandable } from '@freik/fluentui-tools';
+import { Expandable } from '@freik/fluent9-tools';
 import { useAtomValue } from 'jotai';
 import { ReactElement } from 'react';
 import { TranscodeState } from '../../../Shared/CommonTypes';

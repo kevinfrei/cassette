@@ -22,7 +22,7 @@ bool is_hidden_file_os(const std::filesystem::path& path) {
 
 namespace files {
 
-void root_iterator::populate_roots(bool include_empty) {
+void root_iterator::populate_roots(bool /* include_empty */) {
   // TODO: Only populate roots that actually exist?
   // TODO: Maybe only test existence on demand?
   // TODO: Probably skip A & B drives by default, or at least put them at the

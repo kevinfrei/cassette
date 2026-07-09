@@ -1,5 +1,5 @@
 import { ContextualMenu, Dialog, DialogType } from '@fluentui/react';
-import { Spinner } from '@freik/fluentui-tools';
+import { SpinSuspense } from '@freik/fluent9-tools';
 import { useAtom, useAtomValue } from 'jotai';
 import { RESET } from 'jotai/utils';
 import { ReactElement } from 'react';
@@ -44,7 +44,7 @@ export function SongDetailPanel(): ReactElement {
       minWidth={600}
       onDismiss={dismissClick}
       closeButtonAriaLabel="Close">
-      <Spinner label="Loading...">{elem}</Spinner>
+      <SpinSuspense label="Loading...">{elem}</SpinSuspense>
     </Dialog>
   );
 }
