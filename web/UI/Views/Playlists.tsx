@@ -7,9 +7,13 @@ import {
   SelectionMode,
   Text,
 } from '@fluentui/react';
-import { Dialogs } from '@freik/fluentui-tools';
 import { MakeLog } from '@freik/logger';
-import { useDialogState } from '@freik/react-tools';
+import {
+  ConfirmationDialog,
+  MakeDialogApi,
+  TextInputDialog,
+} from '@freik/fluent9-tools';
+import { useBoolState } from '@freik/react-tools';
 import { hasFieldType, isDefined, isNumber, isUndefined } from '@freik/typechk';
 import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { atomWithReset, useResetAtom } from 'jotai/utils';
@@ -115,9 +119,6 @@ export function PlaylistView(): ReactElement {
   const [songPlaylistToRemove, setSongPlaylistToRemove] = useState<
     [string, string, number]
   >(['', '', -1]);
-  const [showPlaylistDelete, playlistDeleteData] = useDialogState();
-  const [showRename, renameData] = useDialogState();
-  const [showRemoveSong, removeSongData] = useDialogState();
 
   const playlistNames = new Set(useAtomValue(playlistNamesState));
   const playlistContents = useAtomValue(allPlaylistsState);
@@ -156,18 +157,29 @@ export function PlaylistView(): ReactElement {
     },
     [playlistNames, playlistContext.data],
   );
+
   const onPlaylistDelete = useCallback((key: string) => {
     setSelected(key);
-    showPlaylistDelete();
+    deletePlaylistApi.openDialog();
   }, []);
   const deleteConfirmed = useCallback(
     () => DeletePlaylist(selected),
     [selected],
   );
+  const deletePlaylistState = useBoolState(false);
+  const deletePlaylistApi = MakeDialogApi(deletePlaylistState, deleteConfirmed);
+
   const renameConfirmed = useCallback(
-    (newName: string) => RenamePlaylist(selected, newName),
+    (newName: string | undefined) => {
+      if (isDefined(newName)) {
+        RenamePlaylist(selected, newName);
+      }
+    },
     [selected],
   );
+  const renamePlaylistState = useBoolState(false);
+  const renamePlaylistApi = MakeDialogApi(renamePlaylistState, renameConfirmed);
+
   const removeSongConfirmed = useJotaiAsyncCallback(
     async (get, set) => {
       if (
@@ -188,6 +200,8 @@ export function PlaylistView(): ReactElement {
     },
     [songPlaylistToRemove],
   );
+  const removeSongState = useBoolState(false);
+  const removeSongApi = MakeDialogApi(removeSongState, removeSongConfirmed);
 
   // TODO: make delete work
   const onTitleRenderer = (ttl: PlaylistSong, index?: number): ReactElement => (
@@ -204,7 +218,7 @@ export function PlaylistView(): ReactElement {
           if (ev.shiftKey) {
             removeSongConfirmed();
           } else {
-            showRemoveSong();
+            removeSongApi.openDialog();
           }
         }}
       />
@@ -259,30 +273,27 @@ export function PlaylistView(): ReactElement {
     <Suspense fallback={<div className="loading-view">Loading...</div>}>
       <div data-is-scrollable="true">
         <ScrollablePane scrollbarVisibility={ScrollbarVisibility.always}>
-          <Dialogs.ConfirmationDialog
-            data={playlistDeleteData}
-            confirmFunc={deleteConfirmed}
+          <ConfirmationDialog
+            api={deletePlaylistApi}
             title="Are you sure?"
             text={`Do you really want to delete the playlist ${selected}?`}
-            yesText="Delete"
-            noText="Cancel"
+            yes="Delete"
+            no="Cancel"
           />
-          <Dialogs.ConfirmationDialog
-            data={removeSongData}
-            confirmFunc={removeSongConfirmed}
+          <ConfirmationDialog
+            api={removeSongApi}
             title="Are you sure?"
             text="Do you really want to remove the song from the playlist?"
-            yesText="Remove"
-            noText="Cancel"
+            yes="Delete"
+            no="Cancel"
           />
-          <Dialogs.TextInput
-            data={renameData}
-            onConfirm={renameConfirmed}
+          <TextInputDialog
+            api={renamePlaylistApi}
             title={`Rename ${selected}...`}
             text="What would you like the playlist to be renamed to?"
             initialValue={selected}
-            yesText="Rename"
-            noText="Cancel"
+            confirm="Rename"
+            cancel="Cancel"
           />
           <DetailsList
             items={expItems}
@@ -327,7 +338,7 @@ export function PlaylistView(): ReactElement {
                 iconProps: { iconName: 'Rename' },
                 onClick: () => {
                   setSelected(playlistContext.data);
-                  showRename();
+                  renamePlaylistApi.openDialog();
                   return true;
                 },
               },
@@ -337,7 +348,7 @@ export function PlaylistView(): ReactElement {
                 iconProps: { iconName: 'Delete' },
                 onClick: () => {
                   setSelected(playlistContext.data);
-                  showPlaylistDelete();
+                  deletePlaylistApi.openDialog();
                 },
               },
               {

@@ -1,4 +1,4 @@
-import { Text } from '@fluentui/react';
+import { Text } from '@fluentui/react-components';
 import { Expandable } from '@freik/fluent9-tools';
 import { useAtomValue } from 'jotai';
 import { ReactElement } from 'react';

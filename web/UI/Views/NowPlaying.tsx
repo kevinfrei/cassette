@@ -14,9 +14,13 @@ import {
   Text,
   TooltipHost,
 } from '@fluentui/react';
-import { Dialogs } from '@freik/fluentui-tools';
+import {
+  ConfirmationDialog,
+  MakeDialogApi,
+  TextInputDialog,
+} from '@freik/fluent9-tools';
 import { MakeLog } from '@freik/logger';
-import { useDialogState } from '@freik/react-tools';
+import { useBoolState } from '@freik/react-tools';
 import { isNumber } from '@freik/typechk';
 import { atom, useAtom, useAtomValue } from 'jotai';
 import { ReactElement, useCallback, useState } from 'react';
@@ -59,6 +63,7 @@ import { SortKey, SortSongList } from '../../Tools/Sorting';
 import { GetHelperText, isPlaylistName } from '../../Utils';
 import { LikeOrHate } from '../Liker';
 
+import { Button } from '@fluentui/react-components';
 import './styles/NowPlaying.css';
 
 const { wrn } = MakeLog('EMP:render:NowPlaying');
@@ -75,12 +80,14 @@ function TopLine(): ReactElement {
   const nowPlaying = useAtomValue(activePlaylistState);
   const songList = useAtomValue(songListState);
   const saveEnabled = useAtomValue(saveableState);
+  const savePlaylistAsState = useBoolState(false);
+  const clearQueueState = useBoolState(false);
 
-  const [showSaveAs, saveAsData] = useDialogState();
-  const [showConfirm, confirmData] = useDialogState();
-
-  const saveListAs = useJotaiAsyncCallback(
-    async (get, set, inputName: string) => {
+  const savePlaylistAs = useJotaiAsyncCallback(
+    async (get, set, inputName: string | undefined) => {
+      if (!inputName || inputName.length === 0) {
+        return;
+      }
       const playlists = await get(playlistNamesState);
       if (playlists.includes(inputName)) {
         window.alert("Sorry: You can't overwrite an existing playlist.");
@@ -91,14 +98,10 @@ function TopLine(): ReactElement {
     },
     [playlistStateFamily, activePlaylistState],
   );
+  const saveAsApi = MakeDialogApi(savePlaylistAsState, savePlaylistAs);
   const stopAndClear = useCallback(() => StopAndClear().catch(wrn), []);
-  const clickClearQueue = useCallback(() => {
-    if (isPlaylistName(nowPlaying)) {
-      StopAndClear().catch(wrn);
-    } else {
-      showConfirm();
-    }
-  }, []);
+  const clearQueueApi = MakeDialogApi(clearQueueState, stopAndClear);
+
   const save = useJotaiCallback(
     (get, set) => () => {
       set(playlistStateFamily(nowPlaying), songList);
@@ -116,28 +119,31 @@ function TopLine(): ReactElement {
   return (
     <div id="current-header">
       <div className="now-playing-header">
-        <Dialogs.TextInput
-          data={saveAsData}
-          onConfirm={saveListAs}
+        <TextInputDialog
+          api={saveAsApi}
           title="Save Playlist as..."
           text="What would you like the playlist to be named?"
           initialValue={nowPlaying}
-          yesText="Save"
-          noText="Cancel"
-        />
-        <Dialogs.ConfirmationDialog
-          data={confirmData}
-          confirmFunc={stopAndClear}
+          confirm="Save"
+          cancel="Cancel">
+          <Button
+            className="save-playlist-as"
+            disabled={emptyQueue}
+            style={{ width: 120 }}>
+            Save As...
+          </Button>
+        </TextInputDialog>
+        <ConfirmationDialog
+          api={clearQueueApi}
           title="Please Confirm"
-          text="Are you sure you want to clear the play queue?"
-        />
-        <DefaultButton
-          className="np-clear-queue"
-          onClick={clickClearQueue}
-          disabled={emptyQueue}
-          style={{ width: 120 }}>
-          Clear Queue
-        </DefaultButton>
+          text="Are you sure you want to clear the play queue?">
+          <Button
+            className="np-clear-queue"
+            disabled={emptyQueue}
+            style={{ width: 120 }}>
+            Clear Queue
+          </Button>
+        </ConfirmationDialog>
         <Text
           className="np-current-playlist"
           variant="large"
@@ -145,13 +151,6 @@ function TopLine(): ReactElement {
           nowrap={true}>
           {header}
         </Text>
-        <DefaultButton
-          className="save-playlist-as"
-          onClick={showSaveAs}
-          disabled={emptyQueue}
-          style={{ width: 120 }}>
-          Save As...
-        </DefaultButton>
         <DefaultButton
           onClick={save}
           className="save-playlist"
