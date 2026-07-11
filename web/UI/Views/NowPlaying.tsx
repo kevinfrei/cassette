@@ -129,8 +129,9 @@ function TopLine(): ReactElement {
           <Button
             className="save-playlist-as"
             disabled={emptyQueue}
-            style={{ width: 120 }}>
-            Save As...
+            style={{ width: 120 }}
+            onClick={saveAsApi.openDialog}>
+            Save pAs...
           </Button>
         </TextInputDialog>
         <ConfirmationDialog
@@ -140,7 +141,8 @@ function TopLine(): ReactElement {
           <Button
             className="np-clear-queue"
             disabled={emptyQueue}
-            style={{ width: 120 }}>
+            style={{ width: 120 }}
+            onClick={clearQueueApi.openDialog}>
             Clear Queue
           </Button>
         </ConfirmationDialog>
