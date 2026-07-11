@@ -1,17 +1,20 @@
 import {
+  Button,
   Dropdown,
-  IconButton,
-  IDropdownOption,
+  DropdownProps,
+  Input,
+  InputProps,
   Label,
+  Option,
   SpinButton,
+  SpinButtonProps,
   Text,
-  TextField,
-  TooltipHost,
-} from '@fluentui/react';
-import { Button, Switch, Tooltip } from '@fluentui/react-components';
+  Tooltip,
+} from '@fluentui/react-components';
 import {
   Add20Regular,
   ArrowDownload20Regular,
+  Delete20Regular,
   SaveImage20Filled,
   Search20Regular,
 } from '@fluentui/react-icons';
@@ -19,6 +22,7 @@ import { Expandable } from '@freik/fluent9-tools';
 import {
   isArrayOfString,
   isDefined,
+  isNumber,
   isString,
   isUndefined,
 } from '@freik/typechk';
@@ -106,13 +110,13 @@ function MusicLocations(): ReactElement {
     <>
       {(allLocs || []).map((elem) => (
         <span key={elem} className="music-loc">
-          <IconButton
+          <Button
+            icon={<Delete20Regular />}
             onClick={() => void setAllLocs(removeFromSet(allLocs, elem))}
-            iconProps={{ iconName: 'Delete' }}
           />
           <Label>{elem}</Label>&nbsp;
           {defLoc === elem ? (
-            <Text variant="small">Default "Save" (NYI)</Text>
+            <Text size={400}>Default "Save" (NYI)</Text>
           ) : (
             <Button
               icon={<SaveImage20Filled />}
@@ -162,14 +166,24 @@ const ignoreTypeNameMap = new Map<IgnoreItemType, string>([
   ['path-keyword', 'Keyword'],
 ]);
 
-const ignoreOptions: IDropdownOption[] = [...ignoreTypeNameMap.entries()].map(
-  ([key, text]) => ({ key, text }),
-);
-
 function IgnoreList(): ReactElement {
   const ignoreItems = useAtomValue(ignoreItemsState);
+  const [selectedIgnoreOptions, setSelectedIgnoreOptions] = useState<string[]>(
+    [],
+  );
+  const [ignoreValue, setIgnoreValue] = useState('');
+  const onOptionSelect: DropdownProps['onOptionSelect'] = (ev, data) => {
+    setSelectedIgnoreOptions(data.selectedOptions);
+    setIgnoreValue(data.optionValue ?? '');
+  };
+
   const [newType, setNewType] = useState<IgnoreItemType | ''>('');
   const [newValue, setNewValue] = useState<string>('');
+  const ignoreValueChange: InputProps['onChange'] = useCallback((ev, data) => {
+    if (isDefined(data.value)) {
+      setNewValue(data.value);
+    }
+  }, []);
   return (
     <div id="ignore-list">
       {ignoreItems.map(({ type, value }, idx) => (
@@ -178,46 +192,37 @@ function IgnoreList(): ReactElement {
             {ignoreTypeNameMap.get(type) || 'ERROR!'}:
           </span>
           <span style={{ gridRow: idx + 1 }} className="ignore-value">
-            <TextField readOnly value={value} />
+            <Input type="text" readOnly value={value} />
           </span>
           <span style={{ gridRow: idx + 1 }} className="ignore-button">
-            <IconButton
+            <Button
+              icon={<Delete20Regular />}
               onClick={() => {
                 /* TODO RemoveIgnoreItem({ type, value } ); */
               }}
-              iconProps={{ iconName: 'Delete' }}
             />
           </span>
         </div>
       ))}
       <span style={{ gridRow: ignoreItems.length + 1 }} className="ignore-type">
         <Dropdown
-          selectedKey={newType}
-          onChange={(ev: unknown, option?: IDropdownOption) => {
-            if (isDefined(option) && option.key !== '') {
-              setNewType(option.key as IgnoreItemType);
-            }
-          }}
-          options={ignoreOptions}
-          dropdownWidth={125}
-        />
+          selectedOptions={selectedIgnoreOptions}
+          onOptionSelect={onOptionSelect}>
+          {[...ignoreTypeNameMap.entries()].map(([iit, val]) => (
+            <Option key={iit}>{val}</Option>
+          ))}
+        </Dropdown>
       </span>
       <span
         style={{ gridRow: ignoreItems.length + 1 }}
         className="ignore-value">
-        <TextField
-          value={newValue}
-          onChange={(ev: unknown, value?: string) => {
-            if (isDefined(value)) {
-              setNewValue(value);
-            }
-          }}
-        />
+        <Input type="text" value={newValue} onChange={ignoreValueChange} />
       </span>
       <span
         style={{ gridRow: ignoreItems.length + 1 }}
         className="ignore-button">
-        <IconButton
+        <Button
+          icon={<Add20Regular />}
           onClick={() => {
             if (newType !== '') {
               // TODO: AddIgnoreItem({ type: newType, value: newValue });
@@ -225,7 +230,6 @@ function IgnoreList(): ReactElement {
             setNewType('');
             setNewValue('');
           }}
-          iconProps={{ iconName: 'Add' }}
           disabled={newValue.length === 0}
         />
       </span>
@@ -241,12 +245,12 @@ function ArticleSorting(): ReactElement {
 function ArtistFiltering(): ReactElement {
   const onlyAlbumArtists = useAtom(showArtistsWithFullAlbumsState);
   const [songCount, setSongCount] = useAtom(minSongCountForArtistListState);
-  const onIncrement = useCallback(
-    () => void setSongCount(Math.min(100, songCount + 1)),
-    [minSongCountForArtistListState],
-  );
-  const onDecrement = useCallback(
-    () => void setSongCount(Math.max(1, songCount - 1)),
+  const onChange: SpinButtonProps['onChange'] = useCallback(
+    (_ev, newValue) => {
+      if (isNumber(newValue)) {
+        void setSongCount(Math.min(Math.max(newValue, 1), 100));
+      }
+    },
     [minSongCountForArtistListState],
   );
   return (
@@ -256,12 +260,14 @@ function ArtistFiltering(): ReactElement {
         use={onlyAlbumArtists}
       />
       <br />
+      <Label htmlFor="song-count">
+        Only show artists with at least this many songs (JODO)
+      </Label>
       <SpinButton
-        label="Only show artists with at least this many songs (JODO)"
+        id="song-count"
         disabled={onlyAlbumArtists[0]}
-        value={songCount.toString()}
-        onIncrement={onIncrement}
-        onDecrement={onDecrement}
+        value={songCount}
+        onChange={onChange}
         style={{ width: '10px' }}
       />
     </>
@@ -299,11 +305,15 @@ function ArtworkSettings(): ReactElement {
           use={saveAlbumArtwork}
         />
         &nbsp;
-        <TextField
+        <Label style={{ fontSize: 11, paddingTop: 5 }} htmlFor="cover-art-name">
+          Filename to save the artwork as
+        </Label>
+        <Input
+          type="text"
+          id="cover-art-name"
           disabled={!saveAlbumArtwork[0] || !dlAlbumArtwork[0]}
-          description="Filename to save the artwork as"
           value={coverArtName}
-          onChange={(_ev, nv) => nv && void setCoverArtName(nv)}
+          onChange={(_ev, nv) => nv.value && void setCoverArtName(nv.value)}
         />
       </div>
       <ToggleSwitch label="Download Artist Artwork" use={dlArtistArtwork} />
