@@ -1,4 +1,5 @@
 import { atom } from 'jotai';
+
 import { chkCurrentView, CurrentView, StorageId } from '../Shared/CommonTypes';
 import { isMiniplayerState } from './SongPlayback';
 import { atomWithMainStorage } from './Storage';

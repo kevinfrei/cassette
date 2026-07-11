@@ -1,11 +1,13 @@
-import { useAtom } from 'jotai';
 import { ReactElement, useEffect } from 'react';
+import { useAtom } from 'jotai';
+
+import { MessageBar } from '@fluentui/react-components';
+
 import {
   displayMessageState,
   recentlyQueuedState,
 } from '../State/SongPlayback';
 
-import { MessageBar } from '@fluentui/react-components';
 import './styles/Notifier.css';
 
 // This is a little self-contained notification doohickey

@@ -1,6 +1,8 @@
-import { isFunction, isPromise } from '@freik/typechk';
-import { WritableAtom, atom } from 'jotai';
+import { atom, WritableAtom } from 'jotai';
 import { AsyncStorage, SyncStorage } from 'jotai/vanilla/utils/atomWithStorage';
+
+import { isFunction, isPromise } from '@freik/typechk';
+
 import { IpcCall } from '../Shared/CommonTypes';
 import { AsyncCallback, SyncCallback, Unsubscribe } from './StateTypes';
 

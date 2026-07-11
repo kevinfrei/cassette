@@ -1,3 +1,6 @@
+import { ReactElement, useCallback, useEffect } from 'react';
+import { useAtom } from 'jotai';
+
 import { Button, Slider, SliderProps } from '@fluentui/react-components';
 import {
   Speaker024Filled,
@@ -5,8 +8,7 @@ import {
   Speaker224Filled,
   SpeakerMute24Filled,
 } from '@fluentui/react-icons';
-import { useAtom } from 'jotai';
-import { ReactElement, useCallback, useEffect } from 'react';
+
 import { mutedState, volumeState } from '../State/SongPlayback';
 import { isValidRefObject } from '../Utils';
 

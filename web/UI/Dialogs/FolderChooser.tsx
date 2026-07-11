@@ -1,4 +1,15 @@
 import {
+  ReactElement,
+  Suspense,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+
+import {
   Button,
   createTableColumn,
   DataGrid,
@@ -33,16 +44,7 @@ import {
   Options20Regular,
 } from '@fluentui/react-icons';
 import { isArrayOfString, isNumber } from '@freik/typechk';
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-import {
-  ReactElement,
-  Suspense,
-  use,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+
 import {
   chkFolderContents,
   chkNamedLocations,

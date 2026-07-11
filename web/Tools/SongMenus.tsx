@@ -1,3 +1,6 @@
+import { ReactElement, useCallback } from 'react';
+import { useAtomValue } from 'jotai';
+
 import {
   ContextualMenu,
   ContextualMenuItemType,
@@ -6,8 +9,7 @@ import {
   Point,
 } from '@fluentui/react';
 import { isString } from '@freik/typechk';
-import { useAtomValue } from 'jotai';
-import { ReactElement, useCallback } from 'react';
+
 import { SongKey } from '../Shared/CommonTypes';
 import { songListLikeNumberFromStringFam } from '../State/LikesAndHates';
 import { ErrorBoundary } from './Utilities';
@@ -19,8 +21,7 @@ type SongListMenuArgs = {
   context: SongListMenuData;
   onClearContext: () => void;
   onGetSongList:
-    | ((data: string) => SongKey[])
-    | ((data: string) => Promise<SongKey[]>);
+    ((data: string) => SongKey[]) | ((data: string) => Promise<SongKey[]>);
   onGetPlaylistName?: (data: string) => string;
   items?: (IContextualMenuItem | string)[];
 };

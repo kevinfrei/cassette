@@ -1,6 +1,8 @@
+import { ForwardedRef } from 'react';
+
 import { MakeLog } from '@freik/logger';
 import { hasStrField } from '@freik/typechk';
-import { ForwardedRef } from 'react';
+
 import { FocusSearch } from '../Globals';
 import { CurrentView } from '../Shared/CommonTypes';
 import { MaybePlayNext, MaybePlayPrev } from '../State/API';

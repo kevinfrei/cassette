@@ -1,3 +1,7 @@
+import { ReactElement, Suspense, useCallback, useState } from 'react';
+import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { atomWithReset, useResetAtom } from 'jotai/utils';
+
 import {
   DetailsList,
   IconButton,
@@ -7,17 +11,15 @@ import {
   SelectionMode,
   Text,
 } from '@fluentui/react';
-import { MakeLog } from '@freik/logger';
 import {
   ConfirmationDialog,
   MakeDialogApi,
   TextInputDialog,
 } from '@freik/fluent9-tools';
+import { MakeLog } from '@freik/logger';
 import { useBoolState } from '@freik/react-tools';
 import { hasFieldType, isDefined, isNumber, isUndefined } from '@freik/typechk';
-import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { atomWithReset, useResetAtom } from 'jotai/utils';
-import { ReactElement, Suspense, useCallback, useState } from 'react';
+
 import { PlaylistName, Song, SongKey } from '../../Shared/CommonTypes';
 import { AddSongs, PlaySongs } from '../../State/API';
 import { useJotaiAsyncCallback, useJotaiCallback } from '../../State/Helpers';
@@ -42,6 +44,7 @@ import {
 } from '../../Tools/SongList';
 import { SongListMenu, SongListMenuData } from '../../Tools/SongMenus';
 import { MakeSortKey } from '../../Tools/Sorting';
+
 import './styles/Playlists.css';
 
 const { wrn } = MakeLog('EMP:render:Playlists');

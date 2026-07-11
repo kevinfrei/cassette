@@ -1,5 +1,7 @@
-import { MakeLog } from '@freik/logger';
 import { atomWithStorage } from 'jotai/utils';
+
+import { MakeLog } from '@freik/logger';
+
 import {
   Album,
   AlbumKey,

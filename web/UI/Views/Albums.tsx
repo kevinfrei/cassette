@@ -1,3 +1,7 @@
+import { ReactElement, Suspense, useCallback, useState } from 'react';
+import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { atomWithReset, useResetAtom } from 'jotai/utils';
+
 import {
   DetailsList,
   IconButton,
@@ -12,9 +16,7 @@ import {
 } from '@fluentui/react';
 import { MakeLog } from '@freik/logger';
 import { hasFieldType, isDefined, isNumber } from '@freik/typechk';
-import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { atomWithReset, useResetAtom } from 'jotai/utils';
-import { ReactElement, Suspense, useCallback, useState } from 'react';
+
 import { AlbumKey, CurrentView, Song } from '../../Shared/CommonTypes';
 import { albumByKey, allAlbumsState } from '../../State/Albums';
 import { AddSongs, dataForAlbumByKey } from '../../State/API';
@@ -42,6 +44,7 @@ import {
   SortSongsFromAlbums,
 } from '../../Tools/Sorting';
 import { getAlbumImageUrl, GetIndexOf } from '../../Utils';
+
 import './styles/Albums.css';
 
 const { wrn } = MakeLog('EMP:render:Albums');

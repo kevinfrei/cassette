@@ -1,4 +1,5 @@
 import { isNumber, typecheck } from '@freik/typechk';
+
 import { CurrentView } from './CommonTypes';
 
 export const isCurrentView: typecheck<CurrentView> = (

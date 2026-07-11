@@ -1,4 +1,5 @@
 import { hasField, hasFieldOf, isNumber } from '@freik/typechk';
+
 import { SocketMsg } from '../Shared/CommonTypes';
 import { MyWindow } from '../Types';
 import { SendMessage, WireUpIpc } from './Ipc';

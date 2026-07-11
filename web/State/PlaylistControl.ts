@@ -1,8 +1,10 @@
-import { ArraySetEqual } from '@freik/helpers';
-import { isArrayOfString, isFunction } from '@freik/typechk';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai-family';
 import { RESET } from 'jotai/utils';
+
+import { ArraySetEqual } from '@freik/helpers';
+import { isArrayOfString, isFunction } from '@freik/typechk';
+
 import {
   IpcCall,
   Playlist,

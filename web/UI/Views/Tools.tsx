@@ -1,7 +1,10 @@
+import { ReactElement, useCallback, useState } from 'react';
+
 import { Switch } from '@fluentui/react-components';
 import { Expandable } from '@freik/fluent9-tools';
-import { ReactElement, useCallback, useState } from 'react';
+
 import { TranscoderConfiguration } from './Tools/Transcoder';
+
 import './styles/Tools.css';
 
 export function ToolsView(): ReactElement {

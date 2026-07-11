@@ -1,6 +1,8 @@
-import { Fail } from '@freik/react-tools';
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai-family';
+
+import { Fail } from '@freik/react-tools';
+
 import { Artist, ArtistKey } from '../Shared/CommonTypes';
 import { allAlbumsState } from './Albums';
 import { musicLibraryState } from './MusicLibrary';

@@ -1,3 +1,6 @@
+import { atom } from 'jotai';
+import { atomWithReset } from 'jotai/utils';
+
 import { isSongKey } from '@freik/media-core';
 import { Catch } from '@freik/react-tools';
 import {
@@ -8,8 +11,7 @@ import {
   isString,
   typecheck,
 } from '@freik/typechk';
-import { atom } from 'jotai';
-import { atomWithReset } from 'jotai/utils';
+
 import {
   IgnoreItemPair,
   Song,

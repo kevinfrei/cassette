@@ -1,5 +1,6 @@
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai-family';
+
 import { Album, AlbumKey, SongKey, VAType } from '../Shared/CommonTypes';
 import { albumByKey, allAlbumsState } from './Albums';
 import { artistStringStateFamily } from './Artists';
@@ -70,11 +71,8 @@ export const songDescriptionFromSongKey = atomFamily((sk: SongKey) =>
 );
 
 export const songDescriptionsFromSongList = atomFamily((sks: SongKey[]) =>
-  atom(
-    async (get): Promise<SongDescription[]> =>
-      Promise.all(
-        sks.map((sk: SongKey) => get(songDescriptionFromSongKey(sk))),
-      ),
+  atom(async (get): Promise<SongDescription[]> =>
+    Promise.all(sks.map((sk: SongKey) => get(songDescriptionFromSongKey(sk)))),
   ),
 );
 

@@ -1,5 +1,6 @@
-import { isString } from '@freik/typechk';
 import { ReactElement } from 'react';
+
+import { isString } from '@freik/typechk';
 
 import { useInterval } from './hooks';
 import { RawGetAsText } from './Tools/Ipc';

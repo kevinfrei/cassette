@@ -1,3 +1,5 @@
+import { Dispatch, ReactElement, SetStateAction } from 'react';
+
 import {
   DetailsRow,
   getTheme,
@@ -14,7 +16,7 @@ import {
   TooltipHost,
 } from '@fluentui/react';
 import { hasFieldType, isDefined } from '@freik/typechk';
-import { Dispatch, ReactElement, SetStateAction } from 'react';
+
 import { ArtistKey } from '../Shared/CommonTypes';
 import { SortKey } from './Sorting';
 

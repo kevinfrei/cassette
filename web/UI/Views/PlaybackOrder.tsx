@@ -1,6 +1,8 @@
-import { IDetailsRowProps, Panel, PanelType } from '@fluentui/react';
-import { useAtom, useAtomValue } from 'jotai';
 import { ReactElement } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+
+import { IDetailsRowProps, Panel, PanelType } from '@fluentui/react';
+
 import {
   currentSongIndexState,
   isMiniplayerState,

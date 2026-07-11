@@ -1,3 +1,6 @@
+import { CSSProperties, ReactElement, useCallback, useState } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+
 import {
   Button,
   Dropdown,
@@ -26,8 +29,7 @@ import {
   isString,
   isUndefined,
 } from '@freik/typechk';
-import { useAtom, useAtomValue } from 'jotai';
-import { CSSProperties, ReactElement, useCallback, useState } from 'react';
+
 import { st } from '../../Constants';
 import {
   IgnoreItemType,
@@ -62,6 +64,7 @@ import { PostMain, SendMessage } from '../../Tools/Ipc';
 import { ShowOpenDialog } from '../../Tools/Utilities';
 import { GetHelperText } from '../../Utils';
 import { ToggleSwitch } from './Tools';
+
 import './styles/Settings.css';
 
 const btnWidth: CSSProperties = { width: '155px', padding: 0 };

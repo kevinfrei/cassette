@@ -1,5 +1,6 @@
 import { atom } from 'jotai';
 import { atomWithReset, RESET } from 'jotai/utils';
+
 import { secondsToTime } from '../Utils';
 
 export type MediaTime = {

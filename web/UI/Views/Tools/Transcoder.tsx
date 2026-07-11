@@ -1,3 +1,6 @@
+import { ReactElement, useState } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+
 import {
   DefaultButton,
   Dropdown,
@@ -8,8 +11,7 @@ import {
   TextField,
 } from '@fluentui/react';
 import { isArrayOfString, isDefined } from '@freik/typechk';
-import { useAtom, useAtomValue } from 'jotai';
-import { ReactElement, useState } from 'react';
+
 import {
   chkTranscodeSource,
   IpcCall,
@@ -30,6 +32,7 @@ import {
 import { SendMain } from '../../../Tools/Ipc';
 import { ShowOpenDialog, StringSpinButton } from '../../../Tools/Utilities';
 import { Setter } from '../../../Types';
+import { ToggleSwitch } from '../Tools';
 import {
   AlbumSelector,
   ArtistSelector,
@@ -38,7 +41,6 @@ import {
 import { TranscodeStatus } from './TranscodeStatus';
 
 import '../styles/Tools.css';
-import { ToggleSwitch } from '../Tools';
 
 /*
 const targetFormats: IDropdownOption[] = [

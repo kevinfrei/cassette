@@ -1,3 +1,6 @@
+import { ReactElement, Suspense, useCallback } from 'react';
+import { atom, useAtom, useAtomValue } from 'jotai';
+
 import {
   DetailsList,
   IDetailsRowProps,
@@ -7,8 +10,7 @@ import {
 } from '@fluentui/react';
 import { MakeLog } from '@freik/logger';
 import { isNumber } from '@freik/typechk';
-import { atom, useAtom, useAtomValue } from 'jotai';
-import { ReactElement, Suspense, useCallback } from 'react';
+
 import { Song, SongKey } from '../../Shared/CommonTypes';
 import { allAlbumsState } from '../../State/Albums';
 import { AddSongs } from '../../State/API';

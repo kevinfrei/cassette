@@ -6,7 +6,9 @@
  */
 
 import { StrictMode } from 'react';
+
 import { createRoot } from 'react-dom/client';
+
 import { Ready, WebSocketRegistrar } from './Tools/ReactWebSocket';
 import { App } from './UI/App';
 

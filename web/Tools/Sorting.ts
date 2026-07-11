@@ -2,7 +2,7 @@
 // You can sort groupings & subelems independently, but group *always*
 
 import { IGroup } from '@fluentui/react';
-import { MakeMultiMap, MultiMap, isMultiMapOf } from '@freik/containers';
+import { isMultiMapOf, MakeMultiMap, MultiMap } from '@freik/containers';
 import { Fail } from '@freik/react-tools';
 import {
   isArrayOfString,
@@ -12,6 +12,7 @@ import {
   isString,
   isUndefined,
 } from '@freik/typechk';
+
 import {
   GetArtistStringFromKeys,
   GetArtistStringFromSong,
@@ -91,9 +92,7 @@ export const noArticlesCmp = (a: string, b: string): number =>
 function MakeSortKeyMultiMap(
   initial: string | string[],
   groups?:
-    | string[]
-    | Iterable<[string, Iterable<number>]>
-    | MultiMap<string, number>,
+    string[] | Iterable<[string, Iterable<number>]> | MultiMap<string, number>,
 ): MultiMap<string, number> {
   if (isOneOf(groups, isUndefined, isArrayOfString)) {
     const res = MakeMultiMap<string, number>();
@@ -172,17 +171,13 @@ export function MakeSortKey(initial: string | string[]): SortKey;
 export function MakeSortKey(
   initial: string[],
   groups:
-    | string[]
-    | Iterable<[string, Iterable<number>]>
-    | MultiMap<string, number>,
+    string[] | Iterable<[string, Iterable<number>]> | MultiMap<string, number>,
 ): SortKey;
 // initial: The list of initial sorting
 export function MakeSortKey(
   initial: string[] | string,
   groups?:
-    | string[]
-    | Iterable<[string, Iterable<number>]>
-    | MultiMap<string, number>,
+    string[] | Iterable<[string, Iterable<number>]> | MultiMap<string, number>,
 ): SortKey {
   // grouping is the list of currently specified sorting strings.
   const grouping: string[] = isString(initial) ? [initial] : [...initial];

@@ -1,7 +1,3 @@
-import { Button, Slider, SliderProps, Text } from '@fluentui/react-components';
-import { ListRegular } from '@fluentui/react-icons';
-import { MakeLog } from '@freik/logger';
-import { useAtom, useAtomValue } from 'jotai';
 import {
   ForwardedRef,
   forwardRef,
@@ -9,6 +5,12 @@ import {
   useCallback,
   useEffect,
 } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+
+import { Button, Slider, SliderProps, Text } from '@fluentui/react-components';
+import { ListRegular } from '@fluentui/react-icons';
+import { MakeLog } from '@freik/logger';
+
 import { MaybePlayNext } from '../State/API';
 import { useJotaiAsyncCallback } from '../State/Helpers';
 import {
@@ -36,6 +38,7 @@ import { mySliderStyles } from '../Tools/Utilities';
 import { isValidRefObject } from '../Utils';
 import { SongDetailClick } from './DetailPanel/Clickers';
 import { onClickPlayPause } from './PlaybackControls';
+
 /*
 import { mySliderStyles } from './Utilities';
 */

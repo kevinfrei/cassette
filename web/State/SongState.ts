@@ -1,5 +1,6 @@
 import { atom } from 'jotai';
 import { atomFamily } from 'jotai-family';
+
 import { SongKey } from '../Shared/CommonTypes';
 import { albumByKey } from './Albums';
 import { artistStringStateFamily } from './Artists';
@@ -48,10 +49,7 @@ export const songDescriptionForSongState = atomFamily((songKey: SongKey) =>
 );
 
 export const songDescriptionsForSongList = atomFamily((sks: SongKey[]) =>
-  atom(
-    async (get): Promise<SongDescription[]> =>
-      Promise.all(
-        sks.map((sk: SongKey) => get(songDescriptionForSongState(sk))),
-      ),
+  atom(async (get): Promise<SongDescription[]> =>
+    Promise.all(sks.map((sk: SongKey) => get(songDescriptionForSongState(sk)))),
   ),
 );

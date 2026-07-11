@@ -1,3 +1,6 @@
+import { ReactElement, useCallback, useState } from 'react';
+import { atom, useAtom, useAtomValue } from 'jotai';
+
 import {
   DefaultButton,
   DetailsList,
@@ -14,6 +17,7 @@ import {
   Text,
   TooltipHost,
 } from '@fluentui/react';
+import { Button } from '@fluentui/react-components';
 import {
   ConfirmationDialog,
   MakeDialogApi,
@@ -22,8 +26,7 @@ import {
 import { MakeLog } from '@freik/logger';
 import { useBoolState } from '@freik/react-tools';
 import { isNumber } from '@freik/typechk';
-import { atom, useAtom, useAtomValue } from 'jotai';
-import { ReactElement, useCallback, useState } from 'react';
+
 import {
   Album,
   AlbumKey,
@@ -63,7 +66,6 @@ import { SortKey, SortSongList } from '../../Tools/Sorting';
 import { GetHelperText, isPlaylistName } from '../../Utils';
 import { LikeOrHate } from '../Liker';
 
-import { Button } from '@fluentui/react-components';
 import './styles/NowPlaying.css';
 
 const { wrn } = MakeLog('EMP:render:NowPlaying');

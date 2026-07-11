@@ -1,5 +1,6 @@
 import { Atom, atom } from 'jotai';
 import { atomFamily } from 'jotai-family';
+
 import { CurrentView } from '../Shared/CommonTypes';
 import { curViewState } from './CurrentView';
 

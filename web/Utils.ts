@@ -1,4 +1,6 @@
 // This is for getting at "global" stuff from the window object
+import { ForwardedRef } from 'react';
+
 import { RefObject } from '@fluentui/react';
 import { MakeLog } from '@freik/logger';
 import {
@@ -9,7 +11,7 @@ import {
   isObjectNonNull,
   isString,
 } from '@freik/typechk';
-import { ForwardedRef } from 'react';
+
 import { AlbumKey, ArtistKey, Keys, PlaylistName } from './Shared/CommonTypes';
 import { SongInfo } from './Types';
 

@@ -1,4 +1,5 @@
 import { isArrayOfString, isBoolean, isNumber, isString } from '@freik/typechk';
+
 import { StorageId } from '../Shared/CommonTypes';
 import { atomWithMainStorage } from './Storage';
 

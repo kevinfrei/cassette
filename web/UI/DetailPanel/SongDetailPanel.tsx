@@ -1,8 +1,10 @@
-import { ContextualMenu, Dialog, DialogType } from '@fluentui/react';
-import { SpinSuspense } from '@freik/fluent9-tools';
+import { ReactElement } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 import { RESET } from 'jotai/utils';
-import { ReactElement } from 'react';
+
+import { ContextualMenu, Dialog, DialogType } from '@fluentui/react';
+import { SpinSuspense } from '@freik/fluent9-tools';
+
 import { maybeDataForSongFunc } from '../../State/DisplayData';
 import { songDetailState } from '../../State/SongPlayback';
 import { MediaInfoTable } from './MediaInfo';

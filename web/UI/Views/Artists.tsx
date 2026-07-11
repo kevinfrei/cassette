@@ -1,3 +1,7 @@
+import { ReactElement, Suspense, useCallback, useState } from 'react';
+import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { atomWithReset, useResetAtom } from 'jotai/utils';
+
 import {
   DetailsList,
   IconButton,
@@ -11,9 +15,7 @@ import {
   Text,
 } from '@fluentui/react';
 import { MakeLog } from '@freik/logger';
-import { atom as jatom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { atomWithReset, useResetAtom } from 'jotai/utils';
-import { ReactElement, Suspense, useCallback, useState } from 'react';
+
 import {
   Album,
   AlbumKey,

@@ -1,3 +1,6 @@
+import { ReactElement } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+
 import {
   DetailsList,
   IColumn,
@@ -7,8 +10,7 @@ import {
 import { Expandable } from '@freik/fluent9-tools';
 import { SongKey } from '@freik/media-core';
 import { isArray, isString } from '@freik/typechk';
-import { useAtom, useAtomValue } from 'jotai';
-import { ReactElement } from 'react';
+
 import { IpcCall } from '../../Shared/CommonTypes';
 import { albumByKey } from '../../State/Albums';
 import { artistStringStateFamily } from '../../State/Artists';

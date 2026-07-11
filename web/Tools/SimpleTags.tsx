@@ -1,6 +1,8 @@
-import { hasFieldType, isArrayOfString } from '@freik/typechk';
-import { useAtomValue } from 'jotai';
 import { ReactElement } from 'react';
+import { useAtomValue } from 'jotai';
+
+import { hasFieldType, isArrayOfString } from '@freik/typechk';
+
 import { AlbumKey, ArtistKey, Song } from '../Shared/CommonTypes';
 import { albumByKey } from '../State/Albums';
 import { artistStringStateFamily } from '../State/Artists';

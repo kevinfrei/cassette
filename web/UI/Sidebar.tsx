@@ -1,7 +1,9 @@
+import { ReactElement, useCallback } from 'react';
+import { useAtom } from 'jotai';
+
 import { FontIcon, SearchBox, Text } from '@fluentui/react';
 import { hasStrField, isObjectNonNull } from '@freik/typechk';
-import { useAtom } from 'jotai';
-import { ReactElement, useCallback } from 'react';
+
 import { st } from '../Constants';
 import { SetSearch } from '../Globals';
 import { CurrentView, Keys, StrId } from '../Shared/CommonTypes';

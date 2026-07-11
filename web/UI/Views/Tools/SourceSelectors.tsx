@@ -1,7 +1,9 @@
+import { ReactElement } from 'react';
+import { useAtom, useAtomValue } from 'jotai';
+
 import { ComboBox, IComboBox, IComboBoxOption } from '@fluentui/react';
 import { isDefined, isString } from '@freik/typechk';
-import { useAtom, useAtomValue } from 'jotai';
-import { ReactElement } from 'react';
+
 import {
   AlbumKey,
   Artist,

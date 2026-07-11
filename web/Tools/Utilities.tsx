@@ -1,4 +1,16 @@
 import {
+  Component,
+  CSSProperties,
+  ForwardedRef,
+  ReactElement,
+  SyntheticEvent,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+
+import {
   ISliderStyles,
   ISpinButtonStyleProps,
   ISpinButtonStyles,
@@ -15,17 +27,7 @@ import {
   isString,
   isUndefined,
 } from '@freik/typechk';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import {
-  Component,
-  CSSProperties,
-  ForwardedRef,
-  ReactElement,
-  SyntheticEvent,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+
 import { IpcCall, OpenDialogOptions } from '../Shared/CommonTypes';
 import { keyBufferState } from '../State/KeyBuffer';
 import { saveableState } from '../State/PlaylistControl';

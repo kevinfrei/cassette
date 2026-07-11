@@ -1,4 +1,5 @@
 import { isDefined } from '@freik/typechk';
+
 import { Album, AlbumKey, Artist, ArtistKey, Song } from './Shared/CommonTypes';
 
 export type SongData = {

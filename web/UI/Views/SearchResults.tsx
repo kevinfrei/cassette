@@ -1,3 +1,6 @@
+import { ReactElement, useCallback, useState } from 'react';
+import { useAtomValue } from 'jotai';
+
 import {
   DetailsList,
   IconButton,
@@ -10,8 +13,7 @@ import {
 } from '@fluentui/react';
 import { MakeLog } from '@freik/logger';
 import { hasFieldType, isBoolean } from '@freik/typechk';
-import { useAtomValue } from 'jotai';
-import { ReactElement, useCallback, useState } from 'react';
+
 import { GetDataForSong, SongData } from '../../DataSchema';
 import {
   Album,

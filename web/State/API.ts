@@ -8,10 +8,12 @@
  *  false otherwise
  */
 
-import { isNumber } from '@freik/typechk';
 import { atom, Atom } from 'jotai';
 import { atomFamily, AtomFamily } from 'jotai-family';
 import { RESET } from 'jotai/utils';
+
+import { isNumber } from '@freik/typechk';
+
 import { AlbumKey, PlaylistName, SongKey, VAType } from '../Shared/CommonTypes';
 import { isPlaylistName, ShuffleArray } from '../Utils';
 import { albumByKey, maybeAlbumByKey } from './Albums';

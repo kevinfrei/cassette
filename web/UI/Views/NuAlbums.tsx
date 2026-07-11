@@ -1,3 +1,6 @@
+import { ReactElement, useCallback, useRef } from 'react';
+import { useAtomValue } from 'jotai';
+
 import {
   getTheme,
   IRectangle,
@@ -5,12 +8,12 @@ import {
   List,
   mergeStyleSets,
 } from '@fluentui/react';
-import { useAtomValue } from 'jotai';
-import { ReactElement, useCallback, useRef } from 'react';
+
 import { Album } from '../../Shared/CommonTypes';
 import { allAlbumsState } from '../../State/Albums';
 import { dataForAlbumByKey } from '../../State/API';
 import { getAlbumImageUrl } from '../../Utils';
+
 import './styles/Albums.css';
 
 const theme: ITheme = getTheme();
