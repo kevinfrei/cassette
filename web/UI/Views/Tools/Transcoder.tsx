@@ -1,15 +1,16 @@
 import { ReactElement, useState } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 
+import { IComboBoxOption, IDropdownOption } from '@fluentui/react';
 import {
-  DefaultButton,
+  Button,
   Dropdown,
-  IComboBoxOption,
-  IDropdownOption,
-  Position,
+  Input,
+  Label,
+  SpinButton,
+  SpinButtonProps,
   Text,
-  TextField,
-} from '@fluentui/react';
+} from '@fluentui/react-components';
 import { isArrayOfString, isDefined } from '@freik/typechk';
 
 import {
@@ -42,6 +43,11 @@ import { TranscodeStatus } from './TranscodeStatus';
 
 import '../styles/Tools.css';
 
+import {
+  MoreCircle20Filled,
+  MoreHorizontal20Regular,
+} from '@fluentui/react-icons';
+
 /*
 const targetFormats: IDropdownOption[] = [
   { key: 'm4a', text: 'm4a' },
@@ -69,6 +75,8 @@ function getDir(setter: Setter<string>, setError: Setter<string>) {
     });
 }
 
+const BITRATE_LOW = 64;
+const BITRATE_HIGH = 320;
 export function TranscoderConfiguration(): ReactElement {
   const copyArtwork = useState(false);
   const mirror = useState(false);
@@ -76,16 +84,31 @@ export function TranscoderConfiguration(): ReactElement {
   const [srcDirLoc, setSrcDirLoc] = useAtom(sourceLocationDirState);
   const [dstLoc, setDstLoc] = useAtom(destLocationState);
   const [err, setError] = useState('');
-  const bitrate = useAtomValue(xcodeBitRateState);
+  const [bitrate, setBitrate] = useAtom(xcodeBitRateState);
+  const [displayBitrate, setDisplayBitrate] = useState(`${bitrate} Kbps`);
   const validSource = useAtomValue(validSourceState);
   const srcLocDescr = useAtomValue(sourceLocationState);
   // const [targetFormat, setTargetFormat] = useState<IDropdownOption>(targetFormats[0]);
   // const xcodeStatus = <TranscodeSummary />;
 
-  const onChange = useJotaiCallback(
-    (get, set, numVal?: number) => {
-      if (isDefined(numVal)) {
-        set(xcodeBitRateState, numVal);
+  const onBitrateChange: SpinButtonProps['onChange'] = useJotaiCallback(
+    (get, set, _ev, data) => {
+      if (data.value !== undefined && data.value !== null) {
+        const val = Math.max(BITRATE_LOW, Math.min(data.value, BITRATE_HIGH));
+        setBitrate(val);
+        setDisplayBitrate(`${val} Kbps`);
+      } else if (data.displayValue !== undefined) {
+        const newValue = Number.parseInt(data.displayValue, 10);
+        if (!Number.isNaN(newValue)) {
+          const val = Math.max(BITRATE_LOW, Math.min(newValue, BITRATE_HIGH));
+          setBitrate(val);
+          setDisplayBitrate(`${val} Kbps`);
+        } else {
+          // Display a "special" value when user types something
+          // that's not parsable as a number.
+          setBitrate(128);
+          setDisplayBitrate('128 Kbps');
+        }
       }
     },
     [xcodeBitRateState],
@@ -117,14 +140,20 @@ export function TranscoderConfiguration(): ReactElement {
     case TranscodeSource.Disk:
     default:
       xcodeSrcLocElem = (
-        <TextField
+        <Input
           value={srcDirLoc}
           readOnly
           required
-          onClick={() => {
-            getDir(setSrcDirLoc, setError);
-          }}
-          iconProps={{ iconName: 'More' }}
+          contentAfter={
+            <Button
+              size="small"
+              appearance="transparent"
+              onClick={() => {
+                getDir(setSrcDirLoc, setError);
+              }}>
+              <MoreHorizontal20Regular />
+            </Button>
+          }
         />
       );
       break;
@@ -133,7 +162,7 @@ export function TranscoderConfiguration(): ReactElement {
   // https://stackoverflow.com/questions/17798709/ffmpeg-how-to-embed-cover-art-image-to-m4a
   return (
     <>
-      <Text variant="mediumPlus">
+      <Text size={400}>
         Transcode (downsample) audio files into a particular directory.
       </Text>
       <div id="xcode-source-area">
@@ -145,37 +174,47 @@ export function TranscoderConfiguration(): ReactElement {
         />
         {xcodeSrcLocElem}
       </div>
-      <TextField
-        label="Destination"
+      <Label weight="semibold" htmlFor="dstLoc">
+        Destination
+      </Label>
+      <Input
+        id="dstLoc"
         value={dstLoc}
         readOnly
         required
-        onClick={() => getDir(setDstLoc, setError)}
-        iconProps={{ iconName: 'More' }}
+        contentAfter={
+          <Button
+            size="small"
+            appearance="transparent"
+            onClick={() => getDir(setDstLoc, setError)}>
+            <MoreHorizontal20Regular />
+          </Button>
+        }
       />
       <div id="xcode-options">
-        <StringSpinButton
-          label="Target Bit Rate"
-          value={bitrate}
-          filter={(val: string) => {
-            const numericValue = parseInt(val.trim(), 10);
-            return isNaN(numericValue) ? undefined : numericValue;
-          }}
-          format={(val: number) => `${val} Kbps`}
-          onChange={onChange}
-          min={64}
-          max={320}
-          step={4}
-          labelPosition={Position.top}
-        />
+        <div>
+          <Label weight="semibold" htmlFor="bitrate-spinbutton">
+            Target Bit Rate
+          </Label>
+          <SpinButton
+            id="bitrate-spinbutton"
+            value={bitrate}
+            displayValue={displayBitrate}
+            onChange={onBitrateChange}
+            min={BITRATE_LOW}
+            max={BITRATE_HIGH}
+            step={4}
+            stepPage={16}
+          />
+        </div>
         <ToggleSwitch label="Copy artwork (NYI) " use={copyArtwork} />
         <ToggleSwitch
           label={'Mirror Source WARNING: May delete files!'}
           use={mirror}
         />
-        <DefaultButton
+        <Button
+          appearance="primary"
           id="transcode-button"
-          text="Transcode"
           disabled={!validSource || dstLoc.length === 0}
           onClick={() => {
             SendMain(IpcCall.TranscodingBegin, {
@@ -186,8 +225,9 @@ export function TranscoderConfiguration(): ReactElement {
               format: 'm4a',
               bitrate: bitrate * 1024,
             });
-          }}
-        />
+          }}>
+          Transcode
+        </Button>
       </div>
       <div>{err}</div>
       <TranscodeStatus />
