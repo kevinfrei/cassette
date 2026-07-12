@@ -1,5 +1,6 @@
 // This is for getting at "global" stuff from the window object
 import { MakeLog } from '@freik/logger';
+
 import { Keys } from './Shared/CommonTypes';
 
 const { log } = MakeLog('EMP:render:Tools');

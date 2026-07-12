@@ -1,5 +1,3 @@
-import { MakeLog } from '@freik/logger';
-import { chkAnyOf, isArrayOfString, isString } from '@freik/typechk';
 import {
   Component,
   ForwardedRef,
@@ -8,6 +6,10 @@ import {
   useRef,
   useState,
 } from 'react';
+
+import { MakeLog } from '@freik/logger';
+import { chkAnyOf, isArrayOfString, isString } from '@freik/typechk';
+
 import { IpcCall, OpenDialogOptions } from '../Shared/CommonTypes';
 import { CallMain } from './Ipc';
 

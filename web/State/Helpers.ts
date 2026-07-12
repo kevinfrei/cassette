@@ -1,6 +1,6 @@
+import { useCallback } from 'react';
 import { Atom, Getter, Setter, useSetAtom } from 'jotai';
 import { useAtomCallback } from 'jotai/utils';
-import { useCallback } from 'react';
 
 export function AsyncHandler<Args extends unknown[], Res>(
   fn: (...args: Args) => Promise<Res>,

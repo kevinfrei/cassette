@@ -14,6 +14,7 @@ import {
   typecheck,
   Unpickle,
 } from '@freik/typechk';
+
 import { chkSocketMsg, IpcCall, SocketMsg } from '../Shared/CommonTypes';
 import { ListenKey, MyWindow } from '../Types';
 

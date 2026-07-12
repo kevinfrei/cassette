@@ -1,7 +1,10 @@
-import { Expandable } from '@freik/fluent9-tools';
 import { ReactElement, Suspense, useState } from 'react';
+
+import { Expandable } from '@freik/fluent9-tools';
+
 import { ErrorBoundary } from '../../Tools/Utilities';
 import { FolderChooser } from '../Dialogs/FolderChooser';
+
 import './styles/Tools.css';
 
 export function ToolsView(): ReactElement {

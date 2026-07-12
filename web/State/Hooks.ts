@@ -1,6 +1,8 @@
-import { BoolState } from '@freik/react-tools';
-import { PrimitiveAtom, WritableAtom, atom, useAtom } from 'jotai';
+import { atom, PrimitiveAtom, useAtom, WritableAtom } from 'jotai';
 import { atomFamily } from 'jotai-family';
+
+import { BoolState } from '@freik/react-tools';
+
 import { SetAtomFamily, WritableAtomType } from './StateTypes';
 
 export function useJotaiBoolState(atm: WritableAtomType<boolean>): BoolState {

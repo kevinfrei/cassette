@@ -15,9 +15,9 @@ import {
   SEnum,
   str,
   Types,
+  u8,
   u16,
   u64,
-  u8,
 } from 'crow-idl/IDL';
 
 const CurrentView: NEnum = enum_num(num(), {

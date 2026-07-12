@@ -1,6 +1,8 @@
-import { hasStrField, isObjectNonNull } from '@freik/typechk';
-import { useAtom } from 'jotai';
 import { ReactElement } from 'react';
+import { useAtom } from 'jotai';
+
+import { hasStrField, isObjectNonNull } from '@freik/typechk';
+
 import { st } from '../Constants';
 import { CurrentView, Keys, StrId } from '../Shared/CommonTypes';
 import { curViewState } from '../State/CurrentView';

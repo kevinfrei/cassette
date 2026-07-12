@@ -3,9 +3,7 @@ import { atomFamily } from 'jotai-family';
 import { RESET } from 'jotai/utils';
 
 export type SetStateActionWithReset<T> =
-  | T
-  | typeof RESET
-  | ((prev: T) => T | typeof RESET);
+  T | typeof RESET | ((prev: T) => T | typeof RESET);
 
 export type SetStateAction<T> = T | ((prev: T) => T);
 

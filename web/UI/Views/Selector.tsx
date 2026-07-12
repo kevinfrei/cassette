@@ -1,5 +1,6 @@
-import { useAtomValue } from 'jotai';
 import { CSSProperties, ReactElement, useState } from 'react';
+import { useAtomValue } from 'jotai';
+
 import { CurrentView } from '../../Shared/CommonTypes';
 import { curViewState } from '../../State/CurrentView';
 import { SettingsView } from './Settings';

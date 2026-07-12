@@ -1,6 +1,8 @@
-import { FluentProvider, webLightTheme } from '@fluentui/react-components';
-import { Provider } from 'jotai';
 import { ReactElement } from 'react';
+import { Provider } from 'jotai';
+
+import { FluentProvider, webLightTheme } from '@fluentui/react-components';
+
 import { KeepAlive } from '../KeepAlive';
 import { getStore } from '../State/Storage';
 import { Sidebar } from './Sidebar';
