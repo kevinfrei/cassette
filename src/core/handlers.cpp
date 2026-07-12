@@ -210,6 +210,10 @@ void initialize_default_apis() {
                  files::get_named_locations);
   register_route(Shared::IpcCall::GetFolderContents,
                  files::get_folder_contents);
+  register_route(Shared::IpcCall::GetMusicDatabase, tunes::get_flat_music_db);
+  register_route(Shared::IpcCall::GetPlaylists, playlist::get_names);
+  register_route(Shared::IpcCall::LoadPlaylist, playlist::load);
+  register_route(Shared::IpcCall::SavePlaylist, playlist::save);
 }
 
 // The URL comes in looking like this:

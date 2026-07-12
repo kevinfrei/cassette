@@ -307,15 +307,45 @@ std::optional<fs::path> MusicDatabase::get_song_path(
   return it->second.path;
 }
 
-const Shared::MusicDatabase& MusicDatabase::get_flat_database() {
+const Shared::FlatMusicDatabase& MusicDatabase::get_flat_database() {
+  static Shared::FlatMusicDatabase flat_db;
+  // std::cout << "Building flat music database..." << std::endl;
   flat_db.songs.clear();
   flat_db.albums.clear();
   flat_db.artists.clear();
-  flat_db.songs.insert(songs.begin(), songs.end());
-  flat_db.albums = albums;
-  flat_db.artists = artists;
-  // NYI: playlists
+  flat_db.songs.reserve(songs.size());
+  for (const auto& [key, song] : songs) {
+    flat_db.songs.push_back(song);
+  }
+  flat_db.albums.reserve(albums.size());
+  for (const auto& [key, album] : albums) {
+    flat_db.albums.push_back(album);
+  }
+  flat_db.artists.reserve(artists.size());
+  for (const auto& [key, artist] : artists) {
+    flat_db.artists.push_back(artist);
+  }
+  // std::cout << "Done building flat music database:" << flat_db.songs.size()
+  // << " songs, " << flat_db.albums.size() << " albums, " <<
+  // flat_db.artists.size() << " artists." << std::endl; NYI: playlists
   return flat_db;
+}
+
+const Shared::MusicDatabase& MusicDatabase::get_music_database() {
+  static Shared::MusicDatabase db;
+  // std::cout << "Building music database..." << std::endl;
+  db.songs.clear();
+  db.albums.clear();
+  db.artists.clear();
+  for (const auto& [key, song] : songs) {
+    db.songs[key] = song;
+  }
+  db.albums = albums;
+  db.artists = artists;
+  // std::cout << "Done building music database:" << db.songs.size() << " songs,
+  // " << db.albums.size() << " albums, " << db.artists.size() << " artists." <<
+  // std::endl;
+  return db;
 }
 
 } // namespace musicdb

@@ -133,7 +133,7 @@ function TopLine(): ReactElement {
             disabled={emptyQueue}
             style={{ width: 120 }}
             onClick={saveAsApi.openDialog}>
-            Save pAs...
+            Save As...
           </Button>
         </TextInputDialog>
         <ConfirmationDialog

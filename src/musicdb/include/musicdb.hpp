@@ -129,7 +129,8 @@ class MusicDatabase {
   std::vector<Shared::IgnoreItemPair> get_ignore_items() const;
 
   // For all the 'parsed' data
-  const Shared::MusicDatabase& get_flat_database();
+  const Shared::FlatMusicDatabase& get_flat_database();
+  const Shared::MusicDatabase& get_music_database();
 
   // Loading from/saving to persistence
   bool load();

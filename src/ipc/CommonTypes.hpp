@@ -2058,6 +2058,12 @@ struct MusicDatabase {
   std::unordered_map<SongKey, Song> songs;
 };
 
+struct FlatMusicDatabase {
+  std::vector<Artist> artists;
+  std::vector<Album> albums;
+  std::vector<Song> songs;
+};
+
 struct SearchResults {
   std::vector<SongKey> songs;
   std::vector<ArtistKey> artists;
@@ -3247,6 +3253,53 @@ inline std::optional<Shared::MusicDatabase> from_json<Shared::MusicDatabase>(
   return _res;
 }
 #pragma endregion JSON serialization for object MusicDatabase
+
+#pragma region JSON serialization for object FlatMusicDatabase
+template <>
+struct impl_to_json<Shared::FlatMusicDatabase> {
+  static inline crow::json::wvalue process(
+      const Shared::FlatMusicDatabase& _value) {
+    crow::json::wvalue _res;
+    _res["artists"] = to_json(_value.artists);
+    _res["albums"] = to_json(_value.albums);
+    _res["songs"] = to_json(_value.songs);
+
+    return _res;
+  }
+};
+
+template <>
+inline std::optional<Shared::FlatMusicDatabase>
+from_json<Shared::FlatMusicDatabase>(const crow::json::rvalue& _value) {
+  if (_value.t() != crow::json::type::Object)
+    return std::nullopt;
+  Shared::FlatMusicDatabase _res;
+
+  if (!_value.has("artists"))
+    return std::nullopt;
+  auto _artists_opt_ =
+      from_json<std::vector<Shared::Artist>>(_value["artists"]);
+  if (!_artists_opt_.has_value())
+    return std::nullopt;
+  _res.artists = std::move(*_artists_opt_);
+
+  if (!_value.has("albums"))
+    return std::nullopt;
+  auto _albums_opt_ = from_json<std::vector<Shared::Album>>(_value["albums"]);
+  if (!_albums_opt_.has_value())
+    return std::nullopt;
+  _res.albums = std::move(*_albums_opt_);
+
+  if (!_value.has("songs"))
+    return std::nullopt;
+  auto _songs_opt_ = from_json<std::vector<Shared::Song>>(_value["songs"]);
+  if (!_songs_opt_.has_value())
+    return std::nullopt;
+  _res.songs = std::move(*_songs_opt_);
+
+  return _res;
+}
+#pragma endregion JSON serialization for object FlatMusicDatabase
 
 #pragma region JSON serialization for object SearchResults
 template <>

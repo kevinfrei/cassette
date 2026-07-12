@@ -331,7 +331,7 @@ function ArtworkSettings(): ReactElement {
 }
 
 export function SettingsView(): ReactElement {
-  const [Data, setData] = useState<string>('<uninitialized>');
+  // const [Data, setData] = useState<string>('<uninitialized>');
   return (
     <div className="settings-view">
       <Expandable separator label="Music Locations" defaultShow={true}>
@@ -367,7 +367,7 @@ export function SettingsView(): ReactElement {
             onClick={() => PostMain(IpcCall.ClearLocalOverrides)}>
             Clear Local Overrides
           </Button>
-          <Button
+          {/* <Button
             style={btnWidth}
             onClick={() => {
               const odo: OpenDialogOptions = {
@@ -391,7 +391,7 @@ export function SettingsView(): ReactElement {
             }}>
             Show Open File Dialog
           </Button>
-          <div>{Data}</div>
+          <div>{Data}</div> */}
         </>
       </Expandable>
     </div>

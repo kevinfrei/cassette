@@ -30,6 +30,12 @@ std::optional<fs::path> get_tune(const std::string& song_key) {
 }
 
 const Shared::MusicDatabase& get_music_db() {
+  // std::cout << "[API] Getting music database..." << std::endl;
+  return musicdb::get().get_music_database();
+}
+
+const Shared::FlatMusicDatabase& get_flat_music_db() {
+  // std::cout << "[API] Getting flat music database..." << std::endl;
   return musicdb::get().get_flat_database();
 }
 

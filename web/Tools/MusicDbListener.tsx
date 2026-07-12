@@ -11,16 +11,18 @@ import { Subscribe, Unsubscribe } from './Ipc';
 
 export function MusicDbListener(): ReactElement {
   useEffect(() => {
+    console.error('Registering MusicDbListener');
     const lk = Subscribe(
       SocketMsg.MusicDBUpdate,
       chkMusicDatabase,
       (data: MusicDatabase) => {
         // Handle the updated music database here
-        console.log('Received MusicDBUpdate:', data);
+        console.error('Received MusicDBUpdate:', data);
         // You can update your state or perform other actions as needed
       },
     );
     return () => {
+      console.error('Unregistering MusicDbListener');
       Unsubscribe(lk);
     };
   });

@@ -60,10 +60,7 @@ export const allPlaylistsState = atom(
           await PostMain(IpcCall.DeletePlaylist, key);
         }),
         ...toAdd.map(async (key) => {
-          await PostMain(IpcCall.SavePlaylist, {
-            name: key,
-            songs: newVal.get(key),
-          });
+          await PostMain(IpcCall.SavePlaylist, key, newVal.get(key));
         }),
       ]);
     }

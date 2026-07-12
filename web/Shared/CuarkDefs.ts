@@ -460,6 +460,7 @@ export const TypesToGenerate: Record<string, Types> = {
   FullMetadata,
   AudioFileRegexPattern,
   MusicDatabase,
+  FlatMusicDatabase,
   SearchResults,
 };
 

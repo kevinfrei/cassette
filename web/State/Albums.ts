@@ -8,6 +8,7 @@ import { musicLibraryState } from './MusicLibrary';
 import { maybeSongByKey } from './Songs';
 
 export const allAlbumsState = atom(async (get) => {
+  console.error('Getting All Albums');
   return (await get(musicLibraryState)).albums as Map<AlbumKey, Album>;
 });
 

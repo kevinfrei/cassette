@@ -25,6 +25,7 @@ export const onlyPlayLikesState = atomWithMainStorage(
   isBoolean,
 );
 
+/*
 const songLikeBackerState = atomWithTranslatedStorageInMain(
   StorageId.LikedSongs,
   new Set<SongKey>(),
@@ -32,7 +33,10 @@ const songLikeBackerState = atomWithTranslatedStorageInMain(
   (val: Set<string>) => [...val],
   (val: string[]) => new Set<string>(val),
 );
+*/
+const songLikeBackerState = atom<Set<SongKey>>(new Set<SongKey>());
 
+/*
 const songHateBackerState = atomWithTranslatedStorageInMain(
   StorageId.HatedSongs,
   new Set<SongKey>(),
@@ -40,6 +44,8 @@ const songHateBackerState = atomWithTranslatedStorageInMain(
   (val: Set<string>) => [...val],
   (val: string[]) => new Set<string>(val),
 );
+*/
+const songHateBackerState = atom<Set<SongKey>>(new Set<SongKey>());
 
 export const isSongLikedFam = atomFamily((key: SongKey) =>
   atom(

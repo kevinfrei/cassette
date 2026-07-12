@@ -625,6 +625,21 @@ export const chkMusicDatabase: TC.typecheck<MusicDatabase> = TC.chkObjectOfType(
   {},
 );
 
+export type FlatMusicDatabase = {
+  artists: Artist[];
+  albums: Album[];
+  songs: Song[];
+};
+export const chkFlatMusicDatabase: TC.typecheck<FlatMusicDatabase> =
+  TC.chkObjectOfType(
+    {
+      artists: TC.chkArrayOf(chkArtist),
+      albums: TC.chkArrayOf(chkAlbum),
+      songs: TC.chkArrayOf(chkSong),
+    },
+    {},
+  );
+
 export type SearchResults = {
   songs: SongKey[];
   artists: ArtistKey[];

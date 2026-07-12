@@ -47,8 +47,8 @@ void marshall_response(crow::response& resp, T&& result) {
   using RawT = std::decay_t<T>;
   if constexpr (is_optional_v<RawT>) {
     if (!result) {
-      resp.set_header("Content-Type", "application/json");
-      resp.body = "null";
+      resp.set_header("Content-Type", "text/plain");
+      resp.body = "";
     } else {
       // Recursively unwrap the value inside the optional
       return marshall_response(resp, std::move(*result));
@@ -96,7 +96,10 @@ void Execute(crow::response& resp, std::string_view path, Func&& handle_call) {
     count++;
   }
   if (count != ArgCount) {
-    tools::e404(resp, "Missing parameters from " + std::string(path));
+    tools::e404(resp,
+                "Missing parameters from " + std::string(path) + " (expected " +
+                    std::to_string(ArgCount) + ", got " +
+                    std::to_string(count) + ")" + " for " + std::string(path));
     return;
   }
 

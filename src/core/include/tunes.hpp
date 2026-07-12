@@ -12,6 +12,7 @@ namespace tunes {
 
 std::optional<std::filesystem::path> get_tune(const std::string& path);
 const Shared::MusicDatabase& get_music_db();
+const Shared::FlatMusicDatabase& get_flat_music_db();
 void send_music_db(crow::websocket::connection& conn);
 
 } // namespace tunes
