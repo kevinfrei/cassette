@@ -1,23 +1,21 @@
-import { ReactElement, useState } from 'react';
+import { ReactElement, useCallback, useState } from 'react';
 import { useAtom, useAtomValue } from 'jotai';
 
-import { IComboBoxOption, IDropdownOption } from '@fluentui/react';
 import {
   Button,
   Dropdown,
+  DropdownProps,
   Input,
   Label,
+  Option,
   SpinButton,
   SpinButtonProps,
   Text,
 } from '@fluentui/react-components';
-import { isArrayOfString, isDefined } from '@freik/typechk';
+import { MoreHorizontal20Regular } from '@fluentui/react-icons';
+import { isArrayOfString } from '@freik/typechk';
 
-import {
-  chkTranscodeSource,
-  IpcCall,
-  TranscodeSource,
-} from '../../../Shared/CommonTypes';
+import { IpcCall, TranscodeSource } from '../../../Shared/CommonTypes';
 import { useJotaiCallback } from '../../../State/Helpers';
 import {
   destLocationState,
@@ -43,11 +41,6 @@ import { TranscodeStatus } from './TranscodeStatus';
 
 import '../styles/Tools.css';
 
-import {
-  MoreCircle20Filled,
-  MoreHorizontal20Regular,
-} from '@fluentui/react-icons';
-
 /*
 const targetFormats: IDropdownOption[] = [
   { key: 'm4a', text: 'm4a' },
@@ -56,12 +49,12 @@ const targetFormats: IDropdownOption[] = [
 ];
 */
 
-const sourceOptions: IComboBoxOption[] = [
-  { key: TranscodeSource.Playlist, text: 'Playlist' },
-  { key: TranscodeSource.Artist, text: 'Artist' },
-  { key: TranscodeSource.Album, text: 'Album' },
-  { key: TranscodeSource.Disk, text: 'Disk location' },
-];
+const sourceOptions: Map<TranscodeSource, string> = new Map([
+  [TranscodeSource.Playlist, 'Playlist'],
+  [TranscodeSource.Artist, 'Artist'],
+  [TranscodeSource.Album, 'Album'],
+  [TranscodeSource.Disk, 'Disk location'],
+]);
 
 function getDir(setter: Setter<string>, setError: Setter<string>) {
   ShowOpenDialog({ folder: true, title: 'Select a directory' })
@@ -81,6 +74,7 @@ export function TranscoderConfiguration(): ReactElement {
   const copyArtwork = useState(false);
   const mirror = useState(false);
   const [srcLocType, setSrcLocType] = useAtom(sourceLocationTypeState);
+  const [selSrcLocTypes, setSelSrcLocTypes] = useState<TranscodeSource[]>([]);
   const [srcDirLoc, setSrcDirLoc] = useAtom(sourceLocationDirState);
   const [dstLoc, setDstLoc] = useAtom(destLocationState);
   const [err, setError] = useState('');
@@ -114,14 +108,18 @@ export function TranscoderConfiguration(): ReactElement {
     [xcodeBitRateState],
   );
 
-  const onSelectSource = (
-    event: React.FormEvent<HTMLDivElement>,
-    option?: IDropdownOption,
-  ): void => {
-    if (isDefined(option) && chkTranscodeSource(option.key)) {
-      setSrcLocType(option.key);
-    }
-  };
+  const onSelectSource: DropdownProps['onOptionSelect'] = useCallback(
+    (_ev, data): void => {
+      const options = data.selectedOptions as TranscodeSource[];
+      setSelSrcLocTypes(options);
+      if (options.length > 0) {
+        setSrcLocType(options[0]);
+      } else {
+        setSrcLocType(TranscodeSource.Disk);
+      }
+    },
+    [setSelSrcLocTypes, setSrcLocType],
+  );
 
   // TODO: Create the element for the transcode source type (and populated it, if appropriate)
   let xcodeSrcLocElem;
@@ -166,12 +164,21 @@ export function TranscoderConfiguration(): ReactElement {
         Transcode (downsample) audio files into a particular directory.
       </Text>
       <div id="xcode-source-area">
-        <Dropdown
-          label="Music Source"
-          selectedKey={srcLocType}
-          onChange={onSelectSource}
-          options={sourceOptions}
-        />
+        <span>
+          <Label weight="semibold" htmlFor="srcLocType">
+            Music Source
+          </Label>
+          <Dropdown
+            value={sourceOptions.get(selSrcLocTypes[0])}
+            selectedOptions={selSrcLocTypes}
+            onOptionSelect={onSelectSource}>
+            {[...sourceOptions.entries()].map(([key, text]) => (
+              <Option value={key} text={text}>
+                {text}
+              </Option>
+            ))}
+          </Dropdown>
+        </span>
         {xcodeSrcLocElem}
       </div>
       <Label weight="semibold" htmlFor="dstLoc">
