@@ -2,7 +2,6 @@ import { ReactElement, useCallback, useState } from 'react';
 import { atom, useAtom, useAtomValue } from 'jotai';
 
 import {
-  DefaultButton,
   DetailsList,
   FontIcon,
   IDetailsHeaderProps,
@@ -70,8 +69,8 @@ import './styles/NowPlaying.css';
 
 const { wrn } = MakeLog('EMP:render:NowPlaying');
 
-// JODO: Why is this an atom, and not just local state?
-// I think it's used in some code that's been temporarily disabled.
+// This is Jotai and now React so that it's remembered if the pane is unmounted.
+// I think.
 const nowPlayingContextState = atom<SongListMenuData>({
   data: '',
   spot: { left: 0, top: 0 },
@@ -155,14 +154,15 @@ function TopLine(): ReactElement {
           nowrap={true}>
           {header}
         </Text>
-        <DefaultButton
+        <Button
+          appearance="primary"
           onClick={save}
           className="save-playlist"
           disabled={!saveEnabled}
           style={{ width: 120 }}
           title={GetHelperText(Keys.SavePlaylist)}>
           Save
-        </DefaultButton>
+        </Button>
       </div>
       <Separator styles={sepStyle} />
     </div>

@@ -29,7 +29,7 @@ import {
   xcodeBitRateState,
 } from '../../../State/Transcode';
 import { SendMain } from '../../../Tools/Ipc';
-import { ShowOpenDialog, StringSpinButton } from '../../../Tools/Utilities';
+import { ShowOpenDialog } from '../../../Tools/Utilities';
 import { Setter } from '../../../Types';
 import { ToggleSwitch } from '../Tools';
 import {

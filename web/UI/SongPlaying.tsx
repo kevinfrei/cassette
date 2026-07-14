@@ -34,7 +34,6 @@ import {
   mediaTimeRemainingState,
   mediaTimeState,
 } from '../State/TimeState';
-import { mySliderStyles } from '../Tools/Utilities';
 import { isValidRefObject } from '../Utils';
 import { SongDetailClick } from './DetailPanel/Clickers';
 import { onClickPlayPause } from './PlaybackControls';
