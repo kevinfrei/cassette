@@ -11,6 +11,8 @@ import { createRoot } from 'react-dom/client';
 import { Ready, WebSocketRegistrar } from './Tools/ReactWebSocket';
 import { App } from './UI/App';
 
+import './index.css';
+
 const elem = document.getElementById('root')!;
 
 const app = (

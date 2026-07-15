@@ -9,8 +9,9 @@ import {
   ScrollablePane,
   ScrollbarVisibility,
   SelectionMode,
-  Text,
 } from '@fluentui/react';
+import { List, ListItem, Text, TextProps } from '@fluentui/react-components';
+import { Group, Panel, Separator } from 'react-resizable-panels';
 import {
   ConfirmationDialog,
   MakeDialogApi,
@@ -118,6 +119,49 @@ function PlaylistHeaderDisplay({
 }
 
 export function PlaylistView(): ReactElement {
+  const [selected, setSelected] = useState('');
+  const playlistContents = useAtomValue(allPlaylistsState);
+  const playlistNames = [...playlistContents.keys()].sort();
+  const onPlaylistInvoked = useJotaiAsyncCallback(
+    async (get, _set, playlistName: PlaylistName) => {
+      const songs = await get(playlistStateFamily(playlistName));
+      PlaySongs(songs, playlistName).catch(wrn);
+    },
+    [],
+  );
+
+  const rightPanel = selected.length ? (
+    <div>
+      Playlist: {selected} with {playlistContents.get(selected)!.length} entries
+    </div>
+  ) : (
+    <Text>Select a playlist to see its contents</Text>
+  );
+
+  return (
+    <Group orientation="horizontal">
+      <Panel minSize={100}>
+        <List>
+          {playlistNames.map((name) => (
+            <ListItem key={name}>
+              <Text
+                size={400}
+                weight={selected === name ? 'semibold' : 'regular'}
+                onClick={() => setSelected(name)}
+                onDoubleClick={() => onPlaylistInvoked(name)}>
+                {name}
+              </Text>
+            </ListItem>
+          ))}
+        </List>
+      </Panel>
+      <Separator className="playlist-separator" />
+      <Panel>{rightPanel}</Panel>
+    </Group>
+  );
+}
+
+export function OldPlaylistView(): ReactElement {
   const [selected, setSelected] = useState('');
   const [songPlaylistToRemove, setSongPlaylistToRemove] = useState<
     [string, string, number]

@@ -125,7 +125,9 @@ void Execute(crow::response& resp, std::string_view path, Func&& handle_call) {
       }
     } catch (const std::exception& e) {
       // This should be a 500
-      tools::e404(resp, std::string("Internal Error: ") + e.what());
+      tools::e404(resp,
+                  std::string("Automated method invocation error for ") +
+                      std::string(path) + ": " + e.what());
     }
   };
 
