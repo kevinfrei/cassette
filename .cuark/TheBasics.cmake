@@ -19,6 +19,7 @@ if(MSVC)
     _CRT_SECURE_NO_WARNINGS
   )
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(_DEBUG)
     # Hey, look, a feature I worked on!
     set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT EditAndContinue)
     set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreadedDebug)
@@ -41,6 +42,7 @@ else()
   # For non-windows compilers, enable sanitizers and stuff
   add_compile_options(-Wpedantic -Wall -Wextra -pedantic)
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(_DEBUG)
     add_compile_options(-O0 -g) # -fsanitize=address,undefined -O0 -g)
     add_link_options(-O0 -g) # -fsanitize=address,undefined -O0 -g)
   else()

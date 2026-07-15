@@ -66,7 +66,7 @@
   "dependencies": {
     "@fluentui-contrib/react-data-grid-react-window": "^1.4.2",
     "@fluentui/react": "^8.125.7",
-    "@fluentui/react-components": "^9.74.3",
+    "@fluentui/react-components": "^9.74.4",
     "@fluentui/react-icons": "^2.0.333",
     "@freik/containers": "^0.4.10",
     "@freik/fluent9-tools": "^0.1.1",

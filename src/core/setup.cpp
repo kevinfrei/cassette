@@ -93,7 +93,11 @@ void init(int, const char* argv[]) {
 
   // Configure the server in a separate thread
   the_app = new crow::SimpleApp();
+#if defined(_DEBUG) || defined(DEBUG)
+  the_app->loglevel(crow::LogLevel::DEBUG);
+#else
   the_app->loglevel(crow::LogLevel::Warning);
+#endif
   configure_routes(*the_app, url);
   server_thread = new std::thread(server_thread_func);
   server_thread->detach(); // Allow it to run independently

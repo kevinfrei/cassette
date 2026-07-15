@@ -139,7 +139,9 @@ std::optional<std::vector<std::string>> get_names() {
   return names;
 }
 
-std::optional<std::vector<Shared::SongKey>> load(std::string_view name) {
+// Load a playlist from the given name. Return a vector of song keys if
+// successful, or std::nullopt if the playlist could not be loaded.
+std::optional<std::vector<Shared::SongKey>> load(const std::string& name) {
   auto path = config::get_playlist_path();
   auto file_path =
       path / files::file_name_encode(name).replace_extension(".tun");
@@ -173,7 +175,9 @@ std::optional<std::vector<Shared::SongKey>> load(std::string_view name) {
   return keys;
 }
 
-void save(std::string_view name, const std::vector<std::string_view>& keys) {
+// Save a playlist with the given name and list of song keys. Overwrites any
+// existing playlist with the same name.
+void save(const std::string& name, const std::vector<std::string>& keys) {
   CROW_LOG_INFO << "Saving playlist " << name << " with keys: ";
   for (const auto& key : keys) {
     CROW_LOG_INFO << "  " << key;

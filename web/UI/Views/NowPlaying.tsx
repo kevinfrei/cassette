@@ -97,7 +97,7 @@ function TopLine(): ReactElement {
         set(activePlaylistState, inputName);
       }
     },
-    [playlistStateFamily, activePlaylistState],
+    [playlistStateFamily, activePlaylistState, songListState],
   );
   const saveAsApi = MakeDialogApi(savePlaylistAsState, savePlaylistAs);
   const stopAndClear = useCallback(() => StopAndClear().catch(wrn), []);
