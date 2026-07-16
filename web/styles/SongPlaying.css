@@ -1,7 +1,8 @@
 @media (min-width: 500px) {
+  /* Top level container */
   #song-container {
     grid-row: 1;
-    grid-column: 3;
+    grid-column: 2;
     justify-self: stretch;
     align-self: center;
     margin: 0px 8px;

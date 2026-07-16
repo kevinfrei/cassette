@@ -66,13 +66,13 @@ export function ViewSelector(): ReactElement {
     contents.push([CurrentView.tools, <ToolsView />]);
   }
   return (
-    <>
+    <div id="cur-view-container">
       <PlaybackOrder />
       {contents.map(([view, elem]) => (
         <div key={view} className="current-view" style={vis(view)}>
           {elem}
         </div>
       ))}
-    </>
+    </div>
   );
 }

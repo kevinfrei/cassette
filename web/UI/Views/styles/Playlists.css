@@ -12,3 +12,14 @@
   justify-content: flex-start;
   align-items: center;
 }
+
+.playlist-separator {
+  background: linear-gradient(to right, #eee 0%, #333 45%, #333 55%, #eee 100%);
+  opacity: 0.2;
+  transition: opacity 0.2s;
+  width: 7px;
+}
+
+.playlist-separator:hover {
+  opacity: 0.8;
+}

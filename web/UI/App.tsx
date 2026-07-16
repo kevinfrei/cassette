@@ -1,7 +1,21 @@
-import { ReactElement, SyntheticEvent, useCallback, useRef } from 'react';
+import {
+  ReactElement,
+  SyntheticEvent,
+  useCallback,
+  useId,
+  useRef,
+  useState,
+} from 'react';
 import { Provider, useAtomValue, useSetAtom } from 'jotai';
 
 import { FluentProvider, webLightTheme } from '@fluentui/react-components';
+import {
+  Group,
+  Layout,
+  Panel,
+  Separator,
+  usePanelRef,
+} from 'react-resizable-panels';
 
 import { KeepAlive } from '../KeepAlive';
 import { useJotaiAsyncCallback } from '../State/Helpers';
@@ -63,7 +77,6 @@ function AudioElement({ audioRef }: AudioElementProps): ReactElement {
     },
     [setMediaTime],
   );
-  console.log('Auto element render');
   return (
     <audio
       src={songKey !== '' ? '/tune/' + songKey : ''}
@@ -77,19 +90,55 @@ function AudioElement({ audioRef }: AudioElementProps): ReactElement {
 }
 
 function TheActualApp(): ReactElement {
+  const panelRef = usePanelRef();
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [collapsed, setCollapsed] = useState(false);
+  const onLayoutChange = useCallback(() => {
+    if (panelRef && panelRef.current) {
+      const isCol = panelRef.current.isCollapsed();
+      if (isCol !== collapsed) {
+        setCollapsed(!collapsed);
+      }
+    }
+  }, [collapsed, setCollapsed, panelRef]);
+  const onToggle = useCallback(() => {
+    if (panelRef && panelRef.current) {
+      if (panelRef.current.isCollapsed()) {
+        panelRef.current.expand();
+      } else {
+        panelRef.current.collapse();
+      }
+    }
+  }, [panelRef]);
   return (
-    <div id="app">
+    <>
       <AudioElement audioRef={audioRef} />
-      <span id="left-column" />
-      <span id="top-row" />
-      <PlaybackControls audioRef={audioRef} />
-      <SongPlaying audioRef={audioRef} />
-      <VolumeControl audioRef={audioRef} />
-      <Sidebar />
-      <ViewSelector />
-      <div className="SongDetailPanel" />
-    </div>
+      <div id="app">
+        <PlaybackControls audioRef={audioRef} />
+        <SongPlaying audioRef={audioRef} />
+        <VolumeControl audioRef={audioRef} />
+        <div className="SongDetailPanel" />
+        <Group
+          id="view-and-content"
+          orientation="horizontal"
+          onLayoutChange={onLayoutChange}>
+          <Panel
+            panelRef={panelRef}
+            collapsible
+            collapsedSize={40}
+            minSize={140}
+            maxSize={140}
+            defaultSize={140}
+            style={{ display: 'flex' }}>
+            <Sidebar collapsed={collapsed} collapseToggle={onToggle} />
+          </Panel>
+          <Separator id="view-separator" />
+          <Panel style={{ display: 'flex' }}>
+            <ViewSelector />
+          </Panel>
+        </Group>
+      </div>
+    </>
   );
 }
 

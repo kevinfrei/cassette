@@ -39,29 +39,12 @@
     "br": "bun run dbr",
     "typecheck": "tsc --noEmit",
     "typechk": "tsc --noEmit",
+    "types": "tsc --noEmit",
     "***": "Generate the TypeScript & C++ types from the Crow IDL definitions",
     "gen": "crow-idl web/Shared/CuarkDefs.ts -c:src/ipc/CommonTypes.hpp -t:web/Shared/CommonTypes.ts -p:__last_cuark_",
     "*-*": "Helper to do OS-specific things",
     "os": "bun run .cuark/os.ts",
     "prepare": "bunx simple-git-hooks"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "bunx lint-staged",
-    "pre-push": "bun run test"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,json}": [
-      "prettier --write"
-    ],
-    "*.cmake": [
-      "passable -i"
-    ],
-    "CMakeLists.txt": [
-      "passable -i"
-    ],
-    "*.{cpp,hpp,c,h,cc,hh}": [
-      "clang-format -i"
-    ]
   },
   "dependencies": {
     "@fluentui-contrib/react-data-grid-react-window": "^1.4.2",
@@ -97,6 +80,24 @@
     "simple-git-hooks": "^2.13.1",
     "typescript": "^7.0.2"
   },
+  "simple-git-hooks": {
+    "pre-commit": "bunx lint-staged",
+    "pre-push": "bun run test"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": [
+      "prettier --write"
+    ],
+    "*.cmake": [
+      "passable -i"
+    ],
+    "CMakeLists.txt": [
+      "passable -i"
+    ],
+    "*.{cpp,hpp,c,h,cc,hh}": [
+      "clang-format -i"
+    ]
+  },
   "prettier": {
     "printWidth": 80,
     "trailingComma": "all",
@@ -106,14 +107,6 @@
     "useTabs": false,
     "bracketSameLine": true,
     "arrowParens": "always",
-    "overrides": [
-      {
-        "files": ".prettierrc",
-        "options": {
-          "parser": "json"
-        }
-      }
-    ],
     "plugins": [
       "@ianvs/prettier-plugin-sort-imports"
     ],

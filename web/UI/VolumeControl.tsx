@@ -41,7 +41,7 @@ export function VolumeControl({
     if (muted) void setMuted(false);
   }, []);
   return (
-    <span className="volume-container-win-linux" id="volume-container">
+    <span id="volume-container">
       <Button
         appearance="transparent"
         id={muted ? 'mute' : 'volIcon'}
@@ -50,7 +50,7 @@ export function VolumeControl({
         style={{ cursor: 'pointer' }}
       />
       <Slider
-        className="volume-slider"
+        id="volume-slider"
         min={0}
         max={1}
         value={volume}

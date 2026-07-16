@@ -139,8 +139,8 @@ export function PlaylistView(): ReactElement {
   );
 
   return (
-    <Group orientation="horizontal">
-      <Panel minSize={100}>
+    <Group orientation="horizontal" style={{ flex: 1 }}>
+      <Panel minSize={100} defaultSize={200}>
         <List>
           {playlistNames.map((name) => (
             <ListItem key={name}>

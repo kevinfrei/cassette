@@ -1,7 +1,12 @@
 import { ReactElement, useCallback } from 'react';
 import { useAtom } from 'jotai';
 
-import { FontIcon, SearchBox, Text } from '@fluentui/react';
+import { SearchBox, Text } from '@fluentui/react';
+import { Button } from '@fluentui/react-components';
+import {
+  ChevronLeft20Regular,
+  ChevronRight20Regular,
+} from '@fluentui/react-icons';
 import { hasStrField, isObjectNonNull } from '@freik/typechk';
 
 import { st } from '../Constants';
@@ -17,6 +22,7 @@ type ViewEntry = {
   name: CurrentView;
   title: StrId;
   accelerator: Keys;
+  file?: string;
 };
 
 const mkEntry = (name: CurrentView, title: StrId, accelerator: Keys) => ({
@@ -39,6 +45,7 @@ const views: (ViewEntry | null)[] = [
 ];
 
 function getEntry(
+  collapsed: boolean,
   curView: CurrentView,
   setCurView: (newView: CurrentView) => Promise<void> | void,
   view: ViewEntry | null,
@@ -58,7 +65,7 @@ function getEntry(
         &nbsp;
       </span>
       <Text variant="mediumPlus" className={`sidebar-text${extra}`}>
-        {st(view.title)}
+        {collapsed ? '' : st(view.title)}
       </Text>
     </div>
   );
@@ -78,7 +85,13 @@ export function isSearchBox(target: EventTarget | null): boolean {
   );
 }
 
-export function Sidebar(): ReactElement {
+export function Sidebar({
+  collapsed,
+  collapseToggle,
+}: {
+  collapsed: boolean;
+  collapseToggle: () => void;
+}): ReactElement {
   const [curView, setCurView] = useAtom(curViewState);
   const [searchTerm, setSearchTerm] = useAtom(searchTermState);
   const onSearch = useCallback(
@@ -89,18 +102,39 @@ export function Sidebar(): ReactElement {
     [setSearchTerm],
   );
   const onFocus = () => void setCurView(CurrentView.search);
+
   return (
     <div id="sidebar">
-      <SearchBox
-        placeholder="Search"
-        onSearch={onSearch}
-        onFocus={onFocus}
-        onChange={(e, nv) => nv && onSearch(nv)}
-        componentRef={(ref) => SetSearch(ref)}
-        title={GetHelperText(Keys.Find)}
-      />
-      <div style={{ height: 8 }} />
-      {views.map((ve, index) => getEntry(curView, setCurView, ve, index))}
+      <div id="sidebar-top">
+        {!collapsed && (
+          <>
+            <SearchBox
+              placeholder="Search"
+              onSearch={onSearch}
+              onFocus={onFocus}
+              onChange={(e, nv) => nv && onSearch(nv)}
+              componentRef={(ref) => SetSearch(ref)}
+              title={GetHelperText(Keys.Find)}
+            />
+            <div style={{ height: 8 }} />
+          </>
+        )}
+        {views.map((ve, index) =>
+          getEntry(collapsed, curView, setCurView, ve, index),
+        )}
+      </div>
+      <div id="sidebar-bottom">
+        <Button
+          id="sidebar-collapse"
+          onClick={collapseToggle}
+          appearance="subtle"
+          icon={
+            collapsed ? <ChevronRight20Regular /> : <ChevronLeft20Regular />
+          }
+          size="small"
+          style={{ float: 'right' }}
+        />
+      </div>
     </div>
   );
 }
