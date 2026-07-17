@@ -23,3 +23,12 @@
 .playlist-separator:hover {
   opacity: 0.8;
 }
+
+.playlist-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}

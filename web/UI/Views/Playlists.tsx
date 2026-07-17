@@ -10,7 +10,13 @@ import {
   ScrollbarVisibility,
   SelectionMode,
 } from '@fluentui/react';
-import { List, ListItem, Text, TextProps } from '@fluentui/react-components';
+import {
+  Button,
+  List,
+  ListItem,
+  Text,
+  TextProps,
+} from '@fluentui/react-components';
 import { Group, Panel, Separator } from 'react-resizable-panels';
 import {
   ConfirmationDialog,
@@ -47,6 +53,14 @@ import { SongListMenu, SongListMenuData } from '../../Tools/SongMenus';
 import { MakeSortKey } from '../../Tools/Sorting';
 
 import './styles/Playlists.css';
+
+import {
+  ArrowSort24Regular,
+  Delete16Regular,
+  Delete20Regular,
+  TextSortAscending24Regular,
+  TextSortDescending24Regular,
+} from '@fluentui/react-icons';
 
 const { wrn } = MakeLog('EMP:render:Playlists');
 wrn.enabled = true;
@@ -121,7 +135,16 @@ function PlaylistHeaderDisplay({
 export function PlaylistView(): ReactElement {
   const [selected, setSelected] = useState('');
   const playlistContents = useAtomValue(allPlaylistsState);
-  const playlistNames = [...playlistContents.keys()].sort();
+  const [ascending, setAscending] = useState(true);
+  const rawPlaylistNames = [...playlistContents.keys()];
+  const sortedNames = ascending
+    ? rawPlaylistNames.sort()
+    : rawPlaylistNames.sort().reverse();
+
+  const changeSort = useCallback(
+    () => setAscending(!ascending),
+    [ascending, setAscending],
+  );
   const onPlaylistInvoked = useJotaiAsyncCallback(
     async (get, _set, playlistName: PlaylistName) => {
       const songs = await get(playlistStateFamily(playlistName));
@@ -140,10 +163,31 @@ export function PlaylistView(): ReactElement {
 
   return (
     <Group orientation="horizontal" style={{ flex: 1 }}>
-      <Panel minSize={100} defaultSize={200}>
-        <List>
-          {playlistNames.map((name) => (
-            <ListItem key={name}>
+      <Panel minSize={125} defaultSize={150} style={{ overflowX: 'hidden' }}>
+        <Button
+          style={{
+            borderTopWidth: 0,
+            borderLeftWidth: 0,
+            borderRightWidth: 0,
+            borderColor: 'lightgray',
+            flex: 1,
+          }}
+          size="large"
+          icon={
+            ascending ? (
+              <TextSortAscending24Regular />
+            ) : (
+              <TextSortDescending24Regular />
+            )
+          }
+          appearance="subtle"
+          onClick={changeSort}>
+          Playlists
+        </Button>
+        <List style={{ flex: 1 }}>
+          {sortedNames.map((name) => (
+            <ListItem className="playlist-item" key={name}>
+              <Button icon={<Delete16Regular />} appearance="subtle" />
               <Text
                 size={400}
                 weight={selected === name ? 'semibold' : 'regular'}
