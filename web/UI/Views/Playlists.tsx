@@ -153,6 +153,17 @@ export function PlaylistView(): ReactElement {
     [],
   );
 
+  const onPlaylistDelete = useCallback((key: string) => {
+    setSelected(key);
+    deletePlaylistApi.openDialog();
+  }, []);
+  const deleteConfirmed = useCallback(
+    () => DeletePlaylist(selected),
+    [selected],
+  );
+  const deletePlaylistState = useBoolState(false);
+  const deletePlaylistApi = MakeDialogApi(deletePlaylistState, deleteConfirmed);
+
   const rightPanel = selected.length ? (
     <div>
       Playlist: {selected} with {playlistContents.get(selected)!.length} entries
@@ -164,6 +175,13 @@ export function PlaylistView(): ReactElement {
   return (
     <Group orientation="horizontal" style={{ flex: 1 }}>
       <Panel minSize={125} defaultSize={150} style={{ overflowX: 'hidden' }}>
+        <ConfirmationDialog
+          api={deletePlaylistApi}
+          title="Are you sure?"
+          text={`Do you really want to delete the playlist ${selected}?`}
+          yes="Delete"
+          no="Cancel"
+        />
         <Button
           style={{
             borderTopWidth: 0,
@@ -187,7 +205,11 @@ export function PlaylistView(): ReactElement {
         <List style={{ flex: 1 }}>
           {sortedNames.map((name) => (
             <ListItem className="playlist-item" key={name}>
-              <Button icon={<Delete16Regular />} appearance="subtle" />
+              <Button
+                icon={<Delete16Regular />}
+                appearance="subtle"
+                onClick={() => onPlaylistDelete(name)}
+              />
               <Text
                 size={400}
                 weight={selected === name ? 'semibold' : 'regular'}
