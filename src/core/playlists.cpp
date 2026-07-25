@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <filesystem>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -200,6 +201,14 @@ void save(const std::string& name, const std::vector<std::string>& keys) {
                      << " with key: " << key;
     }
   }
+}
+
+void remove(const std::string& name) {
+  CROW_LOG_INFO << "Deleting playlist " << name;
+  auto playlists = config::get_playlist_path();
+  auto file_path =
+      playlists / files::file_name_encode(name).replace_extension(".tun");
+  std::filesystem::remove(file_path);
 }
 
 } // namespace playlist

@@ -214,6 +214,7 @@ void initialize_default_apis() {
   register_route(Shared::IpcCall::GetPlaylists, playlist::get_names);
   register_route(Shared::IpcCall::LoadPlaylist, playlist::load);
   register_route(Shared::IpcCall::SavePlaylist, playlist::save);
+  register_route(Shared::IpcCall::DeletePlaylist, playlist::remove);
 }
 
 // The URL comes in looking like this:
