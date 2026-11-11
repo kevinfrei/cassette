@@ -1,6 +1,5 @@
 import { createStore } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
-import { AsyncStorage } from 'jotai/vanilla/utils/atomWithStorage';
 
 import {
   isDefined,
@@ -25,7 +24,7 @@ import {
   Unsubscribe,
   WriteToStorage,
 } from '../Tools/Ipc';
-import { WritableAtomType } from './StateTypes';
+import { AsyncStorage, WritableAtomType } from './StateTypes';
 
 const theStore = createStore();
 

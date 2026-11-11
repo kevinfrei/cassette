@@ -1,10 +1,15 @@
 import { atom, WritableAtom } from 'jotai';
-import { AsyncStorage, SyncStorage } from 'jotai/vanilla/utils/atomWithStorage';
 
 import { isFunction, isPromise } from '@freik/typechk';
 
 import { IpcCall } from '../Shared/CommonTypes';
-import { AsyncCallback, SyncCallback, Unsubscribe } from './StateTypes';
+import {
+  AsyncCallback,
+  AsyncStorage,
+  SyncCallback,
+  SyncStorage,
+  Unsubscribe,
+} from './StateTypes';
 
 type SetStateAction<Value> = Value | ((prev: Value) => Value);
 
